@@ -1259,17 +1259,36 @@
 
         // ---------- Force date combination on form submit ----------
         function combineDateInputsOnSubmit() {
+            console.log('=== COMBINING DATES ON SUBMIT ===');
+            
             // Force combine passing date
             const monthPassing = document.getElementById('month_of_passing');
             const dayPassing = document.getElementById('day_of_passing');
             const yearPassing = document.getElementById('year_of_passing');
             const datePassingHidden = document.getElementById('date_of_passing');
             
+            console.log('Passing date elements found:', {
+                month: !!monthPassing,
+                day: !!dayPassing,
+                year: !!yearPassing,
+                hidden: !!datePassingHidden
+            });
+            
             if (monthPassing && dayPassing && yearPassing && datePassingHidden) {
+                console.log('Passing date values:', {
+                    month: monthPassing.value,
+                    day: dayPassing.value,
+                    year: yearPassing.value
+                });
+                
                 if (monthPassing.value && dayPassing.value && yearPassing.value) {
                     datePassingHidden.value = `${yearPassing.value}-${monthPassing.value}-${dayPassing.value}`;
-                    console.log('Combined passing date:', datePassingHidden.value);
+                    console.log('✅ Combined passing date:', datePassingHidden.value);
+                } else {
+                    console.log('❌ Missing passing date values');
                 }
+            } else {
+                console.log('❌ Missing passing date elements');
             }
             
             // Force combine birth date
@@ -1278,12 +1297,31 @@
             const yearBirth = document.getElementById('year_of_birth');
             const dateBirthHidden = document.getElementById('date_of_birth');
             
+            console.log('Birth date elements found:', {
+                month: !!monthBirth,
+                day: !!dayBirth,
+                year: !!yearBirth,
+                hidden: !!dateBirthHidden
+            });
+            
             if (monthBirth && dayBirth && yearBirth && dateBirthHidden) {
+                console.log('Birth date values:', {
+                    month: monthBirth.value,
+                    day: dayBirth.value,
+                    year: yearBirth.value
+                });
+                
                 if (monthBirth.value && dayBirth.value && yearBirth.value) {
                     dateBirthHidden.value = `${yearBirth.value}-${monthBirth.value}-${dayBirth.value}`;
-                    console.log('Combined birth date:', dateBirthHidden.value);
+                    console.log('✅ Combined birth date:', dateBirthHidden.value);
+                } else {
+                    console.log('❌ Missing birth date values');
                 }
+            } else {
+                console.log('❌ Missing birth date elements');
             }
+            
+            console.log('=== DATE COMBINATION COMPLETE ===');
         }
 
         // ---------- Hook into the Webflow form AFTER Webflow loads ----------
@@ -1320,6 +1358,15 @@
                 
                 const payload = Object.fromEntries(new FormData(form).entries());
                 console.log('Form payload:', payload);
+                console.log('Date fields check:');
+                console.log('- date_of_birth:', payload.date_of_birth);
+                console.log('- date_of_passing:', payload.date_of_passing);
+                console.log('- month_of_birth:', payload.month_of_birth);
+                console.log('- day_of_birth:', payload.day_of_birth);
+                console.log('- year_of_birth:', payload.year_of_birth);
+                console.log('- month_of_passing:', payload.month_of_passing);
+                console.log('- day_of_passing:', payload.day_of_passing);
+                console.log('- year_of_passing:', payload.year_of_passing);
                 
                 try {
                     console.log('Fetching from:', ENDPOINT);
