@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <title>MEMORIO FORMS</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
+  <!-- Preload Dosis font to prevent FOUC -->
+  <link rel="preload" href="fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/webflow.css" rel="stylesheet" type="text/css">
   <link href="css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
@@ -1255,6 +1257,35 @@
             }
         }
 
+        // ---------- Force date combination on form submit ----------
+        function combineDateInputsOnSubmit() {
+            // Force combine passing date
+            const monthPassing = document.getElementById('month_of_passing');
+            const dayPassing = document.getElementById('day_of_passing');
+            const yearPassing = document.getElementById('year_of_passing');
+            const datePassingHidden = document.getElementById('date_of_passing');
+            
+            if (monthPassing && dayPassing && yearPassing && datePassingHidden) {
+                if (monthPassing.value && dayPassing.value && yearPassing.value) {
+                    datePassingHidden.value = `${yearPassing.value}-${monthPassing.value}-${dayPassing.value}`;
+                    console.log('Combined passing date:', datePassingHidden.value);
+                }
+            }
+            
+            // Force combine birth date
+            const monthBirth = document.getElementById('month_of_birth');
+            const dayBirth = document.getElementById('day_of_birth');
+            const yearBirth = document.getElementById('year_of_birth');
+            const dateBirthHidden = document.getElementById('date_of_birth');
+            
+            if (monthBirth && dayBirth && yearBirth && dateBirthHidden) {
+                if (monthBirth.value && dayBirth.value && yearBirth.value) {
+                    dateBirthHidden.value = `${yearBirth.value}-${monthBirth.value}-${dayBirth.value}`;
+                    console.log('Combined birth date:', dateBirthHidden.value);
+                }
+            }
+        }
+
         // ---------- Hook into the Webflow form AFTER Webflow loads ----------
         (function() {
             injectStyles();
@@ -1277,6 +1308,9 @@
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('Form submitted - our handler');
+                
+                // Ensure date fields are combined before submission
+                combineDateInputsOnSubmit();
                 
                 // Swap to success area immediately, then mount loader UI so it shows right away
                 form.style.display = 'none';
