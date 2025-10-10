@@ -45,6 +45,13 @@ jspm_packages/
 
 # dotenv environment variables file
 .env
+.env.local
+.env.*.local
+
+# Supabase
+.supabase/
+supabase/.branches/
+supabase/.temp/
 
 # IDE files
 .vscode/
