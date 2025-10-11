@@ -1,66 +1,4 @@
 
----
-
-## Step 4: Install Supabase CLI (1 min)
-
-```bash
-npm install -g supabase
-supabase login
-```
-
-Follow the browser prompt to authenticate.
-
----
-
-## Step 5: Link Project & Deploy Schema (2 min)
-
-```bash
-# Initialize Supabase in your project
-supabase init
-
-# Link to your remote project
-supabase link --project-ref your-project-ref
-# (Find project-ref in Supabase dashboard URL)
-
-# Push all database migrations
-supabase db push
-```
-
-**Expected output:**
-```
-✔ Finished supabase db push on branch main
-```
-
----
-
-## Step 6: Configure Storage Bucket (2 min)
-
-### Via Supabase Dashboard:
-
-1. Go to **Storage** → **Create Bucket**
-2. Settings:
-   - **Name:** `case-assets`
-   - **Public:** No (private)
-   - **File size limit:** 50 MB
-3. Click **"Create"**
-
-### Set Bucket Policies:
-
-Go to **Storage** → `case-assets` → **Policies** → **"New Policy"**
-
-**Quick Policy (Admin access):**
-```sql
-CREATE POLICY "Admins full access"
-ON storage.objects FOR ALL
-USING (
-  bucket_id = 'case-assets' AND
-  auth.jwt() ->> 'role' = 'admin'
-);
-```
-
-*(For complete policies, see `docs/supabase-setup-guide.md`)*
-
----
 
 ## Step 7: Create Test Accounts (2 min)
 
@@ -158,20 +96,7 @@ python3 -m http.server 8000
 # Fill out the form and verify N8N integration still works
 ```
 
-### Explore the Database:
 
-1. Go to **Supabase Dashboard** → **Table Editor**
-2. Browse the 9 tables
-3. Try inserting/updating data as different roles
-
-### Read the Docs:
-
-- **Schema Reference:** `docs/database-schema.md`
-- **Security Guide:** `docs/security-policies.md`
-- **Complete Setup:** `docs/supabase-setup-guide.md`
-- **Validation Tests:** `docs/validation-checklist.md`
-
----
 
 ## Troubleshooting
 
@@ -203,12 +128,6 @@ Before going live:
 - [ ] Set up monitoring/alerting
 
 ---
-
-## Need Help?
-
-- **Documentation:** Check `docs/` folder
-- **Supabase Docs:** https://supabase.com/docs
-- **Validation Tests:** `docs/validation-checklist.md`
 
 ---
 
