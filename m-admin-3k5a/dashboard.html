@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin Dashboard - Memorio</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <!-- Preload Dosis font -->
+  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link href="../css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="../css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
+  <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="../images/webclip.png" rel="apple-touch-icon">
+  
+  <style>
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 72px;
+    }
+    
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    
+    .dashboard-title {
+      color: #32343a;
+      font-size: 32px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .logout-btn {
+      color: #32343a;
+      background-color: transparent;
+      border: 1.35px solid #32343a;
+      border-radius: 60px;
+      padding: 11px 18px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .logout-btn:hover {
+      background-color: #32343a;
+      color: #f2eadd;
+    }
+    
+    .invite-section {
+      background-color: #fff3e9;
+      border: 3px solid #436481;
+      border-radius: 20px;
+      padding: 48px;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+    }
+    
+    .section-title {
+      color: #32343a;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-row-single {
+      margin-bottom: 20px;
+    }
+    
+    .success-box {
+      background-color: #e8f5e9;
+      border: 2px solid #66bb6a;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .success-box h3 {
+      color: #2e7d32;
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+    
+    .credential-box {
+      background-color: #f4e8de;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    
+    .credential-label {
+      color: #33333373;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+    
+    .credential-value {
+      color: #32343a;
+      font-size: 18px;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    
+    .copy-btn {
+      background-color: #32343a;
+      color: #f2eadd;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    
+    .copy-btn:hover {
+      background-color: #6ca7d3;
+    }
+    
+    .error-box {
+      background-color: #ffebee;
+      border: 2px solid #ef5350;
+      border-radius: 10px;
+      padding: 15px;
+      color: #c62828;
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+    }
+  </style>
+  
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="body">
+  <!-- Nav -->
+  <div class="nav">
+    <div class="logo-wrapper">
+      <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
+           loading="lazy" 
+           width="166" 
+           alt="Memorio Logo" 
+           srcset="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w">
+    </div>
+  </div>
+
+  <!-- Dashboard Container -->
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Admin Dashboard</h1>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+    </div>
+
+    <!-- Invite Director Section -->
+    <div class="invite-section">
+      <h2 class="section-title">Invite Director</h2>
+      <p class="paragraph">Create a new Director account for a funeral home. The credentials will be displayed below for you to share securely.</p>
+      
+      <form id="invite-form">
+        <div class="form-row">
+          <div>
+            <label for="director-email" class="field-label">Email Address*</label>
+            <input 
+              class="text-field w-input" 
+              type="email" 
+              id="director-email" 
+              placeholder="director@funeralhome.com" 
+              required>
+          </div>
+          
+          <div>
+            <label for="director-name" class="field-label">Full Name*</label>
+            <input 
+              class="text-field w-input" 
+              type="text" 
+              id="director-name" 
+              placeholder="John Director" 
+              required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div>
+            <label for="director-phone" class="field-label">Phone Number</label>
+            <input 
+              class="text-field w-input" 
+              type="tel" 
+              id="director-phone" 
+              placeholder="+1-555-0123">
+          </div>
+          
+          <div>
+            <label for="org-id" class="field-label">Organization ID*</label>
+            <input 
+              class="text-field w-input" 
+              type="text" 
+              id="org-id" 
+              placeholder="00000000-0000-0000-0000-000000000001" 
+              required>
+          </div>
+        </div>
+        
+        <div class="form-button" style="margin-top: 20px;">
+          <button type="submit" class="button-primary w-button" id="invite-btn">
+            CREATE DIRECTOR ACCOUNT
+          </button>
+        </div>
+      </form>
+      
+      <!-- Success Box -->
+      <div id="success-box" class="success-box">
+        <h3>✅ Director Account Created Successfully!</h3>
+        <p>Share these credentials with the Director securely. They should change their password after first login.</p>
+        
+        <div class="credential-box">
+          <div class="credential-label">Email Address</div>
+          <div class="credential-value" id="created-email"></div>
+          <button class="copy-btn" onclick="copyToClipboard('created-email')">Copy</button>
+        </div>
+        
+        <div class="credential-box">
+          <div class="credential-label">Temporary Password</div>
+          <div class="credential-value" id="created-password"></div>
+          <button class="copy-btn" onclick="copyToClipboard('created-password')">Copy</button>
+        </div>
+        
+        <div class="credential-box">
+          <div class="credential-label">Login URL</div>
+          <div class="credential-value">https://memorio.ai/m-director-9m6z/login.html</div>
+          <button class="copy-btn" onclick="copyToClipboard('login-url')">Copy</button>
+        </div>
+      </div>
+      
+      <!-- Error Box -->
+      <div id="error-box" class="error-box"></div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Supabase client
+    const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MTcwNDcsImV4cCI6MjA1MDI5MzA0N30.9OsX8j7vQY5uHXzNnKPnR5pLZNpKNLjdLPxGEtShBhY';
+    
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Check if user is logged in and is admin
+    async function checkAuth() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      
+      if (!session) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Verify admin role
+      const { data: userData, error } = await supabaseClient
+        .from('users')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (error || !userData || userData.role !== 'admin') {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'login.html';
+      }
+    }
+    
+    // Run auth check on page load
+    checkAuth();
+    
+    // Logout handler
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    });
+    
+    // Handle invite form submission
+    document.getElementById('invite-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('director-email').value;
+      const name = document.getElementById('director-name').value;
+      const phone = document.getElementById('director-phone').value;
+      const orgId = document.getElementById('org-id').value;
+      
+      const inviteBtn = document.getElementById('invite-btn');
+      const successBox = document.getElementById('success-box');
+      const errorBox = document.getElementById('error-box');
+      const inviteSection = document.querySelector('.invite-section');
+      
+      // Hide previous messages
+      successBox.style.display = 'none';
+      errorBox.style.display = 'none';
+      
+      // Disable form during submission
+      inviteSection.classList.add('loading');
+      inviteBtn.disabled = true;
+      inviteBtn.textContent = 'CREATING ACCOUNT...';
+      
+      try {
+        // Get current session token
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (!session) {
+          throw new Error('Not authenticated');
+        }
+        
+        // Call invite-director Edge Function
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-director`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            email,
+            name,
+            org_id: orgId,
+            phone: phone || undefined
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'Failed to create director account');
+        }
+        
+        // Display success with credentials
+        document.getElementById('created-email').textContent = result.data.email;
+        document.getElementById('created-password').textContent = result.data.temp_password;
+        successBox.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('invite-form').reset();
+        
+      } catch (error) {
+        errorBox.textContent = `Error: ${error.message}`;
+        errorBox.style.display = 'block';
+      } finally {
+        inviteSection.classList.remove('loading');
+        inviteBtn.disabled = false;
+        inviteBtn.textContent = 'CREATE DIRECTOR ACCOUNT';
+      }
+    });
+    
+    // Copy to clipboard function
+    function copyToClipboard(elementId) {
+      let text;
+      if (elementId === 'login-url') {
+        text = 'https://memorio.ai/m-director-9m6z/login.html';
+      } else {
+        text = document.getElementById(elementId).textContent;
+      }
+      
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 2000);
+      });
+    }
+    
+    // Make copy function global
+    window.copyToClipboard = copyToClipboard;
+  </script>
+</body>
+</html>
+
