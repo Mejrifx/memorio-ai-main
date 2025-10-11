@@ -137,9 +137,8 @@ serve(async (req) => {
         }
       });
 
-    // Send invitation email via Supabase
-    // Note: In production, configure custom email templates in Supabase Dashboard
-    // For now, we'll log the credentials
+    // Note: Email integration will be added later
+    // For now, credentials are returned in the response for the Admin to share manually
     console.log(`Director invited: ${email} / ${tempPassword}`);
 
     const response: ApiResponse = {

@@ -165,8 +165,8 @@ serve(async (req) => {
         }
       });
 
-    // Send invitation email
-    // Note: Configure custom email templates in Supabase Dashboard
+    // Note: Email integration will be added later
+    // For now, magic link is returned in the response for the Director to share manually
     console.log(`Family invited: ${email} for case ${case_id}`);
     console.log(`Magic link: ${magicLink}`);
 
