@@ -146,6 +146,73 @@
       pointer-events: none;
     }
     
+    .tab-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .tab-btn {
+      padding: 12px 24px;
+      background-color: transparent;
+      border: 2px solid #32343a;
+      border-radius: 60px;
+      color: #32343a;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .tab-btn.active {
+      background-color: #32343a;
+      color: #f2eadd;
+    }
+    
+    .tab-btn:hover {
+      background-color: #32343a;
+      color: #f2eadd;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .org-card {
+      background-color: #f4e8de;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .org-card-name {
+      color: #32343a;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .org-card-detail {
+      color: #33333373;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    
+    .org-card-id {
+      background-color: #fff3e9;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      word-break: break-all;
+    }
+    
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -155,6 +222,10 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
+      }
+      
+      .tab-container {
+        flex-direction: column;
       }
     }
   </style>
@@ -182,6 +253,104 @@
       <button class="logout-btn" id="logout-btn">Logout</button>
     </div>
 
+    <!-- Tabs -->
+    <div class="tab-container" style="display: flex; gap: 10px; margin-bottom: 30px;">
+      <button class="tab-btn active" onclick="switchTab('organizations')">Organizations</button>
+      <button class="tab-btn" onclick="switchTab('invite-director')">Invite Director</button>
+    </div>
+
+    <!-- Organizations Tab -->
+    <div id="organizations-tab" class="tab-content active">
+      <div class="invite-section">
+        <h2 class="section-title">Create New Organization</h2>
+        <p class="paragraph">Add a new funeral home to the Memorio platform. Each organization can have multiple Directors and manage their own cases.</p>
+        
+        <form id="create-org-form">
+          <div class="form-row">
+            <div>
+              <label for="org-name" class="field-label">Organization Name*</label>
+              <input 
+                class="text-field w-input" 
+                type="text" 
+                id="org-name" 
+                placeholder="Smith Family Funeral Home" 
+                required>
+            </div>
+            
+            <div>
+              <label for="org-email" class="field-label">Contact Email*</label>
+              <input 
+                class="text-field w-input" 
+                type="email" 
+                id="org-email" 
+                placeholder="contact@smithfuneral.com" 
+                required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div>
+              <label for="org-phone" class="field-label">Contact Phone</label>
+              <input 
+                class="text-field w-input" 
+                type="tel" 
+                id="org-phone" 
+                placeholder="+1-555-0123">
+            </div>
+            
+            <div>
+              <label for="org-region" class="field-label">Region</label>
+              <input 
+                class="text-field w-input" 
+                type="text" 
+                id="org-region" 
+                placeholder="New York, NY">
+            </div>
+          </div>
+          
+          <div class="form-button" style="margin-top: 20px;">
+            <button type="submit" class="button-primary w-button" id="create-org-btn">
+              CREATE ORGANIZATION
+            </button>
+          </div>
+        </form>
+        
+        <!-- Success Box -->
+        <div id="org-success-box" class="success-box">
+          <h3>✅ Organization Created Successfully!</h3>
+          <p>Use this Organization ID when inviting Directors for this funeral home.</p>
+          
+          <div class="credential-box">
+            <div class="credential-label">Organization Name</div>
+            <div class="credential-value" id="created-org-name"></div>
+          </div>
+          
+          <div class="credential-box">
+            <div class="credential-label">Organization ID (use this when inviting Directors)</div>
+            <div class="credential-value" id="created-org-id"></div>
+            <button class="copy-btn" onclick="copyToClipboard('created-org-id')">Copy ID</button>
+          </div>
+        </div>
+        
+        <!-- Error Box -->
+        <div id="org-error-box" class="error-box"></div>
+      </div>
+
+      <!-- Existing Organizations List -->
+      <div class="invite-section" style="margin-top: 40px;">
+        <h2 class="section-title">Existing Organizations</h2>
+        <p class="paragraph">All funeral homes registered in Memorio. Copy the Organization ID to use when inviting Directors.</p>
+        
+        <div id="organizations-list" style="margin-top: 20px;">
+          <!-- Organizations will be loaded here -->
+        </div>
+        
+        <div id="org-list-error-box" class="error-box"></div>
+      </div>
+    </div>
+
+    <!-- Invite Director Tab -->
+    <div id="invite-director-tab" class="tab-content">
     <!-- Invite Director Section -->
     <div class="invite-section">
       <h2 class="section-title">Invite Director</h2>
@@ -265,6 +434,7 @@
       <!-- Error Box -->
       <div id="error-box" class="error-box"></div>
     </div>
+    </div>
   </div>
 
   <script>
@@ -300,11 +470,39 @@
     // Run auth check on page load
     checkAuth();
     
+    // Load organizations on page load
+    loadOrganizations();
+    
     // Logout handler
     document.getElementById('logout-btn').addEventListener('click', async () => {
       await supabaseClient.auth.signOut();
       window.location.href = 'login.html';
     });
+    
+    // Tab switching
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Remove active class from all buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      event.target.classList.add('active');
+      
+      // Load organizations if switching to organizations tab
+      if (tabName === 'organizations') {
+        loadOrganizations();
+      }
+    }
+    
+    // Make switchTab global
+    window.switchTab = switchTab;
     
     // Handle invite form submission
     document.getElementById('invite-form').addEventListener('submit', async (e) => {
@@ -376,6 +574,128 @@
         inviteBtn.textContent = 'CREATE DIRECTOR ACCOUNT';
       }
     });
+    
+    // Handle create organization form submission
+    document.getElementById('create-org-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('org-name').value;
+      const email = document.getElementById('org-email').value;
+      const phone = document.getElementById('org-phone').value;
+      const region = document.getElementById('org-region').value;
+      
+      const createBtn = document.getElementById('create-org-btn');
+      const successBox = document.getElementById('org-success-box');
+      const errorBox = document.getElementById('org-error-box');
+      const section = e.target.closest('.invite-section');
+      
+      // Hide previous messages
+      successBox.style.display = 'none';
+      errorBox.style.display = 'none';
+      
+      // Disable form during submission
+      section.classList.add('loading');
+      createBtn.disabled = true;
+      createBtn.textContent = 'CREATING ORGANIZATION...';
+      
+      try {
+        // Insert organization into database
+        const { data, error } = await supabaseClient
+          .from('organizations')
+          .insert({
+            name: name,
+            contact_email: email,
+            contact_phone: phone || null,
+            region: region || null,
+            status: 'active'
+          })
+          .select()
+          .single();
+        
+        if (error) {
+          throw new Error(error.message);
+        }
+        
+        // Display success with organization ID
+        document.getElementById('created-org-name').textContent = data.name;
+        document.getElementById('created-org-id').textContent = data.id;
+        successBox.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('create-org-form').reset();
+        
+        // Reload organizations list
+        loadOrganizations();
+        
+      } catch (error) {
+        errorBox.textContent = `Error: ${error.message}`;
+        errorBox.style.display = 'block';
+      } finally {
+        section.classList.remove('loading');
+        createBtn.disabled = false;
+        createBtn.textContent = 'CREATE ORGANIZATION';
+      }
+    });
+    
+    // Load organizations list
+    async function loadOrganizations() {
+      const orgsList = document.getElementById('organizations-list');
+      const errorBox = document.getElementById('org-list-error-box');
+      
+      errorBox.style.display = 'none';
+      orgsList.innerHTML = '<p class="paragraph">Loading organizations...</p>';
+      
+      try {
+        const { data: orgs, error } = await supabaseClient
+          .from('organizations')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        if (!orgs || orgs.length === 0) {
+          orgsList.innerHTML = '<p class="paragraph">No organizations found. Create your first one above!</p>';
+          return;
+        }
+        
+        orgsList.innerHTML = orgs.map(org => `
+          <div class="org-card">
+            <div class="org-card-name">${org.name}</div>
+            <div class="org-card-detail">📧 ${org.contact_email}</div>
+            ${org.contact_phone ? `<div class="org-card-detail">📞 ${org.contact_phone}</div>` : ''}
+            ${org.region ? `<div class="org-card-detail">📍 ${org.region}</div>` : ''}
+            <div class="org-card-detail" style="margin-top: 10px;">Created: ${new Date(org.created_at).toLocaleDateString()}</div>
+            <div class="org-card-id">
+              <div class="credential-label">Organization ID (copy this when inviting Directors)</div>
+              <div class="credential-value" id="org-${org.id}" style="color: #32343a; margin-top: 5px;">${org.id}</div>
+              <button class="copy-btn" onclick="copyOrgId('org-${org.id}')">Copy ID</button>
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        errorBox.textContent = `Error loading organizations: ${error.message}`;
+        errorBox.style.display = 'block';
+        orgsList.innerHTML = '';
+      }
+    }
+    
+    // Copy organization ID
+    function copyOrgId(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 2000);
+      });
+    }
+    
+    // Make copyOrgId global
+    window.copyOrgId = copyOrgId;
     
     // Copy to clipboard function
     function copyToClipboard(elementId) {
