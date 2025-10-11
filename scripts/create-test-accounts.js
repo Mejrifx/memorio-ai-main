@@ -159,14 +159,32 @@ async function createSampleCase() {
   console.log('\n📁 Creating sample case...');
 
   try {
+    // Get the actual director user ID from the users table
+    const { data: directorUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', 'director@testfuneralhome.com')
+      .single();
+
+    const { data: familyUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', 'family@example.com')
+      .single();
+
+    if (!directorUser || !familyUser) {
+      console.log('   ⚠️  Could not find director or family user, skipping case creation');
+      return;
+    }
+
     const { data, error } = await supabase
       .from('cases')
       .insert({
         id: 'c0000000-0000-0000-0000-000000000001',
         org_id: TEST_ORG_ID,
         deceased_name: 'John Doe',
-        created_by: '20000000-0000-0000-0000-000000000001', // Director
-        assigned_family_user_id: '30000000-0000-0000-0000-000000000001', // Family
+        created_by: directorUser.id, // Use actual director ID
+        assigned_family_user_id: familyUser.id, // Use actual family ID
         status: 'waiting_on_family',
         metadata: {
           service_date: '2025-10-15',
