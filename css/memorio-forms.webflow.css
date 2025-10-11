@@ -40,9 +40,13 @@ body {
 .nav {
   justify-content: center;
   align-items: center;
-  padding-top: 40px;
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   display: flex;
+}
+
+.logo-wrapper {
+  transform: translateY(30px);
 }
 
 .hero-container {
