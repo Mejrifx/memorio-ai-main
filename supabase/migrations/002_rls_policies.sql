@@ -360,4 +360,3 @@ CREATE POLICY "Support read all exports"
 -- COMPLETION
 -- ============================================================================
 COMMENT ON SCHEMA public IS 'Memorio RLS policies v1.0.0 - Multi-tenant security enabled';
-

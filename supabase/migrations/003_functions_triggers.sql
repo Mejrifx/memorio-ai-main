@@ -241,4 +241,3 @@ END $$;
 -- COMPLETION
 -- ============================================================================
 COMMENT ON SCHEMA public IS 'Memorio functions & triggers v1.0.0 - Automation enabled';
-

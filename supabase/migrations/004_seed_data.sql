@@ -55,4 +55,3 @@ ON CONFLICT (id) DO NOTHING;
 -- COMPLETION
 -- ============================================================================
 COMMENT ON SCHEMA public IS 'Memorio seed data v1.0.0 - Test organization created';
-

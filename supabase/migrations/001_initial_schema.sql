@@ -234,4 +234,3 @@ CREATE INDEX idx_exports_created_at ON exports(created_at DESC);
 -- COMPLETION
 -- ============================================================================
 COMMENT ON SCHEMA public IS 'Memorio database schema v1.0.0 - Initial migration completed';
-
