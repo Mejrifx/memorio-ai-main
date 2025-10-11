@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Director Portal - Memorio</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <!-- Preload Dosis font -->
+  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link href="../css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="../css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
+  <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="../images/webclip.png" rel="apple-touch-icon">
+  
+  <style>
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 72px;
+    }
+    
+    .login-box {
+      background-color: #fff3e9;
+      border: 3px solid #436481;
+      border-radius: 20px;
+      padding: 48px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+    }
+    
+    .login-title {
+      color: #32343a;
+      text-align: center;
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .login-subtitle {
+      color: #32343a;
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+    
+    .error-message {
+      background-color: #ffebee;
+      border: 1px solid #ef5350;
+      border-radius: 5px;
+      padding: 12px;
+      color: #c62828;
+      margin-bottom: 20px;
+      display: none;
+      text-align: center;
+    }
+    
+    .success-message-box {
+      background-color: #e8f5e9;
+      border: 1px solid #66bb6a;
+      border-radius: 5px;
+      padding: 12px;
+      color: #2e7d32;
+      margin-bottom: 20px;
+      display: none;
+      text-align: center;
+    }
+  </style>
+  
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="body">
+  <!-- Nav -->
+  <div class="nav">
+    <div class="logo-wrapper">
+      <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
+           loading="lazy" 
+           width="166" 
+           alt="Memorio Logo" 
+           srcset="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w">
+    </div>
+  </div>
+
+  <!-- Login Container -->
+  <div class="login-container">
+    <div class="login-box">
+      <h1 class="login-title">Director Portal</h1>
+      <p class="login-subtitle">Sign in to manage cases</p>
+      
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message-box"></div>
+      
+      <form id="login-form">
+        <div class="form-fields">
+          <label for="email" class="field-label">Email Address</label>
+          <input 
+            class="text-field w-input" 
+            type="email" 
+            id="email" 
+            name="email" 
+            placeholder="director@funeralhome.com" 
+            required>
+          
+          <label for="password" class="field-label">Password</label>
+          <input 
+            class="text-field w-input" 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="Enter your password" 
+            required>
+        </div>
+        
+        <div class="form-button" style="margin-top: 30px;">
+          <button type="submit" class="button-primary w-button" id="login-btn">
+            SIGN IN
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Supabase client
+    const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MTcwNDcsImV4cCI6MjA1MDI5MzA0N30.9OsX8j7vQY5uHXzNnKPnR5pLZNpKNLjdLPxGEtShBhY';
+    
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Handle login form submission
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const loginBtn = document.getElementById('login-btn');
+      const errorMsg = document.getElementById('error-message');
+      const successMsg = document.getElementById('success-message');
+      
+      // Hide previous messages
+      errorMsg.style.display = 'none';
+      successMsg.style.display = 'none';
+      
+      // Disable button during login
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'SIGNING IN...';
+      
+      try {
+        // Sign in with Supabase Auth
+        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (authError) {
+          throw new Error(authError.message);
+        }
+        
+        // Get user metadata to check role
+        const { data: userData, error: userError } = await supabaseClient
+          .from('users')
+          .select('role, org_id, metadata')
+          .eq('id', authData.user.id)
+          .single();
+        
+        if (userError || !userData) {
+          throw new Error('Failed to fetch user data');
+        }
+        
+        // Check if user is director
+        if (userData.role !== 'director') {
+          await supabaseClient.auth.signOut();
+          throw new Error('Access denied. Director role required.');
+        }
+        
+        // Success - redirect to dashboard
+        successMsg.textContent = 'Login successful! Redirecting...';
+        successMsg.style.display = 'block';
+        
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1000);
+        
+      } catch (error) {
+        errorMsg.textContent = error.message || 'An error occurred during login';
+        errorMsg.style.display = 'block';
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'SIGN IN';
+      }
+    });
+  </script>
+</body>
+</html>
+

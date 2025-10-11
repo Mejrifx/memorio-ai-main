@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Director Dashboard - Memorio</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <!-- Preload Dosis font -->
+  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link href="../css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="../css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
+  <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="../images/webclip.png" rel="apple-touch-icon">
+  
+  <style>
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 72px;
+    }
+    
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    
+    .dashboard-title {
+      color: #32343a;
+      font-size: 32px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .logout-btn {
+      color: #32343a;
+      background-color: transparent;
+      border: 1.35px solid #32343a;
+      border-radius: 60px;
+      padding: 11px 18px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .logout-btn:hover {
+      background-color: #32343a;
+      color: #f2eadd;
+    }
+    
+    .action-section {
+      background-color: #fff3e9;
+      border: 3px solid #436481;
+      border-radius: 20px;
+      padding: 48px;
+      margin-bottom: 40px;
+      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+    }
+    
+    .section-title {
+      color: #32343a;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-row-single {
+      margin-bottom: 20px;
+    }
+    
+    .success-box {
+      background-color: #e8f5e9;
+      border: 2px solid #66bb6a;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .success-box h3 {
+      color: #2e7d32;
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+    
+    .credential-box {
+      background-color: #f4e8de;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+    
+    .credential-label {
+      color: #33333373;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+    
+    .credential-value {
+      color: #32343a;
+      font-size: 18px;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    
+    .copy-btn {
+      background-color: #32343a;
+      color: #f2eadd;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    
+    .copy-btn:hover {
+      background-color: #6ca7d3;
+    }
+    
+    .error-box {
+      background-color: #ffebee;
+      border: 2px solid #ef5350;
+      border-radius: 10px;
+      padding: 15px;
+      color: #c62828;
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .tab-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .tab-btn {
+      padding: 12px 24px;
+      background-color: transparent;
+      border: 2px solid #32343a;
+      border-radius: 60px;
+      color: #32343a;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .tab-btn.active {
+      background-color: #32343a;
+      color: #f2eadd;
+    }
+    
+    .tab-btn:hover {
+      background-color: #32343a;
+      color: #f2eadd;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .case-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .case-card {
+      background-color: #f4e8de;
+      border-radius: 10px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .case-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+    }
+    
+    .case-name {
+      color: #32343a;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .case-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    
+    .status-created {
+      background-color: #fff3e0;
+      color: #e65100;
+    }
+    
+    .status-waiting {
+      background-color: #e3f2fd;
+      color: #01579b;
+    }
+    
+    .status-submitted {
+      background-color: #e8f5e9;
+      color: #1b5e20;
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      
+      .tab-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+  
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="body">
+  <!-- Nav -->
+  <div class="nav">
+    <div class="logo-wrapper">
+      <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
+           loading="lazy" 
+           width="166" 
+           alt="Memorio Logo" 
+           srcset="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w">
+    </div>
+  </div>
+
+  <!-- Dashboard Container -->
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Director Dashboard</h1>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-container">
+      <button class="tab-btn active" onclick="switchTab('create-case')">Create Case</button>
+      <button class="tab-btn" onclick="switchTab('invite-family')">Invite Family</button>
+      <button class="tab-btn" onclick="switchTab('my-cases')">My Cases</button>
+    </div>
+
+    <!-- Create Case Tab -->
+    <div id="create-case-tab" class="tab-content active">
+      <div class="action-section">
+        <h2 class="section-title">Create New Case</h2>
+        <p class="paragraph">Start a new memorial tribute case. After creating the case, you can invite the family to complete the intake form.</p>
+        
+        <form id="create-case-form">
+          <div class="form-row-single">
+            <label for="deceased-name" class="field-label">Deceased Person's Name*</label>
+            <input 
+              class="text-field w-input" 
+              type="text" 
+              id="deceased-name" 
+              placeholder="John Doe" 
+              required>
+          </div>
+          
+          <div class="form-row">
+            <div>
+              <label for="service-date" class="field-label">Service Date</label>
+              <input 
+                class="text-field w-input" 
+                type="date" 
+                id="service-date">
+            </div>
+            
+            <div>
+              <label for="service-location" class="field-label">Service Location</label>
+              <input 
+                class="text-field w-input" 
+                type="text" 
+                id="service-location" 
+                placeholder="Memorial Chapel">
+            </div>
+          </div>
+          
+          <div class="form-button" style="margin-top: 20px;">
+            <button type="submit" class="button-primary w-button" id="create-case-btn">
+              CREATE CASE
+            </button>
+          </div>
+        </form>
+        
+        <div id="case-success-box" class="success-box">
+          <h3>✅ Case Created Successfully!</h3>
+          <p>Case ID has been generated. You can now invite the family to complete the tribute form.</p>
+          
+          <div class="credential-box">
+            <div class="credential-label">Case ID</div>
+            <div class="credential-value" id="created-case-id"></div>
+            <button class="copy-btn" onclick="copyToClipboard('created-case-id')">Copy</button>
+          </div>
+        </div>
+        
+        <div id="case-error-box" class="error-box"></div>
+      </div>
+    </div>
+
+    <!-- Invite Family Tab -->
+    <div id="invite-family-tab" class="tab-content">
+      <div class="action-section">
+        <h2 class="section-title">Invite Family Member</h2>
+        <p class="paragraph">Send a secure invitation to a family member to complete the tribute form for their case.</p>
+        
+        <form id="invite-family-form">
+          <div class="form-row">
+            <div>
+              <label for="family-email" class="field-label">Email Address*</label>
+              <input 
+                class="text-field w-input" 
+                type="email" 
+                id="family-email" 
+                placeholder="family@example.com" 
+                required>
+            </div>
+            
+            <div>
+              <label for="family-name" class="field-label">Full Name*</label>
+              <input 
+                class="text-field w-input" 
+                type="text" 
+                id="family-name" 
+                placeholder="Jane Doe" 
+                required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div>
+              <label for="family-phone" class="field-label">Phone Number</label>
+              <input 
+                class="text-field w-input" 
+                type="tel" 
+                id="family-phone" 
+                placeholder="+1-555-0123">
+            </div>
+            
+            <div>
+              <label for="case-id" class="field-label">Case ID*</label>
+              <input 
+                class="text-field w-input" 
+                type="text" 
+                id="case-id" 
+                placeholder="Paste Case ID here" 
+                required>
+            </div>
+          </div>
+          
+          <div class="form-button" style="margin-top: 20px;">
+            <button type="submit" class="button-primary w-button" id="invite-family-btn">
+              SEND INVITATION
+            </button>
+          </div>
+        </form>
+        
+        <div id="family-success-box" class="success-box">
+          <h3>✅ Family Member Invited Successfully!</h3>
+          <p>Share this secure magic link with the family member. It will allow them to access the tribute form directly.</p>
+          
+          <div class="credential-box">
+            <div class="credential-label">Email Address</div>
+            <div class="credential-value" id="invited-email"></div>
+            <button class="copy-btn" onclick="copyToClipboard('invited-email')">Copy</button>
+          </div>
+          
+          <div class="credential-box">
+            <div class="credential-label">Magic Link (valid for 24 hours)</div>
+            <div class="credential-value" id="magic-link"></div>
+            <button class="copy-btn" onclick="copyToClipboard('magic-link')">Copy</button>
+          </div>
+        </div>
+        
+        <div id="family-error-box" class="error-box"></div>
+      </div>
+    </div>
+
+    <!-- My Cases Tab -->
+    <div id="my-cases-tab" class="tab-content">
+      <div class="action-section">
+        <h2 class="section-title">My Cases</h2>
+        <p class="paragraph">View and manage all memorial tribute cases for your organization.</p>
+        
+        <div id="cases-list" class="case-list">
+          <!-- Cases will be loaded here dynamically -->
+        </div>
+        
+        <div id="cases-error-box" class="error-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Supabase client
+    const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MTcwNDcsImV4cCI6MjA1MDI5MzA0N30.9OsX8j7vQY5uHXzNnKPnR5pLZNpKNLjdLPxGEtShBhY';
+    
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let currentSession = null;
+    
+    // Check if user is logged in and is director
+    async function checkAuth() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      
+      if (!session) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      currentSession = session;
+      
+      // Verify director role
+      const { data: userData, error } = await supabaseClient
+        .from('users')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (error || !userData || userData.role !== 'director') {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'login.html';
+      }
+    }
+    
+    // Run auth check on page load
+    checkAuth();
+    
+    // Logout handler
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    });
+    
+    // Tab switching
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Remove active class from all buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      event.target.classList.add('active');
+      
+      // Load cases if switching to my-cases tab
+      if (tabName === 'my-cases') {
+        loadCases();
+      }
+    }
+    
+    // Make switchTab global
+    window.switchTab = switchTab;
+    
+    // Create Case form handler
+    document.getElementById('create-case-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const deceasedName = document.getElementById('deceased-name').value;
+      const serviceDate = document.getElementById('service-date').value;
+      const serviceLocation = document.getElementById('service-location').value;
+      
+      const createBtn = document.getElementById('create-case-btn');
+      const successBox = document.getElementById('case-success-box');
+      const errorBox = document.getElementById('case-error-box');
+      const section = e.target.closest('.action-section');
+      
+      successBox.style.display = 'none';
+      errorBox.style.display = 'none';
+      
+      section.classList.add('loading');
+      createBtn.disabled = true;
+      createBtn.textContent = 'CREATING CASE...';
+      
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-case`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${currentSession.access_token}`,
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            deceased_name: deceasedName,
+            service_date: serviceDate || undefined,
+            service_location: serviceLocation || undefined
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'Failed to create case');
+        }
+        
+        document.getElementById('created-case-id').textContent = result.data.case_id;
+        successBox.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('create-case-form').reset();
+        
+      } catch (error) {
+        errorBox.textContent = `Error: ${error.message}`;
+        errorBox.style.display = 'block';
+      } finally {
+        section.classList.remove('loading');
+        createBtn.disabled = false;
+        createBtn.textContent = 'CREATE CASE';
+      }
+    });
+    
+    // Invite Family form handler
+    document.getElementById('invite-family-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('family-email').value;
+      const name = document.getElementById('family-name').value;
+      const phone = document.getElementById('family-phone').value;
+      const caseId = document.getElementById('case-id').value;
+      
+      const inviteBtn = document.getElementById('invite-family-btn');
+      const successBox = document.getElementById('family-success-box');
+      const errorBox = document.getElementById('family-error-box');
+      const section = e.target.closest('.action-section');
+      
+      successBox.style.display = 'none';
+      errorBox.style.display = 'none';
+      
+      section.classList.add('loading');
+      inviteBtn.disabled = true;
+      inviteBtn.textContent = 'SENDING INVITATION...';
+      
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-family`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${currentSession.access_token}`,
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            email,
+            name,
+            case_id: caseId,
+            phone: phone || undefined
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'Failed to invite family member');
+        }
+        
+        document.getElementById('invited-email').textContent = result.data.email;
+        document.getElementById('magic-link').textContent = result.data.magic_link;
+        successBox.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('invite-family-form').reset();
+        
+      } catch (error) {
+        errorBox.textContent = `Error: ${error.message}`;
+        errorBox.style.display = 'block';
+      } finally {
+        section.classList.remove('loading');
+        inviteBtn.disabled = false;
+        inviteBtn.textContent = 'SEND INVITATION';
+      }
+    });
+    
+    // Load cases
+    async function loadCases() {
+      const casesList = document.getElementById('cases-list');
+      const errorBox = document.getElementById('cases-error-box');
+      
+      errorBox.style.display = 'none';
+      casesList.innerHTML = '<p class="paragraph">Loading cases...</p>';
+      
+      try {
+        const { data: cases, error } = await supabaseClient
+          .from('cases')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        if (!cases || cases.length === 0) {
+          casesList.innerHTML = '<p class="paragraph">No cases found. Create your first case to get started!</p>';
+          return;
+        }
+        
+        casesList.innerHTML = cases.map(c => `
+          <div class="case-card">
+            <div class="case-name">${c.deceased_name}</div>
+            <span class="case-status status-${c.status.split('_')[0]}">${c.status.replace(/_/g, ' ')}</span>
+            <p class="paragraph" style="margin-top: 10px; font-size: 14px;">
+              Created: ${new Date(c.created_at).toLocaleDateString()}
+            </p>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        errorBox.textContent = `Error loading cases: ${error.message}`;
+        errorBox.style.display = 'block';
+        casesList.innerHTML = '';
+      }
+    }
+    
+    // Copy to clipboard function
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 2000);
+      });
+    }
+    
+    // Make copy function global
+    window.copyToClipboard = copyToClipboard;
+  </script>
+</body>
+</html>
+
