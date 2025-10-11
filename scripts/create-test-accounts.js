@@ -97,8 +97,11 @@ async function createTestAccount(account) {
       password: account.password,
       email_confirm: true, // Auto-confirm for testing
       user_metadata: {
-        role: account.role,
         name: account.metadata.name
+      },
+      app_metadata: {
+        role: account.role,
+        org_id: account.org_id
       }
     });
 
