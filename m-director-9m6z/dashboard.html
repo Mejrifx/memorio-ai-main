@@ -298,24 +298,6 @@
               required>
           </div>
           
-          <div class="form-row">
-            <div>
-              <label for="service-date" class="field-label">Service Date</label>
-              <input 
-                class="text-field w-input" 
-                type="date" 
-                id="service-date">
-            </div>
-            
-            <div>
-              <label for="service-location" class="field-label">Service Location</label>
-              <input 
-                class="text-field w-input" 
-                type="text" 
-                id="service-location" 
-                placeholder="Memorial Chapel">
-            </div>
-          </div>
           
           <div class="form-button" style="margin-top: 20px;">
             <button type="submit" class="button-primary w-button" id="create-case-btn">
@@ -505,8 +487,6 @@
       e.preventDefault();
       
       const deceasedName = document.getElementById('deceased-name').value;
-      const serviceDate = document.getElementById('service-date').value;
-      const serviceLocation = document.getElementById('service-location').value;
       
       const createBtn = document.getElementById('create-case-btn');
       const successBox = document.getElementById('case-success-box');
@@ -529,9 +509,7 @@
             'apikey': SUPABASE_ANON_KEY
           },
           body: JSON.stringify({
-            deceased_name: deceasedName,
-            service_date: serviceDate || undefined,
-            service_location: serviceLocation || undefined
+            deceased_name: deceasedName
           })
         });
         
