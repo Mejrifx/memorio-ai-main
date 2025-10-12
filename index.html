@@ -15,6 +15,9 @@
   <link href="https://www.memorio.ai" rel="canonical">
   <script src="https://cdn.prod.website-files.com/683b63acf5908465c8825ca8%2F685146e1d8a68f749232b664%2F68ae0b3dfa796259386da2c8%2Fimportucanddefinelocales-1.1.1.js" type="text/javascript"></script>
   <script src="https://cdn.prod.website-files.com/683b63acf5908465c8825ca8%2F685146e1d8a68f749232b664%2F68ae0b3ee913e1d7f8841a9b%2Fcssimporter-0.0.1.js" type="text/javascript"></script>
+  
+  <!-- Supabase Client for Authentication and Database -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="body">
   <div class="nav">
@@ -979,12 +982,195 @@
         // For local development, uncomment these lines and comment out the above:
         // const ENDPOINT = "http://localhost:3001/webhook/memorio-intake";
         // const EMAIL_ENDPOINT = "http://localhost:3001/webhook/send-email";
+        
+        // ============================================================================
+        // SUPABASE CONFIGURATION
+        // ============================================================================
+        const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDE5MjUsImV4cCI6MjA3NTQ3NzkyNX0.O1DfOR5FBm6r3Pg-tjEE5CkzRr3WlWqGU1xUYKrhtnU';
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Global variables for authenticated user and case
+        let currentUser = null;
+        let currentCase = null;
+        
         // Initialize obituary data
         const obituaryData = { name: "", content: "" };
         let originalObituaryData = {};
         let originalFormPayload = {};
         // 🔑 holds the Wait node's per-execution resume URL (from n8n)
         let MEMORIO_RESUME_URL = "";
+        
+        // ============================================================================
+        // AUTHENTICATION & CASE LOADING
+        // ============================================================================
+        
+        /**
+         * Check if family user is authenticated
+         * If not, redirect to family login page
+         * If yes, load their assigned case
+         */
+        async function checkAuthentication() {
+            try {
+                // Get current session
+                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                
+                if (sessionError || !session) {
+                    console.log('No active session, redirecting to family login...');
+                    // Redirect to family login (will be created in next step)
+                    // window.location.href = '/m-family-7x2p/login.html';
+                    // For now, allow access for testing
+                    console.warn('⚠️ Family authentication not yet enforced - form accessible for testing');
+                    return false;
+                }
+                
+                currentUser = session.user;
+                console.log('✅ User authenticated:', currentUser.email);
+                
+                // Get user's role from app_metadata
+                const role = currentUser.app_metadata?.role;
+                
+                if (role !== 'family') {
+                    alert('Access denied: This form is only accessible to family members.');
+                    window.location.href = '/';
+                    return false;
+                }
+                
+                // Load the family user's assigned case
+                await loadFamilyCase();
+                
+                return true;
+            } catch (error) {
+                console.error('Authentication error:', error);
+                // For now, continue anyway for testing
+                console.warn('⚠️ Continuing without authentication for testing purposes');
+                return false;
+            }
+        }
+        
+        /**
+         * Load the case assigned to the current family user
+         */
+        async function loadFamilyCase() {
+            try {
+                const { data: cases, error } = await supabaseClient
+                    .from('cases')
+                    .select('*')
+                    .eq('assigned_family_user_id', currentUser.id)
+                    .single();
+                
+                if (error) {
+                    console.error('Error loading case:', error);
+                    alert('Error: No case found assigned to your account. Please contact your funeral director.');
+                    return;
+                }
+                
+                currentCase = cases;
+                console.log('✅ Case loaded:', currentCase.deceased_name, '| Case ID:', currentCase.id);
+                
+                // Optionally pre-fill deceased name in form if needed
+                // const deceasedNameField = document.querySelector('[name="loved_ones_name"]');
+                // if (deceasedNameField && !deceasedNameField.value) {
+                //     deceasedNameField.value = currentCase.deceased_name;
+                // }
+                
+            } catch (error) {
+                console.error('Error loading case:', error);
+            }
+        }
+        
+        /**
+         * Save form data to Supabase database
+         * This runs AFTER N8N webhook succeeds
+         */
+        async function saveFormToDatabase(formPayload) {
+            if (!currentCase) {
+                console.warn('⚠️ No case loaded, skipping database save');
+                return;
+            }
+            
+            try {
+                console.log('💾 Saving form data to database...');
+                
+                // Check if a form record already exists for this case
+                const { data: existingForms, error: checkError } = await supabaseClient
+                    .from('forms')
+                    .select('id')
+                    .eq('case_id', currentCase.id)
+                    .single();
+                
+                let formResult;
+                
+                if (existingForms) {
+                    // Update existing form
+                    formResult = await supabaseClient
+                        .from('forms')
+                        .update({
+                            submitted_json: formPayload,
+                            submitted_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', existingForms.id)
+                        .select();
+                } else {
+                    // Create new form record
+                    formResult = await supabaseClient
+                        .from('forms')
+                        .insert({
+                            case_id: currentCase.id,
+                            json_schema_version: 'v1',
+                            submitted_json: formPayload,
+                            submitted_at: new Date().toISOString()
+                        })
+                        .select();
+                }
+                
+                if (formResult.error) {
+                    console.error('❌ Error saving form to database:', formResult.error);
+                    // Don't block the user experience, just log the error
+                    return;
+                }
+                
+                console.log('✅ Form data saved to database successfully');
+                
+                // Update case status to 'submitted'
+                await updateCaseStatus('submitted');
+                
+            } catch (error) {
+                console.error('❌ Error in saveFormToDatabase:', error);
+                // Don't block the user experience
+            }
+        }
+        
+        /**
+         * Update case status in database
+         */
+        async function updateCaseStatus(newStatus) {
+            if (!currentCase) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('cases')
+                    .update({
+                        status: newStatus,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentCase.id);
+                
+                if (error) {
+                    console.error('❌ Error updating case status:', error);
+                    return;
+                }
+                
+                console.log(`✅ Case status updated to: ${newStatus}`);
+                currentCase.status = newStatus;
+                
+            } catch (error) {
+                console.error('❌ Error in updateCaseStatus:', error);
+            }
+        }
+        
         // ---------- helpers ----------
         function extractContent(raw) {
             let text =
@@ -1378,6 +1564,10 @@
                     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
                     const raw = await res.json();
                     console.log('N8N Response:', raw);
+                    
+                    // ✅ DUAL SUBMISSION: After N8N succeeds, save to database
+                    await saveFormToDatabase(payload);
+                    
                     displayObituary(raw, payload);
                 } catch (err) {
                     console.error('Submit error:', err);
@@ -1400,6 +1590,18 @@
             // Listen for iframe postMessage if needed
             window.addEventListener('message', (e) => { 
                 if (e.data?.type === 'obituary-data') displayObituary(e.data.obituary || {}); 
+            });
+            
+            // ============================================================================
+            // CHECK AUTHENTICATION ON PAGE LOAD
+            // ============================================================================
+            // Check if family user is authenticated and load their case
+            checkAuthentication().then(isAuthenticated => {
+                if (isAuthenticated) {
+                    console.log('✅ Page ready - User authenticated and case loaded');
+                } else {
+                    console.log('⚠️ Page ready - Operating without authentication (testing mode)');
+                }
             });
         })();
     </script>
