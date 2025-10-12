@@ -20,6 +20,47 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="body">
+  <!-- Login Modal -->
+  <div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background-color: #fff3e9; border: 3px solid #436481; border-radius: 20px; padding: 48px; max-width: 500px; width: 90%; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);">
+      <h1 style="color: #32343a; text-align: center; font-size: 32px; font-weight: 600; margin-bottom: 10px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Family Portal</h1>
+      <p style="color: #32343a; text-align: center; font-size: 16px; margin-bottom: 30px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Sign in to complete your obituary form</p>
+      
+      <div id="loginError" style="display: none; background-color: #ffebee; border: 1px solid #ef5350; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></div>
+      
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #32343a; font-size: 14px; font-weight: 600; margin-bottom: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Email Address</label>
+          <input type="email" 
+                 id="loginEmail" 
+                 style="width: 100%; padding: 12px; border: 2px solid #436481; border-radius: 8px; font-size: 16px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; background-color: #ffffff; box-sizing: border-box;"
+                 placeholder="Enter your email"
+                 required>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #32343a; font-size: 14px; font-weight: 600; margin-bottom: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Password</label>
+          <input type="password" 
+                 id="loginPassword" 
+                 style="width: 100%; padding: 12px; border: 2px solid #436481; border-radius: 8px; font-size: 16px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; background-color: #ffffff; box-sizing: border-box;"
+                 placeholder="Enter your password"
+                 required>
+        </div>
+        
+        <button type="submit" 
+                id="loginBtn"
+                style="width: 100%; padding: 14px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; transition: background-color 0.2s;">
+          Sign In
+        </button>
+      </form>
+      
+      <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+        Don't have login credentials?<br>
+        Contact your funeral director for access.
+      </p>
+    </div>
+  </div>
+
   <div class="nav">
     <div class="logo-wrapper"><img src="images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" loading="lazy" width="166" sizes="166px" alt="The Memorio Logo" srcset="images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w"></div>
   </div>
@@ -995,6 +1036,91 @@
         let currentUser = null;
         let currentCase = null;
         
+        // ============================================================================
+        // LOGIN MODAL FUNCTIONS
+        // ============================================================================
+        
+        /**
+         * Show login modal overlay
+         */
+        function showLoginModal() {
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // Hide the form while modal is showing
+                const formSlider = document.querySelector('.form-slider-padding');
+                if (formSlider) formSlider.style.display = 'none';
+            }
+        }
+        
+        /**
+         * Hide login modal and show form
+         */
+        function hideLoginModal() {
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.style.display = 'none';
+                // Show the form after successful login
+                const formSlider = document.querySelector('.form-slider-padding');
+                if (formSlider) formSlider.style.display = 'block';
+            }
+        }
+        
+        /**
+         * Handle login form submission
+         */
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMessage = document.getElementById('loginError');
+            
+            // Hide previous errors
+            errorMessage.style.display = 'none';
+            
+            // Disable button and show loading
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+            
+            try {
+                // Attempt login
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                // Check if user is a family member
+                const role = data.user.app_metadata?.role;
+                
+                if (role !== 'family') {
+                    throw new Error('Access denied: This form is only for family members.');
+                }
+                
+                // Success! Hide modal and load case
+                currentUser = data.user;
+                console.log('✅ Login successful:', currentUser.email);
+                
+                hideLoginModal();
+                await loadFamilyCase();
+                
+                // Show success message
+                console.log('✅ You can now complete the obituary form');
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMessage.textContent = error.message || 'Failed to sign in. Please check your credentials.';
+                errorMessage.style.display = 'block';
+                
+                // Re-enable button
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        }
+        
         // Initialize obituary data
         const obituaryData = { name: "", content: "" };
         let originalObituaryData = {};
@@ -1017,9 +1143,9 @@
                 const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
                 
                 if (sessionError || !session) {
-                    console.log('No active session, redirecting to family login...');
-                    // Redirect to family login
-                    window.location.href = '/m-family-7x2p/login.html';
+                    console.log('No active session, showing login modal...');
+                    // Show login modal instead of redirecting
+                    showLoginModal();
                     return false;
                 }
                 
@@ -1355,6 +1481,22 @@
                 // In no-cors mode, we can't read the response, so assume success
                 btn.textContent = 'Sent!';
                 btn.style.background = '#22c55e';
+                
+                // Add "Access Dashboard" button
+                const actionButtons = document.querySelector('.action-buttons');
+                if (actionButtons && !document.getElementById('dashboardBtn')) {
+                    const dashboardBtn = document.createElement('a');
+                    dashboardBtn.id = 'dashboardBtn';
+                    dashboardBtn.href = '/m-family-7x2p/dashboard.html';
+                    dashboardBtn.className = 'btn';
+                    dashboardBtn.textContent = 'Access Dashboard';
+                    dashboardBtn.style.marginLeft = '15px';
+                    dashboardBtn.style.background = '#436481';
+                    dashboardBtn.style.textDecoration = 'none';
+                    dashboardBtn.style.display = 'inline-block';
+                    actionButtons.appendChild(dashboardBtn);
+                }
+                
                 setTimeout(() => {
                     alert('Obituary submitted successfully! You will receive an email shortly with your final obituary.');
                 }, 500);
