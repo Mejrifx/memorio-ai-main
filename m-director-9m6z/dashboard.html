@@ -574,12 +574,29 @@
         
         const result = await response.json();
         
+        console.log('Family invitation response:', result);
+        console.log('Response data:', result.data);
+        console.log('Has temp_password?', !!result.data?.temp_password);
+        console.log('Has magic_link?', !!result.data?.magic_link);
+        
         if (!response.ok || !result.success) {
           throw new Error(result.error || 'Failed to invite family member');
         }
         
         document.getElementById('invited-email').textContent = result.data.email;
-        document.getElementById('family-password').textContent = result.data.temp_password;
+        
+        // Check what we actually received
+        if (result.data.temp_password) {
+          console.log('Setting password:', result.data.temp_password);
+          document.getElementById('family-password').textContent = result.data.temp_password;
+        } else if (result.data.magic_link) {
+          console.log('Received magic_link instead of password:', result.data.magic_link);
+          document.getElementById('family-password').textContent = 'Magic link: ' + result.data.magic_link;
+        } else {
+          console.error('No password or magic_link in response');
+          document.getElementById('family-password').textContent = 'ERROR: No credentials received';
+        }
+        
         successBox.style.display = 'block';
         
         // Reset form
