@@ -1018,10 +1018,8 @@
                 
                 if (sessionError || !session) {
                     console.log('No active session, redirecting to family login...');
-                    // Redirect to family login (will be created in next step)
-                    // window.location.href = '/m-family-7x2p/login.html';
-                    // For now, allow access for testing
-                    console.warn('⚠️ Family authentication not yet enforced - form accessible for testing');
+                    // Redirect to family login
+                    window.location.href = '/m-family-7x2p/login.html';
                     return false;
                 }
                 

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>My Case - Memorio Family Portal</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <!-- Preload Dosis font -->
+  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link href="../css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="../css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
+  <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="../images/webclip.png" rel="apple-touch-icon">
+  
+  <style>
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .dashboard-title {
+      color: #32343a;
+      font-size: 32px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .btn-logout {
+      padding: 10px 24px;
+      background-color: #436481;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-logout:hover {
+      background-color: #1e3a52;
+    }
+    
+    .case-card {
+      background-color: #fff3e9;
+      border: 3px solid #436481;
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+    }
+    
+    .case-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .case-name {
+      color: #32343a;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .status-badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    
+    .status-created {
+      background-color: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    .status-waiting_on_family {
+      background-color: #fff3e0;
+      color: #e65100;
+    }
+    
+    .status-submitted {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .status-in_production {
+      background-color: #f3e5f5;
+      color: #6a1b9a;
+    }
+    
+    .status-delivered {
+      background-color: #e8f5e9;
+      color: #1b5e20;
+    }
+    
+    .case-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .info-item {
+      color: #32343a;
+    }
+    
+    .info-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .info-value {
+      font-size: 16px;
+      color: #32343a;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+      padding: 12px 24px;
+      background-color: #436481;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      transition: background-color 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-primary:hover {
+      background-color: #1e3a52;
+    }
+    
+    .btn-secondary {
+      padding: 12px 24px;
+      background-color: transparent;
+      color: #436481;
+      border: 2px solid #436481;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #436481;
+      color: white;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .empty-state-title {
+      font-size: 24px;
+      color: #32343a;
+      margin-bottom: 8px;
+    }
+    
+    .empty-state-text {
+      font-size: 16px;
+      color: #666;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body class="body">
+  <div class="nav">
+    <div class="logo-wrapper">
+      <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
+           loading="lazy" 
+           width="166" 
+           sizes="166px" 
+           alt="The Memorio Logo" 
+           srcset="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, 
+                   ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, 
+                   ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w">
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">My Case</h1>
+      <button id="logoutBtn" class="btn-logout">Sign Out</button>
+    </div>
+    
+    <div id="loadingState" class="loading">
+      Loading your case...
+    </div>
+    
+    <div id="caseContainer" style="display: none;">
+      <!-- Case will be dynamically inserted here -->
+    </div>
+    
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <div class="empty-state-icon">📋</div>
+      <h2 class="empty-state-title">No Case Found</h2>
+      <p class="empty-state-text">
+        No case has been assigned to your account yet.<br>
+        Please contact your funeral director for assistance.
+      </p>
+    </div>
+  </div>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script>
+    const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDE5MjUsImV4cCI6MjA3NTQ3NzkyNX0.O1DfOR5FBm6r3Pg-tjEE5CkzRr3WlWqGU1xUYKrhtnU';
+    
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let currentUser = null;
+    let currentCase = null;
+    
+    // Check authentication
+    async function checkAuth() {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      
+      if (error || !session) {
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      currentUser = session.user;
+      
+      // Verify family role
+      const role = currentUser.app_metadata?.role;
+      if (role !== 'family') {
+        alert('Access denied: This portal is only for family members.');
+        await supabaseClient.auth.signOut();
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // Load case data
+    async function loadCase() {
+      try {
+        const { data: cases, error } = await supabaseClient
+          .from('cases')
+          .select('*')
+          .eq('assigned_family_user_id', currentUser.id)
+          .single();
+        
+        if (error) {
+          console.error('Error loading case:', error);
+          document.getElementById('loadingState').style.display = 'none';
+          document.getElementById('emptyState').style.display = 'block';
+          return;
+        }
+        
+        currentCase = cases;
+        displayCase(cases);
+        
+      } catch (error) {
+        console.error('Error loading case:', error);
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+      }
+    }
+    
+    // Display case information
+    function displayCase(caseData) {
+      const container = document.getElementById('caseContainer');
+      const loadingState = document.getElementById('loadingState');
+      
+      // Format dates
+      const createdDate = new Date(caseData.created_at).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+      const updatedDate = new Date(caseData.updated_at).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+      // Status display text
+      const statusText = {
+        'created': 'Created',
+        'waiting_on_family': 'Waiting on Form',
+        'intake_in_progress': 'Form In Progress',
+        'submitted': 'Form Submitted',
+        'in_production': 'In Production',
+        'awaiting_review': 'Awaiting Review',
+        'delivered': 'Delivered',
+        'closed': 'Closed'
+      };
+      
+      // Determine action buttons based on status
+      let actionButtons = '';
+      if (caseData.status === 'waiting_on_family' || caseData.status === 'created') {
+        actionButtons = `
+          <a href="../index.html" class="btn-primary">Complete Obituary Form</a>
+        `;
+      } else if (caseData.status === 'submitted') {
+        actionButtons = `
+          <button class="btn-secondary" disabled>Form Submitted - Awaiting Processing</button>
+        `;
+      } else if (caseData.status === 'delivered') {
+        actionButtons = `
+          <button class="btn-primary">Download Final Obituary</button>
+        `;
+      }
+      
+      container.innerHTML = `
+        <div class="case-card">
+          <div class="case-card-header">
+            <h2 class="case-name">${caseData.deceased_name}</h2>
+            <span class="status-badge status-${caseData.status}">
+              ${statusText[caseData.status] || caseData.status}
+            </span>
+          </div>
+          
+          <div class="case-info">
+            <div class="info-item">
+              <div class="info-label">Case ID</div>
+              <div class="info-value">${caseData.id.split('-')[0]}...</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Created</div>
+              <div class="info-value">${createdDate}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Last Updated</div>
+              <div class="info-value">${updatedDate}</div>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            ${actionButtons}
+          </div>
+        </div>
+      `;
+      
+      loadingState.style.display = 'none';
+      container.style.display = 'block';
+    }
+    
+    // Handle logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    });
+    
+    // Initialize
+    (async function init() {
+      const isAuthenticated = await checkAuth();
+      if (isAuthenticated) {
+        await loadCase();
+      }
+    })();
+  </script>
+</body>
+</html>
+
