@@ -86,8 +86,11 @@ serve(async (req) => {
       email,
       password: tempPassword,
       email_confirm: true,
-      user_metadata: {
+      app_metadata: {
         role: 'family',
+        org_id: userData.org_id
+      },
+      user_metadata: {
         name,
         case_id
       }
