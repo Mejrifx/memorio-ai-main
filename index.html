@@ -1144,7 +1144,6 @@
                 
                 if (sessionError || !session) {
                     console.log('No active session, showing login modal...');
-                    // Show login modal instead of redirecting
                     showLoginModal();
                     return false;
                 }
@@ -1156,8 +1155,8 @@
                 const role = currentUser.app_metadata?.role;
                 
                 if (role !== 'family') {
-                    alert('Access denied: This form is only accessible to family members.');
-                    window.location.href = '/';
+                    console.log('User is not a family member, showing login modal');
+                    showLoginModal();
                     return false;
                 }
                 
@@ -1167,8 +1166,8 @@
                 return true;
             } catch (error) {
                 console.error('Authentication error:', error);
-                // For now, continue anyway for testing
-                console.warn('⚠️ Continuing without authentication for testing purposes');
+                console.log('Error occurred, showing login modal...');
+                showLoginModal();
                 return false;
             }
         }
