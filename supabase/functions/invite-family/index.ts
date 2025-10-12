@@ -2,7 +2,7 @@
 // Allows Directors to invite Family members to create tributes for specific cases
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createSupabaseClient, verifyAuth } from '../_shared/supabase-client.ts';
+import { createSupabaseClient, verifyAuth, generatePassword } from '../_shared/supabase-client.ts';
 import { familyInviteTemplate } from '../_shared/email-templates.ts';
 import type { InviteFamilyRequest, ApiResponse } from '../_shared/types.ts';
 
@@ -78,9 +78,13 @@ serve(async (req) => {
       );
     }
 
-    // Create Supabase Auth user with magic link (no password)
+    // Generate temporary password
+    const tempPassword = generatePassword();
+
+    // Create Supabase Auth user with password
     const { data: authData, error: createAuthError } = await supabase.auth.admin.createUser({
       email,
+      password: tempPassword,
       email_confirm: true,
       user_metadata: {
         role: 'family',
@@ -133,21 +137,6 @@ serve(async (req) => {
       })
       .eq('id', case_id);
 
-    // Generate magic link
-    const { data: magicLinkData, error: magicLinkError } = await supabase.auth.admin.generateLink({
-      type: 'magiclink',
-      email,
-      options: {
-        redirectTo: `https://memorio.ai/?case_id=${case_id}`
-      }
-    });
-
-    if (magicLinkError) {
-      console.error('Failed to generate magic link:', magicLinkError);
-    }
-
-    const magicLink = magicLinkData?.properties?.action_link || `https://memorio.ai/?case_id=${case_id}`;
-
     // Log audit event
     await supabase
       .from('events')
@@ -166,15 +155,15 @@ serve(async (req) => {
       });
 
     // Note: Email integration will be added later
-    // For now, magic link is returned in the response for the Director to share manually
+    // For now, credentials are returned in the response for the Director to share manually
     console.log(`Family invited: ${email} for case ${case_id}`);
-    console.log(`Magic link: ${magicLink}`);
+    console.log(`Password: ${tempPassword}`);
 
     const response: ApiResponse = {
       success: true,
       data: {
         user_id: authData.user.id,
-        magic_link: magicLink,
+        temp_password: tempPassword,
         email,
         case_id
       },

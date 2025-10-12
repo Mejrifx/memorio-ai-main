@@ -389,9 +389,9 @@
           </div>
           
           <div class="credential-box">
-            <div class="credential-label">Magic Link (valid for 24 hours)</div>
-            <div class="credential-value" id="magic-link"></div>
-            <button class="copy-btn" onclick="copyToClipboard('magic-link')">Copy</button>
+            <div class="credential-label">Password</div>
+            <div class="credential-value" id="family-password"></div>
+            <button class="copy-btn" onclick="copyToClipboard('family-password')">Copy</button>
           </div>
         </div>
         
@@ -579,7 +579,7 @@
         }
         
         document.getElementById('invited-email').textContent = result.data.email;
-        document.getElementById('magic-link').textContent = result.data.magic_link;
+        document.getElementById('family-password').textContent = result.data.temp_password;
         successBox.style.display = 'block';
         
         // Reset form
