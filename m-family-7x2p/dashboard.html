@@ -207,6 +207,207 @@
       color: #666;
       font-size: 18px;
     }
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .dashboard-section {
+      background-color: #fff3e9;
+      border: 3px solid #436481;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+    }
+    
+    .section-title {
+      color: #32343a;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .obituary-preview {
+      background-color: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .obituary-content {
+      color: #32343a;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    
+    .assets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+    }
+    
+    .asset-item {
+      background-color: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .asset-item:hover {
+      background-color: #e9ecef;
+      transform: translateY(-2px);
+    }
+    
+    .asset-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    .asset-name {
+      font-size: 12px;
+      color: #666;
+      word-break: break-all;
+    }
+    
+    .timeline {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .timeline-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .timeline-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    .timeline-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #436481;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    
+    .timeline-content {
+      flex: 1;
+    }
+    
+    .timeline-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #32343a;
+      margin: 0 0 4px 0;
+    }
+    
+    .timeline-date {
+      font-size: 12px;
+      color: #666;
+      margin: 0;
+    }
+    
+    .timeline-description {
+      font-size: 14px;
+      color: #666;
+      margin: 4px 0 0 0;
+    }
+    
+    .upload-area {
+      border: 2px dashed #436481;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      background-color: #f8f9fa;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .upload-area:hover {
+      background-color: #e9ecef;
+      border-color: #1e3a52;
+    }
+    
+    .upload-icon {
+      font-size: 32px;
+      color: #436481;
+      margin-bottom: 8px;
+    }
+    
+    .upload-text {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .file-input {
+      display: none;
+    }
+    
+    .notification-item {
+      background-color: #f8f9fa;
+      border-left: 4px solid #436481;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .notification-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #32343a;
+      margin: 0 0 4px 0;
+    }
+    
+    .notification-text {
+      font-size: 13px;
+      color: #666;
+      margin: 0;
+    }
+    
+    .notification-date {
+      font-size: 11px;
+      color: #999;
+      margin: 4px 0 0 0;
+    }
+    
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .dashboard-container {
+        padding: 20px 10px;
+      }
+      
+      .dashboard-title {
+        font-size: 24px;
+      }
+    }
   </style>
 </head>
 <body class="body">
@@ -234,7 +435,98 @@
     </div>
     
     <div id="caseContainer" style="display: none;">
-      <!-- Case will be dynamically inserted here -->
+      <!-- Case overview card -->
+      <div class="case-card">
+        <div class="case-card-header">
+          <h2 class="case-name" id="caseName">Loading...</h2>
+          <span class="status-badge" id="caseStatus">Loading...</span>
+        </div>
+        
+        <div class="case-info">
+          <div class="info-item">
+            <div class="info-label">Case ID</div>
+            <div class="info-value" id="caseId">Loading...</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Created</div>
+            <div class="info-value" id="caseCreated">Loading...</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Last Updated</div>
+            <div class="info-value" id="caseUpdated">Loading...</div>
+          </div>
+        </div>
+        
+        <div class="action-buttons" id="caseActions">
+          <!-- Action buttons will be dynamically inserted here -->
+        </div>
+      </div>
+      
+      <!-- Dashboard sections -->
+      <div class="dashboard-grid">
+        <!-- Obituary Section -->
+        <div class="dashboard-section">
+          <h3 class="section-title">
+            📝 Obituary
+          </h3>
+          <div id="obituarySection">
+            <div class="obituary-preview">
+              <div class="obituary-content" id="obituaryContent">
+                Loading obituary...
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn-primary" id="editObituaryBtn" style="display: none;">Edit Obituary</button>
+              <button class="btn-secondary" id="downloadObituaryBtn" style="display: none;">Download PDF</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Assets Section -->
+        <div class="dashboard-section">
+          <h3 class="section-title">
+            📸 Photos & Videos
+          </h3>
+          <div id="assetsSection">
+            <div class="assets-grid" id="assetsGrid">
+              <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Click to upload photos or videos</div>
+              </div>
+            </div>
+            <input type="file" id="fileInput" class="file-input" multiple accept="image/*,video/*">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Timeline Section -->
+      <div class="dashboard-section">
+        <h3 class="section-title">
+          📅 Timeline & Updates
+        </h3>
+        <ul class="timeline" id="timelineList">
+          <li class="timeline-item">
+            <div class="timeline-icon">⏳</div>
+            <div class="timeline-content">
+              <h4 class="timeline-title">Loading timeline...</h4>
+              <p class="timeline-description">Please wait while we load your case updates.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Notifications Section -->
+      <div class="dashboard-section">
+        <h3 class="section-title">
+          🔔 Notifications
+        </h3>
+        <div id="notificationsList">
+          <div class="notification-item">
+            <h4 class="notification-title">Loading notifications...</h4>
+            <p class="notification-text">Please wait while we load your notifications.</p>
+          </div>
+        </div>
+      </div>
     </div>
     
     <div id="emptyState" class="empty-state" style="display: none;">
@@ -259,6 +551,8 @@
     
     let currentUser = null;
     let currentCase = null;
+    let currentForm = null;
+    let currentAssets = [];
     
     // Check authentication
     async function checkAuth() {
@@ -283,37 +577,66 @@
       return true;
     }
     
-    // Load case data
-    async function loadCase() {
+    // Load all case data
+    async function loadCaseData() {
       try {
-        const { data: cases, error } = await supabaseClient
+        // Load case
+        const { data: cases, error: caseError } = await supabaseClient
           .from('cases')
           .select('*')
           .eq('assigned_family_user_id', currentUser.id)
           .single();
         
-        if (error) {
-          console.error('Error loading case:', error);
+        if (caseError) {
+          console.error('Error loading case:', caseError);
           document.getElementById('loadingState').style.display = 'none';
           document.getElementById('emptyState').style.display = 'block';
           return;
         }
         
         currentCase = cases;
-        displayCase(cases);
+        
+        // Load form data
+        const { data: forms, error: formError } = await supabaseClient
+          .from('forms')
+          .select('*')
+          .eq('case_id', cases.id)
+          .single();
+        
+        if (!formError) {
+          currentForm = forms;
+        }
+        
+        // Load assets
+        const { data: assets, error: assetsError } = await supabaseClient
+          .from('assets')
+          .select('*')
+          .eq('case_id', cases.id)
+          .order('uploaded_at', { ascending: false });
+        
+        if (!assetsError) {
+          currentAssets = assets || [];
+        }
+        
+        // Display everything
+        displayCaseOverview(cases);
+        displayObituary();
+        displayAssets();
+        displayTimeline(cases);
+        displayNotifications();
+        
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('caseContainer').style.display = 'block';
         
       } catch (error) {
-        console.error('Error loading case:', error);
+        console.error('Error loading case data:', error);
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('emptyState').style.display = 'block';
       }
     }
     
-    // Display case information
-    function displayCase(caseData) {
-      const container = document.getElementById('caseContainer');
-      const loadingState = document.getElementById('loadingState');
-      
+    // Display case overview
+    function displayCaseOverview(caseData) {
       // Format dates
       const createdDate = new Date(caseData.created_at).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -339,8 +662,18 @@
         'closed': 'Closed'
       };
       
-      // Determine action buttons based on status
+      // Update case info
+      document.getElementById('caseName').textContent = caseData.deceased_name;
+      document.getElementById('caseStatus').textContent = statusText[caseData.status] || caseData.status;
+      document.getElementById('caseStatus').className = `status-badge status-${caseData.status}`;
+      document.getElementById('caseId').textContent = caseData.id.split('-')[0] + '...';
+      document.getElementById('caseCreated').textContent = createdDate;
+      document.getElementById('caseUpdated').textContent = updatedDate;
+      
+      // Update action buttons
+      const actionsContainer = document.getElementById('caseActions');
       let actionButtons = '';
+      
       if (caseData.status === 'waiting_on_family' || caseData.status === 'created') {
         actionButtons = `
           <a href="../index.html" class="btn-primary">Complete Obituary Form</a>
@@ -351,42 +684,251 @@
         `;
       } else if (caseData.status === 'delivered') {
         actionButtons = `
-          <button class="btn-primary">Download Final Obituary</button>
+          <button class="btn-primary" onclick="downloadObituary()">Download Final Obituary</button>
         `;
       }
       
-      container.innerHTML = `
-        <div class="case-card">
-          <div class="case-card-header">
-            <h2 class="case-name">${caseData.deceased_name}</h2>
-            <span class="status-badge status-${caseData.status}">
-              ${statusText[caseData.status] || caseData.status}
-            </span>
-          </div>
-          
-          <div class="case-info">
-            <div class="info-item">
-              <div class="info-label">Case ID</div>
-              <div class="info-value">${caseData.id.split('-')[0]}...</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Created</div>
-              <div class="info-value">${createdDate}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Last Updated</div>
-              <div class="info-value">${updatedDate}</div>
-            </div>
-          </div>
-          
-          <div class="action-buttons">
-            ${actionButtons}
-          </div>
-        </div>
-      `;
+      actionsContainer.innerHTML = actionButtons;
+    }
+    
+    // Display obituary
+    function displayObituary() {
+      const obituaryContent = document.getElementById('obituaryContent');
+      const editBtn = document.getElementById('editObituaryBtn');
+      const downloadBtn = document.getElementById('downloadObituaryBtn');
       
-      loadingState.style.display = 'none';
-      container.style.display = 'block';
+      if (currentForm && currentForm.submitted_json) {
+        // Show submitted obituary
+        const obituaryData = currentForm.submitted_json;
+        obituaryContent.innerHTML = `
+          <h4>${obituaryData.name || 'Obituary'}</h4>
+          <p>${obituaryData.content || 'No content available'}</p>
+        `;
+        
+        if (currentCase.status === 'submitted' || currentCase.status === 'in_production') {
+          editBtn.style.display = 'inline-block';
+          editBtn.onclick = () => window.location.href = '../index.html';
+        }
+        
+        if (currentCase.status === 'delivered') {
+          downloadBtn.style.display = 'inline-block';
+        }
+      } else {
+        obituaryContent.innerHTML = `
+          <p style="color: #666; font-style: italic;">No obituary submitted yet.</p>
+        `;
+      }
+    }
+    
+    // Display assets
+    function displayAssets() {
+      const assetsGrid = document.getElementById('assetsGrid');
+      
+      // Clear existing assets (except upload area)
+      const uploadArea = assetsGrid.querySelector('.upload-area');
+      assetsGrid.innerHTML = '';
+      
+      if (currentAssets.length > 0) {
+        currentAssets.forEach(asset => {
+          const assetItem = document.createElement('div');
+          assetItem.className = 'asset-item';
+          assetItem.onclick = () => viewAsset(asset);
+          
+          const icon = asset.mime_type.startsWith('image/') ? '🖼️' : '🎥';
+          const fileName = asset.file_key.split('/').pop();
+          
+          assetItem.innerHTML = `
+            <div class="asset-icon">${icon}</div>
+            <div class="asset-name">${fileName}</div>
+          `;
+          
+          assetsGrid.appendChild(assetItem);
+        });
+      }
+      
+      // Add upload area back
+      assetsGrid.appendChild(uploadArea);
+    }
+    
+    // Display timeline
+    function displayTimeline(caseData) {
+      const timelineList = document.getElementById('timelineList');
+      const timeline = [];
+      
+      // Case created
+      timeline.push({
+        icon: '📋',
+        title: 'Case Created',
+        date: new Date(caseData.created_at).toLocaleDateString(),
+        description: `Case created for ${caseData.deceased_name}`
+      });
+      
+      // Form submitted
+      if (currentForm && currentForm.submitted_at) {
+        timeline.push({
+          icon: '📝',
+          title: 'Obituary Form Submitted',
+          date: new Date(currentForm.submitted_at).toLocaleDateString(),
+          description: 'Family completed and submitted the obituary form'
+        });
+      }
+      
+      // Status changes
+      if (caseData.status === 'submitted') {
+        timeline.push({
+          icon: '⏳',
+          title: 'Awaiting Processing',
+          date: 'Current',
+          description: 'Your obituary is being processed by our team'
+        });
+      } else if (caseData.status === 'in_production') {
+        timeline.push({
+          icon: '🎬',
+          title: 'In Production',
+          date: 'Current',
+          description: 'Your memorial video is being created'
+        });
+      } else if (caseData.status === 'delivered') {
+        timeline.push({
+          icon: '✅',
+          title: 'Delivered',
+          date: 'Current',
+          description: 'Your memorial video is ready for download'
+        });
+      }
+      
+      // Render timeline
+      timelineList.innerHTML = timeline.map(item => `
+        <li class="timeline-item">
+          <div class="timeline-icon">${item.icon}</div>
+          <div class="timeline-content">
+            <h4 class="timeline-title">${item.title}</h4>
+            <p class="timeline-date">${item.date}</p>
+            <p class="timeline-description">${item.description}</p>
+          </div>
+        </li>
+      `).join('');
+    }
+    
+    // Display notifications
+    function displayNotifications() {
+      const notificationsList = document.getElementById('notificationsList');
+      
+      const notifications = [];
+      
+      // Add status-based notifications
+      if (currentCase.status === 'waiting_on_family') {
+        notifications.push({
+          title: 'Action Required',
+          text: 'Please complete the obituary form to proceed with your memorial video.',
+          date: 'Now'
+        });
+      } else if (currentCase.status === 'submitted') {
+        notifications.push({
+          title: 'Form Received',
+          text: 'Thank you! We have received your obituary form and will begin processing soon.',
+          date: 'Recent'
+        });
+      } else if (currentCase.status === 'in_production') {
+        notifications.push({
+          title: 'In Progress',
+          text: 'Your memorial video is currently being created. We will notify you when it\'s ready.',
+          date: 'Recent'
+        });
+      }
+      
+      if (notifications.length === 0) {
+        notificationsList.innerHTML = `
+          <div class="notification-item">
+            <h4 class="notification-title">No new notifications</h4>
+            <p class="notification-text">You're all caught up!</p>
+          </div>
+        `;
+      } else {
+        notificationsList.innerHTML = notifications.map(notif => `
+          <div class="notification-item">
+            <h4 class="notification-title">${notif.title}</h4>
+            <p class="notification-text">${notif.text}</p>
+            <p class="notification-date">${notif.date}</p>
+          </div>
+        `).join('');
+      }
+    }
+    
+    // Asset functions
+    function viewAsset(asset) {
+      // For now, just show an alert. In production, this would open a modal or new tab
+      alert(`Viewing asset: ${asset.file_key}`);
+    }
+    
+    // File upload handler
+    document.getElementById('fileInput').addEventListener('change', async (event) => {
+      const files = event.target.files;
+      if (files.length === 0) return;
+      
+      for (const file of files) {
+        try {
+          // Upload to Supabase Storage
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+          const filePath = `${currentCase.id}/${fileName}`;
+          
+          const { error: uploadError } = await supabaseClient.storage
+            .from('case-assets')
+            .upload(filePath, file);
+          
+          if (uploadError) {
+            console.error('Upload error:', uploadError);
+            alert('Failed to upload file. Please try again.');
+            continue;
+          }
+          
+          // Add to assets table
+          const { error: dbError } = await supabaseClient
+            .from('assets')
+            .insert({
+              case_id: currentCase.id,
+              uploader_user_id: currentUser.id,
+              file_key: filePath,
+              mime_type: file.type,
+              size_bytes: file.size
+            });
+          
+          if (dbError) {
+            console.error('Database error:', dbError);
+            alert('File uploaded but failed to save metadata. Please refresh the page.');
+          } else {
+            alert('File uploaded successfully!');
+            // Reload assets
+            await loadCaseData();
+          }
+          
+        } catch (error) {
+          console.error('Upload error:', error);
+          alert('Failed to upload file. Please try again.');
+        }
+      }
+      
+      // Clear file input
+      event.target.value = '';
+    });
+    
+    // Download obituary
+    function downloadObituary() {
+      if (currentForm && currentForm.submitted_json) {
+        const obituaryData = currentForm.submitted_json;
+        const content = `${obituaryData.name}\n\n${obituaryData.content}`;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentCase.deceased_name}-obituary.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
     }
     
     // Handle logout
@@ -399,7 +941,7 @@
     (async function init() {
       const isAuthenticated = await checkAuth();
       if (isAuthenticated) {
-        await loadCase();
+        await loadCaseData();
       }
     })();
   </script>

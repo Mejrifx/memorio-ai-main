@@ -1174,6 +1174,7 @@
         
         /**
          * Load the case assigned to the current family user
+         * Check if form is already completed and redirect to dashboard if so
          */
         async function loadFamilyCase() {
             try {
@@ -1192,6 +1193,23 @@
                 currentCase = cases;
                 console.log('✅ Case loaded:', currentCase.deceased_name, '| Case ID:', currentCase.id);
                 
+                // Check if form has already been submitted
+                const { data: forms, error: formError } = await supabaseClient
+                    .from('forms')
+                    .select('*')
+                    .eq('case_id', currentCase.id)
+                    .single();
+                
+                if (!formError && forms && forms.submitted_at) {
+                    console.log('✅ Form already submitted, redirecting to dashboard...');
+                    // Form is already completed, redirect to dashboard
+                    window.location.href = '/m-family-7x2p/dashboard.html';
+                    return;
+                }
+                
+                // Form not completed yet, continue with normal flow
+                console.log('✅ Form not completed yet, showing form...');
+                
                 // Optionally pre-fill deceased name in form if needed
                 // const deceasedNameField = document.querySelector('[name="loved_ones_name"]');
                 // if (deceasedNameField && !deceasedNameField.value) {
@@ -1200,6 +1218,7 @@
                 
             } catch (error) {
                 console.error('Error loading case:', error);
+                alert('Error: Failed to load case information. Please try again.');
             }
         }
         
