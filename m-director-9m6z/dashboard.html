@@ -758,6 +758,7 @@
     window.closeCaseModal = closeCaseModal;
     window.revealCredentials = revealCredentials;
     window.copyToClipboard = copyToClipboard;
+    window.deleteCase = deleteCase;
     
     // Case Details Modal Functions
     let currentCaseDetails = null;
@@ -903,6 +904,32 @@
         closeCaseModal();
       }
     });
+    
+    // Delete Case Function
+    async function deleteCase(caseId, caseName) {
+      const confirmed = confirm(`Are you sure you want to delete the case for "${caseName}"?\n\nThis action cannot be undone and will permanently remove:\n- Case details\n- Form submissions\n- Uploaded assets\n- All related data`);
+      
+      if (!confirmed) return;
+      
+      try {
+        // Delete the case (this will cascade delete related records due to foreign key constraints)
+        const { error } = await supabaseClient
+          .from('cases')
+          .delete()
+          .eq('id', caseId);
+        
+        if (error) throw error;
+        
+        alert(`Case for "${caseName}" has been successfully deleted.`);
+        
+        // Reload the cases list
+        await loadCases();
+        
+      } catch (error) {
+        console.error('Error deleting case:', error);
+        alert(`Failed to delete case: ${error.message}`);
+      }
+    }
     
     // Create Case form handler
     document.getElementById('create-case-form').addEventListener('submit', async (e) => {
@@ -1073,15 +1100,22 @@
         }
         
         casesList.innerHTML = cases.map(c => `
-          <div class="case-card" onclick="openCaseModal('${c.id}')" style="cursor: pointer;">
-            <div class="case-name">${c.deceased_name}</div>
-            <span class="case-status status-${c.status.split('_')[0]}">${c.status.replace(/_/g, ' ')}</span>
-            <p class="paragraph" style="margin-top: 10px; font-size: 14px;">
-              Created: ${new Date(c.created_at).toLocaleDateString()}
-            </p>
-            <p class="paragraph" style="margin-top: 5px; font-size: 12px; color: #666;">
-              Click to view details
-            </p>
+          <div class="case-card">
+            <div onclick="openCaseModal('${c.id}')" style="cursor: pointer; flex: 1;">
+              <div class="case-name">${c.deceased_name}</div>
+              <span class="case-status status-${c.status.split('_')[0]}">${c.status.replace(/_/g, ' ')}</span>
+              <p class="paragraph" style="margin-top: 10px; font-size: 14px;">
+                Created: ${new Date(c.created_at).toLocaleDateString()}
+              </p>
+              <p class="paragraph" style="margin-top: 5px; font-size: 12px; color: #666;">
+                Click to view details
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+              <button class="btn-secondary" onclick="event.stopPropagation(); deleteCase('${c.id}', '${c.deceased_name}')" style="padding: 6px 12px; font-size: 12px;">
+                Delete Case
+              </button>
+            </div>
           </div>
         `).join('');
         
