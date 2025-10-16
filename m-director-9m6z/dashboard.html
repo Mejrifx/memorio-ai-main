@@ -234,6 +234,200 @@
       color: #1b5e20;
     }
     
+    /* Case Details Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background-color: white;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .modal-title {
+      color: #32343a;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #666;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+    }
+    
+    .modal-close:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .modal-section {
+      margin-bottom: 24px;
+    }
+    
+    .modal-section-title {
+      color: #32343a;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .modal-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .modal-info-item {
+      background-color: #f8f9fa;
+      padding: 12px;
+      border-radius: 8px;
+    }
+    
+    .modal-info-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .modal-info-value {
+      font-size: 14px;
+      color: #32343a;
+      font-weight: 500;
+    }
+    
+    .credentials-section {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    
+    .credentials-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .credentials-title {
+      color: #32343a;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .reveal-btn {
+      background-color: #436481;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .reveal-btn:hover {
+      background-color: #1e3a52;
+    }
+    
+    .credentials-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    
+    .credential-item {
+      background-color: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    
+    .credential-label {
+      font-size: 11px;
+      color: #666;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .credential-value {
+      font-size: 14px;
+      color: #32343a;
+      font-weight: 500;
+      font-family: monospace;
+    }
+    
+    .credential-value.blurred {
+      filter: blur(8px);
+      user-select: none;
+    }
+    
+    .copy-btn {
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 10px;
+      cursor: pointer;
+      margin-left: 8px;
+      transition: background-color 0.2s;
+    }
+    
+    .copy-btn:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .copy-btn.copied {
+      background-color: #4caf50;
+      color: white;
+      border-color: #4caf50;
+    }
+    
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -414,6 +608,85 @@
     </div>
   </div>
 
+  <!-- Case Details Modal -->
+  <div id="case-details-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-case-name">Case Details</h2>
+        <button class="modal-close" onclick="closeCaseModal()">&times;</button>
+      </div>
+      
+      <div class="modal-section">
+        <h3 class="modal-section-title">📋 Case Information</h3>
+        <div class="modal-info-grid">
+          <div class="modal-info-item">
+            <div class="modal-info-label">Case ID</div>
+            <div class="modal-info-value" id="modal-case-id">-</div>
+          </div>
+          <div class="modal-info-item">
+            <div class="modal-info-label">Status</div>
+            <div class="modal-info-value" id="modal-case-status">-</div>
+          </div>
+          <div class="modal-info-item">
+            <div class="modal-info-label">Created</div>
+            <div class="modal-info-value" id="modal-case-created">-</div>
+          </div>
+          <div class="modal-info-item">
+            <div class="modal-info-label">Last Updated</div>
+            <div class="modal-info-value" id="modal-case-updated">-</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-section">
+        <h3 class="modal-section-title">👥 Family Information</h3>
+        <div class="modal-info-grid">
+          <div class="modal-info-item">
+            <div class="modal-info-label">Family Member</div>
+            <div class="modal-info-value" id="modal-family-name">-</div>
+          </div>
+          <div class="modal-info-item">
+            <div class="modal-info-label">Email</div>
+            <div class="modal-info-value" id="modal-family-email">-</div>
+          </div>
+        </div>
+        
+        <div class="credentials-section">
+          <div class="credentials-header">
+            <h4 class="credentials-title">🔐 Family Login Credentials</h4>
+            <button class="reveal-btn" id="reveal-credentials-btn" onclick="revealCredentials()">Reveal</button>
+          </div>
+          <div class="credentials-grid">
+            <div class="credential-item">
+              <div class="credential-label">Email</div>
+              <div class="credential-value blurred" id="modal-family-login-email">Click Reveal</div>
+              <button class="copy-btn" onclick="copyToClipboard('modal-family-login-email')">Copy</button>
+            </div>
+            <div class="credential-item">
+              <div class="credential-label">Password</div>
+              <div class="credential-value blurred" id="modal-family-password">Click Reveal</div>
+              <button class="copy-btn" onclick="copyToClipboard('modal-family-password')">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-section">
+        <h3 class="modal-section-title">📝 Form Status</h3>
+        <div class="modal-info-grid">
+          <div class="modal-info-item">
+            <div class="modal-info-label">Form Status</div>
+            <div class="modal-info-value" id="modal-form-status">-</div>
+          </div>
+          <div class="modal-info-item">
+            <div class="modal-info-label">Submitted At</div>
+            <div class="modal-info-value" id="modal-form-submitted">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Initialize Supabase client
     const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
@@ -479,8 +752,157 @@
       }
     }
     
-    // Make switchTab global
+    // Make functions global
     window.switchTab = switchTab;
+    window.openCaseModal = openCaseModal;
+    window.closeCaseModal = closeCaseModal;
+    window.revealCredentials = revealCredentials;
+    window.copyToClipboard = copyToClipboard;
+    
+    // Case Details Modal Functions
+    let currentCaseDetails = null;
+    let credentialsRevealed = false;
+    
+    async function openCaseModal(caseId) {
+      const modal = document.getElementById('case-details-modal');
+      modal.style.display = 'flex';
+      
+      // Reset credentials state
+      credentialsRevealed = false;
+      document.getElementById('reveal-credentials-btn').textContent = 'Reveal';
+      document.getElementById('modal-family-login-email').textContent = 'Click Reveal';
+      document.getElementById('modal-family-password').textContent = 'Click Reveal';
+      document.getElementById('modal-family-login-email').classList.add('blurred');
+      document.getElementById('modal-family-password').classList.add('blurred');
+      
+      try {
+        // Load case details
+        const { data: caseData, error: caseError } = await supabaseClient
+          .from('cases')
+          .select('*')
+          .eq('id', caseId)
+          .single();
+        
+        if (caseError) throw caseError;
+        
+        currentCaseDetails = caseData;
+        
+        // Load family user details if assigned
+        let familyData = null;
+        let familyPassword = null;
+        if (caseData.assigned_family_user_id) {
+          const { data: familyUser, error: familyError } = await supabaseClient
+            .from('users')
+            .select('email, metadata')
+            .eq('id', caseData.assigned_family_user_id)
+            .single();
+          
+          if (!familyError) {
+            familyData = familyUser;
+            familyPassword = familyUser.metadata?.temp_password || null;
+          }
+        }
+        
+        // Load form details
+        const { data: formData, error: formError } = await supabaseClient
+          .from('forms')
+          .select('*')
+          .eq('case_id', caseId)
+          .single();
+        
+        // Populate modal
+        document.getElementById('modal-case-name').textContent = caseData.deceased_name;
+        document.getElementById('modal-case-id').textContent = caseData.id.split('-')[0] + '...';
+        document.getElementById('modal-case-status').textContent = caseData.status.replace(/_/g, ' ');
+        document.getElementById('modal-case-created').textContent = new Date(caseData.created_at).toLocaleDateString();
+        document.getElementById('modal-case-updated').textContent = new Date(caseData.updated_at).toLocaleDateString();
+        
+        if (familyData) {
+          document.getElementById('modal-family-name').textContent = familyData.metadata?.name || 'Family Member';
+          document.getElementById('modal-family-email').textContent = familyData.email;
+          document.getElementById('modal-family-login-email').textContent = familyData.email;
+        } else {
+          document.getElementById('modal-family-name').textContent = 'Not assigned';
+          document.getElementById('modal-family-email').textContent = 'Not assigned';
+          document.getElementById('modal-family-login-email').textContent = 'Not assigned';
+        }
+        
+        if (formData && formData.submitted_at) {
+          document.getElementById('modal-form-status').textContent = 'Submitted';
+          document.getElementById('modal-form-submitted').textContent = new Date(formData.submitted_at).toLocaleDateString();
+        } else {
+          document.getElementById('modal-form-status').textContent = 'Not submitted';
+          document.getElementById('modal-form-submitted').textContent = '-';
+        }
+        
+        // Store family password for reveal
+        if (familyPassword) {
+          document.getElementById('modal-family-password').textContent = familyPassword;
+        } else {
+          document.getElementById('modal-family-password').textContent = 'Password not available';
+        }
+        
+      } catch (error) {
+        console.error('Error loading case details:', error);
+        alert('Error loading case details. Please try again.');
+        closeCaseModal();
+      }
+    }
+    
+    function closeCaseModal() {
+      const modal = document.getElementById('case-details-modal');
+      modal.style.display = 'none';
+      currentCaseDetails = null;
+      credentialsRevealed = false;
+    }
+    
+    function revealCredentials() {
+      const revealBtn = document.getElementById('reveal-credentials-btn');
+      const emailElement = document.getElementById('modal-family-login-email');
+      const passwordElement = document.getElementById('modal-family-password');
+      
+      if (!credentialsRevealed) {
+        // Reveal credentials
+        emailElement.classList.remove('blurred');
+        passwordElement.classList.remove('blurred');
+        revealBtn.textContent = 'Hide';
+        credentialsRevealed = true;
+      } else {
+        // Hide credentials
+        emailElement.classList.add('blurred');
+        passwordElement.classList.add('blurred');
+        revealBtn.textContent = 'Reveal';
+        credentialsRevealed = false;
+      }
+    }
+    
+    function copyToClipboard(elementId) {
+      const element = document.getElementById(elementId);
+      const text = element.textContent;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        // Find the copy button for this element
+        const copyBtn = element.parentNode.querySelector('.copy-btn');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('copied');
+        
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert('Failed to copy to clipboard');
+      });
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('case-details-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'case-details-modal') {
+        closeCaseModal();
+      }
+    });
     
     // Create Case form handler
     document.getElementById('create-case-form').addEventListener('submit', async (e) => {
@@ -589,6 +1011,23 @@
         if (result.data.temp_password) {
           console.log('Setting password:', result.data.temp_password);
           document.getElementById('family-password').textContent = result.data.temp_password;
+          
+          // Store password in user metadata for later retrieval
+          if (result.data.user_id) {
+            try {
+              await supabaseClient
+                .from('users')
+                .update({ 
+                  metadata: { 
+                    temp_password: result.data.temp_password,
+                    password_created_at: new Date().toISOString()
+                  }
+                })
+                .eq('id', result.data.user_id);
+            } catch (updateError) {
+              console.error('Failed to store password in metadata:', updateError);
+            }
+          }
         } else if (result.data.magic_link) {
           console.log('Received magic_link instead of password:', result.data.magic_link);
           document.getElementById('family-password').textContent = 'Magic link: ' + result.data.magic_link;
@@ -634,11 +1073,14 @@
         }
         
         casesList.innerHTML = cases.map(c => `
-          <div class="case-card">
+          <div class="case-card" onclick="openCaseModal('${c.id}')" style="cursor: pointer;">
             <div class="case-name">${c.deceased_name}</div>
             <span class="case-status status-${c.status.split('_')[0]}">${c.status.replace(/_/g, ' ')}</span>
             <p class="paragraph" style="margin-top: 10px; font-size: 14px;">
               Created: ${new Date(c.created_at).toLocaleDateString()}
+            </p>
+            <p class="paragraph" style="margin-top: 5px; font-size: 12px; color: #666;">
+              Click to view details
             </p>
           </div>
         `).join('');
