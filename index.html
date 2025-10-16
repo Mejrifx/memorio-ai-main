@@ -1121,6 +1121,15 @@
             }
         }
         
+        // Hide form content initially to prevent flashing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide the main form content initially
+            const formContent = document.querySelector('.form-container, .form-wrapper, .w-form');
+            if (formContent) {
+                formContent.style.display = 'none';
+            }
+        });
+
         // Initialize obituary data
         const obituaryData = { name: "", content: "" };
         let originalObituaryData = {};
@@ -1216,6 +1225,12 @@
                 
                 currentCase = cases;
                 console.log('✅ Case loaded:', currentCase.deceased_name, '| Case ID:', currentCase.id);
+                
+                // Show the form content now that we know user hasn't completed it
+                const formContent = document.querySelector('.form-container, .form-wrapper, .w-form');
+                if (formContent) {
+                    formContent.style.display = 'block';
+                }
                 
                 // Optionally pre-fill deceased name in form if needed
                 // const deceasedNameField = document.querySelector('[name="loved_ones_name"]');
