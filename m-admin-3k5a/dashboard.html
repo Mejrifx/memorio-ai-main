@@ -670,6 +670,11 @@
               <div class="credential-value" id="org-${org.id}" style="color: #32343a; margin-top: 5px;">${org.id}</div>
               <button class="copy-btn" onclick="copyOrgId('org-${org.id}')">Copy ID</button>
             </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+              <button class="btn-secondary" onclick="deleteOrganization('${org.id}', '${org.name}')" style="padding: 6px 12px; font-size: 12px;">
+                Delete Organization
+              </button>
+            </div>
           </div>
         `).join('');
         
@@ -696,6 +701,33 @@
     
     // Make copyOrgId global
     window.copyOrgId = copyOrgId;
+    window.deleteOrganization = deleteOrganization;
+    
+    // Delete Organization Function
+    async function deleteOrganization(orgId, orgName) {
+      const confirmed = confirm(`Are you sure you want to delete the organization "${orgName}"?\n\nThis action cannot be undone and will permanently remove:\n- Organization details\n- All associated cases\n- All user accounts\n- All form submissions\n- All uploaded assets\n- All related data\n\nThis should only be done if the funeral home is leaving Memorio permanently.`);
+      
+      if (!confirmed) return;
+      
+      try {
+        // Delete the organization (this will cascade delete related records due to foreign key constraints)
+        const { error } = await supabaseClient
+          .from('organizations')
+          .delete()
+          .eq('id', orgId);
+        
+        if (error) throw error;
+        
+        alert(`Organization "${orgName}" has been successfully deleted.`);
+        
+        // Reload the organizations list
+        await loadOrganizations();
+        
+      } catch (error) {
+        console.error('Error deleting organization:', error);
+        alert(`Failed to delete organization: ${error.message}`);
+      }
+    }
     
     // Copy to clipboard function
     function copyToClipboard(elementId) {
