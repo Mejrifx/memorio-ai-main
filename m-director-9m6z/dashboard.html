@@ -428,6 +428,157 @@
       border-color: #4caf50;
     }
     
+    /* Custom Confirmation Modal */
+    .confirmation-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    
+    .confirmation-content {
+      background-color: white;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    
+    .confirmation-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .confirmation-title {
+      color: #32343a;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .confirmation-message {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    
+    .confirmation-warning {
+      background-color: #fff3e0;
+      border: 2px solid #ff9800;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      color: #e65100;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .confirmation-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    
+    .btn-confirm-delete {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-confirm-delete:hover {
+      background-color: #d32f2f;
+    }
+    
+    .btn-cancel {
+      background-color: #f0f0f0;
+      color: #666;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-cancel:hover {
+      background-color: #e0e0e0;
+    }
+    
+    /* Success Modal */
+    .success-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    
+    .success-content {
+      background-color: white;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    
+    .success-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .success-title {
+      color: #32343a;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .success-message {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    
+    .btn-success-ok {
+      background-color: #436481;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-success-ok:hover {
+      background-color: #1e3a52;
+    }
+    
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -687,6 +838,32 @@
     </div>
   </div>
 
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmation-modal" class="confirmation-modal">
+    <div class="confirmation-content">
+      <div class="confirmation-icon">⚠️</div>
+      <h2 class="confirmation-title" id="confirmation-title">Confirm Deletion</h2>
+      <p class="confirmation-message" id="confirmation-message">Are you sure you want to delete this case?</p>
+      <div class="confirmation-warning" id="confirmation-warning">
+        This action cannot be undone and will permanently remove all related data.
+      </div>
+      <div class="confirmation-buttons">
+        <button class="btn-cancel" onclick="closeConfirmationModal()">Cancel</button>
+        <button class="btn-confirm-delete" id="confirm-delete-btn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Success Modal -->
+  <div id="success-modal" class="success-modal">
+    <div class="success-content">
+      <div class="success-icon">✅</div>
+      <h2 class="success-title">Success!</h2>
+      <p class="success-message" id="success-message">The case has been successfully deleted.</p>
+      <button class="btn-success-ok" onclick="closeSuccessModal()">OK</button>
+    </div>
+  </div>
+
   <script>
     // Initialize Supabase client
     const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
@@ -759,6 +936,8 @@
     window.revealCredentials = revealCredentials;
     window.copyToClipboard = copyToClipboard;
     window.deleteCase = deleteCase;
+    window.closeConfirmationModal = closeConfirmationModal;
+    window.closeSuccessModal = closeSuccessModal;
     
     // Case Details Modal Functions
     let currentCaseDetails = null;
@@ -905,30 +1084,62 @@
       }
     });
     
+    // Modal Control Functions
+    function closeConfirmationModal() {
+      document.getElementById('confirmation-modal').style.display = 'none';
+    }
+    
+    function closeSuccessModal() {
+      document.getElementById('success-modal').style.display = 'none';
+    }
+    
+    function showConfirmationModal(title, message, warning, onConfirm) {
+      document.getElementById('confirmation-title').textContent = title;
+      document.getElementById('confirmation-message').textContent = message;
+      document.getElementById('confirmation-warning').textContent = warning;
+      
+      // Set up confirm button
+      const confirmBtn = document.getElementById('confirm-delete-btn');
+      confirmBtn.onclick = () => {
+        closeConfirmationModal();
+        onConfirm();
+      };
+      
+      document.getElementById('confirmation-modal').style.display = 'flex';
+    }
+    
+    function showSuccessModal(message) {
+      document.getElementById('success-message').textContent = message;
+      document.getElementById('success-modal').style.display = 'flex';
+    }
+    
     // Delete Case Function
     async function deleteCase(caseId, caseName) {
-      const confirmed = confirm(`Are you sure you want to delete the case for "${caseName}"?\n\nThis action cannot be undone and will permanently remove:\n- Case details\n- Form submissions\n- Uploaded assets\n- All related data`);
-      
-      if (!confirmed) return;
-      
-      try {
-        // Delete the case (this will cascade delete related records due to foreign key constraints)
-        const { error } = await supabaseClient
-          .from('cases')
-          .delete()
-          .eq('id', caseId);
-        
-        if (error) throw error;
-        
-        alert(`Case for "${caseName}" has been successfully deleted.`);
-        
-        // Reload the cases list
-        await loadCases();
-        
-      } catch (error) {
-        console.error('Error deleting case:', error);
-        alert(`Failed to delete case: ${error.message}`);
-      }
+      showConfirmationModal(
+        'Delete Case',
+        `Are you sure you want to delete the case for "${caseName}"?`,
+        'This action cannot be undone and will permanently remove:\n• Case details\n• Form submissions\n• Uploaded assets\n• All related data',
+        async () => {
+          try {
+            // Delete the case (this will cascade delete related records due to foreign key constraints)
+            const { error } = await supabaseClient
+              .from('cases')
+              .delete()
+              .eq('id', caseId);
+            
+            if (error) throw error;
+            
+            showSuccessModal(`Case for "${caseName}" has been successfully deleted.`);
+            
+            // Reload the cases list
+            await loadCases();
+            
+          } catch (error) {
+            console.error('Error deleting case:', error);
+            showSuccessModal(`Failed to delete case: ${error.message}`);
+          }
+        }
+      );
     }
     
     // Create Case form handler
