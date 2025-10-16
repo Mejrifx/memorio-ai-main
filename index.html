@@ -18,6 +18,16 @@
   
   <!-- Supabase Client for Authentication and Database -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Hide form content initially to prevent flashing -->
+  <style>
+    .form-container, .form-wrapper, .w-form {
+      display: none !important;
+    }
+    .form-container.show, .form-wrapper.show, .w-form.show {
+      display: block !important;
+    }
+  </style>
 </head>
 <body class="body">
   <!-- Login Modal -->
@@ -1121,14 +1131,7 @@
             }
         }
         
-        // Hide form content initially to prevent flashing
-        document.addEventListener('DOMContentLoaded', function() {
-            // Hide the main form content initially
-            const formContent = document.querySelector('.form-container, .form-wrapper, .w-form');
-            if (formContent) {
-                formContent.style.display = 'none';
-            }
-        });
+        // Form content is hidden by CSS initially
 
         // Initialize obituary data
         const obituaryData = { name: "", content: "" };
@@ -1229,7 +1232,7 @@
                 // Show the form content now that we know user hasn't completed it
                 const formContent = document.querySelector('.form-container, .form-wrapper, .w-form');
                 if (formContent) {
-                    formContent.style.display = 'block';
+                    formContent.classList.add('show');
                 }
                 
                 // Optionally pre-fill deceased name in form if needed
