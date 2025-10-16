@@ -1508,7 +1508,40 @@
             // Disable button and show loading state
             btn.disabled = true;
             btn.textContent = 'Sending...';
+            
             try {
+                // First, update the database with the final obituary content
+                if (currentCase && currentCase.id) {
+                    const { data: existingForms, error: formQueryError } = await supabaseClient
+                        .from('forms')
+                        .select('id')
+                        .eq('case_id', currentCase.id)
+                        .single();
+                    
+                    if (!formQueryError && existingForms) {
+                        // Update existing form with final obituary content
+                        const { error: updateError } = await supabaseClient
+                            .from('forms')
+                            .update({
+                                submitted_json: {
+                                    ...originalFormPayload,
+                                    obituary_name: obituaryData.name,
+                                    obituary_content: finalContent,
+                                    generated_at: new Date().toISOString()
+                                },
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', existingForms.id);
+                        
+                        if (updateError) {
+                            console.error('❌ Error updating form with obituary:', updateError);
+                        } else {
+                            console.log('✅ Successfully updated form with final obituary content');
+                        }
+                    }
+                }
+                
+                // Then send to email webhook
                 console.log('Sending to email webhook:', EMAIL_ENDPOINT);
                 console.log('Payload:', finalData);
                 const response = await fetch(EMAIL_ENDPOINT, {

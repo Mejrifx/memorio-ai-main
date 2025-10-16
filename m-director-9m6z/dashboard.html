@@ -564,6 +564,38 @@
       background-color: #1e3a52;
     }
     
+    /* Custom Icons for Modal */
+    .modal-icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background-color: #436481;
+      mask-size: contain;
+      mask-repeat: no-repeat;
+      mask-position: center;
+      -webkit-mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    
+    .modal-icon-case {
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14,2 14,8 20,8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10,9 9,9 8,9'/%3E%3C/svg%3E");
+    }
+    
+    .modal-icon-family {
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M22 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E");
+    }
+    
+    .modal-icon-lock {
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='11' width='18' height='11' rx='2' ry='2'/%3E%3Ccircle cx='12' cy='16' r='1'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E");
+    }
+    
+    .modal-icon-form {
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14,2 14,8 20,8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10,9 9,9 8,9'/%3E%3C/svg%3E");
+    }
+    
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
@@ -753,7 +785,10 @@
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title">📋 Case Information</h3>
+        <h3 class="modal-section-title">
+          <span class="modal-icon modal-icon-case"></span>
+          Case Information
+        </h3>
         <div class="modal-info-grid">
           <div class="modal-info-item">
             <div class="modal-info-label">Case ID</div>
@@ -775,7 +810,10 @@
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title">👥 Family Information</h3>
+        <h3 class="modal-section-title">
+          <span class="modal-icon modal-icon-family"></span>
+          Family Information
+        </h3>
         <div class="modal-info-grid">
           <div class="modal-info-item">
             <div class="modal-info-label">Family Member</div>
@@ -789,7 +827,10 @@
         
         <div class="credentials-section">
           <div class="credentials-header">
-            <h4 class="credentials-title">🔐 Family Login Credentials</h4>
+            <h4 class="credentials-title">
+              <span class="modal-icon modal-icon-lock"></span>
+              Family Login Credentials
+            </h4>
             <button class="reveal-btn" id="reveal-credentials-btn" onclick="revealCredentials()">Reveal</button>
           </div>
           <div class="credentials-grid">
@@ -808,7 +849,10 @@
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title">📝 Form Status</h3>
+        <h3 class="modal-section-title">
+          <span class="modal-icon modal-icon-form"></span>
+          Form Status
+        </h3>
         <div class="modal-info-grid">
           <div class="modal-info-item">
             <div class="modal-info-label">Form Status</div>

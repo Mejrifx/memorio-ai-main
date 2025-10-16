@@ -786,9 +786,13 @@
         const obituaryData = currentForm.submitted_json;
         console.log('Obituary data:', obituaryData);
         
+        // Check for generated obituary content first, then fall back to original form data
+        const obituaryName = obituaryData.obituary_name || obituaryData.name || 'Obituary';
+        const obituaryText = obituaryData.obituary_content || obituaryData.content || 'No content available';
+        
         obituaryContent.innerHTML = `
-          <h4 style="margin-top: 0; color: #32343a;">${obituaryData.name || 'Obituary'}</h4>
-          <div style="white-space: pre-wrap; line-height: 1.6;">${obituaryData.content || 'No content available'}</div>
+          <h4 style="margin-top: 0; color: #32343a;">${obituaryName}</h4>
+          <div style="white-space: pre-wrap; line-height: 1.6;">${obituaryText}</div>
         `;
         
         if (currentCase.status === 'submitted' || currentCase.status === 'in_production') {
@@ -847,7 +851,7 @@
       
       // Case created
       timeline.push({
-        icon: 'icon-case',
+        icon: 'icon-check',
         title: 'Case Created',
         date: new Date(caseData.created_at).toLocaleDateString(),
         description: `Case created for ${caseData.deceased_name}`
