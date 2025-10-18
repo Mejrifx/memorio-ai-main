@@ -916,14 +916,16 @@
       // First, get count of users in this org
       let userCount = 0;
       try {
-        const { data: users, error: countError } = await supabaseClient
+        const { count, error: countError } = await supabaseClient
           .from('users')
-          .select('id', { count: 'exact', head: true })
+          .select('*', { count: 'exact', head: true })
           .eq('org_id', orgId);
         
-        if (!countError && users) {
-          userCount = users.length || 0;
+        if (!countError && count !== null) {
+          userCount = count;
         }
+        
+        console.log(`Found ${userCount} user(s) in organization ${orgId}`);
       } catch (e) {
         console.warn('Could not get user count:', e);
       }
