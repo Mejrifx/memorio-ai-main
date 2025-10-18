@@ -1327,17 +1327,43 @@
       casesList.innerHTML = '<p class="paragraph">Loading cases...</p>';
       
       try {
+        // Get current session to verify authentication
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        console.log('Current session:', session ? 'Active' : 'None');
+        console.log('User ID:', session?.user?.id);
+        console.log('User metadata:', session?.user?.user_metadata);
+        console.log('App metadata:', session?.user?.app_metadata);
+        
+        // Get user info to verify org_id
+        const { data: userData, error: userError } = await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        console.log('User data from database:', userData);
+        if (userError) console.error('Error fetching user data:', userError);
+        
+        // Load cases
         const { data: cases, error } = await supabaseClient
           .from('cases')
           .select('*')
           .order('created_at', { ascending: false });
         
-        if (error) throw error;
+        console.log('Cases query result:', { cases, error });
+        
+        if (error) {
+          console.error('Error loading cases:', error);
+          throw error;
+        }
         
         if (!cases || cases.length === 0) {
+          console.warn('No cases found for this director');
           casesList.innerHTML = '<p class="paragraph">No cases found. Create your first case to get started!</p>';
           return;
         }
+        
+        console.log(`Successfully loaded ${cases.length} cases`);
         
         casesList.innerHTML = cases.map(c => `
           <div class="case-card">
