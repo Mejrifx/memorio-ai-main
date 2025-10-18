@@ -78,10 +78,13 @@ serve(async (req) => {
       email,
       password: tempPassword,
       email_confirm: true,
-      user_metadata: {
+      app_metadata: {
         role: 'director',
-        name,
         org_id
+      },
+      user_metadata: {
+        name,
+        phone
       }
     });
 
