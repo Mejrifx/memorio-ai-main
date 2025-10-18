@@ -626,22 +626,52 @@
     async function checkAuth() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       
+      console.log('=== ADMIN AUTHENTICATION CHECK ===');
+      console.log('Session exists:', !!session);
+      
       if (!session) {
+        console.error('No session found - redirecting to login');
         window.location.href = 'login.html';
         return;
       }
       
-      // Verify admin role
+      console.log('Admin Email:', session.user.email);
+      console.log('JWT app_metadata:', session.user.app_metadata);
+      console.log('JWT user_metadata:', session.user.user_metadata);
+      
+      // Check if app_metadata has admin role
+      const jwtRole = session.user.app_metadata?.role;
+      console.log('JWT Role from app_metadata:', jwtRole);
+      
+      if (!jwtRole || jwtRole !== 'admin') {
+        console.error('❌ CRITICAL: Missing or incorrect app_metadata role in JWT!');
+        console.error('Expected: admin, Got:', jwtRole);
+        console.error('This will cause RLS to block organization creation!');
+        
+        alert('Authentication Issue: Your admin account is missing required metadata.\n\nPlease run the FIX-ADMIN-NOW.sql in Supabase Dashboard, then log out and log back in.');
+        await supabaseClient.auth.signOut();
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Verify admin role from database
       const { data: userData, error } = await supabaseClient
         .from('users')
         .select('role')
         .eq('id', session.user.id)
         .single();
       
+      console.log('Database user data:', userData);
+      
       if (error || !userData || userData.role !== 'admin') {
+        console.error('❌ Not an admin or user not found');
         await supabaseClient.auth.signOut();
         window.location.href = 'login.html';
+        return;
       }
+      
+      console.log('✅ Admin authentication successful');
+      console.log('=== END AUTH CHECK ===\n');
     }
     
     // Run auth check on page load
