@@ -913,21 +913,43 @@
     
     // Delete Organization Function
     async function deleteOrganization(orgId, orgName) {
+      // First, get count of users in this org
+      let userCount = 0;
+      try {
+        const { data: users, error: countError } = await supabaseClient
+          .from('users')
+          .select('id', { count: 'exact', head: true })
+          .eq('org_id', orgId);
+        
+        if (!countError && users) {
+          userCount = users.length || 0;
+        }
+      } catch (e) {
+        console.warn('Could not get user count:', e);
+      }
+      
       showConfirmationModal(
         'Delete Organization',
         `Are you sure you want to delete the organization "${orgName}"?`,
-        'This action cannot be undone and will permanently remove:\n• Organization details\n• All associated cases\n• All user accounts\n• All form submissions\n• All uploaded assets\n• All related data\n\nThis should only be done if the funeral home is leaving Memorio permanently.',
+        `This action cannot be undone and will permanently remove:\n• Organization details\n• ${userCount} user account${userCount !== 1 ? 's' : ''} (Directors, Families)\n• All authentication credentials\n• All associated cases\n• All form submissions\n• All uploaded assets\n• All related data\n\nAll users will be immediately logged out and unable to log in.\n\nThis should only be done if the funeral home is leaving Memorio permanently.`,
         async () => {
           try {
-            // Delete the organization (this will cascade delete related records due to foreign key constraints)
+            console.log(`Deleting organization: ${orgName} (${orgId})`);
+            console.log(`This will cascade delete ${userCount} user(s)`);
+            
+            // Delete the organization (this will trigger cascade deletion)
             const { error } = await supabaseClient
               .from('organizations')
               .delete()
               .eq('id', orgId);
             
-            if (error) throw error;
+            if (error) {
+              console.error('Delete error:', error);
+              throw error;
+            }
             
-            showSuccessModal(`Organization "${orgName}" has been successfully deleted.`);
+            console.log('Organization deleted successfully');
+            showSuccessModal(`Organization "${orgName}" and all ${userCount} associated user account(s) have been permanently deleted.`);
             
             // Reload the organizations list
             await loadOrganizations();
