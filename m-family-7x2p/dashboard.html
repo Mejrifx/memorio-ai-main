@@ -779,16 +779,26 @@
       const editBtn = document.getElementById('editObituaryBtn');
       const downloadBtn = document.getElementById('downloadObituaryBtn');
       
-      console.log('Displaying obituary - currentForm:', currentForm);
+      console.log('=== OBITUARY DISPLAY DEBUG ===');
+      console.log('currentForm:', currentForm);
+      console.log('submitted_json:', currentForm?.submitted_json);
       
       if (currentForm && currentForm.submitted_json) {
         // Show submitted obituary
         const obituaryData = currentForm.submitted_json;
-        console.log('Obituary data:', obituaryData);
+        console.log('Obituary data keys:', Object.keys(obituaryData));
+        console.log('obituary_name:', obituaryData.obituary_name);
+        console.log('obituary_content:', obituaryData.obituary_content);
+        console.log('loved_ones_name:', obituaryData.loved_ones_name);
+        console.log('Full obituaryData:', obituaryData);
         
         // Check for generated obituary content first, then fall back to original form data
-        const obituaryName = obituaryData.obituary_name || obituaryData.name || 'Obituary';
+        const obituaryName = obituaryData.obituary_name || obituaryData.loved_ones_name || obituaryData.name || 'Obituary';
         const obituaryText = obituaryData.obituary_content || obituaryData.content || 'No content available';
+        
+        console.log('Final display - Name:', obituaryName);
+        console.log('Final display - Text:', obituaryText);
+        console.log('=== END OBITUARY DEBUG ===\n');
         
         obituaryContent.innerHTML = `
           <h4 style="margin-top: 0; color: #32343a;">${obituaryName}</h4>
@@ -815,7 +825,20 @@
     function displayAssets() {
       const assetsGrid = document.getElementById('assetsGrid');
       
-      console.log('Displaying assets - currentAssets:', currentAssets);
+      console.log('=== ASSETS DISPLAY DEBUG ===');
+      console.log('currentCase.id:', currentCase?.id);
+      console.log('currentAssets count:', currentAssets?.length);
+      console.log('currentAssets:', currentAssets);
+      currentAssets.forEach((asset, index) => {
+        console.log(`Asset ${index + 1}:`, {
+          id: asset.id,
+          case_id: asset.case_id,
+          file_key: asset.file_key,
+          uploader_user_id: asset.uploader_user_id,
+          source: asset.metadata?.source
+        });
+      });
+      console.log('=== END ASSETS DEBUG ===\n');
       
       // Clear existing assets (except upload area)
       const uploadArea = assetsGrid.querySelector('.upload-area');
