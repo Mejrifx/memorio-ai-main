@@ -16,15 +16,17 @@ All code is deployed! You just need to run SQL migrations in your Supabase Dashb
 
 ---
 
-## 📋 **SQL Script 2: Fix Family Dashboard Photos**
+## 📋 **Step 2: Fix Family Dashboard Photos**
 
-**Location**: Open `FIX-FAMILY-DASHBOARD-ISSUES.md` for the 2 SQL migrations
+**Location**: 
+- `FIX-FAMILY-DASHBOARD-ISSUES.md` for SQL migration (Migration 012)
+- `SETUP-STORAGE-POLICIES.md` for Storage bucket setup (Dashboard UI)
 
 **What it does**: 
-- Fixes RLS policies so families can upload photos
-- Fixes Storage bucket policies for file uploads
+- Fixes RLS policies so families can upload photos (SQL)
+- Fixes Storage bucket policies for file uploads (Dashboard UI)
 
-**Time**: 3 minutes
+**Time**: 5 minutes total
 
 ---
 
