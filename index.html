@@ -1677,7 +1677,7 @@
             }
         }
         // ---------- response handling ----------
-        function displayObituary(data, formPayload = {}) {
+        async function displayObituary(data, formPayload = {}) {
             // Store original form payload for email submission
             originalFormPayload = JSON.parse(JSON.stringify(formPayload));
             obituaryData.name =
@@ -1694,7 +1694,62 @@
                 alert('No obituary content was generated. Please check the n8n workflow output.');
                 return;
             }
+            
+            // ✅ AUTO-SAVE: Save obituary to database immediately after N8N generates it
+            await saveObituaryToDatabase(obituaryData.name, obituaryData.content);
+            
             startTypewriter();
+        }
+        
+        /**
+         * Save generated obituary to database
+         * This runs automatically after N8N generates the obituary
+         */
+        async function saveObituaryToDatabase(obituaryName, obituaryContent) {
+            if (!currentCase || !currentCase.id) {
+                console.warn('⚠️ No case loaded, skipping obituary save');
+                return;
+            }
+            
+            try {
+                console.log('💾 Auto-saving generated obituary to database...');
+                
+                // Find the existing form record
+                const { data: existingForms, error: formQueryError } = await supabaseClient
+                    .from('forms')
+                    .select('id, submitted_json')
+                    .eq('case_id', currentCase.id)
+                    .single();
+                
+                if (formQueryError || !existingForms) {
+                    console.error('❌ Error finding form:', formQueryError);
+                    return;
+                }
+                
+                // Update with obituary content
+                const updatedJson = {
+                    ...existingForms.submitted_json,
+                    obituary_name: obituaryName,
+                    obituary_content: obituaryContent,
+                    generated_at: new Date().toISOString()
+                };
+                
+                const { error: updateError } = await supabaseClient
+                    .from('forms')
+                    .update({
+                        submitted_json: updatedJson,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', existingForms.id);
+                
+                if (updateError) {
+                    console.error('❌ Error saving obituary:', updateError);
+                } else {
+                    console.log('✅ Obituary automatically saved to database');
+                }
+            } catch (error) {
+                console.error('❌ Error in saveObituaryToDatabase:', error);
+            }
         }
         // Expose functions globally
         window.publishObituary = publishObituary;
