@@ -1,36 +1,37 @@
 # Memorio Platform - Quick Start Guide
 
-## 🚀 **You Have 2 Simple SQL Scripts to Run**
+## 🎉 **Almost Everything is Done Automatically!**
 
-All code is deployed! You just need to run SQL migrations in your Supabase Dashboard.
+All code is deployed! Most SQL migrations have been applied automatically via the Supabase API.
 
 ---
 
-## 📋 **SQL Script 1: Fix All User Accounts**
+## ✅ **Already Applied Automatically**
+
+These migrations were applied using your access token:
+
+1. ✅ **Migration 012**: Assets table RLS policy (WITH CHECK clause)
+2. ✅ **Migration 013**: Storage bucket policies (correct JWT paths)
+
+**You don't need to do anything for these!**
+
+---
+
+## 📋 **SQL Script You Still Need to Run** (2 minutes)
+
+**Only ONE script remaining**: Fix user accounts
 
 **Location**: Open `RUN-THIS-SQL-NOW.md` for the complete SQL query
 
 **What it does**: Fixes `app_metadata` for all existing admin, director, and family accounts
 
+**Why manual**: This updates existing user accounts in `auth.users` and needs to be run once
+
 **Time**: 2 minutes
 
 ---
 
-## 📋 **Step 2: Fix Family Dashboard Photos**
-
-**Location**: 
-- `FIX-FAMILY-DASHBOARD-ISSUES.md` for SQL migration (Migration 012)
-- `SETUP-STORAGE-POLICIES.md` for Storage bucket setup (Dashboard UI)
-
-**What it does**: 
-- Fixes RLS policies so families can upload photos (SQL)
-- Fixes Storage bucket policies for file uploads (Dashboard UI)
-
-**Time**: 5 minutes total
-
----
-
-## ✅ **After Running SQL Scripts**
+## ✅ **After Running the SQL Script**
 
 ### **1. Test Admin Account**
 - Log out and log back in
