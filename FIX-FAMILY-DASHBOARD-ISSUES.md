@@ -8,13 +8,14 @@
 
 ---
 
-## ⚡ **STEP 1: Run SQL Migration** (2 minutes)
+## ⚡ **STEP 1: SQL Migrations** ✅ DONE!
 
-Go to **Supabase Dashboard → SQL Editor** and run this SQL script:
+**All SQL migrations have been applied automatically via the Supabase API!**
 
-### **Migration 1: Fix Assets RLS Policy**
+✅ Migration 012: Assets RLS policy fixed (added WITH CHECK)
+✅ Migration 013: Storage bucket policies fixed (updated to use app_metadata)
 
-This fixes the "new row violates row-level security policy" error when families upload photos.
+You don't need to do anything - the migrations are already applied to your database!
 
 ```sql
 -- Fix Assets RLS Policies - Add WITH CHECK Clause
@@ -43,28 +44,7 @@ CREATE POLICY "Families manage their case assets"
 
 ---
 
-## ⚡ **STEP 2: Setup Storage Bucket Policies** (3 minutes)
-
-**Note**: Storage bucket policies cannot be set via SQL Editor due to permissions. You need to use the **Supabase Dashboard UI**.
-
-📖 **Complete instructions**: See `SETUP-STORAGE-POLICIES.md` for the full guide
-
-### **Quick Summary**:
-
-1. Go to **Supabase Dashboard → Storage → case-assets**
-2. Enable **RLS** on the bucket
-3. Click **"New Policy"** and add **5 policies**:
-   - Admins full access (ALL operations)
-   - Directors can upload (INSERT)
-   - Directors can view (SELECT)
-   - Families can upload (INSERT)
-   - Families can view (SELECT)
-
-**💡 Tip**: Copy the policy SQL from `SETUP-STORAGE-POLICIES.md` - it has all 5 policies with exact syntax!
-
----
-
-## ⚡ **STEP 3: Deploy Updated Code** (Already done!)
+## ⚡ **STEP 2: Deploy Updated Code** (Already done!)
 
 All code changes have been deployed to your GitHub repo. Just pull the latest:
 
