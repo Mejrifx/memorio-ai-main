@@ -8,9 +8,9 @@
 
 ---
 
-## ⚡ **STEP 1: Run SQL Migrations** (5 minutes)
+## ⚡ **STEP 1: Run SQL Migration** (2 minutes)
 
-Go to **Supabase Dashboard → SQL Editor** and run these 2 SQL scripts:
+Go to **Supabase Dashboard → SQL Editor** and run this SQL script:
 
 ### **Migration 1: Fix Assets RLS Policy**
 
@@ -41,92 +41,30 @@ CREATE POLICY "Families manage their case assets"
   );
 ```
 
-### **Migration 2: Fix Storage Bucket Policies**
+---
 
-This allows families to upload photos to the storage bucket.
+## ⚡ **STEP 2: Setup Storage Bucket Policies** (3 minutes)
 
-```sql
--- Fix Storage Bucket RLS Policies for case-assets
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+**Note**: Storage bucket policies cannot be set via SQL Editor due to permissions. You need to use the **Supabase Dashboard UI**.
 
--- Drop existing policies if they exist
-DROP POLICY IF EXISTS "Families can upload case assets" ON storage.objects;
-DROP POLICY IF EXISTS "Families can view case assets" ON storage.objects;
-DROP POLICY IF EXISTS "Directors can upload case assets" ON storage.objects;
-DROP POLICY IF EXISTS "Directors can view case assets" ON storage.objects;
-DROP POLICY IF EXISTS "Admins full access to case assets" ON storage.objects;
+📖 **Complete instructions**: See `SETUP-STORAGE-POLICIES.md` for the full guide
 
--- Admins have full access
-CREATE POLICY "Admins full access to case assets"
-  ON storage.objects FOR ALL
-  TO authenticated
-  USING (
-    bucket_id = 'case-assets' AND
-    auth.jwt() -> 'app_metadata' ->> 'role' = 'admin'
-  )
-  WITH CHECK (
-    bucket_id = 'case-assets' AND
-    auth.jwt() -> 'app_metadata' ->> 'role' = 'admin'
-  );
+### **Quick Summary**:
 
--- Directors can upload and view assets in their org's cases
-CREATE POLICY "Directors can upload case assets"
-  ON storage.objects FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    bucket_id = 'case-assets' AND
-    auth.jwt() -> 'app_metadata' ->> 'role' = 'director' AND
-    EXISTS (
-      SELECT 1 FROM public.cases
-      WHERE cases.id = (string_to_array(name, '/'))[1]::uuid
-      AND cases.org_id = (auth.jwt() -> 'app_metadata' ->> 'org_id')::uuid
-    )
-  );
+1. Go to **Supabase Dashboard → Storage → case-assets**
+2. Enable **RLS** on the bucket
+3. Click **"New Policy"** and add **5 policies**:
+   - Admins full access (ALL operations)
+   - Directors can upload (INSERT)
+   - Directors can view (SELECT)
+   - Families can upload (INSERT)
+   - Families can view (SELECT)
 
-CREATE POLICY "Directors can view case assets"
-  ON storage.objects FOR SELECT
-  TO authenticated
-  USING (
-    bucket_id = 'case-assets' AND
-    auth.jwt() -> 'app_metadata' ->> 'role' = 'director' AND
-    EXISTS (
-      SELECT 1 FROM public.cases
-      WHERE cases.id = (string_to_array(name, '/'))[1]::uuid
-      AND cases.org_id = (auth.jwt() -> 'app_metadata' ->> 'org_id')::uuid
-    )
-  );
-
--- Families can upload and view assets for their assigned cases
-CREATE POLICY "Families can upload case assets"
-  ON storage.objects FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    bucket_id = 'case-assets' AND
-    auth.jwt() -> 'app_metadata' ->> 'role' = 'family' AND
-    EXISTS (
-      SELECT 1 FROM public.cases
-      WHERE cases.id = (string_to_array(name, '/'))[1]::uuid
-      AND cases.assigned_family_user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Families can view case assets"
-  ON storage.objects FOR SELECT
-  TO authenticated
-  USING (
-    bucket_id = 'case-assets' AND
-    auth.jwt() -> 'app_metadata' ->> 'role' = 'family' AND
-    EXISTS (
-      SELECT 1 FROM public.cases
-      WHERE cases.id = (string_to_array(name, '/'))[1]::uuid
-      AND cases.assigned_family_user_id = auth.uid()
-    )
-  );
-```
+**💡 Tip**: Copy the policy SQL from `SETUP-STORAGE-POLICIES.md` - it has all 5 policies with exact syntax!
 
 ---
 
-## ⚡ **STEP 2: Deploy Updated Code** (Already done!)
+## ⚡ **STEP 3: Deploy Updated Code** (Already done!)
 
 All code changes have been deployed to your GitHub repo. Just pull the latest:
 
