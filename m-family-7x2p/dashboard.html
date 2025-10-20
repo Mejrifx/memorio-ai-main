@@ -796,8 +796,12 @@
         `;
         
         if (currentCase.status === 'submitted' || currentCase.status === 'in_production') {
+          editBtn.textContent = 'Make Changes';
           editBtn.style.display = 'inline-block';
-          editBtn.onclick = () => window.location.href = '../index.html';
+          editBtn.onclick = () => {
+            // Redirect to form page with edit mode parameter
+            window.location.href = '../index.html?mode=edit';
+          };
         }
         
         if (currentCase.status === 'delivered') {
@@ -827,14 +831,41 @@
           assetItem.onclick = () => viewAsset(asset);
           
           const icon = asset.mime_type.startsWith('image/') ? 'icon-photo' : 'icon-video';
-          const fileName = asset.file_key.split('/').pop();
           
-          assetItem.innerHTML = `
-            <div class="asset-icon">
-              <span class="icon ${icon}"></span>
-            </div>
-            <div class="asset-name">${fileName}</div>
-          `;
+          // Handle different asset sources
+          let fileName = 'Unknown';
+          let thumbnailUrl = null;
+          
+          if (asset.metadata?.source === 'uploadcare') {
+            // Uploadcare photo from initial form submission
+            fileName = asset.metadata?.uploadcare_file_id || 'Uploaded Photo';
+            // Generate Uploadcare thumbnail URL
+            thumbnailUrl = asset.file_key.includes('ucarecdn.com') 
+              ? `${asset.file_key}-/scale_crop/200x200/center/` 
+              : asset.file_key;
+          } else {
+            // Supabase Storage photo uploaded via dashboard
+            fileName = asset.file_key.split('/').pop();
+            // For Supabase Storage, we'll show the icon for now
+            // In production, you'd get a signed URL
+          }
+          
+          // Use thumbnail if available, otherwise use icon
+          if (thumbnailUrl && asset.mime_type.startsWith('image/')) {
+            assetItem.innerHTML = `
+              <div class="asset-thumbnail" style="width: 100%; height: 150px; overflow: hidden; border-radius: 8px; margin-bottom: 8px;">
+                <img src="${thumbnailUrl}" alt="${fileName}" style="width: 100%; height: 100%; object-fit: cover;" />
+              </div>
+              <div class="asset-name" style="font-size: 12px; text-align: center;">${fileName}</div>
+            `;
+          } else {
+            assetItem.innerHTML = `
+              <div class="asset-icon">
+                <span class="icon ${icon}"></span>
+              </div>
+              <div class="asset-name">${fileName}</div>
+            `;
+          }
           
           assetsGrid.appendChild(assetItem);
         });
@@ -953,8 +984,20 @@
     
     // Asset functions
     function viewAsset(asset) {
-      // For now, just show an alert. In production, this would open a modal or new tab
-      alert(`Viewing asset: ${asset.file_key}`);
+      // Open asset in new tab
+      let viewUrl = asset.file_key;
+      
+      // Handle Uploadcare URLs - ensure they're viewable
+      if (asset.metadata?.source === 'uploadcare' && asset.file_key.includes('ucarecdn.com')) {
+        viewUrl = asset.file_key; // Uploadcare URLs are directly viewable
+      } else {
+        // For Supabase Storage, we'd need to get a signed URL
+        // For now, alert that this feature is coming soon
+        alert('Viewing Supabase Storage assets coming soon. For now, photos from the form are viewable.');
+        return;
+      }
+      
+      window.open(viewUrl, '_blank');
     }
     
     // File upload handler

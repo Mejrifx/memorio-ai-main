@@ -1025,7 +1025,7 @@
         .memorial-info { background:#fff3e9; border-radius:20px; padding:25px; margin-bottom:20px; font-size:16px; color:#32343a; text-align:center; box-shadow:0 2px 8px -2px rgba(0,0,0,.2); }
         .memorio-container { max-width: 800px; margin: 0 auto; }
     </style>
-  <script>
+            <script>
         // Production endpoints - will work when deployed to memorio.ai domain
         const ENDPOINT = "https://memorioo.app.n8n.cloud/webhook/memorio-intake";
         const EMAIL_ENDPOINT = "https://memorioo.app.n8n.cloud/webhook/send-email";
@@ -1187,11 +1187,21 @@
                         .eq('case_id', cases.id)
                         .single();
                     
-                    if (!formError && forms && forms.submitted_at) {
+                    // Check if user is in edit mode
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const isEditMode = urlParams.get('mode') === 'edit';
+                    
+                    if (!formError && forms && forms.submitted_at && !isEditMode) {
                         console.log('✅ Form already submitted, redirecting to dashboard immediately...');
-                        // Form is already completed, redirect immediately without showing form
+                        // Form is already completed and not in edit mode, redirect immediately without showing form
                         window.location.href = '/m-family-7x2p/dashboard.html';
                         return false; // Stop execution
+                    }
+                    
+                    if (isEditMode && forms && forms.submitted_at) {
+                        console.log('✅ Edit mode enabled - family can update their submission');
+                        // In edit mode, allow editing and pre-fill form with existing data
+                        // TODO: Pre-fill form fields with existing form data
                     }
                 }
                 
@@ -1301,11 +1311,84 @@
                 
                 console.log('✅ Form data saved to database successfully');
                 
+                // Save uploaded photos to assets table
+                await saveUploadedPhotos(formPayload);
+                
                 // Update case status to 'submitted'
                 await updateCaseStatus('submitted');
                 
             } catch (error) {
                 console.error('❌ Error in saveFormToDatabase:', error);
+                // Don't block the user experience
+            }
+        }
+        
+        /**
+         * Save uploaded photos from Uploadcare to assets table
+         */
+        async function saveUploadedPhotos(formPayload) {
+            if (!currentCase || !currentUser) {
+                console.warn('⚠️ No case or user loaded, skipping photo save');
+                return;
+            }
+            
+            try {
+                // Uploadcare widget uses "Memorio" as the field name (from ctx-name="Memorio")
+                const uploadcareValue = formPayload['Memorio'];
+                
+                if (!uploadcareValue) {
+                    console.log('📷 No photos uploaded');
+                    return;
+                }
+                
+                console.log('📷 Processing uploaded photos:', uploadcareValue);
+                
+                // Uploadcare returns a CDN URL or group ID
+                // Format could be:
+                // - Single file: "https://ucarecdn.com/uuid/"
+                // - Multiple files: "https://ucarecdn.com/uuid1/~https://ucarecdn.com/uuid2/" (group)
+                // - Or just the UUID/group ID
+                
+                const photoUrls = uploadcareValue.split('~').filter(url => url.trim());
+                
+                console.log(`📷 Found ${photoUrls.length} photo(s) to save`);
+                
+                for (const photoUrl of photoUrls) {
+                    try {
+                        const cleanUrl = photoUrl.trim();
+                        
+                        // Extract file UUID from Uploadcare URL
+                        const fileId = cleanUrl.replace('https://ucarecdn.com/', '').replace(/\/$/, '');
+                        
+                        // Save to assets table
+                        const { error: assetError } = await supabaseClient
+                            .from('assets')
+                            .insert({
+                                case_id: currentCase.id,
+                                uploader_user_id: currentUser.id,
+                                file_key: cleanUrl, // Store the full Uploadcare URL
+                                mime_type: 'image/jpeg', // Uploadcare primarily handles images
+                                size_bytes: 0, // We don't have size info from Uploadcare
+                                metadata: {
+                                    source: 'uploadcare',
+                                    uploadcare_file_id: fileId,
+                                    uploaded_via: 'form_submission'
+                                }
+                            });
+                        
+                        if (assetError) {
+                            console.error('❌ Error saving photo to assets:', assetError);
+                        } else {
+                            console.log('✅ Photo saved to assets table:', fileId);
+                        }
+                    } catch (photoError) {
+                        console.error('❌ Error processing individual photo:', photoError);
+                    }
+                }
+                
+                console.log('✅ All photos processed');
+            } catch (error) {
+                console.error('❌ Error saving uploaded photos:', error);
                 // Don't block the user experience
             }
         }
@@ -1804,7 +1887,7 @@
                 }
             });
             
-            // Listen for iframe postMessage if needed
+        // Listen for iframe postMessage if needed
             window.addEventListener('message', (e) => { 
                 if (e.data?.type === 'obituary-data') displayObituary(e.data.obituary || {}); 
             });
