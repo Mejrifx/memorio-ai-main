@@ -1341,24 +1341,41 @@
                     return;
                 }
                 
-                console.log('📷 Processing uploaded photos:', uploadcareValue);
+                console.log('📷 Raw Uploadcare value:', uploadcareValue);
+                console.log('📷 Uploadcare value type:', typeof uploadcareValue);
                 
-                // Uploadcare returns a CDN URL or group ID
-                // Format could be:
-                // - Single file: "https://ucarecdn.com/uuid/"
-                // - Multiple files: "https://ucarecdn.com/uuid1/~https://ucarecdn.com/uuid2/" (group)
-                // - Or just the UUID/group ID
+                // Uploadcare widget returns different formats:
+                // - Group: "https://ucarecdn.com/uuid1/~https://ucarecdn.com/uuid2/"
+                // - Single: "https://ucarecdn.com/uuid/" OR just "uuid"
+                // We need to handle all cases and construct proper URLs
                 
-                const photoUrls = uploadcareValue.split('~').filter(url => url.trim());
+                let photoIds = [];
                 
-                console.log(`📷 Found ${photoUrls.length} photo(s) to save`);
+                if (uploadcareValue.includes('~')) {
+                    // Multiple files in a group
+                    console.log('📷 Detected multiple files (group)');
+                    const parts = uploadcareValue.split('~');
+                    photoIds = parts.map(part => {
+                        const cleaned = part.trim().replace('https://ucarecdn.com/', '').replace(/\/$/, '');
+                        return cleaned;
+                    }).filter(id => id && id.length > 0);
+                } else {
+                    // Single file
+                    console.log('📷 Detected single file');
+                    const cleaned = uploadcareValue.trim().replace('https://ucarecdn.com/', '').replace(/\/$/, '');
+                    if (cleaned && cleaned.length > 0) {
+                        photoIds = [cleaned];
+                    }
+                }
                 
-                for (const photoUrl of photoUrls) {
+                console.log(`📷 Extracted ${photoIds.length} photo ID(s):`, photoIds);
+                
+                for (const photoId of photoIds) {
                     try {
-                        const cleanUrl = photoUrl.trim();
+                        // Construct full Uploadcare CDN URL
+                        const fullUrl = `https://ucarecdn.com/${photoId}/`;
                         
-                        // Extract file UUID from Uploadcare URL
-                        const fileId = cleanUrl.replace('https://ucarecdn.com/', '').replace(/\/$/, '');
+                        console.log(`📷 Saving photo: ${photoId} → ${fullUrl}`);
                         
                         // Save to assets table
                         const { error: assetError } = await supabaseClient
@@ -1366,12 +1383,12 @@
                             .insert({
                                 case_id: currentCase.id,
                                 uploader_user_id: currentUser.id,
-                                file_key: cleanUrl, // Store the full Uploadcare URL
+                                file_key: fullUrl, // Store the full Uploadcare URL
                                 mime_type: 'image/jpeg', // Uploadcare primarily handles images
                                 size_bytes: 0, // We don't have size info from Uploadcare
                                 metadata: {
                                     source: 'uploadcare',
-                                    uploadcare_file_id: fileId,
+                                    uploadcare_file_id: photoId,
                                     uploaded_via: 'form_submission'
                                 }
                             });
@@ -1379,7 +1396,7 @@
                         if (assetError) {
                             console.error('❌ Error saving photo to assets:', assetError);
                         } else {
-                            console.log('✅ Photo saved to assets table:', fileId);
+                            console.log('✅ Photo saved to assets table:', photoId);
                         }
                     } catch (photoError) {
                         console.error('❌ Error processing individual photo:', photoError);

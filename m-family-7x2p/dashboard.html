@@ -858,11 +858,25 @@
           
           if (asset.metadata?.source === 'uploadcare') {
             // Uploadcare photo from initial form submission
-            fileName = asset.metadata?.uploadcare_file_id || 'Uploaded Photo';
-            // Generate Uploadcare thumbnail URL
-            thumbnailUrl = asset.file_key.includes('ucarecdn.com') 
-              ? `${asset.file_key}-/scale_crop/200x200/center/` 
-              : asset.file_key;
+            const fileId = asset.metadata?.uploadcare_file_id || asset.file_key;
+            fileName = fileId.length > 20 ? `Photo-${fileId.substring(0, 8)}` : fileId;
+            
+            // Construct proper Uploadcare URL
+            let baseUrl = asset.file_key;
+            
+            // Ensure we have a proper Uploadcare URL
+            if (!baseUrl.includes('ucarecdn.com')) {
+              // If it's just the UUID, construct the full URL
+              baseUrl = `https://ucarecdn.com/${fileId}`;
+            }
+            
+            // Remove trailing slash if present
+            baseUrl = baseUrl.replace(/\/$/, '');
+            
+            // Generate thumbnail URL with Uploadcare transformations
+            thumbnailUrl = `${baseUrl}/-/scale_crop/200x200/center/`;
+            
+            console.log(`📸 Displaying Uploadcare photo: ${fileId} → ${thumbnailUrl}`);
           } else {
             // Supabase Storage photo uploaded via dashboard
             fileName = asset.file_key.split('/').pop();
@@ -1007,17 +1021,23 @@
       // Open asset in new tab
       let viewUrl = asset.file_key;
       
-      // Handle Uploadcare URLs - ensure they're viewable
-      if (asset.metadata?.source === 'uploadcare' && asset.file_key.includes('ucarecdn.com')) {
-        viewUrl = asset.file_key; // Uploadcare URLs are directly viewable
+      // Handle Uploadcare URLs
+      if (asset.metadata?.source === 'uploadcare') {
+        const fileId = asset.metadata?.uploadcare_file_id || asset.file_key;
+        
+        // Ensure we have a proper URL
+        if (!asset.file_key.includes('ucarecdn.com')) {
+          viewUrl = `https://ucarecdn.com/${fileId}/`;
+        } else {
+          viewUrl = asset.file_key.replace(/\/$/, '') + '/';
+        }
+        
+        console.log(`🖼️ Opening Uploadcare photo: ${viewUrl}`);
+        window.open(viewUrl, '_blank');
       } else {
         // For Supabase Storage, we'd need to get a signed URL
-        // For now, alert that this feature is coming soon
         alert('Viewing Supabase Storage assets coming soon. For now, photos from the form are viewable.');
-        return;
       }
-      
-      window.open(viewUrl, '_blank');
     }
     
     // File upload handler
