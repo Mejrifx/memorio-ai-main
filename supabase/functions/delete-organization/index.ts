@@ -87,22 +87,42 @@ serve(async (req) => {
     if (orgUsers && orgUsers.length > 0) {
       for (const orgUser of orgUsers) {
         try {
-          console.log(`Deleting auth user: ${orgUser.email} (${orgUser.role})`);
+          console.log(`Deleting auth user: ${orgUser.email} (${orgUser.role}) with ID: ${orgUser.id}`);
+          
+          // First, verify the user exists in auth.users
+          const { data: authUserData, error: getUserError } = await supabaseAdmin.auth.admin.getUserById(orgUser.id);
+          
+          if (getUserError || !authUserData?.user) {
+            console.warn(`User ${orgUser.email} not found in auth.users, skipping auth deletion`);
+            deletionResults.push({
+              id: orgUser.id,
+              email: orgUser.email,
+              success: false,
+              error: 'User not found in auth.users (already deleted or never created)',
+            });
+            continue;
+          }
+          
+          console.log(`Found auth user ${authUserData.user.email}, proceeding with deletion...`);
           
           // Delete from auth.users using admin API
-          // shouldSoftDelete: false ensures permanent deletion (not recoverable)
-          const { error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(
+          // Use the parameter format: deleteUser(uid, shouldSoftDelete)
+          const { data: deleteData, error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(
             orgUser.id,
             false  // shouldSoftDelete = false (hard delete)
           );
 
           if (deleteAuthError) {
-            console.error(`Failed to delete auth user ${orgUser.email}:`, deleteAuthError);
+            console.error(`Failed to delete auth user ${orgUser.email}:`, {
+              message: deleteAuthError.message,
+              status: deleteAuthError.status,
+              name: deleteAuthError.name
+            });
             deletionResults.push({
               id: orgUser.id,
               email: orgUser.email,
               success: false,
-              error: deleteAuthError.message,
+              error: deleteAuthError.message || 'Unknown error deleting user',
             });
           } else {
             console.log(`✅ Successfully deleted auth user: ${orgUser.email}`);
@@ -118,7 +138,7 @@ serve(async (req) => {
             id: orgUser.id,
             email: orgUser.email,
             success: false,
-            error: e.message,
+            error: e instanceof Error ? e.message : 'Unknown exception',
           });
         }
       }
