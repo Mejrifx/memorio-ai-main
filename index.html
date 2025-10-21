@@ -819,7 +819,7 @@
           </div>
           <div class="form-questions">
             <div class="form-box optionals">
-              <div class="form-fields"><label for="funeral_home" class="field-label">Upload your images below</label><uploader-memorio ctx-name="Memorio" class="uploader-memorio"><uc-config ctx-name="Memorio" pubkey="e93f30f940f43a1690f2" group-output="true" locale-name="en" files-view-mode="list" img-only="true" source-list="local, url, camera, dropbox, gdrive, gphotos, onedrive, facebook" camera-modes="photo" multiple="true" multiple-min="1" multiple-max="0" use-cloud-image-editor="false" user-agent-integration="Webflow/1.0.0" class="uc-config"></uc-config><uc-file-uploader-regular ctx-name="Memorio" class="uc-file-uploader-regular uc-dark" headless="true" data-uploadcare="true"><uc-form-input ctx-name="Memorio"></uc-form-input></uc-file-uploader-regular><uc-upload-ctx-provider ctx-name="Memorio" class="uc-upload-ctx-provider"></uc-upload-ctx-provider><span ctx-name="Memorio" style="display: block;" class="span"> </span><button ctx-name="Memorio" ucuploadbtn="true" type="button" style="padding: 8px 16px;" class="button">Upload</button></uploader-memorio><label for="tribute_quote" class="field-label quote">Is there a favorite quote, verse, or saying you&#x27;d like us to include in the tribute video?</label><textarea placeholder="Something they always said or something that reminds you of them and captures their spirit." maxlength="5000" id="tribute_quote" name="tribute_quote" data-name="tribute_quote" class="textarea tribute w-input"></textarea>
+              <div class="form-fields"><label for="funeral_home" class="field-label">Upload your images below</label><uploader-memorio ctx-name="Memorio" class="uploader-memorio"><uc-config ctx-name="Memorio" pubkey="e93f30f940f43a1690f2" group-output="false" locale-name="en" files-view-mode="list" img-only="true" source-list="local, url, camera, dropbox, gdrive, gphotos, onedrive, facebook" camera-modes="photo" multiple="true" multiple-min="1" multiple-max="0" use-cloud-image-editor="false" user-agent-integration="Webflow/1.0.0" class="uc-config"></uc-config><uc-file-uploader-regular ctx-name="Memorio" class="uc-file-uploader-regular uc-dark" headless="true" data-uploadcare="true"><uc-form-input ctx-name="Memorio"></uc-form-input></uc-file-uploader-regular><uc-upload-ctx-provider ctx-name="Memorio" class="uc-upload-ctx-provider"></uc-upload-ctx-provider><span ctx-name="Memorio" style="display: block;" class="span"> </span><button ctx-name="Memorio" ucuploadbtn="true" type="button" style="padding: 8px 16px;" class="button">Upload</button></uploader-memorio><label for="tribute_quote" class="field-label quote">Is there a favorite quote, verse, or saying you&#x27;d like us to include in the tribute video?</label><textarea placeholder="Something they always said or something that reminds you of them and captures their spirit." maxlength="5000" id="tribute_quote" name="tribute_quote" data-name="tribute_quote" class="textarea tribute w-input"></textarea>
                 <div class="text-block-2">*Required Fields</div>
               </div>
               <div class="form-button">
@@ -1344,16 +1344,17 @@
                 console.log('📷 Raw Uploadcare value:', uploadcareValue);
                 console.log('📷 Uploadcare value type:', typeof uploadcareValue);
                 
-                // Uploadcare widget returns different formats:
-                // - Group: "https://ucarecdn.com/uuid1/~https://ucarecdn.com/uuid2/"
-                // - Single: "https://ucarecdn.com/uuid/" OR just "uuid"
-                // We need to handle all cases and construct proper URLs
+                // Uploadcare widget with group-output="false" returns individual file URLs
+                // Format: "uuid1~uuid2~uuid3" (separated by ~)
+                // Each UUID can be used to construct: https://ucarecdn.com/uuid/
+                
+                console.log('📷 Processing Uploadcare files:', uploadcareValue);
                 
                 let photoIds = [];
                 
                 if (uploadcareValue.includes('~')) {
-                    // Multiple files in a group
-                    console.log('📷 Detected multiple files (group)');
+                    // Multiple files separated by ~
+                    console.log('📷 Detected multiple files');
                     const parts = uploadcareValue.split('~');
                     photoIds = parts.map(part => {
                         const cleaned = part.trim().replace('https://ucarecdn.com/', '').replace(/\/$/, '');
