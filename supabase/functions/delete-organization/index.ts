@@ -82,9 +82,23 @@ serve(async (req) => {
 
     console.log(`Found ${orgUsers?.length || 0} user(s) to delete`);
 
-    // Step 2: FIRST delete from public.users table (must happen before auth.users)
-    // This is critical because public.users.id references auth.users.id
-    console.log('Step 2: Deleting from public.users first...');
+    // Step 2: Delete all data that references users (in correct order)
+    console.log('Step 2: Deleting all data that references users...');
+    
+    // 2a. Delete cases first (they reference users via created_by, assigned_family_user_id, etc.)
+    const { error: deleteCasesError } = await supabaseAdmin
+      .from('cases')
+      .delete()
+      .eq('org_id', orgId);
+
+    if (deleteCasesError) {
+      console.error(`❌ Failed to delete cases: ${deleteCasesError.message}`);
+      throw new Error(`Failed to delete cases: ${deleteCasesError.message}`);
+    }
+    console.log(`✅ Deleted cases for organization`);
+
+    // 2b. Now delete from public.users (after cases are deleted)
+    console.log('Step 2b: Deleting from public.users...');
     const { error: deletePublicUsersError } = await supabaseAdmin
       .from('users')
       .delete()
