@@ -520,6 +520,7 @@
           <div class="info-item">
             <div class="info-label">Case ID</div>
             <div class="info-value" id="caseId">Loading...</div>
+            <button class="copy-btn" onclick="copyToClipboard('caseId')" style="margin-top: 5px; font-size: 12px;">Copy</button>
           </div>
           <div class="info-item">
             <div class="info-label">Created</div>
@@ -748,7 +749,7 @@
       document.getElementById('caseName').textContent = caseData.deceased_name;
       document.getElementById('caseStatus').textContent = statusText[caseData.status] || caseData.status;
       document.getElementById('caseStatus').className = `status-badge status-${caseData.status}`;
-      document.getElementById('caseId').textContent = caseData.id.split('-')[0] + '...';
+      document.getElementById('caseId').textContent = caseData.id;
       document.getElementById('caseCreated').textContent = createdDate;
       document.getElementById('caseUpdated').textContent = updatedDate;
       

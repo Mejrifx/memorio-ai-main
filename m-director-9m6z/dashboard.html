@@ -793,6 +793,7 @@
           <div class="modal-info-item">
             <div class="modal-info-label">Case ID</div>
             <div class="modal-info-value" id="modal-case-id">-</div>
+            <button class="copy-btn" onclick="copyToClipboard('modal-case-id')" style="margin-top: 5px;">Copy Full ID</button>
           </div>
           <div class="modal-info-item">
             <div class="modal-info-label">Status</div>
@@ -1061,7 +1062,7 @@
         
         // Populate modal
         document.getElementById('modal-case-name').textContent = caseData.deceased_name;
-        document.getElementById('modal-case-id').textContent = caseData.id.split('-')[0] + '...';
+        document.getElementById('modal-case-id').textContent = caseData.id;
         document.getElementById('modal-case-status').textContent = caseData.status.replace(/_/g, ' ');
         document.getElementById('modal-case-created').textContent = new Date(caseData.created_at).toLocaleDateString();
         document.getElementById('modal-case-updated').textContent = new Date(caseData.updated_at).toLocaleDateString();
@@ -1416,6 +1417,11 @@
               <p class="paragraph" style="margin-top: 5px; font-size: 12px; color: #666;">
                 Click to view details
               </p>
+            </div>
+            <div class="credential-box" style="margin-top: 10px;">
+              <div class="credential-label">Case ID</div>
+              <div class="credential-value" id="case-id-${c.id}" style="font-size: 12px;">${c.id}</div>
+              <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('case-id-${c.id}')">Copy</button>
             </div>
             <div style="display: flex; gap: 8px; margin-top: 12px;">
               <button class="btn-secondary" onclick="event.stopPropagation(); deleteCase('${c.id}', '${c.deceased_name}')" style="padding: 6px 12px; font-size: 12px;">
