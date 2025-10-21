@@ -969,19 +969,40 @@
             console.log(`Deleting organization: ${orgName} (${orgId})`);
             console.log(`This will cascade delete ${userCount} user(s)`);
             
-            // Delete the organization (this will trigger cascade deletion)
-            const { error } = await supabaseClient
-              .from('organizations')
-              .delete()
-              .eq('id', orgId);
-            
-            if (error) {
-              console.error('Delete error:', error);
-              throw error;
+            // Get the current session token
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+              throw new Error('No active session');
             }
             
-            console.log('Organization deleted successfully');
-            showSuccessModal(`Organization "${orgName}" and all ${userCount} associated user account(s) have been permanently deleted.`);
+            // Call the Edge Function to delete organization and all auth users
+            const response = await fetch(`${SUPABASE_URL}/functions/v1/delete-organization`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`
+              },
+              body: JSON.stringify({ orgId })
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok || !result.success) {
+              throw new Error(result.error || 'Failed to delete organization');
+            }
+            
+            console.log('Organization deletion result:', result);
+            console.log(`✅ Deleted ${result.deleted_users_count} auth user(s)`);
+            
+            // Show detailed results
+            if (result.deletion_results && result.deletion_results.length > 0) {
+              const failed = result.deletion_results.filter(r => !r.success);
+              if (failed.length > 0) {
+                console.warn('Some users failed to delete:', failed);
+              }
+            }
+            
+            showSuccessModal(`Organization "${orgName}" and all ${result.deleted_users_count} associated user account(s) have been permanently deleted.\n\nAll authentication credentials have been removed. Users can no longer log in.`);
             
             // Reload the organizations list
             await loadOrganizations();
