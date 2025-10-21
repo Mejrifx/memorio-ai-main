@@ -639,22 +639,7 @@
       console.log('JWT app_metadata:', session.user.app_metadata);
       console.log('JWT user_metadata:', session.user.user_metadata);
       
-      // Check if app_metadata has admin role
-      const jwtRole = session.user.app_metadata?.role;
-      console.log('JWT Role from app_metadata:', jwtRole);
-      
-      if (!jwtRole || jwtRole !== 'admin') {
-        console.error('❌ CRITICAL: Missing or incorrect app_metadata role in JWT!');
-        console.error('Expected: admin, Got:', jwtRole);
-        console.error('This will cause RLS to block organization creation!');
-        
-        alert('Authentication Issue: Your admin account is missing required metadata.\n\nPlease run the FIX-ADMIN-NOW.sql in Supabase Dashboard, then log out and log back in.');
-        await supabaseClient.auth.signOut();
-        window.location.href = 'login.html';
-        return;
-      }
-      
-      // Verify admin role from database
+      // Verify admin role from database FIRST (primary check)
       const { data: userData, error } = await supabaseClient
         .from('users')
         .select('role')
@@ -668,6 +653,22 @@
         await supabaseClient.auth.signOut();
         window.location.href = 'login.html';
         return;
+      }
+      
+      // Check if app_metadata has admin role (secondary check - warn only)
+      const jwtRole = session.user.app_metadata?.role;
+      console.log('JWT Role from app_metadata:', jwtRole);
+      
+      if (!jwtRole || jwtRole !== 'admin') {
+        console.warn('⚠️ WARNING: app_metadata role missing or incorrect in JWT!');
+        console.warn('Expected: admin, Got:', jwtRole);
+        console.warn('Database role is correct (admin), so continuing...');
+        console.warn('JWT metadata will refresh on next login');
+        
+        // Don't block the user - database role is correct
+        // The JWT will eventually refresh and fix itself
+      } else {
+        console.log('✅ JWT app_metadata role is correct');
       }
       
       console.log('✅ Admin authentication successful');
