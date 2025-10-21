@@ -111,42 +111,56 @@ serve(async (req) => {
             user_id: orgUser.id
           });
 
+          console.log(`RPC delete_auth_user response for ${orgUser.email}:`, { data: sqlDeleteData, error: sqlDeleteError });
+
           if (sqlDeleteError) {
-            console.error(`Failed to delete auth user ${orgUser.email} via RPC:`, {
+            console.error(`❌ RPC call failed for ${orgUser.email}:`, {
               message: sqlDeleteError.message,
               code: sqlDeleteError.code,
               details: sqlDeleteError.details,
               hint: sqlDeleteError.hint
             });
             
-            // Fallback: Try the Admin API as backup
-            console.log(`Attempting fallback to Admin API for ${orgUser.email}...`);
-            try {
-              const { error: adminApiError } = await supabaseAdmin.auth.admin.deleteUser(orgUser.id);
-              if (adminApiError) {
-                throw adminApiError;
-              }
-              console.log(`✅ Successfully deleted via Admin API fallback: ${orgUser.email}`);
-              deletionResults.push({
-                id: orgUser.id,
-                email: orgUser.email,
-                success: true,
-              });
-            } catch (fallbackError) {
-              console.error(`Both RPC and Admin API failed for ${orgUser.email}`);
-              deletionResults.push({
-                id: orgUser.id,
-                email: orgUser.email,
-                success: false,
-                error: `RPC failed: ${sqlDeleteError.message}. Admin API failed: ${fallbackError.message || 'Unknown'}`,
-              });
-            }
-          } else {
+            deletionResults.push({
+              id: orgUser.id,
+              email: orgUser.email,
+              success: false,
+              error: `RPC error: ${sqlDeleteError.message}`,
+            });
+          } else if (sqlDeleteData && sqlDeleteData.success && sqlDeleteData.deleted) {
+            // RPC succeeded and user was deleted
             console.log(`✅ Successfully deleted auth user via RPC: ${orgUser.email}`);
             deletionResults.push({
               id: orgUser.id,
               email: orgUser.email,
               success: true,
+            });
+          } else if (sqlDeleteData && !sqlDeleteData.deleted) {
+            // RPC succeeded but user wasn't found (already deleted)
+            console.log(`⚠️ User ${orgUser.email} not found in auth.users (already deleted)`);
+            deletionResults.push({
+              id: orgUser.id,
+              email: orgUser.email,
+              success: true,
+              note: 'User not found (already deleted)',
+            });
+          } else if (sqlDeleteData && !sqlDeleteData.success) {
+            // RPC returned error
+            console.error(`❌ RPC function returned error for ${orgUser.email}:`, sqlDeleteData.error);
+            deletionResults.push({
+              id: orgUser.id,
+              email: orgUser.email,
+              success: false,
+              error: `SQL error: ${sqlDeleteData.error || 'Unknown SQL error'}`,
+            });
+          } else {
+            // Unexpected response
+            console.error(`❌ Unexpected RPC response for ${orgUser.email}:`, sqlDeleteData);
+            deletionResults.push({
+              id: orgUser.id,
+              email: orgUser.email,
+              success: false,
+              error: 'Unexpected RPC response format',
             });
           }
         } catch (e) {
