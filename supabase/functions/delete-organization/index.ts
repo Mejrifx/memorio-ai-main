@@ -90,8 +90,10 @@ serve(async (req) => {
           console.log(`Deleting auth user: ${orgUser.email} (${orgUser.role})`);
           
           // Delete from auth.users using admin API
+          // shouldSoftDelete: false ensures permanent deletion (not recoverable)
           const { error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(
-            orgUser.id
+            orgUser.id,
+            false  // shouldSoftDelete = false (hard delete)
           );
 
           if (deleteAuthError) {

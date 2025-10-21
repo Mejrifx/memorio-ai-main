@@ -96,15 +96,19 @@ serve(async (req) => {
       }
     });
 
-    if (createAuthError) {
+    if (createAuthError || !authData?.user) {
+      console.error('Auth user creation error:', createAuthError);
+      console.error('Auth data received:', authData);
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Failed to create auth user: ${createAuthError.message}` 
+          error: `Failed to create auth user: ${createAuthError?.message || 'No user data returned'}` 
         }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    console.log(`✅ Auth user created: ${authData.user.id} - ${email}`);
 
     // Insert user metadata into users table
     const { error: insertError } = await supabase
@@ -119,8 +123,9 @@ serve(async (req) => {
       });
 
     if (insertError) {
-      // Rollback: delete auth user
-      await supabase.auth.admin.deleteUser(authData.user.id);
+      // Rollback: hard delete auth user (permanent)
+      console.error('Failed to insert user metadata, rolling back auth user');
+      await supabase.auth.admin.deleteUser(authData.user.id, false);
       
       return new Response(
         JSON.stringify({ 
