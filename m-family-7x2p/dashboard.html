@@ -1128,16 +1128,26 @@
     }
     
     // Copy to clipboard function
-    function copyToClipboard(elementId) {
+    function copyToClipboard(elementId, buttonElement = null) {
       const text = document.getElementById(elementId).textContent;
       
       navigator.clipboard.writeText(text).then(() => {
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => {
-          btn.textContent = originalText;
-        }, 2000);
+        // Find the button that was clicked
+        const btn = buttonElement || event.target;
+        if (btn) {
+          const originalText = btn.textContent;
+          btn.textContent = 'Copied!';
+          btn.style.backgroundColor = '#28a745';
+          btn.style.color = 'white';
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+          }, 2000);
+        }
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert('Failed to copy to clipboard');
       });
     }
     
