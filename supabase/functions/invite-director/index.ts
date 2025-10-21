@@ -107,6 +107,7 @@ serve(async (req) => {
         role: 'director',
         org_id,
         status: 'invited',
+        temp_password: tempPassword, // Store the temporary password
         metadata: { name, phone }
       });
 

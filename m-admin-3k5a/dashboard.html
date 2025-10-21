@@ -554,6 +554,33 @@
     .modal-btn-secondary:hover {
       background-color: #5a6268;
     }
+    
+    /* Toast Notification Styles */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #28a745;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 2000;
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.3s ease;
+    }
+    
+    .toast.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .toast.error {
+      background-color: #dc3545;
+    }
   </style>
   
   <!-- Supabase Client -->
@@ -879,6 +906,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
 
   <script>
     // Initialize Supabase client
@@ -1289,6 +1319,18 @@
       );
     }
     
+    // Toast notification functions
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${isError ? 'error' : ''}`;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
     // Copy to clipboard function
     function copyToClipboard(elementId, buttonElement = null) {
       let text;
@@ -1312,10 +1354,14 @@
             btn.style.color = '';
           }, 2000);
         }
+        
+        // Show success toast
+        showToast('Copied to clipboard!');
+        
       }).catch(err => {
         console.error('Failed to copy text: ', err);
-        // Fallback: show alert
-        alert('Failed to copy to clipboard');
+        // Show error toast instead of alert
+        showToast('Failed to copy to clipboard', true);
       });
     }
     
@@ -1349,7 +1395,7 @@
         // Load director users for this organization
         const { data: directors, error: directorsError } = await supabaseClient
           .from('users')
-          .select('*')
+          .select('*, temp_password')
           .eq('org_id', orgId)
           .eq('role', 'director');
         
@@ -1388,9 +1434,12 @@
           const firstDirector = directors[0];
           document.getElementById('modal-director-email').textContent = firstDirector.email;
           
-          // Note: We don't store passwords in the database for security
-          // The password would need to be retrieved from the invite process
-          document.getElementById('modal-director-password').textContent = 'Password not stored for security';
+          // Show the actual password if available
+          if (firstDirector.temp_password) {
+            document.getElementById('modal-director-password').textContent = firstDirector.temp_password;
+          } else {
+            document.getElementById('modal-director-password').textContent = 'Password not available';
+          }
         }
         
       } catch (error) {
