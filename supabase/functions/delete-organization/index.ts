@@ -106,11 +106,15 @@ serve(async (req) => {
           console.log(`Found auth user ${authUserData.user.email}, proceeding with deletion...`);
           
           // Delete from auth.users using admin API
-          // Use the parameter format: deleteUser(uid, shouldSoftDelete)
-          const { data: deleteData, error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(
-            orgUser.id,
-            false  // shouldSoftDelete = false (hard delete)
-          );
+          // Try without shouldSoftDelete parameter first (newer API)
+          let deleteAuthError;
+          try {
+            const result = await supabaseAdmin.auth.admin.deleteUser(orgUser.id);
+            deleteAuthError = result.error;
+          } catch (apiError) {
+            console.error(`API exception for ${orgUser.email}:`, apiError);
+            deleteAuthError = apiError;
+          }
 
           if (deleteAuthError) {
             console.error(`Failed to delete auth user ${orgUser.email}:`, {
