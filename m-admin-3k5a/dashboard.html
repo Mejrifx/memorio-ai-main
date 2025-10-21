@@ -1024,7 +1024,7 @@
     }
     
     // Copy to clipboard function
-    function copyToClipboard(elementId) {
+    function copyToClipboard(elementId, buttonElement = null) {
       let text;
       if (elementId === 'login-url') {
         text = 'https://memorio.ai/m-director-9m6z/login.html';
@@ -1033,12 +1033,23 @@
       }
       
       navigator.clipboard.writeText(text).then(() => {
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => {
-          btn.textContent = originalText;
-        }, 2000);
+        // Find the button that was clicked
+        const btn = buttonElement || event.target;
+        if (btn) {
+          const originalText = btn.textContent;
+          btn.textContent = 'Copied!';
+          btn.style.backgroundColor = '#28a745';
+          btn.style.color = 'white';
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+          }, 2000);
+        }
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        // Fallback: show alert
+        alert('Failed to copy to clipboard');
       });
     }
     
