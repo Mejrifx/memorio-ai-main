@@ -379,6 +379,181 @@
         flex-direction: column;
       }
     }
+    
+    /* Organization Details Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background-color: white;
+      border-radius: 10px;
+      padding: 0;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header {
+      background-color: #f4e8de;
+      padding: 20px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      color: #32343a;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #666;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-close:hover {
+      color: #333;
+    }
+    
+    .modal-section {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .modal-section:last-of-type {
+      border-bottom: none;
+    }
+    
+    .modal-section-title {
+      color: #32343a;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .modal-icon {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+    }
+    
+    .modal-icon-org {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2332343a'%3E%3Cpath d='M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V21C3 22.11 3.89 23 5 23H19C20.11 23 21 22.11 21 21V9M19 9H14V4H5V21H19V9Z'/%3E%3C/svg%3E");
+    }
+    
+    .modal-icon-users {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2332343a'%3E%3Cpath d='M16 4C18.21 4 20 5.79 20 8S18.21 12 16 12 12 10.21 12 8 13.79 4 16 4M16 14C18.67 14 24 15.33 24 18V20H8V18C8 15.33 13.33 14 16 14M8 4C10.21 4 12 5.79 12 8S10.21 12 8 12 4 10.21 4 8 5.79 4 8 4M8 14C10.67 14 16 15.33 16 18V20H0V18C0 15.33 5.33 14 8 14Z'/%3E%3C/svg%3E");
+    }
+    
+    .modal-icon-key {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2332343a'%3E%3Cpath d='M7 14C5.9 14 5 13.1 5 12S5.9 10 7 10 9 10.9 9 12 8.1 14 7 14M12.6 10C11.8 7.7 9.6 6 7 6C3.7 6 1 8.7 1 12S3.7 18 7 18C9.6 18 11.8 16.3 12.6 14H16V18H20V14H23V10H12.6Z'/%3E%3C/svg%3E");
+    }
+    
+    .modal-details {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .modal-detail-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
+    
+    .modal-detail-label {
+      font-weight: 600;
+      color: #666;
+      min-width: 120px;
+      font-size: 14px;
+    }
+    
+    .modal-detail-value {
+      color: #32343a;
+      font-size: 14px;
+      flex: 1;
+      word-break: break-all;
+    }
+    
+    .reveal-btn {
+      background-color: #f4e8de;
+      color: #32343a;
+      border: 1px solid #d4c4b0;
+      border-radius: 5px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    
+    .reveal-btn:hover {
+      background-color: #e8d5c4;
+    }
+    
+    .modal-footer {
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 0 0 10px 10px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .modal-btn-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .modal-btn-danger:hover {
+      background-color: #c82333;
+    }
+    
+    .modal-btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+    
+    .modal-btn-secondary:hover {
+      background-color: #5a6268;
+    }
   </style>
   
   <!-- Supabase Client -->
@@ -611,6 +786,97 @@
       <h2 class="success-title">Success!</h2>
       <p class="success-message" id="success-message">The organization has been successfully deleted.</p>
       <button class="btn-success-ok" onclick="closeSuccessModal()">OK</button>
+    </div>
+  </div>
+
+  <!-- Organization Details Modal -->
+  <div id="org-details-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-org-name">Organization Details</h2>
+        <button class="modal-close" onclick="closeOrgModal()">&times;</button>
+      </div>
+      
+      <div class="modal-section">
+        <h3 class="modal-section-title">
+          <span class="modal-icon modal-icon-org"></span>
+          Organization Information
+        </h3>
+        <div class="modal-details">
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Organization ID:</span>
+            <span class="modal-detail-value" id="modal-org-id">-</span>
+            <button class="copy-btn" onclick="copyToClipboard('modal-org-id')" style="margin-left: 10px;">Copy</button>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Name:</span>
+            <span class="modal-detail-value" id="modal-org-name-value">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Contact Email:</span>
+            <span class="modal-detail-value" id="modal-org-email">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Contact Phone:</span>
+            <span class="modal-detail-value" id="modal-org-phone">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Region:</span>
+            <span class="modal-detail-value" id="modal-org-region">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Created:</span>
+            <span class="modal-detail-value" id="modal-org-created">-</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-section">
+        <h3 class="modal-section-title">
+          <span class="modal-icon modal-icon-users"></span>
+          Director Accounts
+        </h3>
+        <div class="modal-details">
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Total Directors:</span>
+            <span class="modal-detail-value" id="modal-director-count">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Total Cases:</span>
+            <span class="modal-detail-value" id="modal-cases-count">-</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-section" id="director-credentials-section" style="display: none;">
+        <h3 class="modal-section-title">
+          <span class="modal-icon modal-icon-key"></span>
+          Director Login Credentials
+          <button id="reveal-director-credentials-btn" class="reveal-btn" onclick="revealDirectorCredentials()">Reveal</button>
+        </h3>
+        <div class="modal-details" id="director-credentials" style="display: none;">
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Director Email:</span>
+            <span class="modal-detail-value" id="modal-director-email">-</span>
+            <button class="copy-btn" onclick="copyToClipboard('modal-director-email')" style="margin-left: 10px;">Copy</button>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Director Password:</span>
+            <span class="modal-detail-value" id="modal-director-password">-</span>
+            <button class="copy-btn" onclick="copyToClipboard('modal-director-password')" style="margin-left: 10px;">Copy</button>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Login URL:</span>
+            <span class="modal-detail-value" id="modal-director-login-url">https://memorio.ai/m-director-9m6z/login.html</span>
+            <button class="copy-btn" onclick="copyToClipboard('modal-director-login-url')" style="margin-left: 10px;">Copy</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-danger" onclick="deleteOrgFromModal()">Delete Organization</button>
+        <button class="modal-btn modal-btn-secondary" onclick="closeOrgModal()">Close</button>
+      </div>
     </div>
   </div>
 
@@ -867,7 +1133,7 @@
         }
         
         orgsList.innerHTML = orgs.map(org => `
-          <div class="org-card">
+          <div class="org-card" onclick="openOrgModal('${org.id}')" style="cursor: pointer;">
             <div class="org-card-name">${org.name}</div>
             <div class="org-card-detail">📧 ${org.contact_email}</div>
             ${org.contact_phone ? `<div class="org-card-detail">📞 ${org.contact_phone}</div>` : ''}
@@ -876,10 +1142,10 @@
             <div class="org-card-id">
               <div class="credential-label">Organization ID (copy this when inviting Directors)</div>
               <div class="credential-value" id="org-${org.id}" style="color: #32343a; margin-top: 5px;">${org.id}</div>
-              <button class="copy-btn" onclick="copyOrgId('org-${org.id}')">Copy ID</button>
+              <button class="copy-btn" onclick="event.stopPropagation(); copyOrgId('org-${org.id}')">Copy ID</button>
             </div>
             <div style="display: flex; gap: 8px; margin-top: 12px;">
-              <button class="btn-secondary" onclick="deleteOrganization('${org.id}', '${org.name}')" style="padding: 6px 12px; font-size: 12px;">
+              <button class="btn-secondary" onclick="event.stopPropagation(); deleteOrganization('${org.id}', '${org.name}')" style="padding: 6px 12px; font-size: 12px;">
                 Delete Organization
               </button>
             </div>
@@ -1055,6 +1321,126 @@
     
     // Make copy function global
     window.copyToClipboard = copyToClipboard;
+    
+    // Organization Details Modal Functions
+    let currentOrgDetails = null;
+    let directorCredentialsRevealed = false;
+    
+    async function openOrgModal(orgId) {
+      const modal = document.getElementById('org-details-modal');
+      modal.style.display = 'flex';
+      
+      // Reset credentials state
+      directorCredentialsRevealed = false;
+      document.getElementById('reveal-director-credentials-btn').textContent = 'Reveal';
+      document.getElementById('director-credentials').style.display = 'none';
+      document.getElementById('director-credentials-section').style.display = 'none';
+      
+      try {
+        // Load organization details
+        const { data: org, error: orgError } = await supabaseClient
+          .from('organizations')
+          .select('*')
+          .eq('id', orgId)
+          .single();
+        
+        if (orgError) throw orgError;
+        
+        // Load director users for this organization
+        const { data: directors, error: directorsError } = await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('org_id', orgId)
+          .eq('role', 'director');
+        
+        if (directorsError) throw directorsError;
+        
+        // Load cases count for this organization
+        const { data: cases, error: casesError } = await supabaseClient
+          .from('cases')
+          .select('id')
+          .eq('org_id', orgId);
+        
+        if (casesError) throw casesError;
+        
+        // Populate modal with organization data
+        document.getElementById('modal-org-name').textContent = org.name;
+        document.getElementById('modal-org-name-value').textContent = org.name;
+        document.getElementById('modal-org-id').textContent = org.id;
+        document.getElementById('modal-org-email').textContent = org.contact_email || 'Not provided';
+        document.getElementById('modal-org-phone').textContent = org.contact_phone || 'Not provided';
+        document.getElementById('modal-org-region').textContent = org.region || 'Not provided';
+        document.getElementById('modal-org-created').textContent = new Date(org.created_at).toLocaleDateString();
+        
+        // Populate director accounts data
+        document.getElementById('modal-director-count').textContent = directors.length;
+        document.getElementById('modal-cases-count').textContent = cases.length;
+        
+        // Store current org details for deletion
+        currentOrgDetails = { id: orgId, name: org.name };
+        
+        // Show director credentials section if there are directors
+        if (directors.length > 0) {
+          document.getElementById('director-credentials-section').style.display = 'block';
+          
+          // For now, show the first director's credentials
+          // In a real app, you might want to show all directors or let admin select
+          const firstDirector = directors[0];
+          document.getElementById('modal-director-email').textContent = firstDirector.email;
+          
+          // Note: We don't store passwords in the database for security
+          // The password would need to be retrieved from the invite process
+          document.getElementById('modal-director-password').textContent = 'Password not stored for security';
+        }
+        
+      } catch (error) {
+        console.error('Error loading organization details:', error);
+        alert('Error loading organization details. Please try again.');
+        closeOrgModal();
+      }
+    }
+    
+    function closeOrgModal() {
+      const modal = document.getElementById('org-details-modal');
+      modal.style.display = 'none';
+      currentOrgDetails = null;
+      directorCredentialsRevealed = false;
+    }
+    
+    function revealDirectorCredentials() {
+      const credentialsDiv = document.getElementById('director-credentials');
+      const revealBtn = document.getElementById('reveal-director-credentials-btn');
+      
+      if (directorCredentialsRevealed) {
+        credentialsDiv.style.display = 'none';
+        revealBtn.textContent = 'Reveal';
+        directorCredentialsRevealed = false;
+      } else {
+        credentialsDiv.style.display = 'block';
+        revealBtn.textContent = 'Hide';
+        directorCredentialsRevealed = true;
+      }
+    }
+    
+    function deleteOrgFromModal() {
+      if (currentOrgDetails) {
+        deleteOrganization(currentOrgDetails.id, currentOrgDetails.name);
+        closeOrgModal();
+      }
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('org-details-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'org-details-modal') {
+        closeOrgModal();
+      }
+    });
+    
+    // Make functions global
+    window.openOrgModal = openOrgModal;
+    window.closeOrgModal = closeOrgModal;
+    window.revealDirectorCredentials = revealDirectorCredentials;
+    window.deleteOrgFromModal = deleteOrgFromModal;
   </script>
 </body>
 </html>
