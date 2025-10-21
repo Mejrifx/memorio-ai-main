@@ -82,7 +82,23 @@ serve(async (req) => {
 
     console.log(`Found ${orgUsers?.length || 0} user(s) to delete`);
 
-    // Step 2: Delete all auth.users for this organization
+    // Step 2: FIRST delete from public.users table (must happen before auth.users)
+    // This is critical because public.users.id references auth.users.id
+    console.log('Step 2: Deleting from public.users first...');
+    const { error: deletePublicUsersError } = await supabaseAdmin
+      .from('users')
+      .delete()
+      .eq('org_id', orgId);
+
+    if (deletePublicUsersError) {
+      console.error(`❌ Failed to delete public.users records: ${deletePublicUsersError.message}`);
+      throw new Error(`Failed to delete public.users: ${deletePublicUsersError.message}`);
+    }
+    
+    console.log(`✅ Deleted ${orgUsers?.length || 0} record(s) from public.users`);
+
+    // Step 3: NOW delete from auth.users (after public.users is clear)
+    console.log('Step 3: Now deleting from auth.users...');
     const deletionResults = [];
     if (orgUsers && orgUsers.length > 0) {
       for (const orgUser of orgUsers) {
@@ -173,16 +189,6 @@ serve(async (req) => {
           });
         }
       }
-    }
-
-    // Step 3: Delete from public.users table (if any remain)
-    const { error: deletePublicUsersError } = await supabaseAdmin
-      .from('users')
-      .delete()
-      .eq('org_id', orgId);
-
-    if (deletePublicUsersError) {
-      console.warn(`Warning: Could not delete public.users records: ${deletePublicUsersError.message}`);
     }
 
     // Step 4: Get organization details for logging
