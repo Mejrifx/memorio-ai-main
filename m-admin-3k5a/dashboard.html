@@ -996,9 +996,16 @@
             
             // Show detailed results
             if (result.deletion_results && result.deletion_results.length > 0) {
+              const succeeded = result.deletion_results.filter(r => r.success);
               const failed = result.deletion_results.filter(r => !r.success);
+              
+              console.log(`✅ Successfully deleted ${succeeded.length} user(s):`, succeeded.map(u => u.email));
+              
               if (failed.length > 0) {
-                console.warn('Some users failed to delete:', failed);
+                console.error(`❌ Failed to delete ${failed.length} user(s):`, failed);
+                failed.forEach(f => {
+                  console.error(`  - ${f.email}: ${f.error}`);
+                });
               }
             }
             
