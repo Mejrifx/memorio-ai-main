@@ -105,31 +105,44 @@ serve(async (req) => {
           
           console.log(`Found auth user ${authUserData.user.email}, proceeding with deletion...`);
           
-          // Delete from auth.users using admin API
-          // Try without shouldSoftDelete parameter first (newer API)
-          let deleteAuthError;
-          try {
-            const result = await supabaseAdmin.auth.admin.deleteUser(orgUser.id);
-            deleteAuthError = result.error;
-          } catch (apiError) {
-            console.error(`API exception for ${orgUser.email}:`, apiError);
-            deleteAuthError = apiError;
-          }
+          // Delete from auth.users using direct SQL (more reliable than Admin API)
+          // The service role has full permissions to execute this
+          const { data: sqlDeleteData, error: sqlDeleteError } = await supabaseAdmin.rpc('delete_auth_user', {
+            user_id: orgUser.id
+          });
 
-          if (deleteAuthError) {
-            console.error(`Failed to delete auth user ${orgUser.email}:`, {
-              message: deleteAuthError.message,
-              status: deleteAuthError.status,
-              name: deleteAuthError.name
+          if (sqlDeleteError) {
+            console.error(`Failed to delete auth user ${orgUser.email} via RPC:`, {
+              message: sqlDeleteError.message,
+              code: sqlDeleteError.code,
+              details: sqlDeleteError.details,
+              hint: sqlDeleteError.hint
             });
-            deletionResults.push({
-              id: orgUser.id,
-              email: orgUser.email,
-              success: false,
-              error: deleteAuthError.message || 'Unknown error deleting user',
-            });
+            
+            // Fallback: Try the Admin API as backup
+            console.log(`Attempting fallback to Admin API for ${orgUser.email}...`);
+            try {
+              const { error: adminApiError } = await supabaseAdmin.auth.admin.deleteUser(orgUser.id);
+              if (adminApiError) {
+                throw adminApiError;
+              }
+              console.log(`✅ Successfully deleted via Admin API fallback: ${orgUser.email}`);
+              deletionResults.push({
+                id: orgUser.id,
+                email: orgUser.email,
+                success: true,
+              });
+            } catch (fallbackError) {
+              console.error(`Both RPC and Admin API failed for ${orgUser.email}`);
+              deletionResults.push({
+                id: orgUser.id,
+                email: orgUser.email,
+                success: false,
+                error: `RPC failed: ${sqlDeleteError.message}. Admin API failed: ${fallbackError.message || 'Unknown'}`,
+              });
+            }
           } else {
-            console.log(`✅ Successfully deleted auth user: ${orgUser.email}`);
+            console.log(`✅ Successfully deleted auth user via RPC: ${orgUser.email}`);
             deletionResults.push({
               id: orgUser.id,
               email: orgUser.email,
