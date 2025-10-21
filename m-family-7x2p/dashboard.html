@@ -1127,6 +1127,23 @@
       }
     }
     
+    // Copy to clipboard function
+    function copyToClipboard(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 2000);
+      });
+    }
+    
+    // Make copy function global
+    window.copyToClipboard = copyToClipboard;
+    
     // Handle logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await supabaseClient.auth.signOut();
