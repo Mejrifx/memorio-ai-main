@@ -31,26 +31,17 @@ serve(async (req) => {
       }
     );
 
-    // Create client with user's token to verify they're an admin
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      }
-    );
-
-    // Verify the user is an admin
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    // Extract JWT token from Authorization header
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify the JWT and get user from service role client
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
     if (userError || !user) {
-      throw new Error('Unauthorized: Invalid user');
+      console.error('User verification error:', userError);
+      throw new Error('Unauthorized: Invalid user token');
     }
+
+    console.log(`User verified: ${user.email} (${user.id})`);
 
     // Check user role from public.users table
     const { data: userData, error: roleError } = await supabaseAdmin
@@ -59,9 +50,17 @@ serve(async (req) => {
       .eq('id', user.id)
       .single();
 
-    if (roleError || !userData || userData.role !== 'admin') {
+    if (roleError) {
+      console.error('Role check error:', roleError);
+      throw new Error('Unauthorized: Could not verify user role');
+    }
+
+    if (!userData || userData.role !== 'admin') {
+      console.error(`User ${user.email} has role: ${userData?.role}, not admin`);
       throw new Error('Unauthorized: Only admins can delete organizations');
     }
+
+    console.log(`Admin verified: ${user.email} (role: ${userData.role})`);
 
     // Get organization ID from request
     const { orgId } = await req.json();
