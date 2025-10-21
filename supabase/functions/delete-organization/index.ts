@@ -82,10 +82,27 @@ serve(async (req) => {
 
     console.log(`Found ${orgUsers?.length || 0} user(s) to delete`);
 
-    // Step 2: Delete all data that references users (in correct order)
-    console.log('Step 2: Deleting all data that references users...');
+    // Step 2: Delete all data in correct dependency order
+    console.log('Step 2: Deleting all dependent data in correct order...');
     
-    // 2a. Delete cases first (they reference users via created_by, assigned_family_user_id, etc.)
+    // Get list of user IDs for this org (for events deletion)
+    const userIds = orgUsers?.map(u => u.id) || [];
+    
+    // 2a. Delete events first (they reference users via actor_user_id)
+    if (userIds.length > 0) {
+      const { error: deleteEventsError } = await supabaseAdmin
+        .from('events')
+        .delete()
+        .in('actor_user_id', userIds);
+
+      if (deleteEventsError) {
+        console.error(`❌ Failed to delete events: ${deleteEventsError.message}`);
+        throw new Error(`Failed to delete events: ${deleteEventsError.message}`);
+      }
+      console.log(`✅ Deleted events for organization users`);
+    }
+    
+    // 2b. Delete cases (they reference users via created_by, assigned_family_user_id, etc.)
     const { error: deleteCasesError } = await supabaseAdmin
       .from('cases')
       .delete()
@@ -97,8 +114,8 @@ serve(async (req) => {
     }
     console.log(`✅ Deleted cases for organization`);
 
-    // 2b. Now delete from public.users (after cases are deleted)
-    console.log('Step 2b: Deleting from public.users...');
+    // 2c. Now delete from public.users (after all references are removed)
+    console.log('Step 2c: Deleting from public.users...');
     const { error: deletePublicUsersError } = await supabaseAdmin
       .from('users')
       .delete()
