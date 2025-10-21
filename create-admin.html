@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Admin Account - Memorio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    h1 {
+      color: #32343a;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      color: #32343a;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .result {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      display: none;
+    }
+    
+    .result.success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+    
+    .result.error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    
+    .credentials {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+    
+    .credentials div {
+      margin: 8px 0;
+    }
+    
+    .credentials strong {
+      color: #32343a;
+    }
+    
+    .note {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      color: #856404;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Create Admin Account</h1>
+    <p class="subtitle">This will clean up the wrong user ID and create a new admin account</p>
+    
+    <div class="note">
+      <strong>⚠️ Note:</strong> This will delete user ID 2540eb1b-21ec-49f0-955f-488732a92c90 and create a fresh admin account.
+    </div>
+    
+    <form id="createAdminForm">
+      <div class="form-group">
+        <label for="email">Admin Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          value="admin@memorio.test" 
+          required
+        >
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Admin Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          value="MemorioAdmin2024!" 
+          required
+        >
+      </div>
+      
+      <button type="submit" id="createBtn">Create Admin Account</button>
+    </form>
+    
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Idrthic2FidHZxd3d1dmlnY2R1Ynd5diIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzM2MzQ2Mjc1LCJleHAiOjIwNTE5MjIyNzV9.vMqNlIoFbQOdHbLcvKUzNYdkZXL85O_uq0Ny5eGIiCw';
+    
+    document.getElementById('createAdminForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const createBtn = document.getElementById('createBtn');
+      const resultDiv = document.getElementById('result');
+      
+      createBtn.disabled = true;
+      createBtn.textContent = 'Creating...';
+      resultDiv.style.display = 'none';
+      
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-admin`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          resultDiv.className = 'result success';
+          resultDiv.innerHTML = `
+            <strong>✅ ${result.message}</strong>
+            <div class="credentials">
+              <div><strong>Email:</strong> ${result.admin.email}</div>
+              <div><strong>Password:</strong> ${result.admin.password}</div>
+              <div><strong>User ID:</strong> ${result.admin.id}</div>
+            </div>
+            <p style="margin-top: 12px; font-size: 13px;">
+              ${result.admin.note || 'Save these credentials securely!'}
+            </p>
+          `;
+          resultDiv.style.display = 'block';
+        } else {
+          throw new Error(result.error || 'Unknown error');
+        }
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = `
+          <strong>❌ Error</strong>
+          <p style="margin-top: 8px;">${error.message}</p>
+        `;
+        resultDiv.style.display = 'block';
+      } finally {
+        createBtn.disabled = false;
+        createBtn.textContent = 'Create Admin Account';
+      }
+    });
+  </script>
+</body>
+</html>
+
