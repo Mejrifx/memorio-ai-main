@@ -1277,7 +1277,8 @@
         // Close modal
         closeObituaryEditor();
         
-        alert('✅ Obituary updated successfully!');
+        // Show success toast instead of alert
+        showToast('Obituary updated successfully!');
         
       } catch (error) {
         console.error('Error saving obituary changes:', error);
