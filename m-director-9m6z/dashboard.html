@@ -1167,11 +1167,21 @@
     
     function copyToClipboard(elementId, buttonElement = null) {
       const element = document.getElementById(elementId);
+      if (!element) {
+        console.error('Element not found:', elementId);
+        showToast('Element not found', true);
+        return;
+      }
+      
       const text = element.textContent;
       
+      // Use the buttonElement parameter if provided, otherwise try to find the button
+      const btn = buttonElement || (event && event.target) || null;
+      
       navigator.clipboard.writeText(text).then(() => {
-        // Find the button that was clicked
-        const btn = buttonElement || event.target;
+        console.log('Successfully copied to clipboard:', text);
+        
+        // Update button appearance
         if (btn) {
           const originalText = btn.textContent;
           btn.textContent = 'Copied!';
@@ -1189,7 +1199,8 @@
         
       }).catch(err => {
         console.error('Failed to copy text: ', err);
-        // Show error toast instead of alert
+        console.error('Text that failed to copy:', text);
+        // Show error toast
         showToast('Failed to copy to clipboard', true);
       });
     }
