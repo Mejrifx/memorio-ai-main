@@ -905,11 +905,18 @@
             thumbnailUrl = `${baseUrl}/-/scale_crop/200x200/center/`;
             
             console.log(`📸 Displaying Uploadcare photo: ${fileId} → ${thumbnailUrl}`);
-          } else {
+          } else if (asset.metadata?.source === 'supabase_storage' || asset.file_key.includes('supabase.co')) {
             // Supabase Storage photo uploaded via dashboard
+            fileName = asset.metadata?.original_filename || asset.file_key.split('/').pop();
+            // Use the public URL as thumbnail (since bucket is public)
+            thumbnailUrl = asset.file_key;
+            console.log(`📸 Displaying Supabase Storage photo: ${fileName} → ${thumbnailUrl}`);
+          } else {
+            // Unknown source - try to use file_key as URL
             fileName = asset.file_key.split('/').pop();
-            // For Supabase Storage, we'll show the icon for now
-            // In production, you'd get a signed URL
+            if (asset.file_key.startsWith('http')) {
+              thumbnailUrl = asset.file_key;
+            }
           }
           
           // Use thumbnail if available, otherwise use icon
@@ -1062,9 +1069,14 @@
         
         console.log(`🖼️ Opening Uploadcare photo: ${viewUrl}`);
         window.open(viewUrl, '_blank');
+      } else if (asset.metadata?.source === 'supabase_storage' || asset.file_key.includes('supabase.co')) {
+        // For Supabase Storage - file_key should already be the public URL
+        console.log(`🖼️ Opening Supabase Storage photo: ${asset.file_key}`);
+        window.open(asset.file_key, '_blank');
       } else {
-        // For Supabase Storage, we'd need to get a signed URL
-        alert('Viewing Supabase Storage assets coming soon. For now, photos from the form are viewable.');
+        // Fallback - try to open whatever URL we have
+        console.log(`🖼️ Opening asset: ${asset.file_key}`);
+        window.open(asset.file_key, '_blank');
       }
     }
     
@@ -1101,15 +1113,27 @@
             continue;
           }
           
+          // Get public URL for the uploaded file
+          const { data: { publicUrl } } = supabaseClient.storage
+            .from('case-assets')
+            .getPublicUrl(filePath);
+          
+          console.log('Public URL:', publicUrl);
+          
           // Add to assets table
           const { error: dbError } = await supabaseClient
             .from('assets')
             .insert({
               case_id: currentCase.id,
               uploader_user_id: currentUser.id,
-              file_key: filePath,
+              file_key: publicUrl,
               mime_type: file.type,
-              size_bytes: file.size
+              size_bytes: file.size,
+              metadata: {
+                source: 'supabase_storage',
+                original_filename: file.name,
+                storage_path: filePath
+              }
             });
           
           if (dbError) {
