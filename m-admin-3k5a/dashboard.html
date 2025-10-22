@@ -330,8 +330,13 @@
     }
     
     .success-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px auto;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2328a745'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
     }
     
     .success-title {
@@ -670,7 +675,8 @@
         
         <!-- Success Box -->
         <div id="org-success-box" class="success-box">
-          <h3>✅ Organization Created Successfully!</h3>
+          <div class="success-icon"></div>
+          <h3>Organization Created Successfully!</h3>
           <p>Use this Organization ID when inviting Directors for this funeral home.</p>
           
           <div class="credential-box">
@@ -762,7 +768,8 @@
       
       <!-- Success Box -->
       <div id="success-box" class="success-box">
-        <h3>✅ Director Account Created Successfully!</h3>
+        <div class="success-icon"></div>
+        <h3>Director Account Created Successfully!</h3>
         <p>Share these credentials with the Director securely. They should change their password after first login.</p>
         
         <div class="credential-box">
@@ -809,7 +816,7 @@
   <!-- Custom Success Modal -->
   <div id="success-modal" class="success-modal">
     <div class="success-content">
-      <div class="success-icon">✅</div>
+      <div class="success-icon"></div>
       <h2 class="success-title">Success!</h2>
       <p class="success-message" id="success-message">The organization has been successfully deleted.</p>
       <button class="btn-success-ok" onclick="closeSuccessModal()">OK</button>
