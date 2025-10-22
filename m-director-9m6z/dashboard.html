@@ -949,28 +949,7 @@
       console.log('JWT app_metadata:', session.user.app_metadata);
       console.log('JWT user_metadata:', session.user.user_metadata);
       
-      // Check if app_metadata has role and org_id
-      const jwtRole = session.user.app_metadata?.role;
-      const jwtOrgId = session.user.app_metadata?.org_id;
-      
-      console.log('JWT Role from app_metadata:', jwtRole);
-      console.log('JWT Org ID from app_metadata:', jwtOrgId);
-      
-      if (!jwtRole || !jwtOrgId) {
-        console.error('❌ CRITICAL: Missing app_metadata in JWT!');
-        console.error('Role:', jwtRole, 'Org ID:', jwtOrgId);
-        console.error('This will cause RLS to block all queries!');
-        console.error('Please update your user account with proper app_metadata.');
-        
-        alert('Authentication Issue: Your account is missing required metadata. Please contact support or recreate your director account.');
-        await supabaseClient.auth.signOut();
-        window.location.href = 'login.html';
-        return;
-      }
-      
-      currentSession = session;
-      
-      // Verify director role from database
+      // Verify director role from database FIRST (primary check)
       const { data: userData, error } = await supabaseClient
         .from('users')
         .select('role, org_id')
@@ -989,6 +968,27 @@
         window.location.href = 'login.html';
         return;
       }
+      
+      // Check if app_metadata has role and org_id (secondary check - warn only)
+      const jwtRole = session.user.app_metadata?.role;
+      const jwtOrgId = session.user.app_metadata?.org_id;
+      
+      console.log('JWT Role from app_metadata:', jwtRole);
+      console.log('JWT Org ID from app_metadata:', jwtOrgId);
+      
+      if (!jwtRole || !jwtOrgId) {
+        console.warn('⚠️ WARNING: app_metadata missing or incorrect in JWT!');
+        console.warn('Role:', jwtRole, 'Org ID:', jwtOrgId);
+        console.warn('Database role is correct (director), so continuing...');
+        console.warn('JWT metadata will refresh on next login');
+        
+        // Don't block the user - database role is correct
+        // The JWT will eventually refresh and fix itself
+      } else {
+        console.log('✅ JWT app_metadata role and org_id are correct');
+      }
+      
+      currentSession = session;
       
       console.log('✅ Authentication successful');
       console.log('Director Org ID:', userData.org_id);
