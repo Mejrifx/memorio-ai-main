@@ -1272,12 +1272,17 @@
           throw new Error('Editor not found');
         }
         
+        // Get current admin user ID for assigned_by field
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const adminUserId = session.user.id;
+        
         // Create editor assignment
         const { error: assignError } = await supabaseClient
           .from('editor_assignments')
           .insert({
             case_id: caseId,
             editor_user_id: editorData.id,
+            assigned_by: adminUserId,
             assigned_at: new Date().toISOString()
           });
         
