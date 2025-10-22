@@ -1308,7 +1308,7 @@
           .from('users')
           .select('email, metadata')
           .eq('role', 'editor')
-          .eq('status', 'active');
+          .in('status', ['active', 'invited']); // Include both active and invited editors
         
         if (error) throw error;
         
