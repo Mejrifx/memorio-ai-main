@@ -819,7 +819,27 @@
           </div>
           <div class="form-questions">
             <div class="form-box optionals">
-              <div class="form-fields"><label for="funeral_home" class="field-label">Upload your images below</label><uploader-memorio ctx-name="Memorio" class="uploader-memorio"><uc-config ctx-name="Memorio" pubkey="e93f30f940f43a1690f2" group-output="false" locale-name="en" files-view-mode="list" img-only="true" source-list="local, url, camera, dropbox, gdrive, gphotos, onedrive, facebook" camera-modes="photo" multiple="true" multiple-min="1" multiple-max="0" use-cloud-image-editor="false" user-agent-integration="Webflow/1.0.0" class="uc-config"></uc-config><uc-file-uploader-regular ctx-name="Memorio" class="uc-file-uploader-regular uc-dark" headless="true" data-uploadcare="true"><uc-form-input ctx-name="Memorio"></uc-form-input></uc-file-uploader-regular><uc-upload-ctx-provider ctx-name="Memorio" class="uc-upload-ctx-provider"></uc-upload-ctx-provider><span ctx-name="Memorio" style="display: block;" class="span"> </span><button ctx-name="Memorio" ucuploadbtn="true" type="button" style="padding: 8px 16px;" class="button">Upload</button></uploader-memorio><label for="tribute_quote" class="field-label quote">Is there a favorite quote, verse, or saying you&#x27;d like us to include in the tribute video?</label><textarea placeholder="Something they always said or something that reminds you of them and captures their spirit." maxlength="5000" id="tribute_quote" name="tribute_quote" data-name="tribute_quote" class="textarea tribute w-input"></textarea>
+              <div class="form-fields">
+                <label for="photo_upload" class="field-label">Upload your images below</label>
+                <div style="margin-bottom: 20px;">
+                  <input 
+                    type="file" 
+                    id="photo_upload" 
+                    name="photo_upload" 
+                    accept="image/*" 
+                    multiple 
+                    style="display: none;">
+                  <button 
+                    type="button" 
+                    onclick="document.getElementById('photo_upload').click()" 
+                    class="button" 
+                    style="padding: 12px 24px; margin-bottom: 10px;">
+                    📷 Select Photos
+                  </button>
+                  <div id="photo-preview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 15px;"></div>
+                </div>
+                <label for="tribute_quote" class="field-label quote">Is there a favorite quote, verse, or saying you&#x27;d like us to include in the tribute video?</label>
+                <textarea placeholder="Something they always said or something that reminds you of them and captures their spirit." maxlength="5000" id="tribute_quote" name="tribute_quote" data-name="tribute_quote" class="textarea tribute w-input"></textarea>
                 <div class="text-block-2">*Required Fields</div>
               </div>
               <div class="form-button">
@@ -1045,6 +1065,7 @@
         // Global variables for authenticated user and case
         let currentUser = null;
         let currentCase = null;
+        let selectedPhotos = []; // Store selected photo files
         
         // ============================================================================
         // LOGIN MODAL FUNCTIONS
@@ -1311,8 +1332,8 @@
                 
                 console.log('✅ Form data saved to database successfully');
                 
-                // Save uploaded photos to assets table
-                await saveUploadedPhotos(formPayload);
+                // Save uploaded photos to Supabase Storage and assets table
+                await saveUploadedPhotos();
                 
                 // Update case status to 'submitted'
                 await updateCaseStatus('submitted');
@@ -1324,59 +1345,98 @@
         }
         
         /**
-         * Save uploaded photos from Uploadcare to assets table
+         * Handle photo selection and preview
          */
-        async function saveUploadedPhotos(formPayload) {
+        function handlePhotoSelection() {
+            const input = document.getElementById('photo_upload');
+            const preview = document.getElementById('photo-preview');
+            
+            input.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                selectedPhotos = files;
+                
+                console.log(`📷 ${files.length} photo(s) selected`);
+                
+                // Clear preview
+                preview.innerHTML = '';
+                
+                // Generate previews
+                files.forEach((file, index) => {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (event) => {
+                        const wrapper = document.createElement('div');
+                        wrapper.style.cssText = 'position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+                        
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.style.cssText = 'width: 100%; height: 120px; object-fit: cover; display: block;';
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.textContent = '×';
+                        removeBtn.type = 'button';
+                        removeBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 18px; line-height: 20px;';
+                        removeBtn.onclick = () => {
+                            selectedPhotos.splice(index, 1);
+                            wrapper.remove();
+                        };
+                        
+                        wrapper.appendChild(img);
+                        wrapper.appendChild(removeBtn);
+                        preview.appendChild(wrapper);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                });
+            });
+        }
+        
+        /**
+         * Save uploaded photos to Supabase Storage and assets table
+         */
+        async function saveUploadedPhotos() {
             if (!currentCase || !currentUser) {
                 console.warn('⚠️ No case or user loaded, skipping photo save');
                 return;
             }
             
+            if (!selectedPhotos || selectedPhotos.length === 0) {
+                console.log('📷 No photos selected');
+                return;
+            }
+            
             try {
-                // Uploadcare widget uses "Memorio" as the field name (from ctx-name="Memorio")
-                const uploadcareValue = formPayload['Memorio'];
+                console.log(`📷 Uploading ${selectedPhotos.length} photo(s) to Supabase Storage...`);
                 
-                if (!uploadcareValue) {
-                    console.log('📷 No photos uploaded');
-                    return;
-                }
-                
-                console.log('📷 Raw Uploadcare value:', uploadcareValue);
-                console.log('📷 Uploadcare value type:', typeof uploadcareValue);
-                
-                // Uploadcare widget with group-output="false" returns individual file URLs
-                // Format: "uuid1~uuid2~uuid3" (separated by ~)
-                // Each UUID can be used to construct: https://ucarecdn.com/uuid/
-                
-                console.log('📷 Processing Uploadcare files:', uploadcareValue);
-                
-                let photoIds = [];
-                
-                if (uploadcareValue.includes('~')) {
-                    // Multiple files separated by ~
-                    console.log('📷 Detected multiple files');
-                    const parts = uploadcareValue.split('~');
-                    photoIds = parts.map(part => {
-                        const cleaned = part.trim().replace('https://ucarecdn.com/', '').replace(/\/$/, '');
-                        return cleaned;
-                    }).filter(id => id && id.length > 0);
-                } else {
-                    // Single file
-                    console.log('📷 Detected single file');
-                    const cleaned = uploadcareValue.trim().replace('https://ucarecdn.com/', '').replace(/\/$/, '');
-                    if (cleaned && cleaned.length > 0) {
-                        photoIds = [cleaned];
-                    }
-                }
-                
-                console.log(`📷 Extracted ${photoIds.length} photo ID(s):`, photoIds);
-                
-                for (const photoId of photoIds) {
+                for (let i = 0; i < selectedPhotos.length; i++) {
+                    const file = selectedPhotos[i];
+                    
                     try {
-                        // Construct full Uploadcare CDN URL
-                        const fullUrl = `https://ucarecdn.com/${photoId}/`;
+                        // Generate unique file path
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `${currentCase.id}/${Date.now()}_${i}.${fileExt}`;
                         
-                        console.log(`📷 Saving photo: ${photoId} → ${fullUrl}`);
+                        console.log(`📷 Uploading: ${file.name} → ${fileName}`);
+                        
+                        // Upload to Supabase Storage
+                        const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                            .from('case-assets')
+                            .upload(fileName, file, {
+                                cacheControl: '3600',
+                                upsert: false
+                            });
+                        
+                        if (uploadError) {
+                            console.error('❌ Error uploading photo:', uploadError);
+                            continue;
+                        }
+                        
+                        // Get public URL
+                        const { data: { publicUrl } } = supabaseClient.storage
+                            .from('case-assets')
+                            .getPublicUrl(fileName);
+                        
+                        console.log(`✅ Photo uploaded: ${publicUrl}`);
                         
                         // Save to assets table
                         const { error: assetError } = await supabaseClient
@@ -1384,20 +1444,20 @@
                             .insert({
                                 case_id: currentCase.id,
                                 uploader_user_id: currentUser.id,
-                                file_key: fullUrl, // Store the full Uploadcare URL
-                                mime_type: 'image/jpeg', // Uploadcare primarily handles images
-                                size_bytes: 0, // We don't have size info from Uploadcare
+                                file_key: publicUrl,
+                                mime_type: file.type,
+                                size_bytes: file.size,
                                 metadata: {
-                                    source: 'uploadcare',
-                                    uploadcare_file_id: photoId,
+                                    source: 'supabase_storage',
+                                    original_filename: file.name,
                                     uploaded_via: 'form_submission'
                                 }
                             });
                         
                         if (assetError) {
-                            console.error('❌ Error saving photo to assets:', assetError);
+                            console.error('❌ Error saving photo to assets table:', assetError);
                         } else {
-                            console.log('✅ Photo saved to assets table:', photoId);
+                            console.log('✅ Photo saved to assets table');
                         }
                     } catch (photoError) {
                         console.error('❌ Error processing individual photo:', photoError);
@@ -1964,6 +2024,11 @@
             window.addEventListener('message', (e) => { 
                 if (e.data?.type === 'obituary-data') displayObituary(e.data.obituary || {}); 
             });
+            
+            // ============================================================================
+            // INITIALIZE PHOTO UPLOAD HANDLER
+            // ============================================================================
+            handlePhotoSelection();
             
             // ============================================================================
             // CHECK AUTHENTICATION ON PAGE LOAD
