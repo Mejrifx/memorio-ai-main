@@ -1103,6 +1103,24 @@
       createBtn.textContent = 'CREATING ORGANIZATION...';
       
       try {
+        // Check if JWT has the required app_metadata
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const jwtRole = session?.user?.app_metadata?.role;
+        
+        if (!jwtRole || jwtRole !== 'admin') {
+          console.warn('⚠️ JWT missing app_metadata.role, refreshing session...');
+          
+          // Force a session refresh to update the JWT with app_metadata
+          const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+          
+          if (refreshError) {
+            console.error('Failed to refresh session:', refreshError);
+            throw new Error('Session refresh failed. Please try logging out and back in.');
+          }
+          
+          console.log('✅ Session refreshed, JWT now has app_metadata');
+        }
+        
         // Insert organization into database
         const { data, error } = await supabaseClient
           .from('organizations')
