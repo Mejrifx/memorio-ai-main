@@ -617,6 +617,8 @@
     <div class="tab-container" style="display: flex; gap: 10px; margin-bottom: 30px;">
       <button class="tab-btn active" onclick="switchTab('organizations')">Organizations</button>
       <button class="tab-btn" onclick="switchTab('invite-director')">Invite Director</button>
+      <button class="tab-btn" onclick="switchTab('invite-editor')">Invite Editor</button>
+      <button class="tab-btn" onclick="switchTab('assign-editor')">Assign Editor</button>
     </div>
 
     <!-- Organizations Tab -->
@@ -794,6 +796,126 @@
       <!-- Error Box -->
       <div id="error-box" class="error-box"></div>
     </div>
+    </div>
+
+    <!-- Invite Editor Tab -->
+    <div id="invite-editor-tab" class="tab-content">
+      <div class="invite-section">
+        <h2 class="section-title">Invite Video Editor</h2>
+        <p class="paragraph">Create a new Video Editor account. Editors create memorial tribute slideshow videos using family photos.</p>
+        
+        <form id="invite-editor-form">
+          <div class="form-row">
+            <div>
+              <label for="editor-email" class="field-label">Email Address*</label>
+              <input 
+                class="text-field w-input" 
+                type="email" 
+                id="editor-email" 
+                placeholder="editor@memorio.ai" 
+                required>
+            </div>
+            
+            <div>
+              <label for="editor-name" class="field-label">Full Name*</label>
+              <input 
+                class="text-field w-input" 
+                type="text" 
+                id="editor-name" 
+                placeholder="Jane Editor" 
+                required>
+            </div>
+          </div>
+          
+          <div class="form-row-single">
+            <div>
+              <label for="editor-phone" class="field-label">Phone Number</label>
+              <input 
+                class="text-field w-input" 
+                type="tel" 
+                id="editor-phone" 
+                placeholder="+1-555-0123">
+            </div>
+          </div>
+          
+          <div class="form-button" style="margin-top: 20px;">
+            <button type="submit" class="button-primary w-button" id="invite-editor-btn">
+              CREATE EDITOR ACCOUNT
+            </button>
+          </div>
+        </form>
+        
+        <!-- Success Box -->
+        <div id="editor-success-box" class="success-box">
+          <h3><span class="success-icon"></span>Editor Account Created Successfully!</h3>
+          <p>Share these credentials with the Editor securely. They should change their password after first login.</p>
+          
+          <div class="credential-box">
+            <div class="credential-label">Email Address</div>
+            <div class="credential-value" id="created-editor-email"></div>
+            <button class="copy-btn" onclick="copyToClipboard('created-editor-email')">Copy</button>
+          </div>
+          
+          <div class="credential-box">
+            <div class="credential-label">Temporary Password</div>
+            <div class="credential-value" id="created-editor-password"></div>
+            <button class="copy-btn" onclick="copyToClipboard('created-editor-password')">Copy</button>
+          </div>
+          
+          <div class="credential-box">
+            <div class="credential-label">Login URL</div>
+            <div class="credential-value">https://memorio.ai/m-editor-5w8r/login.html</div>
+            <button class="copy-btn" onclick="copyToClipboard('editor-login-url')">Copy</button>
+          </div>
+        </div>
+        
+        <!-- Error Box -->
+        <div id="editor-error-box" class="error-box"></div>
+      </div>
+    </div>
+
+    <!-- Assign Editor Tab -->
+    <div id="assign-editor-tab" class="tab-content">
+      <div class="invite-section">
+        <h2 class="section-title">Assign Editor to Case</h2>
+        <p class="paragraph">Assign a Video Editor to work on a specific case. The editor will be able to download photos and create a memorial tribute video.</p>
+        
+        <form id="assign-editor-form">
+          <div class="form-row">
+            <div>
+              <label for="assign-case-id" class="field-label">Case ID*</label>
+              <input 
+                class="text-field w-input" 
+                type="text" 
+                id="assign-case-id" 
+                placeholder="00000000-0000-0000-0000-000000000001" 
+                required>
+            </div>
+            
+            <div>
+              <label for="assign-editor-id" class="field-label">Editor Email*</label>
+              <select class="text-field w-input" id="assign-editor-id" required>
+                <option value="">Select an Editor...</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-button" style="margin-top: 20px;">
+            <button type="submit" class="button-primary w-button" id="assign-editor-btn">
+              ASSIGN EDITOR TO CASE
+            </button>
+          </div>
+        </form>
+        
+        <!-- Success Box -->
+        <div id="assign-success-box" class="success-box">
+          <h3><span class="success-icon"></span>Editor Assigned Successfully!</h3>
+          <p>The editor has been assigned to the case and can now access the photos to create a memorial tribute video.</p>
+        </div>
+        
+        <!-- Error Box -->
+        <div id="assign-error-box" class="error-box"></div>
+      </div>
     </div>
   </div>
 
@@ -989,31 +1111,6 @@
       window.location.href = 'login.html';
     });
     
-    // Tab switching
-    function switchTab(tabName) {
-      // Hide all tabs
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      
-      // Remove active class from all buttons
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      
-      // Show selected tab
-      document.getElementById(`${tabName}-tab`).classList.add('active');
-      event.target.classList.add('active');
-      
-      // Load organizations if switching to organizations tab
-      if (tabName === 'organizations') {
-        loadOrganizations();
-      }
-    }
-    
-    // Make switchTab global
-    window.switchTab = switchTab;
-    
     // Handle invite form submission
     document.getElementById('invite-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1084,6 +1181,178 @@
         inviteBtn.textContent = 'CREATE DIRECTOR ACCOUNT';
       }
     });
+    
+    // Handle invite editor form submission
+    document.getElementById('invite-editor-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('editor-email').value;
+      const name = document.getElementById('editor-name').value;
+      const phone = document.getElementById('editor-phone').value;
+      
+      const inviteBtn = document.getElementById('invite-editor-btn');
+      const successBox = document.getElementById('editor-success-box');
+      const errorBox = document.getElementById('editor-error-box');
+      const section = e.target.closest('.invite-section');
+      
+      // Hide previous messages
+      successBox.style.display = 'none';
+      errorBox.style.display = 'none';
+      
+      // Disable form during submission
+      section.classList.add('loading');
+      inviteBtn.disabled = true;
+      inviteBtn.textContent = 'CREATING EDITOR ACCOUNT...';
+      
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-editor`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
+          },
+          body: JSON.stringify({ email, name, phone })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to create editor account');
+        }
+        
+        // Display success with credentials
+        document.getElementById('created-editor-email').textContent = result.data.email;
+        document.getElementById('created-editor-password').textContent = result.data.temp_password;
+        successBox.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('invite-editor-form').reset();
+        
+      } catch (error) {
+        errorBox.textContent = `Error: ${error.message}`;
+        errorBox.style.display = 'block';
+      } finally {
+        section.classList.remove('loading');
+        inviteBtn.disabled = false;
+        inviteBtn.textContent = 'CREATE EDITOR ACCOUNT';
+      }
+    });
+    
+    // Handle assign editor form submission
+    document.getElementById('assign-editor-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const caseId = document.getElementById('assign-case-id').value;
+      const editorEmail = document.getElementById('assign-editor-id').value;
+      
+      const assignBtn = document.getElementById('assign-editor-btn');
+      const successBox = document.getElementById('assign-success-box');
+      const errorBox = document.getElementById('assign-error-box');
+      const section = e.target.closest('.invite-section');
+      
+      // Hide previous messages
+      successBox.style.display = 'none';
+      errorBox.style.display = 'none';
+      
+      // Disable form during submission
+      section.classList.add('loading');
+      assignBtn.disabled = true;
+      assignBtn.textContent = 'ASSIGNING EDITOR...';
+      
+      try {
+        // Get editor user ID from email
+        const { data: editorData, error: editorError } = await supabaseClient
+          .from('users')
+          .select('id')
+          .eq('email', editorEmail)
+          .eq('role', 'editor')
+          .single();
+        
+        if (editorError || !editorData) {
+          throw new Error('Editor not found');
+        }
+        
+        // Create editor assignment
+        const { error: assignError } = await supabaseClient
+          .from('editor_assignments')
+          .insert({
+            case_id: caseId,
+            editor_user_id: editorData.id,
+            assigned_at: new Date().toISOString()
+          });
+        
+        if (assignError) {
+          throw new Error(`Failed to assign editor: ${assignError.message}`);
+        }
+        
+        // Display success
+        successBox.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('assign-editor-form').reset();
+        
+      } catch (error) {
+        errorBox.textContent = `Error: ${error.message}`;
+        errorBox.style.display = 'block';
+      } finally {
+        section.classList.remove('loading');
+        assignBtn.disabled = false;
+        assignBtn.textContent = 'ASSIGN EDITOR TO CASE';
+      }
+    });
+    
+    // Load editors for assignment dropdown
+    async function loadEditors() {
+      try {
+        const { data: editors, error } = await supabaseClient
+          .from('users')
+          .select('email, metadata')
+          .eq('role', 'editor')
+          .eq('status', 'active');
+        
+        if (error) throw error;
+        
+        const select = document.getElementById('assign-editor-id');
+        select.innerHTML = '<option value="">Select an Editor...</option>';
+        
+        editors.forEach(editor => {
+          const option = document.createElement('option');
+          option.value = editor.email;
+          option.textContent = `${editor.metadata?.name || editor.email}`;
+          select.appendChild(option);
+        });
+        
+      } catch (error) {
+        console.error('Error loading editors:', error);
+      }
+    }
+    
+    // Load editors when assign editor tab is opened
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Remove active class from all buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      event.target.classList.add('active');
+      
+      // Load data based on tab
+      if (tabName === 'organizations') {
+        loadOrganizations();
+      } else if (tabName === 'assign-editor') {
+        loadEditors();
+      }
+    }
+    
+    // Make switchTab global
+    window.switchTab = switchTab;
     
     // Handle create organization form submission
     document.getElementById('create-org-form').addEventListener('submit', async (e) => {

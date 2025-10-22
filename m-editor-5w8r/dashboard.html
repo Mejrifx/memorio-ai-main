@@ -275,22 +275,6 @@
       font-size: 16px;
     }
     
-    .obituary-editor {
-      width: 100%;
-      min-height: 300px;
-      padding: 15px;
-      border: 2px solid #ddd;
-      border-radius: 5px;
-      font-family: inherit;
-      font-size: 16px;
-      line-height: 1.6;
-      resize: vertical;
-    }
-    
-    .obituary-editor:focus {
-      outline: none;
-      border-color: #436481;
-    }
     
     .modal-actions {
       padding: 20px;
@@ -436,8 +420,8 @@
   <div class="dashboard-container">
     <div class="dashboard-header">
       <div>
-        <h1 class="dashboard-title">Editor Dashboard</h1>
-        <p class="user-info">Welcome, <span id="editor-name">Editor</span></p>
+        <h1 class="dashboard-title">Video Editor Portal</h1>
+        <p class="user-info">Welcome, <span id="editor-name">Editor</span> - Create memorial tribute videos</p>
       </div>
       <button class="logout-btn" onclick="handleLogout()">LOGOUT</button>
     </div>
@@ -518,18 +502,23 @@
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title">Obituary Content</h3>
-        <textarea 
-          id="obituary-editor" 
-          class="obituary-editor" 
-          placeholder="Write the obituary content here..."
-        ></textarea>
+        <h3 class="modal-section-title">Download Photos for Video Creation</h3>
+        <p style="color: #666; margin-bottom: 20px;">
+          Download the family's uploaded photos to create a memorial tribute slideshow video.
+        </p>
+        <div id="download-section">
+          <button class="btn-primary" onclick="downloadAllPhotos()" id="download-all-btn">
+            📥 Download All Photos
+          </button>
+          <p style="color: #666; font-size: 14px; margin-top: 10px;">
+            This will download all photos as a ZIP file for video creation.
+          </p>
+        </div>
       </div>
       
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeCaseModal()">Close</button>
-        <button class="btn-primary" onclick="saveDraft()">Save Draft</button>
-        <button class="btn-success" onclick="submitObitary()">Submit for Review</button>
+        <button class="btn-success" onclick="markVideoComplete()">Mark Video Complete</button>
       </div>
     </div>
   </div>
@@ -758,9 +747,15 @@
           photosContent.innerHTML = '<p style="color: #666;">No photos uploaded yet.</p>';
         }
         
-        // Load existing obituary content
-        const obituaryContent = formData.obituary_content || formData.final_details || '';
-        document.getElementById('obituary-editor').value = obituaryContent;
+        // Update download button state
+        const downloadBtn = document.getElementById('download-all-btn');
+        if (caseData.assets && caseData.assets.length > 0) {
+          downloadBtn.disabled = false;
+          downloadBtn.textContent = `📥 Download All Photos (${caseData.assets.length})`;
+        } else {
+          downloadBtn.disabled = true;
+          downloadBtn.textContent = '📥 No Photos Available';
+        }
         
       } catch (error) {
         console.error('Error loading case details:', error);
@@ -776,79 +771,72 @@
       currentCase = null;
     }
     
-    // Save draft
-    async function saveDraft() {
-      if (!currentCase) return;
-      
-      const obituaryContent = document.getElementById('obituary-editor').value;
-      
-      try {
-        // Update form with obituary content
-        const { error } = await supabaseClient
-          .from('forms')
-          .update({
-            submitted_json: {
-              ...currentCase.forms[0]?.submitted_json,
-              obituary_content: obituaryContent
-            },
-            updated_at: new Date().toISOString()
-          })
-          .eq('case_id', currentCase.id);
-        
-        if (error) throw error;
-        
-        showToast('Draft saved successfully!');
-        
-      } catch (error) {
-        console.error('Error saving draft:', error);
-        showToast('Error saving draft', true);
-      }
-    }
-    
-    // Submit obituary for review
-    async function submitObitary() {
-      if (!currentCase) return;
-      
-      const obituaryContent = document.getElementById('obituary-editor').value;
-      
-      if (!obituaryContent.trim()) {
-        showToast('Please write obituary content before submitting', true);
+    // Download all photos for video creation
+    async function downloadAllPhotos() {
+      if (!currentCase || !currentCase.assets || currentCase.assets.length === 0) {
+        showToast('No photos available to download', true);
         return;
       }
       
       try {
-        // Update form with obituary content
-        const { error: formError } = await supabaseClient
-          .from('forms')
-          .update({
-            submitted_json: {
-              ...currentCase.forms[0]?.submitted_json,
-              obituary_content: obituaryContent
-            },
-            updated_at: new Date().toISOString()
-          })
-          .eq('case_id', currentCase.id);
+        // Create a ZIP file with all photos
+        const photos = currentCase.assets.filter(asset => 
+          asset.mime_type && asset.mime_type.startsWith('image/')
+        );
         
-        if (formError) throw formError;
+        if (photos.length === 0) {
+          showToast('No valid photos found', true);
+          return;
+        }
         
-        // Update case status to awaiting_review
+        showToast(`Preparing ${photos.length} photos for download...`);
+        
+        // For now, we'll download photos individually
+        // In a production environment, you'd create a ZIP file server-side
+        for (let i = 0; i < photos.length; i++) {
+          const photo = photos[i];
+          const link = document.createElement('a');
+          link.href = photo.file_key;
+          link.download = `photo_${i + 1}_${currentCase.deceased_name.replace(/\s+/g, '_')}.jpg`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Small delay between downloads
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        showToast(`Downloaded ${photos.length} photos successfully!`);
+        
+      } catch (error) {
+        console.error('Error downloading photos:', error);
+        showToast('Error downloading photos', true);
+      }
+    }
+    
+    // Mark video as complete
+    async function markVideoComplete() {
+      if (!currentCase) return;
+      
+      try {
+        // Update case status to video_complete
         const { error: caseError } = await supabaseClient
           .from('cases')
           .update({
-            status: 'awaiting_review',
+            status: 'video_complete',
             updated_at: new Date().toISOString()
           })
           .eq('id', currentCase.id);
         
         if (caseError) throw caseError;
         
-        showToast('Obituary submitted for review!');
+        showToast('Video marked as complete!');
         closeCaseModal();
         await loadAssignedCases();
         
       } catch (error) {
-        console.error('Error submitting obituary:', error);
-        showToast('Error submitting obituary', true);
+        console.error('Error marking video complete:', error);
+        showToast('Error marking video complete', true);
       }
     }
     
