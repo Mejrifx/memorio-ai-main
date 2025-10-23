@@ -807,33 +807,51 @@
         
         showToast(`Starting download of ${photos.length} photos...`);
         
-        // Download photos individually with proper naming
+        // Download photos individually using fetch + blob
         for (let i = 0; i < photos.length; i++) {
           const photo = photos[i];
           
-          // Create download link
-          const link = document.createElement('a');
-          link.href = photo.file_key;
-          
-          // Generate filename based on metadata or fallback
-          let filename = `photo_${i + 1}`;
-          if (photo.metadata?.original_filename) {
-            const ext = photo.metadata.original_filename.split('.').pop();
-            filename = `photo_${i + 1}_${currentCase.deceased_name.replace(/\s+/g, '_')}.${ext}`;
-          } else {
-            filename = `photo_${i + 1}_${currentCase.deceased_name.replace(/\s+/g, '_')}.jpg`;
+          try {
+            // Fetch the image as blob
+            const response = await fetch(photo.file_key);
+            if (!response.ok) {
+              console.warn(`Failed to fetch photo ${i + 1}:`, response.statusText);
+              continue;
+            }
+            
+            const blob = await response.blob();
+            
+            // Generate filename based on metadata or fallback
+            let filename = `photo_${i + 1}`;
+            if (photo.metadata?.original_filename) {
+              const ext = photo.metadata.original_filename.split('.').pop();
+              filename = `photo_${i + 1}_${currentCase.deceased_name.replace(/\s+/g, '_')}.${ext}`;
+            } else {
+              filename = `photo_${i + 1}_${currentCase.deceased_name.replace(/\s+/g, '_')}.jpg`;
+            }
+            
+            // Create download link with blob URL
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up blob URL
+            URL.revokeObjectURL(link.href);
+            
+            console.log(`✅ Downloaded: ${filename}`);
+            
+          } catch (photoError) {
+            console.error(`Error downloading photo ${i + 1}:`, photoError);
+            // Continue with next photo instead of failing completely
           }
           
-          link.download = filename;
-          link.target = '_blank'; // Open in new tab as fallback
-          
-          // Trigger download
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
           // Small delay between downloads to prevent browser blocking
-          await new Promise(resolve => setTimeout(resolve, 200));
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
         
         showToast(`✅ Downloaded ${photos.length} photos successfully!`);
