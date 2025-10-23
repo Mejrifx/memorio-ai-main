@@ -375,6 +375,15 @@
       overflow: hidden;
       padding-bottom: 100%;
       background-color: #f0f0f0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .photo-item:hover {
+      transform: scale(1.05);
+      border-color: #007bff;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
     }
     
     .photo-item img {
@@ -384,6 +393,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: all 0.3s ease;
     }
     
     @media (max-width: 768px) {
@@ -738,9 +748,9 @@
         // Display photos
         const photosContent = document.getElementById('photos-content');
         if (caseData.assets && caseData.assets.length > 0) {
-          photosContent.innerHTML = caseData.assets.map(asset => `
-            <div class="photo-item">
-              <img src="${asset.file_key}" alt="Family photo" loading="lazy">
+          photosContent.innerHTML = caseData.assets.map((asset, index) => `
+            <div class="photo-item" onclick="viewPhoto('${asset.file_key}', ${index + 1})" style="cursor: pointer;" title="Click to view full size">
+              <img src="${asset.file_key}" alt="Family photo ${index + 1}" loading="lazy">
             </div>
           `).join('');
         } else {
@@ -771,6 +781,12 @@
       currentCase = null;
     }
     
+    // View individual photo in new tab
+    function viewPhoto(photoUrl, photoNumber) {
+      console.log(`🖼️ Opening photo ${photoNumber} in new tab: ${photoUrl}`);
+      window.open(photoUrl, '_blank');
+    }
+    
     // Download all photos for video creation
     async function downloadAllPhotos() {
       if (!currentCase || !currentCase.assets || currentCase.assets.length === 0) {
@@ -779,7 +795,7 @@
       }
       
       try {
-        // Create a ZIP file with all photos
+        // Filter for image files only
         const photos = currentCase.assets.filter(asset => 
           asset.mime_type && asset.mime_type.startsWith('image/')
         );
@@ -789,24 +805,38 @@
           return;
         }
         
-        showToast(`Preparing ${photos.length} photos for download...`);
+        showToast(`Starting download of ${photos.length} photos...`);
         
-        // For now, we'll download photos individually
-        // In a production environment, you'd create a ZIP file server-side
+        // Download photos individually with proper naming
         for (let i = 0; i < photos.length; i++) {
           const photo = photos[i];
+          
+          // Create download link
           const link = document.createElement('a');
           link.href = photo.file_key;
-          link.download = `photo_${i + 1}_${currentCase.deceased_name.replace(/\s+/g, '_')}.jpg`;
+          
+          // Generate filename based on metadata or fallback
+          let filename = `photo_${i + 1}`;
+          if (photo.metadata?.original_filename) {
+            const ext = photo.metadata.original_filename.split('.').pop();
+            filename = `photo_${i + 1}_${currentCase.deceased_name.replace(/\s+/g, '_')}.${ext}`;
+          } else {
+            filename = `photo_${i + 1}_${currentCase.deceased_name.replace(/\s+/g, '_')}.jpg`;
+          }
+          
+          link.download = filename;
+          link.target = '_blank'; // Open in new tab as fallback
+          
+          // Trigger download
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
           
-          // Small delay between downloads
-          await new Promise(resolve => setTimeout(resolve, 100));
+          // Small delay between downloads to prevent browser blocking
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
         
-        showToast(`Downloaded ${photos.length} photos successfully!`);
+        showToast(`✅ Downloaded ${photos.length} photos successfully!`);
         
       } catch (error) {
         console.error('Error downloading photos:', error);
