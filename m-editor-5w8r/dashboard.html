@@ -537,7 +537,8 @@
   <div id="toast" class="toast"></div>
 
   <!-- Supabase Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
   <script>
     // Initialize Supabase client
@@ -787,7 +788,7 @@
       window.open(photoUrl, '_blank');
     }
     
-    // Download all photos for video creation
+    // Download all photos for video creation as ZIP file
     async function downloadAllPhotos() {
       if (!currentCase || !currentCase.assets || currentCase.assets.length === 0) {
         showToast('No photos available to download', true);
@@ -805,9 +806,12 @@
           return;
         }
         
-        showToast(`Starting download of ${photos.length} photos...`);
+        showToast(`Preparing ZIP file with ${photos.length} photos...`);
         
-        // Download photos individually using fetch + blob
+        // Create a new ZIP instance
+        const zip = new JSZip();
+        
+        // Add photos to ZIP
         for (let i = 0; i < photos.length; i++) {
           const photo = photos[i];
           
@@ -830,35 +834,40 @@
               filename = `photo_${i + 1}_${currentCase.deceased_name.replace(/\s+/g, '_')}.jpg`;
             }
             
-            // Create download link with blob URL
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            
-            // Trigger download
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Clean up blob URL
-            URL.revokeObjectURL(link.href);
-            
-            console.log(`✅ Downloaded: ${filename}`);
+            // Add photo to ZIP
+            zip.file(filename, blob);
+            console.log(`✅ Added to ZIP: ${filename}`);
             
           } catch (photoError) {
-            console.error(`Error downloading photo ${i + 1}:`, photoError);
+            console.error(`Error processing photo ${i + 1}:`, photoError);
             // Continue with next photo instead of failing completely
           }
-          
-          // Small delay between downloads to prevent browser blocking
-          await new Promise(resolve => setTimeout(resolve, 300));
         }
         
-        showToast(`✅ Downloaded ${photos.length} photos successfully!`);
+        // Generate ZIP file
+        showToast('Generating ZIP file...');
+        const zipBlob = await zip.generateAsync({type: 'blob'});
+        
+        // Create download link for ZIP file
+        const zipFilename = `${currentCase.deceased_name.replace(/\s+/g, '_')}_Memorial_Photos.zip`;
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(zipBlob);
+        link.download = zipFilename;
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up blob URL
+        URL.revokeObjectURL(link.href);
+        
+        showToast(`✅ Downloaded ${photos.length} photos as ZIP file!`);
+        console.log(`✅ ZIP file downloaded: ${zipFilename}`);
         
       } catch (error) {
-        console.error('Error downloading photos:', error);
-        showToast('Error downloading photos', true);
+        console.error('Error creating ZIP file:', error);
+        showToast('Error creating ZIP file', true);
       }
     }
     
