@@ -1295,6 +1295,15 @@
       createBtn.textContent = 'CREATING CASE...';
       
       try {
+        // Refresh session to ensure JWT has latest app_metadata
+        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+        
+        if (refreshError || !refreshData.session) {
+          throw new Error('Session refresh failed. Please try logging out and back in.');
+        }
+        
+        currentSession = refreshData.session; // Update global session
+        
         const response = await fetch(`${SUPABASE_URL}/functions/v1/create-case`, {
           method: 'POST',
           headers: {
@@ -1351,6 +1360,15 @@
       inviteBtn.textContent = 'SENDING INVITATION...';
       
       try {
+        // Refresh session to ensure JWT has latest app_metadata
+        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+        
+        if (refreshError || !refreshData.session) {
+          throw new Error('Session refresh failed. Please try logging out and back in.');
+        }
+        
+        currentSession = refreshData.session; // Update global session
+        
         const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-family`, {
           method: 'POST',
           headers: {

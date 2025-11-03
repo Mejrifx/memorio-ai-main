@@ -1135,12 +1135,14 @@
       inviteBtn.textContent = 'CREATING ACCOUNT...';
       
       try {
-        // Get current session token
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        // Refresh session to ensure JWT has latest app_metadata
+        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
         
-        if (!session) {
-          throw new Error('Not authenticated');
+        if (refreshError || !refreshData.session) {
+          throw new Error('Session refresh failed. Please try logging out and back in.');
         }
+        
+        const session = refreshData.session;
         
         // Call invite-director Edge Function
         const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-director`, {
@@ -1205,11 +1207,20 @@
       inviteBtn.textContent = 'CREATING EDITOR ACCOUNT...';
       
       try {
+        // Refresh session to ensure JWT has latest app_metadata
+        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+        
+        if (refreshError || !refreshData.session) {
+          throw new Error('Session refresh failed. Please try logging out and back in.');
+        }
+        
+        const session = refreshData.session;
+        
         const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-editor`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabaseClient.auth.getSession()).data.session.access_token}`
+            'Authorization': `Bearer ${session.access_token}`
           },
           body: JSON.stringify({ email, name, phone })
         });
@@ -1383,23 +1394,31 @@
       createBtn.textContent = 'CREATING ORGANIZATION...';
       
       try {
-        // Check if JWT has the required app_metadata
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        const jwtRole = session?.user?.app_metadata?.role;
+        // CRITICAL FIX: Always refresh session before organization creation
+        // This ensures the JWT contains the latest app_metadata.role = 'admin'
+        // Without this, RLS policy fails intermittently on first attempt
+        console.log('🔄 Ensuring JWT has latest app_metadata before organization creation...');
+        
+        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+        
+        if (refreshError) {
+          console.error('❌ Failed to refresh session:', refreshError);
+          throw new Error('Session refresh failed. Please try logging out and back in.');
+        }
+        
+        // Verify the refreshed session has admin role in app_metadata
+        const refreshedSession = refreshData.session;
+        const jwtRole = refreshedSession?.user?.app_metadata?.role;
         
         if (!jwtRole || jwtRole !== 'admin') {
-          console.warn('⚠️ JWT missing app_metadata.role, refreshing session...');
-          
-          // Force a session refresh to update the JWT with app_metadata
-          const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
-          
-          if (refreshError) {
-            console.error('Failed to refresh session:', refreshError);
-            throw new Error('Session refresh failed. Please try logging out and back in.');
-          }
-          
-          console.log('✅ Session refreshed, JWT now has app_metadata');
+          console.error('❌ JWT still missing app_metadata.role after refresh:', refreshedSession?.user);
+          throw new Error('Your account does not have admin privileges. Please contact support.');
         }
+        
+        console.log('✅ JWT verified with app_metadata.role =', jwtRole);
+        
+        // Small delay to ensure JWT propagation (prevents race condition)
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         // Insert organization into database
         const { data, error } = await supabaseClient
