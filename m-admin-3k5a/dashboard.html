@@ -13,58 +13,353 @@
   <link href="../images/webclip.png" rel="apple-touch-icon">
   
   <style>
+    /* ============================================================================
+       MODERN ADMIN DASHBOARD REDESIGN
+       ============================================================================ */
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* ============================================================================
+       SIDEBAR NAVIGATION
+       ============================================================================ */
+    
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar-logo {
+      padding: 30px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .sidebar-logo img {
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      object-fit: contain;
+      background: white;
+      padding: 5px;
+    }
+    
+    .sidebar-logo-text {
+      color: white;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    .sidebar-logo-subtitle {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 12px;
+      font-weight: 400;
+      margin-top: -2px;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 24px;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+    
+    .sidebar-nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+    
+    .sidebar-nav-item.active {
+      background: rgba(99, 179, 237, 0.15);
+      color: #63b3ed;
+      border-left-color: #63b3ed;
+    }
+    
+    .sidebar-nav-item svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    
+    .sidebar-footer {
+      padding: 20px 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: white;
+    }
+    
+    .sidebar-user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .sidebar-user-info {
+      flex: 1;
+    }
+    
+    .sidebar-user-name {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    
+    .sidebar-user-role {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    /* ============================================================================
+       TOP NAVBAR
+       ============================================================================ */
+    
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 280px;
+      right: 0;
+      height: 70px;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+    
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    
+    .topbar-title {
+      color: #2d3748;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    .topbar-search {
+      position: relative;
+    }
+    
+    .topbar-search-input {
+      width: 350px;
+      padding: 10px 16px 10px 40px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      background: #f7fafc;
+    }
+    
+    .topbar-search-input:focus {
+      outline: none;
+      border-color: #63b3ed;
+      background: white;
+    }
+    
+    .topbar-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: #a0aec0;
+    }
+    
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .topbar-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #f7fafc;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    
+    .topbar-icon-btn:hover {
+      background: #edf2f7;
+      transform: translateY(-1px);
+    }
+    
+    .topbar-icon-btn svg {
+      width: 20px;
+      height: 20px;
+      color: #4a5568;
+    }
+    
+    .topbar-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 18px;
+      height: 18px;
+      background: #f56565;
+      border-radius: 50%;
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+    }
+    
+    .topbar-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px 6px 6px;
+      background: #f7fafc;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .topbar-profile:hover {
+      background: #edf2f7;
+    }
+    
+    .topbar-profile-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .topbar-profile-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+    
+    /* ============================================================================
+       MAIN CONTENT AREA
+       ============================================================================ */
+    
+    .main-content {
+      margin-left: 280px;
+      margin-top: 70px;
+      padding: 32px;
+      min-height: calc(100vh - 70px);
+    }
+    
     .dashboard-container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 72px;
     }
     
     .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
     
     .dashboard-title {
-      color: #32343a;
-      font-size: 32px;
-      font-weight: 600;
-      margin: 0;
+      color: #2d3748;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
     }
     
-    .logout-btn {
-      color: #32343a;
-      background-color: transparent;
-      border: 1.35px solid #32343a;
-      border-radius: 60px;
-      padding: 11px 18px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
+    .dashboard-subtitle {
+      color: #718096;
+      font-size: 15px;
     }
     
-    .logout-btn:hover {
-      background-color: #32343a;
-      color: #f2eadd;
-    }
+    /* ============================================================================
+       CARDS & SECTIONS
+       ============================================================================ */
     
     .invite-section {
-      background-color: #fff3e9;
-      border: 3px solid #436481;
-      border-radius: 20px;
-      padding: 48px;
-      margin-bottom: 40px;
-      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
     }
     
     .section-title {
-      color: #32343a;
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 20px;
+      color: #2d3748;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-title svg {
+      width: 24px;
+      height: 24px;
+      color: #63b3ed;
     }
     
     .form-row {
@@ -78,57 +373,225 @@
       margin-bottom: 20px;
     }
     
-    .success-box {
-      background-color: #e8f5e9;
-      border: 2px solid #66bb6a;
+    /* ============================================================================
+       FORM ELEMENTS
+       ============================================================================ */
+    
+    .field-label {
+      display: block;
+      color: #4a5568;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .text-field {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
       border-radius: 10px;
-      padding: 20px;
+      font-size: 15px;
+      transition: all 0.2s ease;
+      background: #f7fafc;
+    }
+    
+    .text-field:focus {
+      outline: none;
+      border-color: #63b3ed;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
+    }
+    
+    .text-field:disabled {
+      background: #edf2f7;
+      cursor: not-allowed;
+    }
+    
+    /* ============================================================================
+       BUTTONS
+       ============================================================================ */
+    
+    .button-primary {
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+    }
+    
+    .button-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .button-primary:active {
+      transform: translateY(0);
+    }
+    
+    .button-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      padding: 10px 20px;
+      background: #edf2f7;
+      color: #4a5568;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+    }
+    
+    .logout-btn {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
+    }
+    
+    /* ============================================================================
+       SUCCESS & ERROR BOXES
+       ============================================================================ */
+    
+    .success-box {
+      background: linear-gradient(135deg, #e6fffa 0%, #d5f5f2 100%);
+      border: 2px solid #48bb78;
+      border-radius: 12px;
+      padding: 24px;
       margin-top: 20px;
       display: none;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     .success-box h3 {
-      color: #2e7d32;
+      color: #22543d;
       margin-top: 0;
       margin-bottom: 15px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .success-icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background: #48bb78;
+      border-radius: 50%;
+      position: relative;
+    }
+    
+    .success-icon::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    
+    .error-box {
+      background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+      border: 2px solid #fc8181;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      color: #742a2a;
+      display: none;
+      font-weight: 500;
+      animation: slideIn 0.3s ease;
     }
     
     .credential-box {
-      background-color: #f4e8de;
-      border-radius: 5px;
-      padding: 15px;
-      margin-bottom: 10px;
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
       position: relative;
     }
     
     .credential-label {
-      color: #33333373;
+      color: #718096;
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      font-weight: 600;
     }
     
     .credential-value {
-      color: #32343a;
-      font-size: 18px;
+      color: #2d3748;
+      font-size: 15px;
       font-weight: 600;
       word-break: break-all;
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;
+      background: white;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
     }
     
     .copy-btn {
-      background-color: #32343a;
-      color: #f2eadd;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
       border: none;
-      border-radius: 5px;
-      padding: 5px 10px;
-      font-size: 12px;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 11px;
       cursor: pointer;
-      margin-top: 5px;
+      margin-top: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
     }
     
     .copy-btn:hover {
-      background-color: #6ca7d3;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
     }
     
     .error-box {
@@ -184,21 +647,38 @@
     }
     
     .org-card {
-      background-color: #f4e8de;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 15px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .org-card:hover {
+      border-color: #63b3ed;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     }
     
     .org-card-name {
-      color: #32343a;
+      color: #2d3748;
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .org-card-name::before {
+      content: '🏢';
       font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 10px;
     }
     
     .org-card-detail {
-      color: #33333373;
+      color: #718096;
       font-size: 14px;
       margin-bottom: 5px;
     }
@@ -588,6 +1068,90 @@
     .toast.error {
       background-color: #dc3545;
     }
+    
+    /* ============================================================================
+       RESPONSIVE DESIGN
+       ============================================================================ */
+    
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-280px);
+      }
+      
+      .sidebar.mobile-open {
+        transform: translateX(0);
+      }
+      
+      .topbar {
+        left: 0;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .topbar-search {
+        display: none;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .topbar-title {
+        font-size: 18px;
+      }
+      
+      .main-content {
+        padding: 16px;
+      }
+      
+      .invite-section {
+        padding: 20px;
+      }
+      
+      .section-title {
+        font-size: 18px;
+      }
+      
+      .topbar-profile-name {
+        display: none;
+      }
+    }
+    
+    /* ============================================================================
+       UTILITY CLASSES
+       ============================================================================ */
+    
+    .flex-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .flex-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .mt-2 { margin-top: 8px; }
+    .mt-4 { margin-top: 16px; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-4 { margin-bottom: 16px; }
+    
+    .text-sm { font-size: 13px; }
+    .text-lg { font-size: 17px; }
+    
+    .font-semibold { font-weight: 600; }
+    .font-bold { font-weight: 700; }
+    
+    /* Hide old nav completely */
+    .nav {
+      display: none !important;
+    }
   </style>
   
   <!-- Supabase Client -->
@@ -595,31 +1159,121 @@
 </head>
 
 <body class="body">
-  <!-- Nav -->
-  <div class="nav">
-    <div class="logo-wrapper">
-      <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
-           loading="lazy" 
-           width="166" 
-           alt="Memorio Logo" 
-           srcset="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w">
+  
+  <!-- ============================================================================
+       SIDEBAR NAVIGATION
+       ============================================================================ -->
+  <div class="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio Logo">
+      <div>
+        <div class="sidebar-logo-text">Memorio</div>
+        <div class="sidebar-logo-subtitle">Admin Portal</div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="sidebar-nav">
+      <div class="sidebar-nav-item active" onclick="switchTab('organizations')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
+        </svg>
+        <span>Organizations</span>
+      </div>
+
+      <div class="sidebar-nav-item" onclick="switchTab('invite-director')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          <path d="M19 13h-2v-2h-2v2h-2v2h2v2h2v-2h2z" fill="currentColor" opacity="0.7"/>
+        </svg>
+        <span>Invite Director</span>
+      </div>
+
+      <div class="sidebar-nav-item" onclick="switchTab('invite-editor')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M12 15c1.66 0 2.99-1.34 2.99-3L15 6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 15 6.7 12H5c0 3.41 2.72 6.23 6 6.72V22h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+        </svg>
+        <span>Invite Editor</span>
+      </div>
+
+      <div class="sidebar-nav-item" onclick="switchTab('assign-editor')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/>
+        </svg>
+        <span>Assign Editor</span>
+      </div>
+    </div>
+
+    <!-- User Info -->
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">A</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Admin User</div>
+          <div class="sidebar-user-role">System Administrator</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Dashboard Container -->
-  <div class="dashboard-container">
-    <div class="dashboard-header">
-      <h1 class="dashboard-title">Admin Dashboard</h1>
-      <button class="logout-btn" id="logout-btn">Logout</button>
+  <!-- ============================================================================
+       TOP NAVBAR
+       ============================================================================ -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 class="topbar-title" id="topbar-page-title">Organizations</h1>
+      <div class="topbar-search">
+        <svg class="topbar-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <input type="text" class="topbar-search-input" placeholder="Search organizations, users, cases..." id="topbar-search">
+      </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="tab-container" style="display: flex; gap: 10px; margin-bottom: 30px;">
-      <button class="tab-btn active" onclick="switchTab('organizations')">Organizations</button>
-      <button class="tab-btn" onclick="switchTab('invite-director')">Invite Director</button>
-      <button class="tab-btn" onclick="switchTab('invite-editor')">Invite Editor</button>
-      <button class="tab-btn" onclick="switchTab('assign-editor')">Assign Editor</button>
+    <div class="topbar-right">
+      <!-- Notifications -->
+      <button class="topbar-icon-btn" title="Notifications">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+        </svg>
+        <span class="topbar-badge">3</span>
+      </button>
+
+      <!-- Settings -->
+      <button class="topbar-icon-btn" title="Settings">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+        </svg>
+      </button>
+
+      <!-- Profile with Logout -->
+      <div class="topbar-profile" onclick="document.getElementById('logout-btn').click()" style="cursor: pointer;" title="Logout">
+        <div class="topbar-profile-avatar">A</div>
+        <span class="topbar-profile-name">Admin</span>
+        <svg style="width: 16px; height: 16px; color: #718096;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 10l5 5 5-5z"/>
+        </svg>
+      </div>
+      
+      <!-- Hidden logout button for functionality -->
+      <button id="logout-btn" style="display: none;"></button>
     </div>
+  </div>
+
+  <!-- ============================================================================
+       MAIN CONTENT AREA
+       ============================================================================ -->
+  <div class="main-content">
+    <div class="dashboard-container">
+    
+      <!-- Tabs (Hidden - controlled by sidebar) -->
+      <div class="tab-container" style="display: none;">
+        <button class="tab-btn active" onclick="switchTab('organizations')">Organizations</button>
+        <button class="tab-btn" onclick="switchTab('invite-director')">Invite Director</button>
+        <button class="tab-btn" onclick="switchTab('invite-editor')">Invite Editor</button>
+        <button class="tab-btn" onclick="switchTab('assign-editor')">Assign Editor</button>
+      </div>
 
     <!-- Organizations Tab -->
     <div id="organizations-tab" class="tab-content active">
@@ -1350,14 +2004,46 @@
         tab.classList.remove('active');
       });
       
-      // Remove active class from all buttons
+      // Remove active class from all sidebar nav items
+      document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Remove active class from all old tab buttons
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
       });
       
       // Show selected tab
       document.getElementById(`${tabName}-tab`).classList.add('active');
-      event.target.classList.add('active');
+      
+      // Update topbar title
+      const titles = {
+        'organizations': 'Organizations',
+        'invite-director': 'Invite Director',
+        'invite-editor': 'Invite Editor',
+        'assign-editor': 'Assign Editor'
+      };
+      document.getElementById('topbar-page-title').textContent = titles[tabName] || 'Dashboard';
+      
+      // Add active class to clicked sidebar item (if triggered by click)
+      if (event && event.target) {
+        const clickedItem = event.target.closest('.sidebar-nav-item');
+        if (clickedItem) {
+          clickedItem.classList.add('active');
+        } else {
+          // If event target is an old tab button
+          event.target.classList.add('active');
+        }
+      } else {
+        // Fallback: find and activate the matching sidebar item
+        document.querySelectorAll('.sidebar-nav-item').forEach((item, index) => {
+          const tabs = ['organizations', 'invite-director', 'invite-editor', 'assign-editor'];
+          if (tabs[index] === tabName) {
+            item.classList.add('active');
+          }
+        });
+      }
       
       // Load data based on tab
       if (tabName === 'organizations') {
