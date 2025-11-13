@@ -40,7 +40,7 @@
       top: 0;
       width: 280px;
       height: 100vh;
-      background-color: #32343a;
+      background-color: #436481;
       box-shadow: 4px 0 15px rgba(67, 100, 129, 0.15);
       z-index: 1000;
       display: flex;
@@ -50,7 +50,7 @@
     
     .sidebar-logo {
       padding: 30px 24px;
-      border-bottom: 1px solid rgba(244, 232, 222, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -78,7 +78,7 @@
       font-size: 12px;
       font-weight: 400;
       margin-top: -2px;
-      opacity: 0.7;
+      opacity: 0.9;
     }
     
     .sidebar-nav {
@@ -100,20 +100,17 @@
       transition: all 0.2s ease;
       border-left: 3px solid transparent;
       position: relative;
-      opacity: 0.7;
     }
     
     .sidebar-nav-item:hover {
-      background: rgba(108, 167, 211, 0.1);
-      color: #6ca7d3;
-      opacity: 1;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
     }
     
     .sidebar-nav-item.active {
-      background: rgba(108, 167, 211, 0.15);
-      color: #6ca7d3;
-      border-left-color: #6ca7d3;
-      opacity: 1;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border-left-color: #f2eadd;
     }
     
     .sidebar-nav-item svg {
@@ -124,7 +121,7 @@
     
     .sidebar-footer {
       padding: 20px 24px;
-      border-top: 1px solid rgba(244, 232, 222, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
     }
     
     .sidebar-user {
@@ -138,13 +135,13 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background-color: #436481;
+      background-color: #f4e8de;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
       font-size: 16px;
-      color: #f2eadd;
+      color: #436481;
     }
     
     .sidebar-user-info {
@@ -160,7 +157,7 @@
     .sidebar-user-role {
       font-size: 12px;
       color: #f4e8de;
-      opacity: 0.7;
+      opacity: 0.85;
     }
     
     /* ============================================================================
@@ -332,6 +329,70 @@
       color: #32343a;
       font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
       transition: color 0.2s ease;
+    }
+    
+    /* Profile Dropdown */
+    .topbar-profile-wrapper {
+      position: relative;
+    }
+    
+    .topbar-profile-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.2);
+      min-width: 200px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 9999;
+    }
+    
+    .topbar-profile-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .topbar-profile-dropdown-item {
+      padding: 12px 20px;
+      color: #32343a;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(67, 100, 129, 0.1);
+    }
+    
+    .topbar-profile-dropdown-item:last-child {
+      border-bottom: none;
+    }
+    
+    .topbar-profile-dropdown-item:hover {
+      background-color: #6ca7d3;
+      color: white;
+    }
+    
+    .topbar-profile-dropdown-item:first-child {
+      border-radius: 10px 10px 0 0;
+    }
+    
+    .topbar-profile-dropdown-item:last-child {
+      border-radius: 0 0 10px 10px;
+    }
+    
+    .topbar-profile-dropdown-item svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
     }
     
     /* ============================================================================
@@ -1282,17 +1343,26 @@
         </svg>
       </button>
 
-      <!-- Profile with Logout -->
-      <div class="topbar-profile" onclick="document.getElementById('logout-btn').click()" style="cursor: pointer;" title="Logout">
-        <div class="topbar-profile-avatar">A</div>
-        <span class="topbar-profile-name">Admin</span>
-        <svg style="width: 16px; height: 16px; color: #718096;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 10l5 5 5-5z"/>
-        </svg>
+      <!-- Profile with Dropdown -->
+      <div class="topbar-profile-wrapper">
+        <div class="topbar-profile" onclick="toggleProfileDropdown()" style="cursor: pointer;">
+          <div class="topbar-profile-avatar">A</div>
+          <span class="topbar-profile-name">Admin</span>
+          <svg style="width: 16px; height: 16px; color: #436481; transition: transform 0.2s ease;" id="profile-dropdown-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 10l5 5 5-5z"/>
+          </svg>
+        </div>
+        
+        <!-- Dropdown Menu -->
+        <div class="topbar-profile-dropdown" id="profile-dropdown">
+          <div class="topbar-profile-dropdown-item" onclick="handleLogout()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+            </svg>
+            <span>Logout</span>
+          </div>
+        </div>
       </div>
-      
-      <!-- Hidden logout button for functionality -->
-      <button id="logout-btn" style="display: none;"></button>
     </div>
   </div>
 
@@ -1794,11 +1864,40 @@
     // Load organizations on page load
     loadOrganizations();
     
+    // Profile dropdown functions
+    function toggleProfileDropdown() {
+      const dropdown = document.getElementById('profile-dropdown');
+      const arrow = document.getElementById('profile-dropdown-arrow');
+      dropdown.classList.toggle('show');
+      
+      // Rotate arrow
+      if (dropdown.classList.contains('show')) {
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('profile-dropdown');
+      const profileWrapper = e.target.closest('.topbar-profile-wrapper');
+      
+      if (!profileWrapper && dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+        document.getElementById('profile-dropdown-arrow').style.transform = 'rotate(0deg)';
+      }
+    });
+    
     // Logout handler
-    document.getElementById('logout-btn').addEventListener('click', async () => {
+    async function handleLogout() {
       await supabaseClient.auth.signOut();
       window.location.href = 'login.html';
-    });
+    }
+    
+    // Make functions global
+    window.toggleProfileDropdown = toggleProfileDropdown;
+    window.handleLogout = handleLogout;
     
     // Handle invite form submission
     document.getElementById('invite-form').addEventListener('submit', async (e) => {
