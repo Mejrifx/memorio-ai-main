@@ -80,7 +80,7 @@
         <div data-w-id="86196f90-a25f-a17c-ed10-b72b29827283" class="form-slider-step-1">
           <div class="form-title">
             <div class="text-block">Memorios Obituary Writer</div>
-            <h1 class="heading-2">Lets begin!</h1>
+            <h1 class="heading-2" id="welcome-heading">Lets begin!</h1>
           </div>
           <div class="form-bubbles">
             <div class="bubble-container">
@@ -1135,6 +1135,37 @@
                 currentUser = data.user;
                 console.log('✅ Login successful:', currentUser.email);
                 
+                // Fetch and display user's name for personalized greeting
+                try {
+                    const { data: userData, error: userError } = await supabaseClient
+                        .from('users')
+                        .select('metadata')
+                        .eq('id', currentUser.id)
+                        .single();
+                    
+                    if (!userError && userData?.metadata?.name) {
+                        const userName = userData.metadata.name;
+                        console.log('✅ User name loaded:', userName);
+                        
+                        // Update the welcome heading with personalized greeting
+                        const welcomeHeading = document.getElementById('welcome-heading');
+                        if (welcomeHeading) {
+                            welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
+                        }
+                    } else {
+                        // Fallback to JWT user_metadata
+                        const fallbackName = currentUser.user_metadata?.name;
+                        if (fallbackName) {
+                            const welcomeHeading = document.getElementById('welcome-heading');
+                            if (welcomeHeading) {
+                                welcomeHeading.textContent = `Hey ${fallbackName}, Let's begin.`;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('❌ Error fetching user name:', e);
+                }
+                
                 hideLoginModal();
                 await loadFamilyCase();
                 
@@ -1191,6 +1222,40 @@
                     console.log('User is not a family member, showing login modal');
                     showLoginModal();
                     return false;
+                }
+                
+                // Fetch user's name for personalized greeting
+                try {
+                    const { data: userData, error: userError } = await supabaseClient
+                        .from('users')
+                        .select('metadata')
+                        .eq('id', currentUser.id)
+                        .single();
+                    
+                    if (!userError && userData?.metadata?.name) {
+                        const userName = userData.metadata.name;
+                        console.log('✅ User name loaded:', userName);
+                        
+                        // Update the welcome heading with personalized greeting
+                        const welcomeHeading = document.getElementById('welcome-heading');
+                        if (welcomeHeading) {
+                            welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
+                        }
+                    } else {
+                        console.warn('⚠️ Could not load user name from database:', userError);
+                        // Fallback: try to get name from user_metadata (JWT)
+                        const fallbackName = currentUser.user_metadata?.name;
+                        if (fallbackName) {
+                            console.log('✅ User name loaded from JWT:', fallbackName);
+                            const welcomeHeading = document.getElementById('welcome-heading');
+                            if (welcomeHeading) {
+                                welcomeHeading.textContent = `Hey ${fallbackName}, Let's begin.`;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('❌ Error fetching user name:', e);
+                    // Continue without personalization - will show default "Lets begin!"
                 }
                 
                 // Check if form is already completed BEFORE loading the page
