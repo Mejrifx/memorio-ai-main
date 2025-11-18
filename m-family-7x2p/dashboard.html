@@ -527,7 +527,7 @@
 
   <div class="dashboard-container">
     <div class="dashboard-header">
-      <h1 class="dashboard-title">My Case</h1>
+      <h1 class="dashboard-title" id="dashboard-title">My Case</h1>
       <button id="logoutBtn" class="btn-logout">Sign Out</button>
     </div>
     
@@ -663,6 +663,7 @@
     let currentCase = null;
     let currentForm = null;
     let currentAssets = [];
+    let userName = null;
     
     // Check authentication
     async function checkAuth() {
@@ -682,6 +683,41 @@
         await supabaseClient.auth.signOut();
         window.location.href = 'login.html';
         return false;
+      }
+      
+      // Fetch user's name from the database
+      try {
+        const { data: userData, error: userError } = await supabaseClient
+          .from('users')
+          .select('metadata')
+          .eq('id', currentUser.id)
+          .single();
+        
+        if (!userError && userData?.metadata?.name) {
+          userName = userData.metadata.name;
+          console.log('✅ User name loaded:', userName);
+          
+          // Update the dashboard title with personalized greeting
+          const titleElement = document.getElementById('dashboard-title');
+          if (titleElement) {
+            titleElement.textContent = `Hey ${userName}, Let's begin.`;
+          }
+        } else {
+          console.warn('⚠️ Could not load user name from database:', userError);
+          // Fallback: try to get name from user_metadata (JWT)
+          const fallbackName = currentUser.user_metadata?.name;
+          if (fallbackName) {
+            userName = fallbackName;
+            console.log('✅ User name loaded from JWT:', userName);
+            const titleElement = document.getElementById('dashboard-title');
+            if (titleElement) {
+              titleElement.textContent = `Hey ${userName}, Let's begin.`;
+            }
+          }
+        }
+      } catch (e) {
+        console.error('❌ Error fetching user name:', e);
+        // Continue without personalization - will show default "My Case"
       }
       
       return true;
