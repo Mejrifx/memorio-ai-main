@@ -1049,11 +1049,30 @@
       }
     });
     
+    // Check for URL parameters and apply filters
+    function checkURLFilters() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orgId = urlParams.get('org');
+      
+      if (orgId) {
+        // Set the org filter
+        document.getElementById('filterOrg').value = orgId;
+        
+        // Apply filters automatically
+        setTimeout(() => {
+          applyFilters();
+        }, 500); // Small delay to ensure data is loaded
+      }
+    }
+    
     // Initialize
     (async function init() {
       const authenticated = await checkAuth();
       if (authenticated) {
         await loadCases();
+        
+        // Check for URL filters and apply them
+        checkURLFilters();
         
         // Auto-refresh every 30 seconds
         setInterval(loadCases, 30000);

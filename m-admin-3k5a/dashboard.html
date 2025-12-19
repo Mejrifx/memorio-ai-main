@@ -1779,10 +1779,40 @@
             <span class="modal-detail-label">Total Directors:</span>
             <span class="modal-detail-value" id="modal-director-count">-</span>
           </div>
+        </div>
+      </div>
+      
+      <div class="modal-section">
+        <h3 class="modal-section-title">
+          <span class="modal-icon">📊</span>
+          Case Analytics
+        </h3>
+        <div class="modal-details">
           <div class="modal-detail-item">
-            <span class="modal-detail-label">Total Cases:</span>
-            <span class="modal-detail-value" id="modal-cases-count">-</span>
+            <span class="modal-detail-label">Active Cases:</span>
+            <span class="modal-detail-value" id="modal-active-cases">-</span>
           </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Cases (Last 30 Days):</span>
+            <span class="modal-detail-value" id="modal-recent-cases">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">On-Time Cases:</span>
+            <span class="modal-detail-value" id="modal-on-time-cases">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Breach Cases:</span>
+            <span class="modal-detail-value" id="modal-breach-cases">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">SLA Performance:</span>
+            <span class="modal-detail-value" id="modal-sla-percentage">-</span>
+          </div>
+        </div>
+        <div style="margin-top: 20px;">
+          <button class="button-primary w-button" onclick="viewOrgCases()" style="width: 100%;">
+            📋 View All Cases for This Organization
+          </button>
         </div>
       </div>
       
@@ -2746,13 +2776,21 @@
         
         if (directorsError) throw directorsError;
         
-        // Load cases count for this organization
-        const { data: cases, error: casesError } = await supabaseClient
-          .from('cases')
-          .select('id')
-          .eq('org_id', orgId);
+        // Load case analytics from the view
+        const { data: analytics, error: analyticsError } = await supabaseClient
+          .from('case_analytics')
+          .select('*')
+          .eq('org_id', orgId)
+          .single();
         
-        if (casesError) throw casesError;
+        // Handle case where no analytics exist yet (new org with no cases)
+        const analyticsData = analyticsError ? {
+          active_cases: 0,
+          cases_last_30_days: 0,
+          on_time_cases: 0,
+          breach_cases: 0,
+          sla_percentage: 100
+        } : analytics;
         
         // Populate modal with organization data
         document.getElementById('modal-org-name').textContent = org.name;
@@ -2765,7 +2803,18 @@
         
         // Populate director accounts data
         document.getElementById('modal-director-count').textContent = directors.length;
-        document.getElementById('modal-cases-count').textContent = cases.length;
+        
+        // Populate case analytics
+        document.getElementById('modal-active-cases').textContent = analyticsData.active_cases || 0;
+        document.getElementById('modal-recent-cases').textContent = analyticsData.cases_last_30_days || 0;
+        document.getElementById('modal-on-time-cases').textContent = analyticsData.on_time_cases || 0;
+        document.getElementById('modal-breach-cases').textContent = analyticsData.breach_cases || 0;
+        
+        // Format SLA percentage with color
+        const slaPercent = analyticsData.sla_percentage || 100;
+        const slaColor = slaPercent >= 80 ? '#2e7d32' : slaPercent >= 60 ? '#d68000' : '#c62828';
+        document.getElementById('modal-sla-percentage').innerHTML = 
+          `<span style="color: ${slaColor}; font-weight: 600;">${slaPercent}%</span>`;
         
         // Store current org details for deletion
         currentOrgDetails = { id: orgId, name: org.name };
@@ -2830,11 +2879,20 @@
       }
     });
     
+    // View organization cases
+    function viewOrgCases() {
+      if (!currentOrgDetails) return;
+      
+      // Redirect to cases page with org filter
+      window.location.href = `cases.html?org=${currentOrgDetails.id}`;
+    }
+    
     // Make functions global
     window.openOrgModal = openOrgModal;
     window.closeOrgModal = closeOrgModal;
     window.revealDirectorCredentials = revealDirectorCredentials;
     window.deleteOrgFromModal = deleteOrgFromModal;
+    window.viewOrgCases = viewOrgCases;
   </script>
 </body>
 </html>
