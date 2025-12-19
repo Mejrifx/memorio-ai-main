@@ -966,32 +966,39 @@
         }
         
         // CRITICAL: Check if form has been submitted before allowing access to dashboard
+        // This matches the exact logic in index.html to prevent infinite loops
         console.log('🔍 Checking if form has been submitted...');
         try {
+          // Step 1: Get the case
           const { data: caseData, error: caseError } = await supabaseClient
             .from('cases')
-            .select('id, forms(submitted_at)')
+            .select('id')
             .eq('assigned_family_user_id', currentUser.id)
             .single();
           
           if (caseError) {
             console.error('❌ Error loading case:', caseError);
-            // If no case found, redirect to intake form
             console.log('No case found, redirecting to intake form...');
             window.location.href = '../index.html';
             return false;
           }
           
-          // Check if form has been submitted
-          const formSubmitted = caseData.forms && caseData.forms.length > 0 && caseData.forms[0].submitted_at;
+          // Step 2: Get the form for this case (using same query as index.html)
+          const { data: formData, error: formError } = await supabaseClient
+            .from('forms')
+            .select('submitted_at')
+            .eq('case_id', caseData.id)
+            .single();
           
-          if (!formSubmitted) {
+          // Check if form has been submitted (exact same logic as index.html)
+          if (!formError && formData && formData.submitted_at) {
+            console.log('✅ Form has been submitted, allowing dashboard access');
+            // Form is submitted, allow access to dashboard
+          } else {
             console.log('⚠️ Form not submitted yet, redirecting to intake form...');
             window.location.href = '../index.html';
             return false;
           }
-          
-          console.log('✅ Form has been submitted, allowing dashboard access');
           
         } catch (e) {
           console.error('❌ Error checking form submission:', e);
