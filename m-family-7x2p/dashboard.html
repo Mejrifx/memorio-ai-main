@@ -875,17 +875,18 @@
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       console.log('🔐 Auth state changed:', event, session?.user?.email);
       
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        isAuthenticated = false;
-        currentSession = null;
-        window.location.href = 'login.html';
-        return;
-      }
-      
+      // Update session state but DON'T redirect (let checkAuth handle redirects)
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         currentSession = session;
         isAuthenticated = !!session;
         console.log('✅ Session updated/refreshed successfully');
+      }
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        isAuthenticated = false;
+        currentSession = null;
+        console.log('⚠️ User signed out');
+        // Don't redirect here - it causes loops. Let checkAuth handle redirects.
       }
       
       if (event === 'TOKEN_REFRESHED') {
