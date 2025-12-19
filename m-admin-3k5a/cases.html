@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Cases - Admin Portal - Memorio</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link href="../css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="../css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
+  <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="../images/webclip.png" rel="apple-touch-icon">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <style>
+    /* ============================================================================
+       MEMORIO ADMIN CASES - KANBAN CONTROL TOWER
+       ============================================================================ */
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      background-color: #f4e8de;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* ============================================================================
+       SIDEBAR NAVIGATION
+       ============================================================================ */
+    
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background-color: #fff3e9;
+      border-right: 3px solid #436481;
+      box-shadow: 4px 0 15px rgba(67, 100, 129, 0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-logo {
+      height: 70px;
+      padding: 0;
+      border-bottom: 2px solid #436481;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .sidebar-logo img {
+      width: 140px;
+      height: auto;
+      max-height: 60px;
+      object-fit: contain;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 24px;
+      margin: 4px 12px;
+      color: #32343a;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+      border: 1.5px solid transparent;
+    }
+    
+    .sidebar-nav-item:hover {
+      background-color: #f4e8de;
+      border-color: #6ca7d3;
+      color: #436481;
+    }
+    
+    .sidebar-nav-item.active {
+      background-color: #f4e8de;
+      border-color: #436481;
+      color: #436481;
+      font-weight: 600;
+    }
+    
+    .nav-icon {
+      font-size: 20px;
+      width: 24px;
+      text-align: center;
+    }
+    
+    /* ============================================================================
+       TOP NAVBAR
+       ============================================================================ */
+    
+    .topbar {
+      position: fixed;
+      left: 280px;
+      top: 0;
+      right: 0;
+      height: 70px;
+      background-color: #fff3e9;
+      border-bottom: 2px solid #436481;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      z-index: 999;
+    }
+    
+    .topbar-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #32343a;
+    }
+    
+    .topbar-profile-wrapper {
+      position: relative;
+    }
+    
+    .topbar-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 20px;
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .topbar-profile:hover {
+      background-color: #f4e8de;
+      border-color: #6ca7d3;
+    }
+    
+    .topbar-profile-name {
+      font-weight: 500;
+      color: #32343a;
+    }
+    
+    .topbar-profile-arrow {
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+    
+    .topbar-profile-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      width: 100%;
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 60px;
+      padding: 8px;
+      display: none;
+      z-index: 1000;
+    }
+    
+    .topbar-profile-dropdown.show {
+      display: block;
+    }
+    
+    .topbar-profile-dropdown button {
+      width: 100%;
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      border-radius: 50px;
+      color: #32343a;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    
+    .topbar-profile-dropdown button:hover {
+      background-color: #f4e8de;
+      color: #436481;
+    }
+    
+    /* ============================================================================
+       MAIN CONTENT
+       ============================================================================ */
+    
+    .main-content {
+      margin-left: 280px;
+      margin-top: 70px;
+      padding: 24px;
+      min-height: calc(100vh - 70px);
+    }
+    
+    /* ============================================================================
+       FILTERS BAR
+       ============================================================================ */
+    
+    .filters-bar {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 180px;
+    }
+    
+    .filter-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #32343a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .filter-select,
+    .filter-input {
+      padding: 10px 14px;
+      border: 2px solid #436481;
+      border-radius: 8px;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-size: 15px;
+      background-color: white;
+      color: #32343a;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    
+    .filter-select:focus,
+    .filter-input:focus {
+      border-color: #6ca7d3;
+    }
+    
+    .filter-button {
+      padding: 11px 24px;
+      background-color: #32343a;
+      color: #f2eadd;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      align-self: flex-end;
+    }
+    
+    .filter-button:hover {
+      background-color: #6ca7d3;
+    }
+    
+    /* ============================================================================
+       KANBAN BOARD
+       ============================================================================ */
+    
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    
+    @media (max-width: 1400px) {
+      .kanban-board {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .kanban-board {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .kanban-column {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 16px;
+      padding: 16px;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .kanban-column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #436481;
+    }
+    
+    .kanban-column-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #32343a;
+    }
+    
+    .kanban-column-count {
+      background-color: #32343a;
+      color: #f2eadd;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    .kanban-column-cards {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+    
+    /* ============================================================================
+       CASE CARDS
+       ============================================================================ */
+    
+    .case-card {
+      background-color: white;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .case-card:hover {
+      border-color: #6ca7d3;
+      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .case-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    
+    .case-card-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #32343a;
+      line-height: 1.3;
+    }
+    
+    .sla-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    .sla-badge.green {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #66bb6a;
+    }
+    
+    .sla-badge.yellow {
+      background-color: #fff9e6;
+      color: #d68000;
+      border: 1px solid #ffeb3b;
+    }
+    
+    .sla-badge.orange {
+      background-color: #fff3e0;
+      color: #e65100;
+      border: 1px solid #ff9800;
+    }
+    
+    .sla-badge.red {
+      background-color: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef5350;
+    }
+    
+    .case-card-org {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .case-card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .case-card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .meta-icon {
+      width: 16px;
+      text-align: center;
+    }
+    
+    .case-card-footer {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #999;
+    }
+    
+    /* ============================================================================
+       CASE DETAIL MODAL
+       ============================================================================ */
+    
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      overflow-y: auto;
+      padding: 40px 20px;
+    }
+    
+    .modal-overlay.show {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    
+    .modal-content {
+      background-color: #fff3e9;
+      border: 3px solid #436481;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 900px;
+      width: 100%;
+      position: relative;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #666;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+    
+    .modal-close:hover {
+      background-color: #f4e8de;
+      color: #32343a;
+    }
+    
+    .modal-header {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #436481;
+    }
+    
+    .modal-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #32343a;
+      margin-bottom: 12px;
+    }
+    
+    .modal-meta {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 15px;
+      color: #666;
+    }
+    
+    .modal-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .modal-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #436481;
+      padding-bottom: 0;
+    }
+    
+    .modal-tab {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: -2px;
+    }
+    
+    .modal-tab:hover {
+      color: #32343a;
+      background-color: #f4e8de;
+    }
+    
+    .modal-tab.active {
+      color: #32343a;
+      font-weight: 600;
+      border-bottom-color: #436481;
+    }
+    
+    .modal-tab-content {
+      display: none;
+    }
+    
+    .modal-tab-content.active {
+      display: block;
+    }
+    
+    /* ============================================================================
+       LOADING & EMPTY STATES
+       ============================================================================ */
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-size: 16px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 15px;
+    }
+    
+    /* ============================================================================
+       UTILITIES
+       ============================================================================ */
+    
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body class="body">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
+           alt="Memorio Logo">
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="sidebar-nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="cases.html" class="sidebar-nav-item active">
+        <span class="nav-icon">📋</span>
+        <span>All Cases</span>
+      </a>
+    </nav>
+  </div>
+  
+  <!-- Top Navbar -->
+  <div class="topbar">
+    <h1 class="topbar-title">Cases Control Tower</h1>
+    
+    <div class="topbar-profile-wrapper">
+      <div class="topbar-profile" onclick="toggleProfileDropdown()">
+        <span class="topbar-profile-name">Admin</span>
+        <span class="topbar-profile-arrow" id="profile-dropdown-arrow">▼</span>
+      </div>
+      <div class="topbar-profile-dropdown" id="profile-dropdown">
+        <button onclick="handleLogout()">Logout</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Filters Bar -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <label class="filter-label">Organization</label>
+        <select id="filterOrg" class="filter-select">
+          <option value="">All Organizations</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label class="filter-label">Editor</label>
+        <select id="filterEditor" class="filter-select">
+          <option value="">All Editors</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label class="filter-label">SLA Status</label>
+        <select id="filterSLA" class="filter-select">
+          <option value="">All</option>
+          <option value="green">🟢 On Time (&lt;24h)</option>
+          <option value="yellow">🟡 Yellow (24-36h)</option>
+          <option value="orange">🟠 Orange (36-48h)</option>
+          <option value="red">🔴 Breach (48h+)</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label class="filter-label">Search</label>
+        <input type="text" id="filterSearch" class="filter-input" placeholder="Search by name...">
+      </div>
+      
+      <button class="filter-button" onclick="applyFilters()">Apply Filters</button>
+    </div>
+    
+    <!-- Kanban Board -->
+    <div class="kanban-board">
+      <!-- Waiting on Family -->
+      <div class="kanban-column">
+        <div class="kanban-column-header">
+          <h2 class="kanban-column-title">Waiting on Family</h2>
+          <span class="kanban-column-count" id="count-waiting">0</span>
+        </div>
+        <div class="kanban-column-cards" id="column-waiting">
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+      
+      <!-- In Progress -->
+      <div class="kanban-column">
+        <div class="kanban-column-header">
+          <h2 class="kanban-column-title">In Progress</h2>
+          <span class="kanban-column-count" id="count-progress">0</span>
+        </div>
+        <div class="kanban-column-cards" id="column-progress">
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+      
+      <!-- Awaiting Review -->
+      <div class="kanban-column">
+        <div class="kanban-column-header">
+          <h2 class="kanban-column-title">Awaiting Review</h2>
+          <span class="kanban-column-count" id="count-review">0</span>
+        </div>
+        <div class="kanban-column-cards" id="column-review">
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+      
+      <!-- Complete -->
+      <div class="kanban-column">
+        <div class="kanban-column-header">
+          <h2 class="kanban-column-title">Complete</h2>
+          <span class="kanban-column-count" id="count-complete">0</span>
+        </div>
+        <div class="kanban-column-cards" id="column-complete">
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Case Detail Modal -->
+  <div class="modal-overlay" id="caseDetailModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      
+      <div class="modal-header" id="modalHeader">
+        <!-- Dynamic content -->
+      </div>
+      
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchModalTab('overview')">Overview</button>
+        <button class="modal-tab" onclick="switchModalTab('timeline')">Timeline</button>
+        <button class="modal-tab" onclick="switchModalTab('notes')">Notes</button>
+      </div>
+      
+      <div class="modal-tab-content active" id="tab-overview">
+        <!-- Overview content -->
+      </div>
+      
+      <div class="modal-tab-content" id="tab-timeline">
+        <!-- Timeline content -->
+      </div>
+      
+      <div class="modal-tab-content" id="tab-notes">
+        <!-- Notes content -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Supabase
+    const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDE5MjUsImV4cCI6MjA3NTQ3NzkyNX0.O1DfOR5FBm6r3Pg-tjEE5CkzRr3WlWqGU1xUYKrhtnU';
+    
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: 'memorio-admin-auth',
+      }
+    });
+    
+    let allCases = [];
+    let filteredCases = [];
+    
+    // Check authentication
+    async function checkAuth() {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      
+      if (error || !session) {
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      // Verify admin role
+      const { data: userData, error: userError } = await supabaseClient
+        .from('users')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (userError || !userData || userData.role !== 'admin') {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // Load all cases with relationships
+    async function loadCases() {
+      try {
+        const { data: cases, error } = await supabaseClient
+          .from('cases')
+          .select(`
+            *,
+            organizations (name),
+            users!cases_assigned_family_user_id_fkey (email, metadata),
+            editor_assignments!inner (
+              editor_user_id,
+              users!editor_assignments_editor_user_id_fkey (email, metadata)
+            ),
+            video_submissions (qc_status, qc_reviewer_id)
+          `)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        allCases = cases || [];
+        filteredCases = allCases;
+        
+        // Load filter dropdowns
+        await loadFilterOptions();
+        
+        // Render cases
+        renderKanban();
+        
+      } catch (error) {
+        console.error('Error loading cases:', error);
+        alert('Failed to load cases: ' + error.message);
+      }
+    }
+    
+    // Load filter options
+    async function loadFilterOptions() {
+      // Load organizations
+      const { data: orgs } = await supabaseClient
+        .from('organizations')
+        .select('id, name')
+        .order('name');
+      
+      const orgSelect = document.getElementById('filterOrg');
+      orgs?.forEach(org => {
+        const option = document.createElement('option');
+        option.value = org.id;
+        option.textContent = org.name;
+        orgSelect.appendChild(option);
+      });
+      
+      // Load editors
+      const { data: editors } = await supabaseClient
+        .from('users')
+        .select('id, email, metadata')
+        .eq('role', 'editor')
+        .in('status', ['active', 'invited']);
+      
+      const editorSelect = document.getElementById('filterEditor');
+      editors?.forEach(editor => {
+        const option = document.createElement('option');
+        option.value = editor.id;
+        option.textContent = editor.metadata?.name || editor.email;
+        editorSelect.appendChild(option);
+      });
+    }
+    
+    // Apply filters
+    function applyFilters() {
+      const orgFilter = document.getElementById('filterOrg').value;
+      const editorFilter = document.getElementById('filterEditor').value;
+      const slaFilter = document.getElementById('filterSLA').value;
+      const searchFilter = document.getElementById('filterSearch').value.toLowerCase();
+      
+      filteredCases = allCases.filter(c => {
+        // Organization filter
+        if (orgFilter && c.org_id !== orgFilter) return false;
+        
+        // Editor filter
+        if (editorFilter) {
+          const hasEditor = c.editor_assignments?.some(a => a.editor_user_id === editorFilter);
+          if (!hasEditor) return false;
+        }
+        
+        // SLA filter
+        if (slaFilter && c.sla_state !== slaFilter) return false;
+        
+        // Search filter
+        if (searchFilter && !c.deceased_name.toLowerCase().includes(searchFilter)) return false;
+        
+        return true;
+      });
+      
+      renderKanban();
+    }
+    
+    // Render Kanban board
+    function renderKanban() {
+      // Map statuses to Kanban columns
+      const columns = {
+        waiting: ['waiting_on_family', 'intake_in_progress'],
+        progress: ['in_production'],
+        review: ['awaiting_review', 'revision_requested'],
+        complete: ['delivered', 'closed']
+      };
+      
+      // Clear columns
+      ['waiting', 'progress', 'review', 'complete'].forEach(col => {
+        document.getElementById(`column-${col}`).innerHTML = '';
+      });
+      
+      // Sort cases by SLA state (red first, then orange, yellow, green)
+      const slaOrder = { red: 0, orange: 1, yellow: 2, green: 3 };
+      const sortedCases = [...filteredCases].sort((a, b) => {
+        const orderA = slaOrder[a.sla_state] ?? 999;
+        const orderB = slaOrder[b.sla_state] ?? 999;
+        return orderA - orderB;
+      });
+      
+      // Group cases by column
+      sortedCases.forEach(c => {
+        let column = null;
+        if (columns.waiting.includes(c.status)) column = 'waiting';
+        else if (columns.progress.includes(c.status)) column = 'progress';
+        else if (columns.review.includes(c.status)) column = 'review';
+        else if (columns.complete.includes(c.status)) column = 'complete';
+        
+        if (column) {
+          document.getElementById(`column-${column}`).appendChild(createCaseCard(c));
+        }
+      });
+      
+      // Update counts
+      ['waiting', 'progress', 'review', 'complete'].forEach(col => {
+        const cards = document.getElementById(`column-${col}`).children;
+        document.getElementById(`count-${col}`).textContent = cards.length || 0;
+        
+        // Show empty state if no cards
+        if (cards.length === 0) {
+          document.getElementById(`column-${col}`).innerHTML = '<div class="empty-state">No cases</div>';
+        }
+      });
+    }
+    
+    // Create case card
+    function createCaseCard(c) {
+      const card = document.createElement('div');
+      card.className = 'case-card';
+      card.onclick = () => openCaseDetail(c.id);
+      
+      const editor = c.editor_assignments?.[0]?.users;
+      const editorName = editor?.metadata?.name || editor?.email || 'Unassigned';
+      
+      const slaHours = c.sla_hours_elapsed ? Math.floor(c.sla_hours_elapsed) : 0;
+      const slaText = c.sla_state ? `${slaHours}h` : 'N/A';
+      
+      card.innerHTML = `
+        <div class="case-card-header">
+          <div class="case-card-name">${c.deceased_name}</div>
+          ${c.sla_state ? `<div class="sla-badge ${c.sla_state}">${slaText}</div>` : ''}
+        </div>
+        <div class="case-card-org">🏢 ${c.organizations?.name || 'Unknown Org'}</div>
+        <div class="case-card-meta">
+          <div class="case-card-meta-row">
+            <span class="meta-icon">✏️</span>
+            <span>${editorName}</span>
+          </div>
+          <div class="case-card-meta-row">
+            <span class="meta-icon">📅</span>
+            <span>${new Date(c.created_at).toLocaleDateString()}</span>
+          </div>
+        </div>
+        <div class="case-card-footer">
+          <span>ID: ${c.id.slice(0, 8)}</span>
+          <span>${c.status.replace(/_/g, ' ')}</span>
+        </div>
+      `;
+      
+      return card;
+    }
+    
+    // Open case detail modal
+    function openCaseDetail(caseId) {
+      const caseData = allCases.find(c => c.id === caseId);
+      if (!caseData) return;
+      
+      const modal = document.getElementById('caseDetailModal');
+      const header = document.getElementById('modalHeader');
+      
+      const editor = caseData.editor_assignments?.[0]?.users;
+      const editorName = editor?.metadata?.name || editor?.email || 'Unassigned';
+      
+      const slaHours = caseData.sla_hours_elapsed ? Math.floor(caseData.sla_hours_elapsed) : 0;
+      
+      header.innerHTML = `
+        <h1 class="modal-title">${caseData.deceased_name}</h1>
+        <div class="modal-meta">
+          <div class="modal-meta-item">
+            <strong>Organization:</strong> ${caseData.organizations?.name || 'Unknown'}
+          </div>
+          <div class="modal-meta-item">
+            <strong>Status:</strong> ${caseData.status.replace(/_/g, ' ')}
+          </div>
+          ${caseData.sla_state ? `
+          <div class="modal-meta-item">
+            <strong>SLA:</strong> <span class="sla-badge ${caseData.sla_state}">${slaHours}h</span>
+          </div>` : ''}
+          <div class="modal-meta-item">
+            <strong>Editor:</strong> ${editorName}
+          </div>
+        </div>
+      `;
+      
+      // Load overview tab
+      document.getElementById('tab-overview').innerHTML = `
+        <h3 style="margin-bottom: 16px;">Case Details</h3>
+        <p><strong>Case ID:</strong> ${caseData.id}</p>
+        <p><strong>Created:</strong> ${new Date(caseData.created_at).toLocaleString()}</p>
+        <p><strong>Last Updated:</strong> ${new Date(caseData.updated_at).toLocaleString()}</p>
+        ${caseData.first_submission_at ? `<p><strong>Form Submitted:</strong> ${new Date(caseData.first_submission_at).toLocaleString()}</p>` : ''}
+      `;
+      
+      modal.classList.add('show');
+    }
+    
+    // Close modal
+    function closeModal() {
+      document.getElementById('caseDetailModal').classList.remove('show');
+    }
+    
+    // Switch modal tab
+    function switchModalTab(tab) {
+      document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.modal-tab-content').forEach(c => c.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tab}`).classList.add('active');
+    }
+    
+    // Profile dropdown
+    function toggleProfileDropdown() {
+      document.getElementById('profile-dropdown').classList.toggle('show');
+    }
+    
+    // Logout
+    async function handleLogout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('profile-dropdown');
+      const profileWrapper = e.target.closest('.topbar-profile-wrapper');
+      
+      if (!profileWrapper && dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+      }
+    });
+    
+    // Initialize
+    (async function init() {
+      const authenticated = await checkAuth();
+      if (authenticated) {
+        await loadCases();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadCases, 30000);
+      }
+    })();
+  </script>
+</body>
+</html>
+
