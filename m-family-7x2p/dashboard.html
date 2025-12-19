@@ -965,6 +965,41 @@
           // Continue without personalization - will show default "My Case"
         }
         
+        // CRITICAL: Check if form has been submitted before allowing access to dashboard
+        console.log('🔍 Checking if form has been submitted...');
+        try {
+          const { data: caseData, error: caseError } = await supabaseClient
+            .from('cases')
+            .select('id, forms(submitted_at)')
+            .eq('assigned_family_user_id', currentUser.id)
+            .single();
+          
+          if (caseError) {
+            console.error('❌ Error loading case:', caseError);
+            // If no case found, redirect to intake form
+            console.log('No case found, redirecting to intake form...');
+            window.location.href = '../index.html';
+            return false;
+          }
+          
+          // Check if form has been submitted
+          const formSubmitted = caseData.forms && caseData.forms.length > 0 && caseData.forms[0].submitted_at;
+          
+          if (!formSubmitted) {
+            console.log('⚠️ Form not submitted yet, redirecting to intake form...');
+            window.location.href = '../index.html';
+            return false;
+          }
+          
+          console.log('✅ Form has been submitted, allowing dashboard access');
+          
+        } catch (e) {
+          console.error('❌ Error checking form submission:', e);
+          // On error, redirect to intake form to be safe
+          window.location.href = '../index.html';
+          return false;
+        }
+        
         isAuthenticated = true;
         console.log('✅ Family authentication successful');
         console.log('=== END AUTH CHECK ===\n');
