@@ -201,23 +201,11 @@
     });
     
     // Check if already logged in
-    supabaseClient.auth.getSession().then(async ({ data: { session } }) => {
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
       if (session && session.user.app_metadata?.role === 'family') {
-        // Check if form has been submitted
-        const { data: caseData } = await supabaseClient
-          .from('cases')
-          .select('id, status, forms(submitted_at)')
-          .eq('assigned_family_user_id', session.user.id)
-          .single();
-        
-        // Redirect based on form status
-        if (caseData && caseData.forms && caseData.forms.length > 0 && caseData.forms[0].submitted_at) {
-          // Form submitted - go to dashboard
-          window.location.href = 'dashboard.html';
-        } else {
-          // Form not submitted or no case - go to intake form
-          window.location.href = '../index.html';
-        }
+        // Already logged in, redirect to intake form
+        // index.html will handle routing to dashboard if form is already submitted
+        window.location.href = '../index.html';
       }
     });
     
@@ -255,40 +243,13 @@
           throw new Error('Access denied: This portal is only for family members.');
         }
         
-        // Check if form has been submitted by checking the case and form status
-        const { data: caseData, error: caseError } = await supabaseClient
-          .from('cases')
-          .select('id, status, forms(submitted_at)')
-          .eq('assigned_family_user_id', data.user.id)
-          .single();
-        
-        if (caseError && caseError.code !== 'PGRST116') {
-          // Error other than "not found"
-          console.error('Error checking case:', caseError);
-        }
-        
-        // Determine where to redirect
-        let redirectUrl = '../index.html'; // Default to intake form
-        let redirectMessage = 'Redirecting to form...';
-        
-        if (caseData) {
-          // Case exists - check if form has been submitted
-          const formSubmitted = caseData.forms && caseData.forms.length > 0 && caseData.forms[0].submitted_at;
-          
-          if (formSubmitted) {
-            // Form already submitted - go to dashboard
-            redirectUrl = 'dashboard.html';
-            redirectMessage = 'Redirecting to dashboard...';
-          }
-          // If form not submitted, stay with default (index.html)
-        }
-        
-        // Success message
-        successMessage.textContent = `✓ Login successful! ${redirectMessage}`;
+        // Success - always redirect to index.html (intake form)
+        // index.html will handle routing: if form submitted → dashboard, else → show form
+        successMessage.textContent = '✓ Login successful! Redirecting...';
         successMessage.style.display = 'block';
         
         setTimeout(() => {
-          window.location.href = redirectUrl;
+          window.location.href = '../index.html';
         }, 1000);
         
       } catch (error) {
