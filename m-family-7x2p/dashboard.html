@@ -850,70 +850,161 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDE5MjUsImV4cCI6MjA3NTQ3NzkyNX0.O1DfOR5FBm6r3Pg-tjEE5CkzRr3WlWqGU1xUYKrhtnU';
     
     const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
+    // Initialize Supabase client with proper session persistence
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        autoRefreshToken: true,           // Automatically refresh token before expiry
+        persistSession: true,              // Persist session to localStorage
+        detectSessionInUrl: true,          // Detect OAuth sessions in URL
+        storage: window.localStorage,      // Use localStorage for session persistence
+        storageKey: 'memorio-family-auth', // Unique key per portal
+      }
+    });
+    
+    // Global auth state
+    let isAuthenticated = false;
+    let currentSession = null;
     let currentUser = null;
     let currentCase = null;
     let currentForm = null;
     let currentAssets = [];
     let userName = null;
     
-    // Check authentication
+    // Set up automatic token refresh and session monitoring
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔐 Auth state changed:', event, session?.user?.email);
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        isAuthenticated = false;
+        currentSession = null;
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        currentSession = session;
+        isAuthenticated = !!session;
+        console.log('✅ Session updated/refreshed successfully');
+      }
+      
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('🔄 Access token auto-refreshed - no action needed');
+      }
+    });
+    
+    // Enhanced auth check with proper session handling
     async function checkAuth() {
-      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      console.log('=== FAMILY AUTHENTICATION CHECK ===');
       
-      if (error || !session) {
-        window.location.href = 'login.html';
-        return false;
-      }
-      
-      currentUser = session.user;
-      
-      // Verify family role
-      const role = currentUser.app_metadata?.role;
-      if (role !== 'family') {
-        alert('Access denied: This portal is only for family members.');
-        await supabaseClient.auth.signOut();
-        window.location.href = 'login.html';
-        return false;
-      }
-      
-      // Fetch user's name from the database
       try {
-        const { data: userData, error: userError } = await supabaseClient
-          .from('users')
-          .select('metadata')
-          .eq('id', currentUser.id)
-          .single();
+        // Get session from localStorage (persisted)
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         
-        if (!userError && userData?.metadata?.name) {
-          userName = userData.metadata.name;
-          console.log('✅ User name loaded:', userName);
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          throw new Error('Session retrieval failed');
+        }
+        
+        if (!session) {
+          console.error('No session found - redirecting to login');
+          window.location.href = 'login.html';
+          return false;
+        }
+        
+        console.log('Session exists:', !!session);
+        console.log('User Email:', session.user.email);
+        
+        // Store session globally
+        currentSession = session;
+        currentUser = session.user;
+        
+        // Verify family role
+        const role = currentUser.app_metadata?.role;
+        if (role !== 'family') {
+          console.error('❌ Not a family user');
+          alert('Access denied: This portal is only for family members.');
+          await supabaseClient.auth.signOut();
+          window.location.href = 'login.html';
+          return false;
+        }
+        
+        // Fetch user's name from the database
+        try {
+          const { data: userData, error: userError } = await supabaseClient
+            .from('users')
+            .select('metadata')
+            .eq('id', currentUser.id)
+            .single();
           
-          // Update the dashboard title with personalized greeting
-          const titleElement = document.getElementById('dashboard-title');
-          if (titleElement) {
-            titleElement.textContent = `Hey ${userName}, Let's begin.`;
-          }
-        } else {
-          console.warn('⚠️ Could not load user name from database:', userError);
-          // Fallback: try to get name from user_metadata (JWT)
-          const fallbackName = currentUser.user_metadata?.name;
-          if (fallbackName) {
-            userName = fallbackName;
-            console.log('✅ User name loaded from JWT:', userName);
+          if (!userError && userData?.metadata?.name) {
+            userName = userData.metadata.name;
+            console.log('✅ User name loaded:', userName);
+            
+            // Update the dashboard title with personalized greeting
             const titleElement = document.getElementById('dashboard-title');
             if (titleElement) {
               titleElement.textContent = `Hey ${userName}, Let's begin.`;
             }
+          } else {
+            console.warn('⚠️ Could not load user name from database:', userError);
+            // Fallback: try to get name from user_metadata (JWT)
+            const fallbackName = currentUser.user_metadata?.name;
+            if (fallbackName) {
+              userName = fallbackName;
+              console.log('✅ User name loaded from JWT:', userName);
+              const titleElement = document.getElementById('dashboard-title');
+              if (titleElement) {
+                titleElement.textContent = `Hey ${userName}, Let's begin.`;
+              }
+            }
           }
+        } catch (e) {
+          console.error('❌ Error fetching user name:', e);
+          // Continue without personalization - will show default "My Case"
         }
-      } catch (e) {
-        console.error('❌ Error fetching user name:', e);
-        // Continue without personalization - will show default "My Case"
+        
+        isAuthenticated = true;
+        console.log('✅ Family authentication successful');
+        console.log('=== END AUTH CHECK ===\n');
+        return true;
+        
+      } catch (error) {
+        console.error('❌ Auth check failed:', error);
+        window.location.href = 'login.html';
+        return false;
+      }
+    }
+    
+    // Helper function to get valid session (with auto-refresh if needed)
+    async function getValidSession() {
+      if (!currentSession) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        currentSession = session;
       }
       
-      return true;
+      // If session is close to expiry, refresh it
+      if (currentSession) {
+        const expiresAt = currentSession.expires_at;
+        const now = Math.floor(Date.now() / 1000);
+        const timeUntilExpiry = expiresAt - now;
+        
+        // Refresh if less than 5 minutes until expiry
+        if (timeUntilExpiry < 300) {
+          console.log('🔄 Session expiring soon, refreshing...');
+          const { data: refreshData, error } = await supabaseClient.auth.refreshSession();
+          if (!error && refreshData.session) {
+            currentSession = refreshData.session;
+            console.log('✅ Session refreshed successfully');
+          }
+        }
+      }
+      
+      if (!currentSession) {
+        throw new Error('No valid session - please log in again');
+      }
+      
+      return currentSession;
     }
     
     // Load all case data

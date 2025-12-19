@@ -692,40 +692,132 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDE5MjUsImV4cCI6MjA3NTQ3NzkyNX0.O1DfOR5FBm6r3Pg-tjEE5CkzRr3WlWqGU1xUYKrhtnU';
     
     const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
+    // Initialize Supabase client with proper session persistence
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        autoRefreshToken: true,           // Automatically refresh token before expiry
+        persistSession: true,              // Persist session to localStorage
+        detectSessionInUrl: true,          // Detect OAuth sessions in URL
+        storage: window.localStorage,      // Use localStorage for session persistence
+        storageKey: 'memorio-qc-auth',     // Unique key per portal
+      }
+    });
+    
+    // Global auth state
+    let isAuthenticated = false;
+    let currentSession = null;
     let currentUser = null;
     let currentOrgId = null;
     let currentSubmission = null;
     let allSubmissions = [];
     
-    // Check authentication
+    // Set up automatic token refresh and session monitoring
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔐 Auth state changed:', event, session?.user?.email);
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        isAuthenticated = false;
+        currentSession = null;
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        currentSession = session;
+        isAuthenticated = !!session;
+        console.log('✅ Session updated/refreshed successfully');
+      }
+      
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('🔄 Access token auto-refreshed - no action needed');
+      }
+    });
+    
+    // Enhanced auth check with proper session handling
     async function checkAuth() {
-      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      console.log('=== QC AUTHENTICATION CHECK ===');
       
-      if (error || !session) {
+      try {
+        // Get session from localStorage (persisted)
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          throw new Error('Session retrieval failed');
+        }
+        
+        if (!session) {
+          console.error('No session found - redirecting to login');
+          window.location.href = 'login.html';
+          return false;
+        }
+        
+        console.log('Session exists:', !!session);
+        console.log('User Email:', session.user.email);
+        
+        // Store session globally
+        currentSession = session;
+        currentUser = session.user;
+        
+        // Verify QC role
+        const role = currentUser.app_metadata?.role;
+        if (role !== 'qc') {
+          console.error('❌ Not a QC user');
+          alert('Access denied: This portal is only for QC users.');
+          await supabaseClient.auth.signOut();
+          window.location.href = 'login.html';
+          return false;
+        }
+        
+        currentOrgId = currentUser.app_metadata?.org_id;
+        
+        // Display user name
+        const userName = currentUser.user_metadata?.name || currentUser.email;
+        document.getElementById('userName').textContent = userName;
+        
+        isAuthenticated = true;
+        console.log('✅ QC authentication successful');
+        console.log('QC Org ID:', currentOrgId);
+        console.log('=== END AUTH CHECK ===\n');
+        return true;
+        
+      } catch (error) {
+        console.error('❌ Auth check failed:', error);
         window.location.href = 'login.html';
         return false;
       }
-      
-      currentUser = session.user;
-      
-      // Verify QC role
-      const role = currentUser.app_metadata?.role;
-      if (role !== 'qc') {
-        alert('Access denied: This portal is only for QC users.');
-        await supabaseClient.auth.signOut();
-        window.location.href = 'login.html';
-        return false;
+    }
+    
+    // Helper function to get valid session (with auto-refresh if needed)
+    async function getValidSession() {
+      if (!currentSession) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        currentSession = session;
       }
       
-      currentOrgId = currentUser.app_metadata?.org_id;
+      // If session is close to expiry, refresh it
+      if (currentSession) {
+        const expiresAt = currentSession.expires_at;
+        const now = Math.floor(Date.now() / 1000);
+        const timeUntilExpiry = expiresAt - now;
+        
+        // Refresh if less than 5 minutes until expiry
+        if (timeUntilExpiry < 300) {
+          console.log('🔄 Session expiring soon, refreshing...');
+          const { data: refreshData, error } = await supabaseClient.auth.refreshSession();
+          if (!error && refreshData.session) {
+            currentSession = refreshData.session;
+            console.log('✅ Session refreshed successfully');
+          }
+        }
+      }
       
-      // Display user name
-      const userName = currentUser.user_metadata?.name || currentUser.email;
-      document.getElementById('userName').textContent = userName;
+      if (!currentSession) {
+        throw new Error('No valid session - please log in again');
+      }
       
-      return true;
+      return currentSession;
     }
     
     // Load video submissions

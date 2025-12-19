@@ -1110,75 +1110,165 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDE5MjUsImV4cCI6MjA3NTQ3NzkyNX0.O1DfOR5FBm6r3Pg-tjEE5CkzRr3WlWqGU1xUYKrhtnU';
     
     const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
+    // Initialize Supabase client with proper session persistence
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        autoRefreshToken: true,           // Automatically refresh token before expiry
+        persistSession: true,              // Persist session to localStorage
+        detectSessionInUrl: true,          // Detect OAuth sessions in URL
+        storage: window.localStorage,      // Use localStorage for session persistence
+        storageKey: 'memorio-director-auth', // Unique key per portal
+      }
+    });
+    
+    // Global auth state
+    let isAuthenticated = false;
     let currentSession = null;
     let currentCaseDetails = null;
     let credentialsRevealed = false;
     
-    // Check if user is logged in and is director
+    // Set up automatic token refresh and session monitoring
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔐 Auth state changed:', event, session?.user?.email);
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        isAuthenticated = false;
+        currentSession = null;
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        currentSession = session;
+        isAuthenticated = !!session;
+        console.log('✅ Session updated/refreshed successfully');
+      }
+      
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('🔄 Access token auto-refreshed - no action needed');
+      }
+    });
+    
+    // Enhanced auth check with proper session handling
     async function checkAuth() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
+      console.log('=== DIRECTOR AUTHENTICATION CHECK ===');
       
-      console.log('=== AUTHENTICATION CHECK ===');
-      console.log('Session exists:', !!session);
-      
-      if (!session) {
-        console.error('No session found - redirecting to login');
+      try {
+        // Get session from localStorage (persisted)
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          throw new Error('Session retrieval failed');
+        }
+        
+        if (!session) {
+          console.error('No session found - redirecting to login');
+          window.location.href = 'login.html';
+          return false;
+        }
+        
+        console.log('Session exists:', !!session);
+        console.log('User Email:', session.user.email);
+        console.log('JWT app_metadata:', session.user.app_metadata);
+        
+        // Store session globally
+        currentSession = session;
+        
+        // Verify director role from database
+        const { data: userData, error } = await supabaseClient
+          .from('users')
+          .select('role, org_id')
+          .eq('id', session.user.id)
+          .single();
+        
+        console.log('Database user data:', userData);
+        
+        if (error || !userData || userData.role !== 'director') {
+          console.error('❌ Not a director or user not found');
+          await supabaseClient.auth.signOut();
+          window.location.href = 'login.html';
+          return false;
+        }
+        
+        // Check JWT role (secondary check)
+        const jwtRole = session.user.app_metadata?.role;
+        const jwtOrgId = session.user.app_metadata?.org_id;
+        
+        console.log('JWT Role from app_metadata:', jwtRole);
+        console.log('JWT Org ID from app_metadata:', jwtOrgId);
+        
+        if (!jwtRole || !jwtOrgId) {
+          console.warn('⚠️ WARNING: app_metadata missing in JWT - refreshing session...');
+          // Refresh session to get updated JWT
+          const { data: refreshData } = await supabaseClient.auth.refreshSession();
+          if (refreshData?.session) {
+            currentSession = refreshData.session;
+            console.log('✅ Session refreshed, JWT updated');
+          }
+        } else {
+          console.log('✅ JWT app_metadata role and org_id are correct');
+        }
+        
+        isAuthenticated = true;
+        console.log('✅ Director authentication successful');
+        console.log('Director Org ID:', userData.org_id);
+        console.log('=== END AUTH CHECK ===\n');
+        return true;
+        
+      } catch (error) {
+        console.error('❌ Auth check failed:', error);
         window.location.href = 'login.html';
-        return;
+        return false;
       }
-      
-      console.log('User ID:', session.user.id);
-      console.log('User Email:', session.user.email);
-      console.log('JWT app_metadata:', session.user.app_metadata);
-      console.log('JWT user_metadata:', session.user.user_metadata);
-      
-      // Verify director role from database FIRST (primary check)
-      const { data: userData, error } = await supabaseClient
-        .from('users')
-        .select('role, org_id')
-        .eq('id', session.user.id)
-        .single();
-      
-      console.log('Database user data:', userData);
-      
-      if (error) {
-        console.error('Error fetching user data:', error);
-      }
-      
-      if (error || !userData || userData.role !== 'director') {
-        console.error('❌ Not a director or user not found');
-        await supabaseClient.auth.signOut();
-        window.location.href = 'login.html';
-        return;
-      }
-      
-      // Check if app_metadata has role and org_id (secondary check - warn only)
-      const jwtRole = session.user.app_metadata?.role;
-      const jwtOrgId = session.user.app_metadata?.org_id;
-      
-      console.log('JWT Role from app_metadata:', jwtRole);
-      console.log('JWT Org ID from app_metadata:', jwtOrgId);
-      
-      if (!jwtRole || !jwtOrgId) {
-        console.warn('⚠️ WARNING: app_metadata missing or incorrect in JWT!');
-        console.warn('Role:', jwtRole, 'Org ID:', jwtOrgId);
-        console.warn('Database role is correct (director), so continuing...');
-        console.warn('JWT metadata will refresh on next login');
-      } else {
-        console.log('✅ JWT app_metadata role and org_id are correct');
-      }
-      
-      currentSession = session;
-      
-      console.log('✅ Authentication successful');
-      console.log('Director Org ID:', userData.org_id);
-      console.log('=== END AUTH CHECK ===\n');
     }
     
-    // Run auth check on page load
-    checkAuth();
+    // Helper function to get valid session (with auto-refresh if needed)
+    async function getValidSession() {
+      if (!currentSession) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        currentSession = session;
+      }
+      
+      // If session is close to expiry, refresh it
+      if (currentSession) {
+        const expiresAt = currentSession.expires_at;
+        const now = Math.floor(Date.now() / 1000);
+        const timeUntilExpiry = expiresAt - now;
+        
+        // Refresh if less than 5 minutes until expiry
+        if (timeUntilExpiry < 300) {
+          console.log('🔄 Session expiring soon, refreshing...');
+          const { data: refreshData, error } = await supabaseClient.auth.refreshSession();
+          if (!error && refreshData.session) {
+            currentSession = refreshData.session;
+            console.log('✅ Session refreshed successfully');
+          }
+        }
+      }
+      
+      if (!currentSession) {
+        throw new Error('No valid session - please log in again');
+      }
+      
+      return currentSession;
+    }
+    
+    // Initialize app - authenticate FIRST, then load data
+    async function initializeApp() {
+      const authSuccess = await checkAuth();
+      
+      if (authSuccess) {
+        // Only load data after successful authentication
+        console.log('🚀 Loading cases...');
+        await loadCases();
+        console.log('✅ App initialization complete');
+      }
+    }
+    
+    // Run initialization on page load
+    initializeApp();
     
     // Profile dropdown toggle
     document.getElementById('profile-toggle').addEventListener('click', function(e) {
@@ -1435,18 +1525,13 @@
       createBtn.textContent = 'CREATING CASE...';
       
       try {
-        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
-        
-        if (refreshError || !refreshData.session) {
-          throw new Error('Session refresh failed. Please try logging out and back in.');
-        }
-        
-        currentSession = refreshData.session;
+        // Get valid session (will auto-refresh if needed)
+        const session = await getValidSession();
         
         const response = await fetch(`${SUPABASE_URL}/functions/v1/create-case`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${currentSession.access_token}`,
+            'Authorization': `Bearer ${session.access_token}`,
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON_KEY
           },
@@ -1497,18 +1582,13 @@
       inviteBtn.textContent = 'SENDING INVITATION...';
       
       try {
-        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
-        
-        if (refreshError || !refreshData.session) {
-          throw new Error('Session refresh failed. Please try logging out and back in.');
-        }
-        
-        currentSession = refreshData.session;
+        // Get valid session (will auto-refresh if needed)
+        const session = await getValidSession();
         
         const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-family`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${currentSession.access_token}`,
+            'Authorization': `Bearer ${session.access_token}`,
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON_KEY
           },
