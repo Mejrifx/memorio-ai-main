@@ -3,7 +3,7 @@
 export interface User {
   id: string;
   email: string;
-  role: 'admin' | 'director' | 'family' | 'editor' | 'support';
+  role: 'admin' | 'director' | 'family' | 'editor' | 'support' | 'qc';
   org_id?: string;
   status: 'invited' | 'active' | 'suspended' | 'archived';
   metadata: {
@@ -22,7 +22,7 @@ export interface Case {
   deceased_name: string;
   created_by: string;
   assigned_family_user_id?: string;
-  status: 'created' | 'waiting_on_family' | 'intake_in_progress' | 'submitted' | 'in_production' | 'awaiting_review' | 'delivered' | 'closed';
+  status: 'created' | 'waiting_on_family' | 'intake_in_progress' | 'submitted' | 'in_production' | 'awaiting_review' | 'revision_requested' | 'delivered' | 'closed';
   sla_start_at?: string;
   sla_state?: 'on_time' | 'warning' | 'breach';
   metadata?: {
@@ -53,6 +53,48 @@ export interface CreateCaseRequest {
   service_date?: string;
   service_location?: string;
   metadata?: object;
+}
+
+export interface VideoSubmission {
+  id: string;
+  case_id: string;
+  editor_user_id: string;
+  video_url: string;
+  thumbnail_url?: string;
+  duration_seconds?: number;
+  file_size_bytes: number;
+  mime_type: string;
+  editor_notes?: string;
+  submitted_at: string;
+  qc_reviewer_id?: string;
+  qc_status: 'pending' | 'in_review' | 'approved' | 'revision_requested' | 'rejected';
+  qc_notes?: string;
+  qc_reviewed_at?: string;
+  revision_number: number;
+  previous_submission_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ObituaryContent {
+  id: string;
+  case_id: string;
+  content_html: string;
+  content_plain: string;
+  generated_at: string;
+  generated_by: string;
+  approved_by?: string;
+  approved_at?: string;
+  version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InviteQCRequest {
+  email: string;
+  name: string;
+  org_id: string;
+  phone?: string;
 }
 
 export interface ApiResponse<T = any> {
