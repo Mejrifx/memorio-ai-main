@@ -764,6 +764,8 @@
     
     let allCases = [];
     let filteredCases = [];
+    let currentCaseId = null;
+    let currentCaseData = null;
     
     // Check authentication
     async function checkAuth() {
@@ -971,17 +973,25 @@
     }
     
     // Open case detail modal
-    function openCaseDetail(caseId) {
+    async function openCaseDetail(caseId) {
       const caseData = allCases.find(c => c.id === caseId);
       if (!caseData) return;
+      
+      currentCaseId = caseId;
+      currentCaseData = caseData;
       
       const modal = document.getElementById('caseDetailModal');
       const header = document.getElementById('modalHeader');
       
       const editor = caseData.editor_assignments?.[0]?.users;
+      const editorId = caseData.editor_assignments?.[0]?.editor_user_id;
       const editorName = editor?.metadata?.name || editor?.email || 'Unassigned';
       
       const slaHours = caseData.sla_hours_elapsed ? Math.floor(caseData.sla_hours_elapsed) : 0;
+      
+      // Get QC info
+      const qcSubmission = caseData.video_submissions?.[0];
+      const qcStatus = qcSubmission?.qc_status || 'N/A';
       
       header.innerHTML = `
         <h1 class="modal-title">${caseData.deceased_name}</h1>
@@ -999,24 +1009,469 @@
           <div class="modal-meta-item">
             <strong>Editor:</strong> ${editorName}
           </div>
+          <div class="modal-meta-item">
+            <strong>QC Status:</strong> ${qcStatus}
+          </div>
         </div>
       `;
       
-      // Load overview tab
+      // Load overview tab with support actions
       document.getElementById('tab-overview').innerHTML = `
-        <h3 style="margin-bottom: 16px;">Case Details</h3>
-        <p><strong>Case ID:</strong> ${caseData.id}</p>
-        <p><strong>Created:</strong> ${new Date(caseData.created_at).toLocaleString()}</p>
-        <p><strong>Last Updated:</strong> ${new Date(caseData.updated_at).toLocaleString()}</p>
-        ${caseData.first_submission_at ? `<p><strong>Form Submitted:</strong> ${new Date(caseData.first_submission_at).toLocaleString()}</p>` : ''}
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+          <div>
+            <h3 style="margin-bottom: 16px; color: #32343a;">Case Details</h3>
+            <p style="margin: 8px 0;"><strong>Case ID:</strong> ${caseData.id}</p>
+            <p style="margin: 8px 0;"><strong>Deceased Name:</strong> ${caseData.deceased_name}</p>
+            <p style="margin: 8px 0;"><strong>Created:</strong> ${new Date(caseData.created_at).toLocaleString()}</p>
+            <p style="margin: 8px 0;"><strong>Last Updated:</strong> ${new Date(caseData.updated_at).toLocaleString()}</p>
+            ${caseData.first_submission_at ? `<p style="margin: 8px 0;"><strong>Form Submitted:</strong> ${new Date(caseData.first_submission_at).toLocaleString()}</p>` : ''}
+            <p style="margin: 8px 0;"><strong>Current Editor:</strong> ${editorName} ${editorId ? `(ID: ${editorId.slice(0, 8)})` : ''}</p>
+            <p style="margin: 8px 0;"><strong>Family User:</strong> ${caseData.users?.email || 'Not assigned'}</p>
+          </div>
+          
+          <div style="background: #fff3e9; border: 2px solid #436481; border-radius: 12px; padding: 16px;">
+            <h3 style="margin-bottom: 16px; color: #32343a; font-size: 16px;">⚙️ Support Actions</h3>
+            
+            <button class="filter-button" onclick="showReassignEditor()" style="width: 100%; margin-bottom: 10px; font-size: 13px; padding: 8px;">
+              ↔️ Reassign Editor
+            </button>
+            
+            <button class="filter-button" onclick="showPushToRevision()" style="width: 100%; margin-bottom: 10px; font-size: 13px; padding: 8px; background-color: #e65100;">
+              🔄 Push to Revision
+            </button>
+            
+            <button class="filter-button" onclick="regenerateFamilyLink()" style="width: 100%; margin-bottom: 10px; font-size: 13px; padding: 8px; background-color: #2e7d32;">
+              🔗 Regenerate Family Link
+            </button>
+            
+            <button class="filter-button" onclick="viewFullAuditLog()" style="width: 100%; font-size: 13px; padding: 8px; background-color: #666;">
+              📋 View Full Audit Log
+            </button>
+          </div>
+        </div>
+        
+        <div id="action-panel" style="display: none; margin-top: 20px; background: #fff; border: 2px solid #436481; border-radius: 12px; padding: 20px;">
+          <!-- Dynamic action content -->
+        </div>
       `;
       
+      // Load timeline tab
+      await loadCaseTimeline(caseId);
+      
+      // Load notes tab
+      await loadCaseNotes(caseId);
+      
       modal.classList.add('show');
+    }
+    
+    // Load case timeline
+    async function loadCaseTimeline(caseId) {
+      try {
+        const { data: events, error } = await supabaseClient
+          .from('events')
+          .select('*, users(email, metadata)')
+          .or(`target_id.eq.${caseId},payload->>case_id.eq.${caseId}`)
+          .order('timestamp', { ascending: false })
+          .limit(50);
+        
+        if (error) throw error;
+        
+        const timelineHTML = events && events.length > 0 ? events.map(event => {
+          const actorName = event.users?.metadata?.name || event.users?.email || 'System';
+          const actionIcon = {
+            'CASE_CREATED': '✨',
+            'CASE_UPDATED': '📝',
+            'EDITOR_ASSIGNED': '👤',
+            'FORM_SUBMITTED': '📄',
+            'VIDEO_SUBMITTED': '🎬',
+            'QC_REVIEWED': '✅',
+            'REVISION_REQUESTED': '🔄',
+            'DELIVERED': '🎉'
+          }[event.action_type] || '📌';
+          
+          return `
+            <div style="padding: 16px; border-left: 3px solid #436481; margin-bottom: 16px; background: #fff;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                <div style="font-weight: 600; color: #32343a;">
+                  ${actionIcon} ${event.action_type.replace(/_/g, ' ')}
+                </div>
+                <div style="font-size: 12px; color: #999;">
+                  ${new Date(event.timestamp).toLocaleString()}
+                </div>
+              </div>
+              <div style="font-size: 14px; color: #666; margin-bottom: 4px;">
+                By: ${actorName}
+              </div>
+              ${event.payload ? `
+              <div style="font-size: 13px; color: #888; margin-top: 8px;">
+                ${JSON.stringify(event.payload, null, 2).substring(0, 200)}
+              </div>` : ''}
+            </div>
+          `;
+        }).join('') : '<p style="color: #999; text-align: center; padding: 40px;">No timeline events yet</p>';
+        
+        document.getElementById('tab-timeline').innerHTML = `
+          <h3 style="margin-bottom: 16px; color: #32343a;">Case Timeline & Audit Trail</h3>
+          ${timelineHTML}
+        `;
+        
+      } catch (error) {
+        console.error('Error loading timeline:', error);
+        document.getElementById('tab-timeline').innerHTML = '<p style="color: #c62828;">Failed to load timeline</p>';
+      }
+    }
+    
+    // Load case notes
+    async function loadCaseNotes(caseId) {
+      try {
+        const { data: notes, error } = await supabaseClient
+          .from('case_notes')
+          .select('*, users(email, metadata)')
+          .eq('case_id', caseId)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        const notesHTML = notes && notes.length > 0 ? notes.map(note => {
+          const authorName = note.users?.metadata?.name || note.users?.email || 'Unknown';
+          const noteTypeEmoji = {
+            'general': '📝',
+            'support': '🛠️',
+            'revision': '🔄',
+            'internal': '🔒'
+          }[note.note_type] || '📝';
+          
+          return `
+            <div style="padding: 16px; border: 2px solid #436481; border-radius: 12px; margin-bottom: 16px; background: #fff;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                <div style="font-weight: 600; color: #32343a;">
+                  ${noteTypeEmoji} ${note.note_type.toUpperCase()} ${note.is_pinned ? '📌' : ''}
+                </div>
+                <div style="font-size: 12px; color: #999;">
+                  ${new Date(note.created_at).toLocaleString()}
+                </div>
+              </div>
+              <div style="font-size: 14px; color: #666; margin-bottom: 8px;">
+                <strong>By:</strong> ${authorName}
+              </div>
+              <div style="font-size: 15px; color: #32343a; white-space: pre-wrap;">
+                ${note.content}
+              </div>
+            </div>
+          `;
+        }).join('') : '<p style="color: #999; text-align: center; padding: 20px;">No notes yet</p>';
+        
+        document.getElementById('tab-notes').innerHTML = `
+          <h3 style="margin-bottom: 16px; color: #32343a;">Case Notes</h3>
+          
+          <div style="background: #fff3e9; border: 2px solid #436481; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 12px; color: #32343a;">Add New Note</h4>
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #32343a;">Note Type:</label>
+              <select id="noteType" style="width: 100%; padding: 10px; border: 2px solid #436481; border-radius: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+                <option value="general">General</option>
+                <option value="support">Support</option>
+                <option value="revision">Revision</option>
+                <option value="internal">Internal</option>
+              </select>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; margin-bottom: 6px; font-weight: 600; color: #32343a;">Note Content:</label>
+              <textarea id="noteContent" rows="4" style="width: 100%; padding: 10px; border: 2px solid #436481; border-radius: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; resize: vertical;" placeholder="Enter your note..."></textarea>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="pinNote" style="width: 18px; height: 18px;">
+                <span style="font-weight: 600; color: #32343a;">Pin this note</span>
+              </label>
+            </div>
+            <button class="filter-button" onclick="addCaseNote()" style="width: 100%;">
+              💾 Save Note
+            </button>
+          </div>
+          
+          <div id="notes-list">
+            ${notesHTML}
+          </div>
+        `;
+        
+      } catch (error) {
+        console.error('Error loading notes:', error);
+        document.getElementById('tab-notes').innerHTML = '<p style="color: #c62828;">Failed to load notes</p>';
+      }
+    }
+    
+    // Add case note
+    async function addCaseNote() {
+      const noteType = document.getElementById('noteType').value;
+      const noteContent = document.getElementById('noteContent').value.trim();
+      const pinNote = document.getElementById('pinNote').checked;
+      
+      if (!noteContent) {
+        alert('Please enter note content');
+        return;
+      }
+      
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        const { error } = await supabaseClient
+          .from('case_notes')
+          .insert({
+            case_id: currentCaseId,
+            author_user_id: session.user.id,
+            note_type: noteType,
+            content: noteContent,
+            is_pinned: pinNote
+          });
+        
+        if (error) throw error;
+        
+        // Log to audit trail
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'NOTE_ADDED',
+            target_type: 'cases',
+            target_id: currentCaseId,
+            payload: { note_type: noteType, is_pinned: pinNote }
+          });
+        
+        // Reload notes
+        await loadCaseNotes(currentCaseId);
+        
+        alert('Note added successfully!');
+        
+      } catch (error) {
+        console.error('Error adding note:', error);
+        alert('Failed to add note: ' + error.message);
+      }
+    }
+    
+    // Support action: Reassign editor
+    function showReassignEditor() {
+      const panel = document.getElementById('action-panel');
+      panel.style.display = 'block';
+      panel.innerHTML = `
+        <h4 style="margin-bottom: 16px; color: #32343a;">Reassign Editor</h4>
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; margin-bottom: 6px; font-weight: 600;">Select New Editor:</label>
+          <select id="newEditorId" style="width: 100%; padding: 10px; border: 2px solid #436481; border-radius: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+            <option value="">Loading editors...</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; margin-bottom: 6px; font-weight: 600;">Reason for Reassignment:</label>
+          <textarea id="reassignReason" rows="3" style="width: 100%; padding: 10px; border: 2px solid #436481; border-radius: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;" placeholder="Enter reason..."></textarea>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button class="filter-button" onclick="executeReassignEditor()" style="flex: 1;">
+            Confirm Reassignment
+          </button>
+          <button class="filter-button" onclick="document.getElementById('action-panel').style.display='none'" style="flex: 1; background-color: #666;">
+            Cancel
+          </button>
+        </div>
+      `;
+      
+      // Load editors
+      loadEditorsForReassign();
+    }
+    
+    async function loadEditorsForReassign() {
+      const { data: editors } = await supabaseClient
+        .from('users')
+        .select('id, email, metadata')
+        .eq('role', 'editor')
+        .in('status', ['active', 'invited']);
+      
+      const select = document.getElementById('newEditorId');
+      if (editors) {
+        select.innerHTML = '<option value="">-- Select Editor --</option>' + 
+          editors.map(e => `<option value="${e.id}">${e.metadata?.name || e.email}</option>`).join('');
+      }
+    }
+    
+    async function executeReassignEditor() {
+      const newEditorId = document.getElementById('newEditorId').value;
+      const reason = document.getElementById('reassignReason').value.trim();
+      
+      if (!newEditorId) {
+        alert('Please select an editor');
+        return;
+      }
+      
+      if (!reason) {
+        alert('Please provide a reason for reassignment');
+        return;
+      }
+      
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        // Unassign current editor
+        if (currentCaseData.editor_assignments?.[0]) {
+          await supabaseClient
+            .from('editor_assignments')
+            .update({ unassigned_at: new Date().toISOString() })
+            .eq('id', currentCaseData.editor_assignments[0].id);
+        }
+        
+        // Assign new editor
+        await supabaseClient
+          .from('editor_assignments')
+          .insert({
+            case_id: currentCaseId,
+            editor_user_id: newEditorId,
+            assigned_by: session.user.id
+          });
+        
+        // Log to audit trail
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'EDITOR_REASSIGNED',
+            target_type: 'cases',
+            target_id: currentCaseId,
+            payload: { new_editor_id: newEditorId, reason }
+          });
+        
+        alert('Editor reassigned successfully!');
+        document.getElementById('action-panel').style.display = 'none';
+        
+        // Reload cases
+        await loadCases();
+        closeModal();
+        
+      } catch (error) {
+        console.error('Error reassigning editor:', error);
+        alert('Failed to reassign editor: ' + error.message);
+      }
+    }
+    
+    // Support action: Push to revision
+    function showPushToRevision() {
+      const panel = document.getElementById('action-panel');
+      panel.style.display = 'block';
+      panel.innerHTML = `
+        <h4 style="margin-bottom: 16px; color: #32343a;">🔄 Push Case to Revision</h4>
+        <p style="color: #666; margin-bottom: 16px;">This will set the case status to "revision_requested" and notify the editor and QC team.</p>
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; margin-bottom: 6px; font-weight: 600;">Revision Notes (Required):</label>
+          <textarea id="revisionNotes" rows="4" style="width: 100%; padding: 10px; border: 2px solid #436481; border-radius: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;" placeholder="Explain what needs to be revised..." required></textarea>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button class="filter-button" onclick="executePushToRevision()" style="flex: 1; background-color: #e65100;">
+            Confirm Push to Revision
+          </button>
+          <button class="filter-button" onclick="document.getElementById('action-panel').style.display='none'" style="flex: 1; background-color: #666;">
+            Cancel
+          </button>
+        </div>
+      `;
+    }
+    
+    async function executePushToRevision() {
+      const notes = document.getElementById('revisionNotes').value.trim();
+      
+      if (!notes) {
+        alert('Revision notes are required');
+        return;
+      }
+      
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        // Update case status
+        await supabaseClient
+          .from('cases')
+          .update({ status: 'revision_requested', updated_at: new Date().toISOString() })
+          .eq('id', currentCaseId);
+        
+        // Add note
+        await supabaseClient
+          .from('case_notes')
+          .insert({
+            case_id: currentCaseId,
+            author_user_id: session.user.id,
+            note_type: 'revision',
+            content: notes,
+            is_pinned: true
+          });
+        
+        // Log to audit trail
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'REVISION_REQUESTED',
+            target_type: 'cases',
+            target_id: currentCaseId,
+            payload: { notes }
+          });
+        
+        alert('Case pushed to revision successfully!');
+        document.getElementById('action-panel').style.display = 'none';
+        
+        // Reload cases
+        await loadCases();
+        closeModal();
+        
+      } catch (error) {
+        console.error('Error pushing to revision:', error);
+        alert('Failed to push to revision: ' + error.message);
+      }
+    }
+    
+    // Support action: Regenerate family link
+    async function regenerateFamilyLink() {
+      if (!currentCaseData.assigned_family_user_id) {
+        alert('No family user assigned to this case');
+        return;
+      }
+      
+      const confirmed = confirm('This will generate a new password for the family user. Continue?');
+      if (!confirmed) return;
+      
+      try {
+        // In a real implementation, this would call an Edge Function to reset password
+        // For now, just log the action
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'FAMILY_LINK_REGENERATED',
+            target_type: 'cases',
+            target_id: currentCaseId,
+            payload: { family_user_id: currentCaseData.assigned_family_user_id }
+          });
+        
+        alert('Family link regenerated successfully! (Implementation pending for actual password reset)');
+        
+      } catch (error) {
+        console.error('Error regenerating family link:', error);
+        alert('Failed to regenerate family link: ' + error.message);
+      }
+    }
+    
+    // View full audit log
+    function viewFullAuditLog() {
+      alert('Full audit log viewer coming soon! For now, check the Timeline tab.');
     }
     
     // Close modal
     function closeModal() {
       document.getElementById('caseDetailModal').classList.remove('show');
+      currentCaseId = null;
+      currentCaseData = null;
     }
     
     // Switch modal tab
