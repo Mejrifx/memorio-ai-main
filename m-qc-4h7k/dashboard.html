@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>QC Dashboard - Memorio</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link href="../css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="../css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
+  <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="../images/webclip.png" rel="apple-touch-icon">
+  
+  <style>
+    /* ============================================================================
+       MEMORIO QC DASHBOARD - BRAND-CONSISTENT DESIGN
+       ============================================================================ */
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      background-color: #f4e8de;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* ============================================================================
+       SIDEBAR NAVIGATION
+       ============================================================================ */
+    
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background-color: #fff3e9;
+      border-right: 3px solid #436481;
+      box-shadow: 4px 0 15px rgba(67, 100, 129, 0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-logo {
+      height: 70px;
+      padding: 0;
+      border-bottom: 2px solid #436481;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .sidebar-logo img {
+      width: 140px;
+      height: auto;
+      max-height: 60px;
+      object-fit: contain;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 24px;
+      margin: 4px 12px;
+      color: #32343a;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+      border: 1.5px solid transparent;
+    }
+    
+    .sidebar-nav-item:hover {
+      background-color: #f4e8de;
+      border-color: #6ca7d3;
+      color: #436481;
+    }
+    
+    .sidebar-nav-item.active {
+      background-color: #f4e8de;
+      border-color: #436481;
+      color: #436481;
+    }
+    
+    .sidebar-nav-item svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    
+    /* ============================================================================
+       TOP NAVBAR
+       ============================================================================ */
+    
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 280px;
+      right: 0;
+      height: 70px;
+      background-color: #fff3e9;
+      border-bottom: 2px solid #436481;
+      box-shadow: 0 2px 8px rgba(67, 100, 129, 0.1);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+    
+    .topbar-title {
+      color: #32343a;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .topbar-profile {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .topbar-profile-btn {
+      padding: 10px 20px;
+      background-color: #fff3e9;
+      border: 1.5px solid #436481;
+      border-radius: 60px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #32343a;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+    }
+    
+    .topbar-profile-btn:hover {
+      background-color: #f4e8de;
+      border-color: #6ca7d3;
+    }
+    
+    .topbar-profile-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      width: 100%;
+      background-color: #fff3e9;
+      border: 1.5px solid #436481;
+      border-radius: 60px;
+      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.2);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 9999;
+      overflow: hidden;
+    }
+    
+    .topbar-profile.active .topbar-profile-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .topbar-dropdown-item {
+      padding: 12px 20px;
+      color: #32343a;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s ease;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+    }
+    
+    .topbar-dropdown-item:hover {
+      background-color: #f4e8de;
+    }
+    
+    /* ============================================================================
+       MAIN CONTENT AREA
+       ============================================================================ */
+    
+    .main-content {
+      margin-left: 280px;
+      margin-top: 70px;
+      padding: 32px;
+      min-height: calc(100vh - 70px);
+    }
+    
+    /* ============================================================================
+       DASHBOARD SECTIONS
+       ============================================================================ */
+    
+    .dashboard-section {
+      display: none;
+    }
+    
+    .dashboard-section.active {
+      display: block;
+    }
+    
+    /* ============================================================================
+       PENDING REVIEWS TAB
+       ============================================================================ */
+    
+    .review-grid {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 24px;
+      height: calc(100vh - 140px);
+    }
+    
+    .review-list {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .review-list-header {
+      font-size: 18px;
+      font-weight: 600;
+      color: #32343a;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid #436481;
+    }
+    
+    .review-list-item {
+      padding: 16px;
+      background-color: white;
+      border: 1.5px solid #436481;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .review-list-item:hover {
+      border-color: #6ca7d3;
+      box-shadow: 0 2px 8px rgba(108, 167, 211, 0.2);
+    }
+    
+    .review-list-item.active {
+      background-color: #f4e8de;
+      border-color: #436481;
+      border-width: 2px;
+    }
+    
+    .review-item-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #32343a;
+      margin-bottom: 6px;
+    }
+    
+    .review-item-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 6px;
+    }
+    
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-in-review {
+      background-color: #cce5ff;
+      color: #004085;
+    }
+    
+    .review-item-date {
+      font-size: 13px;
+      color: rgba(50, 52, 58, 0.6);
+      margin-top: 6px;
+    }
+    
+    .review-details {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: rgba(50, 52, 58, 0.5);
+      font-size: 16px;
+    }
+    
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    
+    /* ============================================================================
+       VIDEO PLAYER & CONTENT
+       ============================================================================ */
+    
+    .review-content-header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #436481;
+    }
+    
+    .review-content-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #32343a;
+      margin-bottom: 8px;
+    }
+    
+    .review-content-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 14px;
+      color: rgba(50, 52, 58, 0.6);
+    }
+    
+    .video-section {
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #32343a;
+      margin-bottom: 12px;
+    }
+    
+    .video-player {
+      width: 100%;
+      max-width: 800px;
+      border-radius: 8px;
+      border: 2px solid #436481;
+      background-color: black;
+    }
+    
+    .editor-notes {
+      background-color: white;
+      border: 1.5px solid #436481;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .obituary-section {
+      margin-bottom: 24px;
+    }
+    
+    .obituary-content {
+      background-color: white;
+      border: 1.5px solid #436481;
+      border-radius: 8px;
+      padding: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      line-height: 1.8;
+      color: #32343a;
+    }
+    
+    /* ============================================================================
+       QC FEEDBACK FORM
+       ============================================================================ */
+    
+    .qc-feedback-section {
+      margin-bottom: 24px;
+    }
+    
+    .qc-textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 14px 18px;
+      border: 1.5px solid #436481;
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      background-color: white;
+      color: #32343a;
+      resize: vertical;
+      transition: all 0.2s ease;
+    }
+    
+    .qc-textarea:focus {
+      outline: none;
+      border-color: #6ca7d3;
+      box-shadow: 0 0 0 3px rgba(108, 167, 211, 0.1);
+    }
+    
+    .qc-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 60px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-approve {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .btn-approve:hover {
+      background-color: #218838;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-revision {
+      background-color: #ffc107;
+      color: #32343a;
+    }
+    
+    .btn-revision:hover {
+      background-color: #e0a800;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+    
+    .btn-reject {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .btn-reject:hover {
+      background-color: #c82333;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn:disabled {
+      background-color: rgba(50, 52, 58, 0.3);
+      color: rgba(50, 52, 58, 0.5);
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* ============================================================================
+       STATISTICS CARDS
+       ============================================================================ */
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s ease;
+    }
+    
+    .stat-card:hover {
+      border-color: #6ca7d3;
+      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.15);
+    }
+    
+    .stat-card-title {
+      font-size: 14px;
+      color: rgba(50, 52, 58, 0.7);
+      margin-bottom: 8px;
+    }
+    
+    .stat-card-value {
+      font-size: 32px;
+      font-weight: 600;
+      color: #32343a;
+    }
+    
+    /* ============================================================================
+       TOAST NOTIFICATIONS
+       ============================================================================ */
+    
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background-color: #32343a;
+      color: #f2eadd;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      z-index: 10000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+    
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    
+    .toast.error {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .toast.success {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    /* ============================================================================
+       RESPONSIVE DESIGN
+       ============================================================================ */
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .topbar {
+        left: 0;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .review-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .review-list {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio Logo">
+    </div>
+    
+    <div class="sidebar-nav">
+      <div class="sidebar-nav-item active" data-tab="pending-reviews">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+        </svg>
+        Pending Reviews
+      </div>
+      
+      <div class="sidebar-nav-item" data-tab="review-history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+        Review History
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Navigation Bar -->
+  <div class="topbar">
+    <h1 class="topbar-title" id="topbar-title">Pending Reviews</h1>
+    
+    <div class="topbar-right">
+      <div class="topbar-profile" id="profileDropdown">
+        <button class="topbar-profile-btn" id="profileBtn">
+          <span id="userName">QC User</span> ▾
+        </button>
+        <div class="topbar-profile-dropdown">
+          <a class="topbar-dropdown-item" id="logoutBtn">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Pending Reviews Tab -->
+    <section id="pending-reviews" class="dashboard-section active">
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-title">Pending Review</div>
+          <div class="stat-card-value" id="stat-pending">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">In Review</div>
+          <div class="stat-card-value" id="stat-in-review">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Approved Today</div>
+          <div class="stat-card-value" id="stat-approved">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Revisions Requested</div>
+          <div class="stat-card-value" id="stat-revisions">0</div>
+        </div>
+      </div>
+
+      <!-- Review Grid -->
+      <div class="review-grid">
+        <!-- Left: List of Submissions -->
+        <div class="review-list">
+          <div class="review-list-header">Video Submissions</div>
+          <div id="submissionsList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Right: Review Details -->
+        <div class="review-details">
+          <div id="reviewContent" class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            <p>Select a video submission to review</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Review History Tab -->
+    <section id="review-history" class="dashboard-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-title">Total Reviewed</div>
+          <div class="stat-card-value" id="stat-total-reviewed">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Approval Rate</div>
+          <div class="stat-card-value" id="stat-approval-rate">0%</div>
+        </div>
+      </div>
+      
+      <div style="background-color: #fff3e9; border: 2px solid #436481; border-radius: 12px; padding: 32px; text-align: center;">
+        <p style="color: rgba(50, 52, 58, 0.6); font-size: 16px;">Review history coming soon...</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script>
+    const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDE5MjUsImV4cCI6MjA3NTQ3NzkyNX0.O1DfOR5FBm6r3Pg-tjEE5CkzRr3WlWqGU1xUYKrhtnU';
+    
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let currentUser = null;
+    let currentOrgId = null;
+    let currentSubmission = null;
+    let allSubmissions = [];
+    
+    // Check authentication
+    async function checkAuth() {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      
+      if (error || !session) {
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      currentUser = session.user;
+      
+      // Verify QC role
+      const role = currentUser.app_metadata?.role;
+      if (role !== 'qc') {
+        alert('Access denied: This portal is only for QC users.');
+        await supabaseClient.auth.signOut();
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      currentOrgId = currentUser.app_metadata?.org_id;
+      
+      // Display user name
+      const userName = currentUser.user_metadata?.name || currentUser.email;
+      document.getElementById('userName').textContent = userName;
+      
+      return true;
+    }
+    
+    // Load video submissions
+    async function loadSubmissions() {
+      try {
+        // Get all pending and in-review submissions for this organization's cases
+        const { data: submissions, error } = await supabaseClient
+          .from('video_submissions')
+          .select(`
+            *,
+            cases!inner(id, deceased_name, org_id, status),
+            users!video_submissions_editor_user_id_fkey(email, metadata)
+          `)
+          .eq('cases.org_id', currentOrgId)
+          .in('qc_status', ['pending', 'in_review'])
+          .order('submitted_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        allSubmissions = submissions || [];
+        displaySubmissions();
+        updateStats();
+        
+      } catch (error) {
+        console.error('Error loading submissions:', error);
+        showToast('Error loading submissions', true);
+      }
+    }
+    
+    // Display submissions in list
+    function displaySubmissions() {
+      const listContainer = document.getElementById('submissionsList');
+      
+      if (allSubmissions.length === 0) {
+        listContainer.innerHTML = `
+          <div style="text-align: center; padding: 32px; color: rgba(50, 52, 58, 0.5);">
+            <p>No pending reviews</p>
+          </div>
+        `;
+        return;
+      }
+      
+      listContainer.innerHTML = allSubmissions.map(sub => `
+        <div class="review-list-item" data-id="${sub.id}" onclick="selectSubmission('${sub.id}')">
+          <div class="review-item-name">${sub.cases.deceased_name}</div>
+          <div class="review-item-status status-${sub.qc_status.replace('_', '-')}">${formatStatus(sub.qc_status)}</div>
+          <div class="review-item-date">Submitted: ${formatDate(sub.submitted_at)}</div>
+          ${sub.revision_number > 1 ? `<div class="review-item-date">Revision #${sub.revision_number}</div>` : ''}
+        </div>
+      `).join('');
+    }
+    
+    // Select a submission to review
+    async function selectSubmission(submissionId) {
+      // Remove active class from all items
+      document.querySelectorAll('.review-list-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class to selected item
+      document.querySelector(`[data-id="${submissionId}"]`)?.classList.add('active');
+      
+      // Find submission
+      currentSubmission = allSubmissions.find(s => s.id === submissionId);
+      if (!currentSubmission) return;
+      
+      // Mark as in_review if pending
+      if (currentSubmission.qc_status === 'pending') {
+        await supabaseClient
+          .from('video_submissions')
+          .update({ 
+            qc_status: 'in_review',
+            qc_reviewer_id: currentUser.id
+          })
+          .eq('id', submissionId);
+        
+        currentSubmission.qc_status = 'in_review';
+        loadSubmissions(); // Refresh list
+      }
+      
+      // Load obituary content
+      const { data: obituary } = await supabaseClient
+        .from('obituary_content')
+        .select('*')
+        .eq('case_id', currentSubmission.case_id)
+        .single();
+      
+      // Display review interface
+      displayReviewInterface(currentSubmission, obituary);
+    }
+    
+    // Display review interface
+    function displayReviewInterface(submission, obituary) {
+      const content = document.getElementById('reviewContent');
+      const editorName = submission.users?.metadata?.name || submission.users?.email || 'Editor';
+      
+      content.innerHTML = `
+        <div class="review-content-header">
+          <h2 class="review-content-title">${submission.cases.deceased_name}</h2>
+          <div class="review-content-meta">
+            <span>Editor: ${editorName}</span>
+            <span>•</span>
+            <span>Submitted: ${formatDate(submission.submitted_at)}</span>
+            ${submission.revision_number > 1 ? `<span>• Revision #${submission.revision_number}</span>` : ''}
+          </div>
+        </div>
+        
+        <div class="video-section">
+          <h3 class="section-title">Memorial Video</h3>
+          <video class="video-player" controls>
+            <source src="${submission.video_url}" type="${submission.mime_type}">
+            Your browser does not support the video tag.
+          </video>
+          <p style="margin-top: 8px; font-size: 14px; color: rgba(50, 52, 58, 0.6);">
+            Duration: ${formatDuration(submission.duration_seconds)} | 
+            Size: ${formatFileSize(submission.file_size_bytes)}
+          </p>
+        </div>
+        
+        ${submission.editor_notes ? `
+          <div class="editor-notes">
+            <strong style="color: #32343a;">Editor's Notes:</strong>
+            <p style="margin-top: 8px; color: #32343a;">${submission.editor_notes}</p>
+          </div>
+        ` : ''}
+        
+        ${obituary ? `
+          <div class="obituary-section">
+            <h3 class="section-title">Obituary Content</h3>
+            <div class="obituary-content">
+              ${obituary.content_html || obituary.content_plain}
+            </div>
+          </div>
+        ` : ''}
+        
+        <div class="qc-feedback-section">
+          <h3 class="section-title">QC Feedback</h3>
+          <textarea 
+            id="qcNotes" 
+            class="qc-textarea" 
+            placeholder="Add notes or feedback for the editor..."
+          ></textarea>
+          
+          <div class="qc-actions">
+            <button class="btn btn-approve" onclick="handleApprove()">
+              ✓ Approve & Deliver
+            </button>
+            <button class="btn btn-revision" onclick="handleRevision()">
+              ⟳ Request Revision
+            </button>
+            <button class="btn btn-reject" onclick="handleReject()">
+              ✗ Reject
+            </button>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Handle Approve
+    async function handleApprove() {
+      if (!currentSubmission) return;
+      
+      if (!confirm('Approve this video and deliver to family?')) return;
+      
+      const notes = document.getElementById('qcNotes').value;
+      
+      try {
+        // Update submission status
+        const { error: subError } = await supabaseClient
+          .from('video_submissions')
+          .update({
+            qc_status: 'approved',
+            qc_reviewer_id: currentUser.id,
+            qc_notes: notes || null,
+            qc_reviewed_at: new Date().toISOString()
+          })
+          .eq('id', currentSubmission.id);
+        
+        if (subError) throw subError;
+        
+        // Update case status to delivered
+        const { error: caseError } = await supabaseClient
+          .from('cases')
+          .update({ status: 'delivered' })
+          .eq('id', currentSubmission.case_id);
+        
+        if (caseError) throw caseError;
+        
+        showToast('✓ Video approved and delivered to family!', false);
+        
+        // Clear selection and reload
+        currentSubmission = null;
+        document.getElementById('reviewContent').innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            <p>Select a video submission to review</p>
+          </div>
+        `;
+        loadSubmissions();
+        
+      } catch (error) {
+        console.error('Error approving video:', error);
+        showToast('Error approving video', true);
+      }
+    }
+    
+    // Handle Request Revision
+    async function handleRevision() {
+      if (!currentSubmission) return;
+      
+      const notes = document.getElementById('qcNotes').value;
+      
+      if (!notes || notes.trim() === '') {
+        alert('Please provide specific feedback for the requested revisions.');
+        return;
+      }
+      
+      if (!confirm('Request revision from editor?')) return;
+      
+      try {
+        // Update submission status
+        const { error: subError } = await supabaseClient
+          .from('video_submissions')
+          .update({
+            qc_status: 'revision_requested',
+            qc_reviewer_id: currentUser.id,
+            qc_notes: notes,
+            qc_reviewed_at: new Date().toISOString()
+          })
+          .eq('id', currentSubmission.id);
+        
+        if (subError) throw subError;
+        
+        // Update case status
+        const { error: caseError } = await supabaseClient
+          .from('cases')
+          .update({ status: 'revision_requested' })
+          .eq('id', currentSubmission.case_id);
+        
+        if (caseError) throw caseError;
+        
+        showToast('Revision requested. Editor will be notified.', false);
+        
+        // Clear and reload
+        currentSubmission = null;
+        document.getElementById('reviewContent').innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            <p>Select a video submission to review</p>
+          </div>
+        `;
+        loadSubmissions();
+        
+      } catch (error) {
+        console.error('Error requesting revision:', error);
+        showToast('Error requesting revision', true);
+      }
+    }
+    
+    // Handle Reject
+    async function handleReject() {
+      if (!currentSubmission) return;
+      
+      const notes = document.getElementById('qcNotes').value;
+      
+      if (!notes || notes.trim() === '') {
+        alert('Please provide a reason for rejection.');
+        return;
+      }
+      
+      if (!confirm('Reject this video? This will escalate to admin.')) return;
+      
+      try {
+        const { error } = await supabaseClient
+          .from('video_submissions')
+          .update({
+            qc_status: 'rejected',
+            qc_reviewer_id: currentUser.id,
+            qc_notes: notes,
+            qc_reviewed_at: new Date().toISOString()
+          })
+          .eq('id', currentSubmission.id);
+        
+        if (error) throw error;
+        
+        showToast('Video rejected. Admin will be notified.', false);
+        
+        currentSubmission = null;
+        document.getElementById('reviewContent').innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            <p>Select a video submission to review</p>
+          </div>
+        `;
+        loadSubmissions();
+        
+      } catch (error) {
+        console.error('Error rejecting video:', error);
+        showToast('Error rejecting video', true);
+      }
+    }
+    
+    // Update statistics
+    async function updateStats() {
+      const pending = allSubmissions.filter(s => s.qc_status === 'pending').length;
+      const inReview = allSubmissions.filter(s => s.qc_status === 'in_review').length;
+      
+      document.getElementById('stat-pending').textContent = pending;
+      document.getElementById('stat-in-review').textContent = inReview;
+      
+      // Get today's approved count
+      const today = new Date().toISOString().split('T')[0];
+      const { count: approvedCount } = await supabaseClient
+        .from('video_submissions')
+        .select('id', { count: 'exact', head: true })
+        .eq('qc_status', 'approved')
+        .gte('qc_reviewed_at', today);
+      
+      document.getElementById('stat-approved').textContent = approvedCount || 0;
+      
+      // Get today's revision count
+      const { count: revisionCount } = await supabaseClient
+        .from('video_submissions')
+        .select('id', { count: 'exact', head: true })
+        .eq('qc_status', 'revision_requested')
+        .gte('qc_reviewed_at', today);
+      
+      document.getElementById('stat-revisions').textContent = revisionCount || 0;
+    }
+    
+    // Tab switching
+    function switchTab(tabId) {
+      // Update sidebar
+      document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+      
+      // Update content sections
+      document.querySelectorAll('.dashboard-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(tabId).classList.add('active');
+      
+      // Update topbar title
+      const titles = {
+        'pending-reviews': 'Pending Reviews',
+        'review-history': 'Review History'
+      };
+      document.getElementById('topbar-title').textContent = titles[tabId];
+    }
+    
+    // Utility functions
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+    
+    function formatDuration(seconds) {
+      if (!seconds) return 'Unknown';
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function formatFileSize(bytes) {
+      if (!bytes) return 'Unknown';
+      const mb = (bytes / (1024 * 1024)).toFixed(2);
+      return `${mb} MB`;
+    }
+    
+    function formatStatus(status) {
+      const statusMap = {
+        'pending': 'Pending',
+        'in_review': 'In Review',
+        'approved': 'Approved',
+        'revision_requested': 'Revision Requested',
+        'rejected': 'Rejected'
+      };
+      return statusMap[status] || status;
+    }
+    
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show' + (isError ? ' error' : ' success');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Event Listeners
+    document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+      item.addEventListener('click', () => switchTab(item.dataset.tab));
+    });
+    
+    // Profile dropdown
+    document.getElementById('profileBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('profileDropdown').classList.toggle('active');
+    });
+    
+    document.addEventListener('click', () => {
+      document.getElementById('profileDropdown').classList.remove('active');
+    });
+    
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    });
+    
+    // Initialize
+    (async function init() {
+      const authenticated = await checkAuth();
+      if (authenticated) {
+        await loadSubmissions();
+        
+        // Refresh every 30 seconds
+        setInterval(loadSubmissions, 30000);
+      }
+    })();
+  </script>
+</body>
+</html>
+
