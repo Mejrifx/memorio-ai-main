@@ -1820,66 +1820,131 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDE5MjUsImV4cCI6MjA3NTQ3NzkyNX0.O1DfOR5FBm6r3Pg-tjEE5CkzRr3WlWqGU1xUYKrhtnU';
     
     const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    // Check if user is logged in and is admin
+    // Initialize Supabase client with proper session persistence
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        autoRefreshToken: true,           // Automatically refresh token before expiry
+        persistSession: true,              // Persist session to localStorage
+        detectSessionInUrl: true,          // Detect OAuth sessions in URL
+        storage: window.localStorage,      // Use localStorage for session persistence
+        storageKey: 'memorio-admin-auth',  // Unique key per portal
+      }
+    });
+    
+    // Global auth state
+    let isAuthenticated = false;
+    let currentSession = null;
+    
+    // Set up automatic token refresh and session monitoring
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔐 Auth state changed:', event, session?.user?.email);
+      
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        isAuthenticated = false;
+        currentSession = null;
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        currentSession = session;
+        isAuthenticated = !!session;
+        console.log('✅ Session updated/refreshed successfully');
+      }
+      
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('🔄 Access token auto-refreshed - no action needed');
+      }
+    });
+    
+    // Enhanced auth check with proper session handling
     async function checkAuth() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      
       console.log('=== ADMIN AUTHENTICATION CHECK ===');
-      console.log('Session exists:', !!session);
       
-      if (!session) {
-        console.error('No session found - redirecting to login');
-        window.location.href = 'login.html';
-        return;
-      }
-      
-      console.log('Admin Email:', session.user.email);
-      console.log('JWT app_metadata:', session.user.app_metadata);
-      console.log('JWT user_metadata:', session.user.user_metadata);
-      
-      // Verify admin role from database FIRST (primary check)
-      const { data: userData, error } = await supabaseClient
-        .from('users')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-      
-      console.log('Database user data:', userData);
-      
-      if (error || !userData || userData.role !== 'admin') {
-        console.error('❌ Not an admin or user not found');
-        await supabaseClient.auth.signOut();
-        window.location.href = 'login.html';
-        return;
-      }
-      
-      // Check if app_metadata has admin role (secondary check - warn only)
-      const jwtRole = session.user.app_metadata?.role;
-      console.log('JWT Role from app_metadata:', jwtRole);
-      
-      if (!jwtRole || jwtRole !== 'admin') {
-        console.warn('⚠️ WARNING: app_metadata role missing or incorrect in JWT!');
-        console.warn('Expected: admin, Got:', jwtRole);
-        console.warn('Database role is correct (admin), so continuing...');
-        console.warn('JWT metadata will refresh on next login');
+      try {
+        // Get session from localStorage (persisted)
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
         
-        // Don't block the user - database role is correct
-        // The JWT will eventually refresh and fix itself
-      } else {
-        console.log('✅ JWT app_metadata role is correct');
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          throw new Error('Session retrieval failed');
+        }
+        
+        if (!session) {
+          console.error('No session found - redirecting to login');
+          window.location.href = 'login.html';
+          return false;
+        }
+        
+        console.log('Session exists:', !!session);
+        console.log('Admin Email:', session.user.email);
+        console.log('JWT app_metadata:', session.user.app_metadata);
+        
+        // Store session globally
+        currentSession = session;
+        
+        // Verify admin role from database
+        const { data: userData, error } = await supabaseClient
+          .from('users')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        
+        console.log('Database user data:', userData);
+        
+        if (error || !userData || userData.role !== 'admin') {
+          console.error('❌ Not an admin or user not found');
+          await supabaseClient.auth.signOut();
+          window.location.href = 'login.html';
+          return false;
+        }
+        
+        // Check JWT role
+        const jwtRole = session.user.app_metadata?.role;
+        console.log('JWT Role from app_metadata:', jwtRole);
+        
+        if (!jwtRole || jwtRole !== 'admin') {
+          console.warn('⚠️ WARNING: app_metadata role missing or incorrect in JWT!');
+          console.warn('Expected: admin, Got:', jwtRole);
+          console.warn('Refreshing session to update JWT...');
+          
+          // Refresh session to get updated JWT
+          const { data: refreshData } = await supabaseClient.auth.refreshSession();
+          if (refreshData?.session) {
+            currentSession = refreshData.session;
+            console.log('✅ Session refreshed, JWT updated');
+          }
+        } else {
+          console.log('✅ JWT app_metadata role is correct');
+        }
+        
+        isAuthenticated = true;
+        console.log('✅ Admin authentication successful');
+        console.log('=== END AUTH CHECK ===\n');
+        return true;
+        
+      } catch (error) {
+        console.error('❌ Auth check failed:', error);
+        window.location.href = 'login.html';
+        return false;
       }
-      
-      console.log('✅ Admin authentication successful');
-      console.log('=== END AUTH CHECK ===\n');
     }
     
-    // Run auth check on page load
-    checkAuth();
+    // Initialize app - authenticate FIRST, then load data
+    async function initializeApp() {
+      const authSuccess = await checkAuth();
+      
+      if (authSuccess) {
+        // Only load data after successful authentication
+        console.log('🚀 Loading organizations...');
+        await loadOrganizations();
+        console.log('✅ App initialization complete');
+      }
+    }
     
-    // Load organizations on page load
-    loadOrganizations();
+    // Run initialization on page load
+    initializeApp();
     
     // Profile dropdown functions
     function toggleProfileDropdown() {
@@ -1916,6 +1981,38 @@
     window.toggleProfileDropdown = toggleProfileDropdown;
     window.handleLogout = handleLogout;
     
+    // Helper function to get valid session (with auto-refresh if needed)
+    async function getValidSession() {
+      // Check if we have a session
+      if (!currentSession) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        currentSession = session;
+      }
+      
+      // If session is close to expiry, refresh it
+      if (currentSession) {
+        const expiresAt = currentSession.expires_at;
+        const now = Math.floor(Date.now() / 1000);
+        const timeUntilExpiry = expiresAt - now;
+        
+        // Refresh if less than 5 minutes until expiry
+        if (timeUntilExpiry < 300) {
+          console.log('🔄 Session expiring soon, refreshing...');
+          const { data: refreshData, error } = await supabaseClient.auth.refreshSession();
+          if (!error && refreshData.session) {
+            currentSession = refreshData.session;
+            console.log('✅ Session refreshed successfully');
+          }
+        }
+      }
+      
+      if (!currentSession) {
+        throw new Error('No valid session - please log in again');
+      }
+      
+      return currentSession;
+    }
+    
     // Handle invite form submission
     document.getElementById('invite-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1940,14 +2037,8 @@
       inviteBtn.textContent = 'CREATING ACCOUNT...';
       
       try {
-        // Refresh session to ensure JWT has latest app_metadata
-        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
-        
-        if (refreshError || !refreshData.session) {
-          throw new Error('Session refresh failed. Please try logging out and back in.');
-        }
-        
-        const session = refreshData.session;
+        // Get valid session (will auto-refresh if needed)
+        const session = await getValidSession();
         
         // Call invite-director Edge Function
         const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-director`, {
@@ -2012,14 +2103,8 @@
       inviteBtn.textContent = 'CREATING EDITOR ACCOUNT...';
       
       try {
-        // Refresh session to ensure JWT has latest app_metadata
-        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
-        
-        if (refreshError || !refreshData.session) {
-          throw new Error('Session refresh failed. Please try logging out and back in.');
-        }
-        
-        const session = refreshData.session;
+        // Get valid session (will auto-refresh if needed)
+        const session = await getValidSession();
         
         const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-editor`, {
           method: 'POST',
@@ -2085,14 +2170,8 @@
       inviteBtn.textContent = 'CREATING QC ACCOUNT...';
       
       try {
-        // Refresh session to ensure JWT has latest app_metadata
-        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
-        
-        if (refreshError || !refreshData.session) {
-          throw new Error('Session refresh failed. Please try logging out and back in.');
-        }
-        
-        const session = refreshData.session;
+        // Get valid session (will auto-refresh if needed)
+        const session = await getValidSession();
         
         const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-qc`, {
           method: 'POST',
@@ -2333,24 +2412,15 @@
       createBtn.textContent = 'CREATING ORGANIZATION...';
       
       try {
-        // CRITICAL FIX: Always refresh session before organization creation
-        // This ensures the JWT contains the latest app_metadata.role = 'admin'
-        // Without this, RLS policy fails intermittently on first attempt
-        console.log('🔄 Ensuring JWT has latest app_metadata before organization creation...');
+        // Get valid session (will auto-refresh if needed)
+        console.log('🔄 Ensuring valid session before organization creation...');
+        const session = await getValidSession();
         
-        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
-        
-        if (refreshError) {
-          console.error('❌ Failed to refresh session:', refreshError);
-          throw new Error('Session refresh failed. Please try logging out and back in.');
-        }
-        
-        // Verify the refreshed session has admin role in app_metadata
-        const refreshedSession = refreshData.session;
-        const jwtRole = refreshedSession?.user?.app_metadata?.role;
+        // Verify the session has admin role in app_metadata
+        const jwtRole = session?.user?.app_metadata?.role;
         
         if (!jwtRole || jwtRole !== 'admin') {
-          console.error('❌ JWT still missing app_metadata.role after refresh:', refreshedSession?.user);
+          console.error('❌ JWT still missing app_metadata.role:', session?.user);
           throw new Error('Your account does not have admin privileges. Please contact support.');
         }
         
