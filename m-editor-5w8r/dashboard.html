@@ -1234,8 +1234,7 @@
           submitBtn.disabled = false;
           submitBtn.textContent = '🚀 Submit to Quality Control';
           
-          // Reload case to show submission status
-          await loadCaseDetails(currentCase.id);
+          // Reload cases list to show updated submission status
           await loadAssignedCases();
         }, 2000);
         
