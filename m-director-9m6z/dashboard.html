@@ -1564,6 +1564,35 @@
     });
     
     // Load cases
+    // Get video/QC status badge HTML
+    function getVideoStatusBadge(status) {
+      const statusConfig = {
+        'in_production': { text: '🎬 Editor Working', color: '#9c27b0' },
+        'awaiting_review': { text: '⏳ Pending QC', color: '#ff9800' },
+        'revision_requested': { text: '🔄 Revision Needed', color: '#f44336' },
+        'delivered': { text: '✅ Delivered', color: '#4caf50' }
+      };
+      
+      const config = statusConfig[status];
+      if (!config) return '';
+      
+      return `
+        <div style="
+          background-color: ${config.color}15;
+          border: 1.5px solid ${config.color};
+          color: ${config.color};
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 600;
+          margin-top: 8px;
+          display: inline-block;
+        ">
+          ${config.text}
+        </div>
+      `;
+    }
+    
     async function loadCases() {
       const casesList = document.getElementById('cases-list');
       const errorBox = document.getElementById('cases-error-box');
@@ -1588,6 +1617,7 @@
           <div class="case-card" onclick="openCaseModal('${c.id}')">
             <div class="case-name">${c.deceased_name}</div>
             <span class="case-status status-${c.status.split('_')[0]}">${c.status.replace(/_/g, ' ')}</span>
+            ${getVideoStatusBadge(c.status)}
             <p class="case-meta">Created: ${new Date(c.created_at).toLocaleDateString()}</p>
             <div class="credential-box" style="margin-top: 12px;">
               <div class="credential-label">Case ID</div>
