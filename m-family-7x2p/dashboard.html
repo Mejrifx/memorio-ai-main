@@ -871,6 +871,26 @@
     let currentAssets = [];
     let userName = null;
     
+    // Redirect lock to prevent infinite loops
+    const REDIRECT_LOCK_KEY = 'memorio-family-redirect-lock';
+    const REDIRECT_LOCK_DURATION = 3000; // 3 seconds
+    
+    function canRedirect() {
+      const lastRedirect = sessionStorage.getItem(REDIRECT_LOCK_KEY);
+      if (lastRedirect) {
+        const timeSinceRedirect = Date.now() - parseInt(lastRedirect);
+        if (timeSinceRedirect < REDIRECT_LOCK_DURATION) {
+          console.warn('⚠️ Redirect blocked - too soon since last redirect');
+          return false;
+        }
+      }
+      return true;
+    }
+    
+    function setRedirectLock() {
+      sessionStorage.setItem(REDIRECT_LOCK_KEY, Date.now().toString());
+    }
+    
     // Set up automatic token refresh and session monitoring
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
       console.log('🔐 Auth state changed:', event, session?.user?.email);
@@ -978,8 +998,14 @@
           
           if (caseError) {
             console.error('❌ Error loading case:', caseError);
-            console.log('No case found, redirecting to intake form...');
-            window.location.href = '../index.html';
+            if (canRedirect()) {
+              console.log('No case found, redirecting to intake form...');
+              setRedirectLock();
+              window.location.href = '../index.html';
+            } else {
+              console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
+              alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
+            }
             return false;
           }
           
@@ -994,9 +1020,16 @@
           if (!formError && formData && formData.submitted_at) {
             console.log('✅ Form has been submitted, allowing dashboard access');
             // Form is submitted, allow access to dashboard
+            sessionStorage.removeItem(REDIRECT_LOCK_KEY); // Clear lock on success
           } else {
             console.log('⚠️ Form not submitted yet, redirecting to intake form...');
-            window.location.href = '../index.html';
+            if (canRedirect()) {
+              setRedirectLock();
+              window.location.href = '../index.html';
+            } else {
+              console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
+              alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
+            }
             return false;
           }
           
