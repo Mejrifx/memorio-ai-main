@@ -395,6 +395,145 @@
       margin: 4px 0 0 0;
     }
     
+    /* Completed Memorial Section */
+    .completed-memorial-card {
+      background: linear-gradient(135deg, #fff3e9 0%, #f4e8de 100%);
+      border: 3px solid #436481;
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(67, 100, 129, 0.15);
+    }
+    
+    .memorial-header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid #436481;
+    }
+    
+    .memorial-title {
+      font-size: 32px;
+      font-weight: 600;
+      color: #32343a;
+      margin: 0 0 12px 0;
+    }
+    
+    .memorial-subtitle {
+      font-size: 16px;
+      color: #666;
+      margin: 0;
+    }
+    
+    .memorial-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    
+    .memorial-video-section {
+      background-color: white;
+      border: 2px solid #436481;
+      border-radius: 16px;
+      padding: 24px;
+    }
+    
+    .memorial-section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #32343a;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .memorial-video-player {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      border-radius: 12px;
+      border: 2px solid #436481;
+      background-color: black;
+    }
+    
+    .memorial-obituary-section {
+      background-color: white;
+      border: 2px solid #436481;
+      border-radius: 16px;
+      padding: 24px;
+    }
+    
+    .memorial-obituary-content {
+      line-height: 1.8;
+      color: #32343a;
+      font-size: 16px;
+      max-height: 500px;
+      overflow-y: auto;
+      padding: 16px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .memorial-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-download-video {
+      padding: 14px 32px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 60px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-download-video:hover {
+      background-color: #218838;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    .memorial-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: #28a745;
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+      .completed-memorial-card {
+        padding: 24px;
+      }
+      
+      .memorial-title {
+        font-size: 24px;
+      }
+      
+      .memorial-actions {
+        flex-direction: column;
+      }
+      
+      .btn-download-video {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    
     /* Custom Icons */
     .icon {
       display: inline-block;
@@ -605,6 +744,60 @@
         </div>
       </div>
       
+      <!-- Completed Memorial (Only shown when delivered) -->
+      <div id="completedMemorialSection" class="completed-memorial-card" style="display: none;">
+        <div class="memorial-header">
+          <div class="memorial-badge">✓ Your Memorial is Complete</div>
+          <h2 class="memorial-title" id="memorialDeceasedName">Memorial Tribute</h2>
+          <p class="memorial-subtitle">Your memorial tribute video and obituary have been carefully created and reviewed</p>
+        </div>
+        
+        <div class="memorial-content">
+          <!-- Video Section -->
+          <div class="memorial-video-section">
+            <h3 class="memorial-section-title">
+              🎬 Memorial Tribute Video
+            </h3>
+            <div style="display: flex; justify-content: center;">
+              <video id="memorialVideo" class="memorial-video-player" controls>
+                <source id="memorialVideoSource" src="" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <p style="color: #666; text-align: center; margin-top: 12px; font-size: 14px;" id="videoDetails">
+              <!-- Video duration and size will be displayed here -->
+            </p>
+          </div>
+          
+          <!-- Obituary Section -->
+          <div id="memorialObituarySection" class="memorial-obituary-section" style="display: none;">
+            <h3 class="memorial-section-title">
+              📝 Obituary
+            </h3>
+            <div id="memorialObituaryContent" class="memorial-obituary-content">
+              <!-- Obituary content will be loaded here -->
+            </div>
+          </div>
+          
+          <!-- Actions -->
+          <div class="memorial-actions">
+            <button class="btn-download-video" onclick="downloadMemorialVideo()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+              Download Video
+            </button>
+            <button class="btn-secondary" onclick="shareMemorial()" style="padding: 14px 32px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+              </svg>
+              Share
+            </button>
+          </div>
+        </div>
+      </div>
+      
       <!-- Timeline Section -->
       <div class="dashboard-section">
         <h3 class="section-title">
@@ -770,6 +963,9 @@
         displayAssets();
         displayTimeline(cases);
         displayNotifications();
+        
+        // Load completed memorial if status is delivered
+        await loadCompletedMemorial(currentCase);
         
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('caseContainer').style.display = 'block';
@@ -1275,6 +1471,134 @@
       await supabaseClient.auth.signOut();
       window.location.href = 'login.html';
     });
+    
+    // Load completed memorial (if case is delivered)
+    async function loadCompletedMemorial(caseData) {
+      // Only show if case status is 'delivered'
+      if (caseData.status !== 'delivered') {
+        document.getElementById('completedMemorialSection').style.display = 'none';
+        return;
+      }
+      
+      try {
+        // Get approved video submission
+        const { data: videoSubmission, error: videoError } = await supabaseClient
+          .from('video_submissions')
+          .select('*')
+          .eq('case_id', caseData.id)
+          .eq('qc_status', 'approved')
+          .order('qc_reviewed_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (videoError || !videoSubmission) {
+          console.warn('No approved video found:', videoError);
+          document.getElementById('completedMemorialSection').style.display = 'none';
+          return;
+        }
+        
+        // Get obituary content
+        const { data: obituary, error: obituaryError } = await supabaseClient
+          .from('obituary_content')
+          .select('*')
+          .eq('case_id', caseData.id)
+          .single();
+        
+        // Display memorial section
+        document.getElementById('completedMemorialSection').style.display = 'block';
+        document.getElementById('memorialDeceasedName').textContent = caseData.deceased_name;
+        
+        // Set up video player
+        const videoElement = document.getElementById('memorialVideo');
+        const videoSource = document.getElementById('memorialVideoSource');
+        videoSource.src = videoSubmission.video_url;
+        videoSource.type = videoSubmission.mime_type || 'video/mp4';
+        videoElement.load();
+        
+        // Display video details
+        const duration = videoSubmission.duration_seconds 
+          ? `${Math.floor(videoSubmission.duration_seconds / 60)}:${(videoSubmission.duration_seconds % 60).toString().padStart(2, '0')}`
+          : 'Unknown';
+        const size = videoSubmission.file_size_bytes
+          ? `${(videoSubmission.file_size_bytes / (1024 * 1024)).toFixed(2)} MB`
+          : 'Unknown';
+        document.getElementById('videoDetails').textContent = `Duration: ${duration} | Size: ${size}`;
+        
+        // Store video URL for download
+        window.memorialVideoUrl = videoSubmission.video_url;
+        window.memorialVideoName = `${caseData.deceased_name.replace(/\s+/g, '_')}_Memorial_Tribute`;
+        
+        // Display obituary if available
+        if (!obituaryError && obituary) {
+          document.getElementById('memorialObituarySection').style.display = 'block';
+          document.getElementById('memorialObituaryContent').innerHTML = obituary.content_html || obituary.content_plain;
+        }
+        
+        console.log('✅ Completed memorial loaded successfully');
+        
+      } catch (error) {
+        console.error('Error loading completed memorial:', error);
+        document.getElementById('completedMemorialSection').style.display = 'none';
+      }
+    }
+    
+    // Download memorial video
+    async function downloadMemorialVideo() {
+      if (!window.memorialVideoUrl) {
+        showToast('Video URL not available', true);
+        return;
+      }
+      
+      try {
+        showToast('Preparing download...');
+        
+        // Fetch the video as a blob
+        const response = await fetch(window.memorialVideoUrl);
+        if (!response.ok) throw new Error('Failed to fetch video');
+        
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        
+        // Trigger download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${window.memorialVideoName}.mp4`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Cleanup
+        URL.revokeObjectURL(url);
+        
+        showToast('✓ Video download started!');
+        
+      } catch (error) {
+        console.error('Error downloading video:', error);
+        showToast('Error downloading video', true);
+      }
+    }
+    
+    // Share memorial
+    function shareMemorial() {
+      if (navigator.share && window.memorialVideoUrl) {
+        navigator.share({
+          title: `Memorial Tribute - ${window.memorialVideoName.replace(/_/g, ' ')}`,
+          text: 'View our memorial tribute video',
+          url: window.location.href
+        }).then(() => {
+          showToast('✓ Share successful!');
+        }).catch(error => {
+          console.log('Share cancelled or failed:', error);
+        });
+      } else {
+        // Fallback: Copy link to clipboard
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          showToast('✓ Link copied to clipboard!');
+        }).catch(() => {
+          showToast('Unable to share. Please copy the page URL manually.', true);
+        });
+      }
+    }
     
     // Initialize
     (async function init() {
