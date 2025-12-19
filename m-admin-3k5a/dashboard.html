@@ -1226,6 +1226,13 @@
         <span>Invite Editor</span>
       </div>
 
+      <div class="sidebar-nav-item" onclick="switchTab('invite-qc')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+        <span>Invite QC User</span>
+      </div>
+
       <div class="sidebar-nav-item" onclick="switchTab('assign-editor')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/>
@@ -1552,6 +1559,94 @@
         
         <!-- Error Box -->
         <div id="editor-error-box" class="error-box"></div>
+      </div>
+    </div>
+
+    <!-- Invite QC Tab -->
+    <div id="invite-qc-tab" class="tab-content">
+      <div class="invite-section">
+        <h2 class="section-title">Invite Quality Control User</h2>
+        <p class="paragraph">Create a new QC (Quality Control) account for a funeral home. QC users review and approve memorial videos before delivery to families.</p>
+        
+        <form id="invite-qc-form">
+          <div class="form-row">
+            <div>
+              <label for="qc-email" class="field-label">Email Address*</label>
+              <input 
+                class="text-field w-input" 
+                type="email" 
+                id="qc-email" 
+                placeholder="qc@funeralhome.com" 
+                required>
+            </div>
+            
+            <div>
+              <label for="qc-name" class="field-label">Full Name*</label>
+              <input 
+                class="text-field w-input" 
+                type="text" 
+                id="qc-name" 
+                placeholder="Jane Quality" 
+                required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div>
+              <label for="qc-org" class="field-label">Funeral Home*</label>
+              <select class="text-field w-input" id="qc-org" required>
+                <option value="">Select Funeral Home...</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="qc-phone" class="field-label">Phone Number</label>
+              <input 
+                class="text-field w-input" 
+                type="tel" 
+                id="qc-phone" 
+                placeholder="+1-555-0123">
+            </div>
+          </div>
+          
+          <div class="form-button" style="margin-top: 20px;">
+            <button type="submit" class="button-primary w-button" id="invite-qc-btn">
+              CREATE QC ACCOUNT
+            </button>
+          </div>
+        </form>
+        
+        <!-- Success Box -->
+        <div id="qc-success-box" class="success-box">
+          <h3><span class="success-icon"></span>QC Account Created Successfully!</h3>
+          <p>Share these credentials with the QC user securely. They should change their password after first login.</p>
+          
+          <div class="credential-box">
+            <div class="credential-label">Email Address</div>
+            <div class="credential-value" id="created-qc-email"></div>
+            <button class="copy-btn" onclick="copyToClipboard('created-qc-email')">Copy</button>
+          </div>
+          
+          <div class="credential-box">
+            <div class="credential-label">Temporary Password</div>
+            <div class="credential-value" id="created-qc-password"></div>
+            <button class="copy-btn" onclick="copyToClipboard('created-qc-password')">Copy</button>
+          </div>
+          
+          <div class="credential-box">
+            <div class="credential-label">Organization</div>
+            <div class="credential-value" id="created-qc-org"></div>
+          </div>
+          
+          <div class="credential-box">
+            <div class="credential-label">Login URL</div>
+            <div class="credential-value">https://memorio.ai/m-qc-4h7k/login.html</div>
+            <button class="copy-btn" onclick="copyToClipboard('qc-login-url')">Copy</button>
+          </div>
+        </div>
+        
+        <!-- Error Box -->
+        <div id="qc-error-box" class="error-box"></div>
       </div>
     </div>
 
@@ -1959,6 +2054,80 @@
       }
     });
     
+    // Handle invite QC form submission
+    document.getElementById('invite-qc-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('qc-email').value;
+      const name = document.getElementById('qc-name').value;
+      const orgId = document.getElementById('qc-org').value;
+      const phone = document.getElementById('qc-phone').value;
+      
+      const inviteBtn = document.getElementById('invite-qc-btn');
+      const successBox = document.getElementById('qc-success-box');
+      const errorBox = document.getElementById('qc-error-box');
+      const section = e.target.closest('.invite-section');
+      
+      // Validate organization selection
+      if (!orgId) {
+        errorBox.textContent = 'Please select a funeral home';
+        errorBox.style.display = 'block';
+        return;
+      }
+      
+      // Hide previous messages
+      successBox.style.display = 'none';
+      errorBox.style.display = 'none';
+      
+      // Disable form during submission
+      section.classList.add('loading');
+      inviteBtn.disabled = true;
+      inviteBtn.textContent = 'CREATING QC ACCOUNT...';
+      
+      try {
+        // Refresh session to ensure JWT has latest app_metadata
+        const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+        
+        if (refreshError || !refreshData.session) {
+          throw new Error('Session refresh failed. Please try logging out and back in.');
+        }
+        
+        const session = refreshData.session;
+        
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-qc`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({ email, name, org_id: orgId, phone })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to create QC account');
+        }
+        
+        // Display success with credentials
+        document.getElementById('created-qc-email').textContent = result.data.email;
+        document.getElementById('created-qc-password').textContent = result.data.temp_password;
+        document.getElementById('created-qc-org').textContent = result.data.org_name;
+        successBox.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('invite-qc-form').reset();
+        
+      } catch (error) {
+        errorBox.textContent = `Error: ${error.message}`;
+        errorBox.style.display = 'block';
+      } finally {
+        section.classList.remove('loading');
+        inviteBtn.disabled = false;
+        inviteBtn.textContent = 'CREATE QC ACCOUNT';
+      }
+    });
+    
     // Handle assign editor form submission
     document.getElementById('assign-editor-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -2078,6 +2247,7 @@
         'organizations': 'Organizations',
         'invite-director': 'Invite Director',
         'invite-editor': 'Invite Editor',
+        'invite-qc': 'Invite QC User',
         'assign-editor': 'Assign Editor'
       };
       document.getElementById('topbar-page-title').textContent = titles[tabName] || 'Dashboard';
@@ -2106,6 +2276,33 @@
         loadOrganizations();
       } else if (tabName === 'assign-editor') {
         loadEditors();
+      } else if (tabName === 'invite-qc') {
+        loadQCOrgDropdown();
+      }
+    }
+    
+    // Load organizations for QC dropdown
+    async function loadQCOrgDropdown() {
+      const qcOrgSelect = document.getElementById('qc-org');
+      
+      try {
+        const { data: orgs, error } = await supabaseClient
+          .from('organizations')
+          .select('id, name')
+          .order('name');
+        
+        if (error) throw error;
+        
+        qcOrgSelect.innerHTML = '<option value="">Select Funeral Home...</option>';
+        orgs.forEach(org => {
+          const option = document.createElement('option');
+          option.value = org.id;
+          option.textContent = org.name;
+          qcOrgSelect.appendChild(option);
+        });
+        
+      } catch (error) {
+        console.error('Error loading organizations for QC dropdown:', error);
       }
     }
     
