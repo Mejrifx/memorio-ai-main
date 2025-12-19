@@ -1067,6 +1067,26 @@
         let currentCase = null;
         let selectedPhotos = []; // Store selected photo files
         
+        // Redirect lock to prevent infinite loops between index.html and dashboard.html
+        const REDIRECT_LOCK_KEY = 'memorio-family-redirect-lock';
+        const REDIRECT_LOCK_DURATION = 3000; // 3 seconds
+        
+        function canRedirect() {
+            const lastRedirect = sessionStorage.getItem(REDIRECT_LOCK_KEY);
+            if (lastRedirect) {
+                const timeSinceRedirect = Date.now() - parseInt(lastRedirect);
+                if (timeSinceRedirect < REDIRECT_LOCK_DURATION) {
+                    console.warn('⚠️ Redirect blocked - too soon since last redirect');
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function setRedirectLock() {
+            sessionStorage.setItem(REDIRECT_LOCK_KEY, Date.now().toString());
+        }
+        
         // ============================================================================
         // LOGIN MODAL FUNCTIONS
         // ============================================================================
@@ -1280,8 +1300,17 @@
                     if (!formError && forms && forms.submitted_at && !isEditMode) {
                         console.log('✅ Form already submitted, redirecting to dashboard immediately...');
                         // Form is already completed and not in edit mode, redirect immediately without showing form
-                        window.location.href = '/m-family-7x2p/dashboard.html';
+                        if (canRedirect()) {
+                            setRedirectLock();
+                            window.location.href = '/m-family-7x2p/dashboard.html';
+                        } else {
+                            console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
+                            alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
+                        }
                         return false; // Stop execution
+                    } else {
+                        // Clear redirect lock when staying on form page
+                        sessionStorage.removeItem(REDIRECT_LOCK_KEY);
                     }
                     
                     if (isEditMode && forms && forms.submitted_at) {
