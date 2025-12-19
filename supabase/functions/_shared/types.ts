@@ -23,13 +23,25 @@ export interface Case {
   created_by: string;
   assigned_family_user_id?: string;
   status: 'created' | 'waiting_on_family' | 'intake_in_progress' | 'submitted' | 'in_production' | 'awaiting_review' | 'revision_requested' | 'delivered' | 'closed';
-  sla_start_at?: string;
-  sla_state?: 'on_time' | 'warning' | 'breach';
+  first_submission_at?: string;  // When SLA clock starts
+  sla_hours_elapsed?: number;    // Hours since submission
+  sla_state?: 'green' | 'yellow' | 'orange' | 'red' | 'on_time' | 'warning' | 'breach';
   metadata?: {
     service_date?: string;
     service_location?: string;
     [key: string]: any;
   };
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CaseNote {
+  id: string;
+  case_id: string;
+  author_user_id: string;
+  note_type: 'general' | 'support' | 'revision' | 'internal';
+  content: string;
+  is_pinned: boolean;
   created_at: string;
   updated_at: string;
 }
