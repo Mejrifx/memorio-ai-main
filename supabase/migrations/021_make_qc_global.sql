@@ -143,7 +143,7 @@ COMMENT ON POLICY "QC users read all users" ON users IS
 -- ============================================================================
 
 -- QC can read ALL case notes (global access)
-DROP POLICY IF EXISTS "QC users read case notes in their org" ON case_notes;
+DROP POLICY IF EXISTS "QC access case_notes in their org" ON case_notes;
 
 CREATE POLICY "QC users read all case notes"
   ON case_notes FOR SELECT
@@ -153,14 +153,12 @@ CREATE POLICY "QC users read all case notes"
   );
 
 -- QC can create case notes on any case
-DROP POLICY IF EXISTS "QC users create case notes in their org" ON case_notes;
-
 CREATE POLICY "QC users create all case notes"
   ON case_notes FOR INSERT
   TO authenticated
   WITH CHECK (
     auth.jwt() -> 'app_metadata' ->> 'role' = 'qc' AND
-    user_id = auth.uid()
+    author_user_id = auth.uid()
   );
 
 COMMENT ON POLICY "QC users read all case notes" ON case_notes IS 
