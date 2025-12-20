@@ -4,7 +4,7 @@
 -- Family user ID: dda56a32-d5f5-4f5b-af97-818b8e2217fd
 -- Email: imran@gmail.com
 
-\echo '=== 1. Check if family user exists in auth.users ==='
+SELECT '=== 1. Check if family user exists in auth.users ===' as section;
 SELECT 
   id,
   email,
@@ -16,7 +16,7 @@ SELECT
 FROM auth.users
 WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
 
-\echo '=== 2. Check if family user exists in public.users ==='
+SELECT '=== 2. Check if family user exists in public.users ===' as section;
 SELECT 
   id,
   email,
@@ -27,7 +27,7 @@ SELECT
 FROM users
 WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
 
-\echo '=== 3. Check if case is assigned to family user ==='
+SELECT '=== 3. Check if case is assigned to family user ===' as section;
 SELECT 
   id,
   deceased_name,
@@ -38,7 +38,7 @@ SELECT
 FROM cases
 WHERE assigned_family_user_id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
 
-\echo '=== 4. Check RLS policies for users table ==='
+SELECT '=== 4. Check RLS policies for users table ===' as section;
 SELECT 
   schemaname,
   tablename,
@@ -52,7 +52,7 @@ FROM pg_policies
 WHERE tablename = 'users'
 ORDER BY policyname;
 
-\echo '=== 5. Check RLS policies for cases table (family) ==='
+SELECT '=== 5. Check RLS policies for cases table (family) ===' as section;
 SELECT 
   policyname,
   cmd,
@@ -62,33 +62,7 @@ WHERE tablename = 'cases'
   AND policyname LIKE '%Famil%'
 ORDER BY policyname;
 
-\echo '=== 6. Test RLS as family user (simulated) ==='
--- This simulates what happens when the family user makes a request
-SET LOCAL role = authenticated;
-
--- First, get the org_id for this family user
-DO $$
-DECLARE
-  v_org_id UUID;
-BEGIN
-  SELECT org_id INTO v_org_id FROM users WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
-  
-  EXECUTE format('SET LOCAL request.jwt.claims = ''{ "sub": "dda56a32-d5f5-4f5b-af97-818b8e2217fd", "role": "authenticated", "app_metadata": { "role": "family", "org_id": "%s" } }''', v_org_id);
-END $$;
-
--- Try to read user's own profile
-SELECT 'Attempting to read own profile...' as test;
-SELECT id, email, role FROM users WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
-
--- Try to read assigned case
-SELECT 'Attempting to read assigned case...' as test;
-SELECT id, deceased_name FROM cases WHERE assigned_family_user_id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
-
--- Reset
-RESET role;
-RESET request.jwt.claims;
-
-\echo '=== 7. Check if organization exists ==='
+SELECT '=== 6. Check if organization exists ===' as section;
 SELECT 
   id,
   name,
@@ -99,12 +73,14 @@ WHERE id = (
   SELECT org_id FROM users WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd'
 );
 
-\echo '=== DIAGNOSIS COMPLETE ==='
-\echo 'Look for:'
-\echo '1. jwt_role should be "family" in auth.users'
-\echo '2. role should be "family" in public.users'
-\echo '3. org_id should match in both tables'
-\echo '4. assigned_family_user_id should match user id in cases table'
-\echo '5. RLS policies should allow authenticated users to read their own profile'
-\echo '6. Simulated RLS test should return results (not empty)'
+SELECT '=== DIAGNOSIS SUMMARY ===' as section;
+SELECT '
+Look for:
+1. jwt_role should be "family" in auth.users (Section 1)
+2. role should be "family" in public.users (Section 2)
+3. org_id should match in both tables (Sections 1 & 2)
+4. assigned_family_user_id should match user id in cases table (Section 3)
+5. RLS policies should allow authenticated users to read their own profile (Section 4)
+6. Organization should exist and be active (Section 6)
+' as diagnosis_checklist;
 
