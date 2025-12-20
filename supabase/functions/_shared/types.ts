@@ -105,8 +105,8 @@ export interface ObituaryContent {
 export interface InviteQCRequest {
   email: string;
   name: string;
-  org_id: string;
   phone?: string;
+  // No org_id - QC users are global
 }
 
 export interface ApiResponse<T = any> {

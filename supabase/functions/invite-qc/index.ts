@@ -1,5 +1,5 @@
 // Invite QC (Quality Control) Edge Function
-// Allows Admins to invite QC users to organizations
+// Allows Admins to invite GLOBAL QC users (not org-scoped)
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, verifyAuth, generatePassword } from '../_shared/supabase-client.ts';
@@ -45,27 +45,13 @@ serve(async (req) => {
 
     // Parse request body
     const body: InviteQCRequest = await req.json();
-    const { email, name, org_id, phone } = body;
+    const { email, name, phone } = body;
 
-    // Validate required fields
-    if (!email || !name || !org_id) {
+    // Validate required fields (org_id removed - QC is global)
+    if (!email || !name) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Missing required fields: email, name, org_id' }),
+        JSON.stringify({ success: false, error: 'Missing required fields: email, name' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Verify organization exists
-    const { data: orgData, error: orgError } = await supabase
-      .from('organizations')
-      .select('id, name')
-      .eq('id', org_id)
-      .single();
-
-    if (orgError || !orgData) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Organization not found' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -78,8 +64,8 @@ serve(async (req) => {
       password: tempPassword,
       email_confirm: true,
       app_metadata: {
-        role: 'qc',
-        org_id: org_id
+        role: 'qc'
+        // No org_id - QC is global
       },
       user_metadata: {
         name,
@@ -104,7 +90,7 @@ serve(async (req) => {
         id: authData.user.id,
         email,
         role: 'qc',
-        org_id: org_id,
+        org_id: null, // QC users are global, not org-scoped
         status: 'invited',
         temp_password: tempPassword,
         metadata: { name, phone }
@@ -135,24 +121,22 @@ serve(async (req) => {
         payload: {
           email,
           name,
-          org_id,
-          org_name: orgData.name
+          note: 'QC user invited - global access to all organizations'
         }
       });
 
     // Note: Email integration will be added later
     // For now, credentials are returned in the response for the Admin to share manually
-    console.log(`QC user invited: ${email} / ${tempPassword} (Org: ${orgData.name})`);
+    console.log(`Global QC user invited: ${email} / ${tempPassword}`);
 
     const response: ApiResponse = {
       success: true,
       data: {
         user_id: authData.user.id,
         temp_password: tempPassword,
-        email,
-        org_name: orgData.name
+        email
       },
-      message: `QC user invitation sent to ${email} for ${orgData.name}`
+      message: `QC user invitation sent to ${email} (Global Access)`
     };
 
     return new Response(

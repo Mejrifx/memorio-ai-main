@@ -1573,7 +1573,7 @@
     <div id="invite-qc-tab" class="tab-content">
       <div class="invite-section">
         <h2 class="section-title">Invite Quality Control User</h2>
-        <p class="paragraph">Create a new QC (Quality Control) account for a funeral home. QC users review and approve memorial videos before delivery to families.</p>
+        <p class="paragraph">Create a new <strong>Global QC Account</strong>. QC users review and approve memorial videos for <strong>all funeral homes</strong>, not tied to a specific organization.</p>
         
         <form id="invite-qc-form">
           <div class="form-row">
@@ -1583,7 +1583,7 @@
                 class="text-field w-input" 
                 type="email" 
                 id="qc-email" 
-                placeholder="qc@funeralhome.com" 
+                placeholder="qc@memorio.ai" 
                 required>
             </div>
             
@@ -1600,19 +1600,18 @@
           
           <div class="form-row">
             <div>
-              <label for="qc-org" class="field-label">Funeral Home*</label>
-              <select class="text-field w-input" id="qc-org" required>
-                <option value="">Select Funeral Home...</option>
-              </select>
-            </div>
-            
-            <div>
               <label for="qc-phone" class="field-label">Phone Number</label>
               <input 
                 class="text-field w-input" 
                 type="tel" 
                 id="qc-phone" 
                 placeholder="+1-555-0123">
+            </div>
+            
+            <div style="display: flex; align-items: flex-end;">
+              <div style="background: #fff3e9; padding: 15px; border: 2px solid #436481; border-radius: 12px; font-size: 14px; color: #32343a;">
+                <strong>🌍 Global Access:</strong> This QC user will have access to review videos from all funeral homes.
+              </div>
             </div>
           </div>
           
@@ -1627,6 +1626,9 @@
         <div id="qc-success-box" class="success-box">
           <h3><span class="success-icon"></span>QC Account Created Successfully!</h3>
           <p>Share these credentials with the QC user securely. They should change their password after first login.</p>
+          <p style="color: #436481; font-weight: 600; margin-top: 10px;">
+            🌍 This QC user has <strong>global access</strong> to review videos from all funeral homes.
+          </p>
           
           <div class="credential-box">
             <div class="credential-label">Email Address</div>
@@ -1641,9 +1643,11 @@
           </div>
           
           <div class="credential-box">
-            <div class="credential-label">Organization</div>
-            <div class="credential-value" id="created-qc-org"></div>
+            <div class="credential-label">Login URL</div>
+            <div class="credential-value">https://memorio.ai/m-qc-4h7k/login.html</div>
+            <button class="copy-btn" onclick="copyToClipboard('qc-login-url')">Copy</button>
           </div>
+        </div>
           
           <div class="credential-box">
             <div class="credential-label">Login URL</div>
@@ -2183,20 +2187,12 @@
       
       const email = document.getElementById('qc-email').value;
       const name = document.getElementById('qc-name').value;
-      const orgId = document.getElementById('qc-org').value;
       const phone = document.getElementById('qc-phone').value;
       
       const inviteBtn = document.getElementById('invite-qc-btn');
       const successBox = document.getElementById('qc-success-box');
       const errorBox = document.getElementById('qc-error-box');
       const section = e.target.closest('.invite-section');
-      
-      // Validate organization selection
-      if (!orgId) {
-        errorBox.textContent = 'Please select a funeral home';
-        errorBox.style.display = 'block';
-        return;
-      }
       
       // Hide previous messages
       successBox.style.display = 'none';
@@ -2205,7 +2201,7 @@
       // Disable form during submission
       section.classList.add('loading');
       inviteBtn.disabled = true;
-      inviteBtn.textContent = 'CREATING QC ACCOUNT...';
+      inviteBtn.textContent = 'CREATING GLOBAL QC ACCOUNT...';
       
       try {
         // Get valid session (will auto-refresh if needed)
@@ -2217,7 +2213,7 @@
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`
           },
-          body: JSON.stringify({ email, name, org_id: orgId, phone })
+          body: JSON.stringify({ email, name, phone }) // No org_id - QC is global
         });
         
         const result = await response.json();
@@ -2229,7 +2225,6 @@
         // Display success with credentials
         document.getElementById('created-qc-email').textContent = result.data.email;
         document.getElementById('created-qc-password').textContent = result.data.temp_password;
-        document.getElementById('created-qc-org').textContent = result.data.org_name;
         successBox.style.display = 'block';
         
         // Reset form
