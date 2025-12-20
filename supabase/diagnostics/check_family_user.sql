@@ -1,8 +1,8 @@
 -- Diagnostic Query: Check Family User Setup
 -- Run this to diagnose why family users get 406 errors
 
--- Replace these with actual values from your test:
--- Family user ID: 7df3a0e1-0803-46c2-abdd-5a3ac6a33823 (from your console log)
+-- Family user ID: dda56a32-d5f5-4f5b-af97-818b8e2217fd
+-- Email: imran@gmail.com
 
 \echo '=== 1. Check if family user exists in auth.users ==='
 SELECT 
@@ -14,7 +14,7 @@ SELECT
   created_at,
   email_confirmed_at
 FROM auth.users
-WHERE id = '7df3a0e1-0803-46c2-abdd-5a3ac6a33823';
+WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
 
 \echo '=== 2. Check if family user exists in public.users ==='
 SELECT 
@@ -25,7 +25,7 @@ SELECT
   status,
   metadata
 FROM users
-WHERE id = '7df3a0e1-0803-46c2-abdd-5a3ac6a33823';
+WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
 
 \echo '=== 3. Check if case is assigned to family user ==='
 SELECT 
@@ -36,7 +36,7 @@ SELECT
   status,
   created_at
 FROM cases
-WHERE assigned_family_user_id = '7df3a0e1-0803-46c2-abdd-5a3ac6a33823';
+WHERE assigned_family_user_id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
 
 \echo '=== 4. Check RLS policies for users table ==='
 SELECT 
@@ -65,22 +65,24 @@ ORDER BY policyname;
 \echo '=== 6. Test RLS as family user (simulated) ==='
 -- This simulates what happens when the family user makes a request
 SET LOCAL role = authenticated;
-SET LOCAL request.jwt.claims = '{
-  "sub": "7df3a0e1-0803-46c2-abdd-5a3ac6a33823",
-  "role": "authenticated",
-  "app_metadata": {
-    "role": "family",
-    "org_id": "REPLACE_WITH_ORG_ID"
-  }
-}';
+
+-- First, get the org_id for this family user
+DO $$
+DECLARE
+  v_org_id UUID;
+BEGIN
+  SELECT org_id INTO v_org_id FROM users WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
+  
+  EXECUTE format('SET LOCAL request.jwt.claims = ''{ "sub": "dda56a32-d5f5-4f5b-af97-818b8e2217fd", "role": "authenticated", "app_metadata": { "role": "family", "org_id": "%s" } }''', v_org_id);
+END $$;
 
 -- Try to read user's own profile
 SELECT 'Attempting to read own profile...' as test;
-SELECT id, email, role FROM users WHERE id = '7df3a0e1-0803-46c2-abdd-5a3ac6a33823';
+SELECT id, email, role FROM users WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
 
 -- Try to read assigned case
 SELECT 'Attempting to read assigned case...' as test;
-SELECT id, deceased_name FROM cases WHERE assigned_family_user_id = '7df3a0e1-0803-46c2-abdd-5a3ac6a33823';
+SELECT id, deceased_name FROM cases WHERE assigned_family_user_id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd';
 
 -- Reset
 RESET role;
@@ -94,7 +96,7 @@ SELECT
   created_at
 FROM organizations
 WHERE id = (
-  SELECT org_id FROM users WHERE id = '7df3a0e1-0803-46c2-abdd-5a3ac6a33823'
+  SELECT org_id FROM users WHERE id = 'dda56a32-d5f5-4f5b-af97-818b8e2217fd'
 );
 
 \echo '=== DIAGNOSIS COMPLETE ==='
