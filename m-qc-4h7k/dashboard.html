@@ -824,15 +824,20 @@
     // Load video submissions
     async function loadSubmissions() {
       try {
-        // Get all pending and in-review submissions for this organization's cases
+        // QC users are global - get ALL pending and in-review submissions across all organizations
         const { data: submissions, error } = await supabaseClient
           .from('video_submissions')
           .select(`
             *,
-            cases!inner(id, deceased_name, org_id, status),
+            cases!inner(
+              id,
+              deceased_name,
+              org_id,
+              status,
+              organizations(id, name)
+            ),
             users!video_submissions_editor_user_id_fkey(email, metadata)
           `)
-          .eq('cases.org_id', currentOrgId)
           .in('qc_status', ['pending', 'in_review'])
           .order('submitted_at', { ascending: false });
         
@@ -864,6 +869,9 @@
       listContainer.innerHTML = allSubmissions.map(sub => `
         <div class="review-list-item" data-id="${sub.id}" onclick="selectSubmission('${sub.id}')">
           <div class="review-item-name">${sub.cases.deceased_name}</div>
+          <div class="review-item-date" style="font-size: 13px; color: #436481;">
+            🏢 ${sub.cases.organizations?.name || 'Unknown Organization'}
+          </div>
           <div class="review-item-status status-${sub.qc_status.replace('_', '-')}">${formatStatus(sub.qc_status)}</div>
           <div class="review-item-date">Submitted: ${formatDate(sub.submitted_at)}</div>
           ${sub.revision_number > 1 ? `<div class="review-item-date">Revision #${sub.revision_number}</div>` : ''}
