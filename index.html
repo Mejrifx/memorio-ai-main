@@ -1234,6 +1234,8 @@
                 
                 currentUser = session.user;
                 console.log('✅ User authenticated:', currentUser.email);
+                console.log('🔐 JWT app_metadata:', currentUser.app_metadata);
+                console.log('🔐 User ID:', currentUser.id);
                 
                 // Get user's role from app_metadata
                 const role = currentUser.app_metadata?.role;
@@ -1246,11 +1248,20 @@
                 
                 // Fetch user's name for personalized greeting
                 try {
+                    console.log('📡 Attempting to fetch user data from database...');
                     const { data: userData, error: userError } = await supabaseClient
                         .from('users')
                         .select('metadata')
                         .eq('id', currentUser.id)
                         .single();
+                    
+                    if (userError) {
+                        console.error('❌ Database query failed:', userError);
+                        console.error('❌ Error code:', userError.code);
+                        console.error('❌ Error message:', userError.message);
+                        console.error('❌ Error details:', userError.details);
+                        console.error('❌ Error hint:', userError.hint);
+                    }
                     
                     if (!userError && userData?.metadata?.name) {
                         const userName = userData.metadata.name;
