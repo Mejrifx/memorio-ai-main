@@ -1503,11 +1503,10 @@
                     formContent.classList.add('show');
                 }
                 
-                // Optionally pre-fill deceased name in form if needed
-                // const deceasedNameField = document.querySelector('[name="loved_ones_name"]');
-                // if (deceasedNameField && !deceasedNameField.value) {
-                //     deceasedNameField.value = currentCase.deceased_name;
-                // }
+                // Initialize family portal enhancements (hide steps, populate data)
+                // This runs after case is loaded (whether from login or after password change)
+                console.log('🎨 Initializing family portal enhancements...');
+                initFamilyPortalEnhancements();
                 
             } catch (error) {
                 console.error('Error loading case:', error);
@@ -2274,8 +2273,6 @@
             checkAuthentication().then(isAuthenticated => {
                 if (isAuthenticated) {
                     console.log('✅ Page ready - User authenticated and case loaded');
-                    // Initialize family portal enhancements after authentication
-                    initFamilyPortalEnhancements();
                 } else {
                     console.log('⚠️ Page ready - Operating without authentication (testing mode)');
                 }
