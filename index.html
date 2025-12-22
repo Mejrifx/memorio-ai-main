@@ -1236,14 +1236,22 @@
                 
                 console.log('✅ Password changed successfully');
                 
-                // Hide modal and continue to form
+                // Update currentUser metadata to reflect password change
+                if (currentUser) {
+                    currentUser.metadata.requires_password_change = false;
+                }
+                
+                // Hide modal
                 hidePasswordChangeModal();
                 
-                // Show success message
-                alert('Password updated successfully! You can now proceed with the form.');
-                
-                // Load the family case and continue
+                // Load the family case and continue to form
+                console.log('📋 Loading case after password change...');
                 await loadFamilyCase();
+                
+                // Show success message (non-blocking)
+                setTimeout(() => {
+                    console.log('✅ Password updated - form ready');
+                }, 500);
                 
             } catch (error) {
                 console.error('Password change error:', error);
@@ -1283,33 +1291,20 @@
                 
                 if (error) throw error;
                 
-                // Check if user is a family member
-                const role = data.user.app_metadata?.role;
+                console.log('✅ Auth successful:', data.user.email);
                 
-                if (role !== 'family') {
-                    throw new Error('Access denied: This form is only for family members.');
-                }
-                
-                // Fetch user data from database (EXACT same as Director Portal)
+                // Fetch user data from database (SINGLE query like Director Portal)
                 const { data: userData, error: userError } = await supabaseClient
                     .from('users')
                     .select('role, metadata')
                     .eq('id', data.user.id)
                     .single();
                 
-                console.log('✅ Login successful:', data.user.email);
                 console.log('🔐 Database user data:', userData);
                 
                 if (userError || !userData || userData.role !== 'family') {
+                    console.error('❌ Role check failed:', userError);
                     throw new Error('Access denied: This form is only for family members.');
-                }
-                
-                // Check if user needs to change password (EXACT same check as Director Portal)
-                if (userData.metadata?.requires_password_change === true) {
-                    console.log('⚠️ First login detected - forcing password change');
-                    hideLoginModal();
-                    showPasswordChangeModal();
-                    return; // Stop execution until password is changed
                 }
                 
                 // Set currentUser with full data
@@ -1319,35 +1314,23 @@
                     ...userData
                 };
                 
-                // Fetch and display user's name for personalized greeting
-                try {
-                    const { data: userData, error: userError } = await supabaseClient
-                        .from('users')
-                        .select('metadata')
-                        .eq('id', currentUser.id)
-                        .single();
-                    
-                    if (!userError && userData?.metadata?.name) {
-                        const userName = userData.metadata.name;
-                        console.log('✅ User name loaded:', userName);
-                        
-                        // Update the welcome heading with personalized greeting
-                        const welcomeHeading = document.getElementById('welcome-heading');
-                        if (welcomeHeading) {
-                            welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
-                        }
-                    } else {
-                        // Fallback to JWT user_metadata
-                        const fallbackName = currentUser.user_metadata?.name;
-                        if (fallbackName) {
-                            const welcomeHeading = document.getElementById('welcome-heading');
-                            if (welcomeHeading) {
-                                welcomeHeading.textContent = `Hey ${fallbackName}, Let's begin.`;
-                            }
-                        }
+                // Check if user needs to change password (BEFORE loading anything else)
+                if (userData.metadata?.requires_password_change === true) {
+                    console.log('⚠️ First login - password change required');
+                    hideLoginModal();
+                    showPasswordChangeModal();
+                    return; // STOP HERE - don't load form until password changed
+                }
+                
+                console.log('✅ Login complete - proceeding to form');
+                
+                // Update welcome heading with user name if available
+                const userName = userData.metadata?.name;
+                if (userName) {
+                    const welcomeHeading = document.getElementById('welcome-heading');
+                    if (welcomeHeading) {
+                        welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
                     }
-                } catch (e) {
-                    console.error('❌ Error fetching user name:', e);
                 }
                 
                 hideLoginModal();
@@ -1396,27 +1379,21 @@
                     return false;
                 }
                 
-                // Fetch user data from database (EXACT same as Director Portal)
+                console.log('✅ Session found:', session.user.email);
+                
+                // Fetch user data from database (SINGLE query)
                 const { data: userData, error: userError } = await supabaseClient
                     .from('users')
                     .select('role, metadata')
                     .eq('id', session.user.id)
                     .single();
                 
-                console.log('✅ User authenticated:', session.user.email);
                 console.log('🔐 Database user data:', userData);
                 
                 if (userError || !userData || userData.role !== 'family') {
                     console.error('❌ Not a family member or user not found:', userError);
                     showLoginModal();
                     return false;
-                }
-                
-                // Check if user needs to change password (EXACT same check as Director Portal)
-                if (userData.metadata?.requires_password_change === true) {
-                    console.log('⚠️ First login detected - forcing password change');
-                    showPasswordChangeModal();
-                    return false; // Block form access until password is changed
                 }
                 
                 // Set currentUser with full data
@@ -1426,47 +1403,22 @@
                     ...userData
                 };
                 
-                // Fetch user's name for personalized greeting
-                try {
-                    console.log('📡 Attempting to fetch user data from database...');
-                    const { data: userData, error: userError } = await supabaseClient
-                        .from('users')
-                        .select('metadata')
-                        .eq('id', currentUser.id)
-                        .single();
-                    
-                    if (userError) {
-                        console.error('❌ Database query failed:', userError);
-                        console.error('❌ Error code:', userError.code);
-                        console.error('❌ Error message:', userError.message);
-                        console.error('❌ Error details:', userError.details);
-                        console.error('❌ Error hint:', userError.hint);
+                // Check if user needs to change password (BEFORE loading form)
+                if (userData.metadata?.requires_password_change === true) {
+                    console.log('⚠️ First login - password change required');
+                    showPasswordChangeModal();
+                    return false; // STOP - password must be changed first
+                }
+                
+                console.log('✅ Authentication complete');
+                
+                // Update welcome heading with user name if available
+                const userName = userData.metadata?.name;
+                if (userName) {
+                    const welcomeHeading = document.getElementById('welcome-heading');
+                    if (welcomeHeading) {
+                        welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
                     }
-                    
-                    if (!userError && userData?.metadata?.name) {
-                        const userName = userData.metadata.name;
-                        console.log('✅ User name loaded:', userName);
-                        
-                        // Update the welcome heading with personalized greeting
-                        const welcomeHeading = document.getElementById('welcome-heading');
-                        if (welcomeHeading) {
-                            welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
-                        }
-                    } else {
-                        console.warn('⚠️ Could not load user name from database:', userError);
-                        // Fallback: try to get name from user_metadata (JWT)
-                        const fallbackName = currentUser.user_metadata?.name;
-                        if (fallbackName) {
-                            console.log('✅ User name loaded from JWT:', fallbackName);
-                            const welcomeHeading = document.getElementById('welcome-heading');
-                            if (welcomeHeading) {
-                                welcomeHeading.textContent = `Hey ${fallbackName}, Let's begin.`;
-                            }
-                        }
-                    }
-                } catch (e) {
-                    console.error('❌ Error fetching user name:', e);
-                    // Continue without personalization - will show default "Lets begin!"
                 }
                 
                 // Check if form is already completed BEFORE loading the page
@@ -2375,42 +2327,36 @@
          * Hide DOB and DOD steps (collected by director)
          */
         function hideDateSteps() {
-            // List of visible field selectors that need to be disabled
-            const visibleDateFields = [
-                'month_of_passing', 'day_of_passing', 'year_of_passing',
-                'city_of_passing', 'state_of_passing', 'country_of_passing',
-                'month_of_birth', 'day_of_birth', 'year_of_birth',
-                'city_of_birth', 'state_of_birth', 'country_of_birth'
-            ];
+            console.log('🔍 Attempting to hide date steps...');
             
-            // Remove name and required attributes from visible fields to prevent submission
-            visibleDateFields.forEach(fieldName => {
-                const visibleFields = document.querySelectorAll(`[name="${fieldName}"]:not([type="hidden"])`);
-                visibleFields.forEach(field => {
-                    field.removeAttribute('name'); // Won't be submitted
-                    field.removeAttribute('required'); // Won't block submission
-                });
+            // Find and hide all form step containers by their heading text
+            const allSteps = document.querySelectorAll('.form-slider-step-1');
+            let hiddenCount = 0;
+            
+            allSteps.forEach(step => {
+                const heading = step.querySelector('.heading-2');
+                if (heading) {
+                    const headingText = heading.textContent.trim();
+                    
+                    // Hide DOD step
+                    if (headingText.includes('When Did Your Loved One Pass') || 
+                        headingText.includes('date') && headingText.includes('pass')) {
+                        step.style.display = 'none';
+                        console.log('✅ Hidden step:', headingText);
+                        hiddenCount++;
+                    }
+                    
+                    // Hide DOB step
+                    if (headingText.includes('Please provide more details about their birth') ||
+                        headingText.includes('birth')) {
+                        step.style.display = 'none';
+                        console.log('✅ Hidden step:', headingText);
+                        hiddenCount++;
+                    }
+                }
             });
             
-            // Hide DOD step (date of passing)
-            const dateOfPassingField = document.querySelector('select#month_of_passing, [id="month_of_passing"]:not([type="hidden"])');
-            if (dateOfPassingField) {
-                const dodStepContainer = dateOfPassingField.closest('.form-slider-step-1');
-                if (dodStepContainer) {
-                    dodStepContainer.style.display = 'none';
-                    console.log('✅ Date of death step hidden');
-                }
-            }
-            
-            // Hide DOB step (date of birth)
-            const dateOfBirthField = document.querySelector('select#month_of_birth, [id="month_of_birth"]:not([type="hidden"])');
-            if (dateOfBirthField) {
-                const dobStepContainer = dateOfBirthField.closest('.form-slider-step-1');
-                if (dobStepContainer) {
-                    dobStepContainer.style.display = 'none';
-                    console.log('✅ Date of birth step hidden');
-                }
-            }
+            console.log(`✅ Total date/birth steps hidden: ${hiddenCount}`);
         }
         
         /**
