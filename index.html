@@ -2365,14 +2365,14 @@
                 console.log('✅ Removed name attribute from visible funeral_home field');
             });
             
-            // Find and hide the funeral home step container by searching for the label text
+            // REMOVE (not just hide) the funeral home step container entirely from DOM
             const allLabels = document.querySelectorAll('label');
             allLabels.forEach(label => {
                 if (label.textContent.includes('Name of the funeral home')) {
                     const stepContainer = label.closest('.form-slider-step-1');
                     if (stepContainer) {
-                        stepContainer.style.display = 'none';
-                        console.log('✅ Funeral home step hidden (by label text)');
+                        stepContainer.remove(); // Completely remove from DOM
+                        console.log('✅ Funeral home step REMOVED from DOM');
                     }
                 }
             });
@@ -2403,24 +2403,24 @@
                 });
             });
             
-            // Hide step containers by searching for their label text (more reliable)
+            // REMOVE (not just hide) step containers entirely from DOM
             const allLabels = document.querySelectorAll('label');
             allLabels.forEach(label => {
-                // Hide "Please provide more details about their passing" step
+                // REMOVE "Please provide more details about their passing" step
                 if (label.textContent.includes('Please provide more details about their passing')) {
                     const stepContainer = label.closest('.form-slider-step-1');
                     if (stepContainer) {
-                        stepContainer.style.display = 'none';
-                        console.log('✅ Date of death step hidden (by label text)');
+                        stepContainer.remove(); // Completely remove from DOM
+                        console.log('✅ Date of death step REMOVED from DOM');
                     }
                 }
                 
-                // Hide "Please provide more details about their birth" step
+                // REMOVE "Please provide more details about their birth" step
                 if (label.textContent.includes('Please provide more details about their birth')) {
                     const stepContainer = label.closest('.form-slider-step-1');
                     if (stepContainer) {
-                        stepContainer.style.display = 'none';
-                        console.log('✅ Date of birth step hidden (by label text)');
+                        stepContainer.remove(); // Completely remove from DOM
+                        console.log('✅ Date of birth step REMOVED from DOM');
                     }
                 }
             });
