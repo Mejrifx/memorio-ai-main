@@ -134,6 +134,7 @@
                 <input type="hidden" id="loved_ones_name" name="loved_ones_name" value="">
                 <input type="hidden" id="loved_ones_last_name" name="loved_ones_last_name" value="">
                 <input type="hidden" id="loved_ones_gender" name="loved_ones_gender" value="">
+                <input type="hidden" id="funeral_home" name="funeral_home" value="">
                 
                 <!-- Hidden date/city fields (auto-populated from director's input) -->
                 <input type="hidden" id="month_of_birth" name="month_of_birth" value="">
@@ -1532,7 +1533,7 @@
             try {
                 const { data: cases, error } = await supabaseClient
                     .from('cases')
-                    .select('*')
+                    .select('*, organizations(name)')
                     .eq('assigned_family_user_id', currentUser.id)
                     .single();
                 
@@ -2356,10 +2357,17 @@
          * Hide the funeral home question step (collected by director)
          */
         function hideFuneralHomeStep() {
-            // Find the funeral home step by looking for the input field
-            const funeralHomeInput = document.getElementById('funeral_home');
+            // Remove 'name' attribute from VISIBLE funeral_home field (same pattern as date fields)
+            const visibleFields = document.querySelectorAll('[name="funeral_home"]:not([type="hidden"])');
+            visibleFields.forEach(field => {
+                field.removeAttribute('name'); // Remove name so FormData ignores it
+                field.removeAttribute('required'); // Remove required so validation doesn't block
+                console.log('✅ Removed name attribute from visible funeral_home field');
+            });
+            
+            // Find and hide the funeral home step container
+            const funeralHomeInput = document.querySelector('input[id="funeral_home"]:not([type="hidden"])');
             if (funeralHomeInput) {
-                // Find the parent step container
                 const stepContainer = funeralHomeInput.closest('.form-slider-step-1');
                 if (stepContainer) {
                     stepContainer.style.display = 'none';
@@ -2465,6 +2473,15 @@
                 }
             }
             
+            // Populate FUNERAL HOME name (from organization)
+            if (currentCase.organizations?.name) {
+                const funeralHomeField = document.getElementById('funeral_home');
+                if (funeralHomeField) {
+                    funeralHomeField.value = currentCase.organizations.name;
+                    console.log('✅ Pre-populated funeral_home:', currentCase.organizations.name);
+                }
+            }
+            
             // Populate DATE OF BIRTH fields (same pattern as name fields above)
             if (currentCase.metadata?.date_of_birth) {
                 const dobParts = currentCase.metadata.date_of_birth.split('-'); // YYYY-MM-DD format
@@ -2527,6 +2544,7 @@
             console.log('📋 All director-provided data populated:', {
                 name: fullName,
                 gender: currentCase.metadata?.gender,
+                funeral_home: currentCase.organizations?.name,
                 dob: currentCase.metadata?.date_of_birth,
                 dod: currentCase.metadata?.date_of_death,
                 city_of_birth: currentCase.metadata?.city_of_birth,
