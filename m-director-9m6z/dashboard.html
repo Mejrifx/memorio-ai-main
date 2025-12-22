@@ -1201,6 +1201,7 @@
     let currentSession = null;
     let currentCaseDetails = null;
     let credentialsRevealed = false;
+    let allCases = []; // Store all cases for filtering
     
     // Set up automatic token refresh and session monitoring
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
@@ -1827,39 +1828,8 @@
         
         if (error) throw error;
         
-        if (!cases || cases.length === 0) {
-          casesList.innerHTML = '<p style="color: #32343a; opacity: 0.6;">No cases found. Create your first case to get started!</p>';
-          return;
-        }
-        
-        casesList.innerHTML = cases.map(c => {
-          const stage = getCaseStage(c.status);
-          return `
-            <div class="case-card" onclick="openCaseModal('${c.id}')">
-              <div class="case-name">${c.deceased_name}</div>
-              <div style="
-                background-color: ${stage.color}15;
-                border: 1.5px solid ${stage.color};
-                color: ${stage.color};
-                padding: 8px 14px;
-                border-radius: 20px;
-                font-size: 13px;
-                font-weight: 600;
-                margin-top: 8px;
-                display: inline-block;
-              ">
-                ${stage.emoji} ${stage.label}
-              </div>
-              ${getVideoStatusBadge(c.status)}
-              <p class="case-meta">Created: ${new Date(c.created_at).toLocaleDateString()}</p>
-              <div class="credential-box" style="margin-top: 12px;">
-                <div class="credential-label">Case ID</div>
-                <div class="credential-value" id="case-id-${c.id}" style="font-size: 11px; word-break: break-all;">${c.id}</div>
-                <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('case-id-${c.id}')">Copy</button>
-              </div>
-            </div>
-          `;
-        }).join('');
+        allCases = cases || [];
+        renderCases(allCases);
         
       } catch (error) {
         errorBox.textContent = `Error loading cases: ${error.message}`;
@@ -1867,6 +1837,67 @@
         casesList.innerHTML = '';
       }
     }
+    
+    // Render cases to the list
+    function renderCases(cases) {
+      const casesList = document.getElementById('cases-list');
+      
+      if (!cases || cases.length === 0) {
+        casesList.innerHTML = '<p style="color: #32343a; opacity: 0.6;">No cases found. Create your first case to get started!</p>';
+        return;
+      }
+      
+      casesList.innerHTML = cases.map(c => {
+        const stage = getCaseStage(c.status);
+        return `
+          <div class="case-card" onclick="openCaseModal('${c.id}')">
+            <div class="case-name">${c.deceased_name}</div>
+            <div style="
+              background-color: ${stage.color}15;
+              border: 1.5px solid ${stage.color};
+              color: ${stage.color};
+              padding: 8px 14px;
+              border-radius: 20px;
+              font-size: 13px;
+              font-weight: 600;
+              margin-top: 8px;
+              display: inline-block;
+            ">
+              ${stage.emoji} ${stage.label}
+            </div>
+            ${getVideoStatusBadge(c.status)}
+            <p class="case-meta">Created: ${new Date(c.created_at).toLocaleDateString()}</p>
+            <div class="credential-box" style="margin-top: 12px;">
+              <div class="credential-label">Case ID</div>
+              <div class="credential-value" id="case-id-${c.id}" style="font-size: 11px; word-break: break-all;">${c.id}</div>
+              <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('case-id-${c.id}')">Copy</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Search functionality - filters by name or case ID
+    function filterCases(searchTerm) {
+      if (!searchTerm || searchTerm.trim() === '') {
+        renderCases(allCases);
+        return;
+      }
+      
+      const term = searchTerm.toLowerCase().trim();
+      const filtered = allCases.filter(c => {
+        const name = c.deceased_name.toLowerCase();
+        const caseId = c.id.toLowerCase();
+        return name.includes(term) || caseId.includes(term);
+      });
+      
+      renderCases(filtered);
+    }
+    
+    // Attach search event listener
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      filterCases(e.target.value);
+    });
   </script>
 </body>
 </html>
