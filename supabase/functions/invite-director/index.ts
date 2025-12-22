@@ -108,7 +108,11 @@ serve(async (req) => {
         org_id,
         status: 'invited',
         temp_password: tempPassword, // Store the temporary password
-        metadata: { name, phone }
+        metadata: { 
+          name, 
+          phone,
+          requires_password_change: true // Force password change on first login
+        }
       });
 
     if (insertError) {

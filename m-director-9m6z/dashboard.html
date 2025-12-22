@@ -1088,6 +1088,56 @@
   </div>
 
   <!-- ============================================================================
+       PASSWORD CHANGE MODAL (First Login)
+       ============================================================================ -->
+  <div id="password-change-modal" class="modal-overlay" style="display: none; z-index: 9999;">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header" style="border-bottom: 2px solid #436481;">
+        <h2 class="modal-title">🔒 Change Your Password</h2>
+      </div>
+      
+      <div style="padding: 24px;">
+        <p style="margin-bottom: 20px; color: #32343a; font-size: 15px;">
+          For security reasons, you must change your temporary password before accessing the dashboard.
+        </p>
+        
+        <form id="password-change-form">
+          <div class="form-group">
+            <label for="new-password" class="form-label">New Password*</label>
+            <input 
+              class="form-input" 
+              type="password" 
+              id="new-password" 
+              placeholder="Enter new password" 
+              minlength="8"
+              required>
+            <small style="color: rgba(50, 52, 58, 0.6); font-size: 12px; display: block; margin-top: 4px;">
+              Must be at least 8 characters
+            </small>
+          </div>
+          
+          <div class="form-group">
+            <label for="confirm-password" class="form-label">Confirm New Password*</label>
+            <input 
+              class="form-input" 
+              type="password" 
+              id="confirm-password" 
+              placeholder="Confirm new password" 
+              minlength="8"
+              required>
+          </div>
+          
+          <div id="password-error" class="error-box" style="display: none; margin-bottom: 16px;"></div>
+          
+          <button type="submit" class="btn-primary" id="change-password-btn" style="width: 100%;">
+            CHANGE PASSWORD
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================================
        CASE DETAILS MODAL
        ============================================================================ -->
   <div id="case-details-modal" class="modal-overlay">
@@ -1279,7 +1329,7 @@
         // Verify director role from database and fetch organization name
         const { data: userData, error } = await supabaseClient
           .from('users')
-          .select('role, org_id, organizations (name)')
+          .select('role, org_id, metadata, organizations (name)')
           .eq('id', session.user.id)
           .single();
         
@@ -1290,6 +1340,13 @@
           await supabaseClient.auth.signOut();
           window.location.href = 'login.html';
           return false;
+        }
+        
+        // Check if user needs to change password (first login)
+        if (userData.metadata?.requires_password_change === true) {
+          console.log('⚠️ First login detected - forcing password change');
+          showPasswordChangeModal();
+          return false; // Block dashboard access
         }
         
         // Display funeral home name in topbar
@@ -1426,6 +1483,94 @@
         loadCases();
       }
     }
+    
+    // ============================================================================
+    // PASSWORD CHANGE (First Login)
+    // ============================================================================
+    
+    function showPasswordChangeModal() {
+      const modal = document.getElementById('password-change-modal');
+      modal.style.display = 'flex';
+      
+      // Disable all other UI elements
+      document.querySelector('.sidebar').style.pointerEvents = 'none';
+      document.querySelector('.topbar').style.pointerEvents = 'none';
+      document.querySelector('.main-content').style.pointerEvents = 'none';
+    }
+    
+    // Password change form handler
+    document.getElementById('password-change-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const errorBox = document.getElementById('password-error');
+      const submitBtn = document.getElementById('change-password-btn');
+      
+      errorBox.style.display = 'none';
+      
+      // Validate passwords match
+      if (newPassword !== confirmPassword) {
+        errorBox.textContent = 'Passwords do not match';
+        errorBox.style.display = 'block';
+        return;
+      }
+      
+      // Validate password length
+      if (newPassword.length < 8) {
+        errorBox.textContent = 'Password must be at least 8 characters';
+        errorBox.style.display = 'block';
+        return;
+      }
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'CHANGING PASSWORD...';
+      
+      try {
+        // Update password in Supabase Auth
+        const { error: passwordError } = await supabaseClient.auth.updateUser({
+          password: newPassword
+        });
+        
+        if (passwordError) throw passwordError;
+        
+        // Clear the requires_password_change flag in user metadata
+        const session = await getValidSession();
+        if (!session) throw new Error('Session expired');
+        
+        const { error: metadataError } = await supabaseClient
+          .from('users')
+          .update({
+            metadata: {
+              ...currentSession.user.user_metadata,
+              requires_password_change: false,
+              password_changed_at: new Date().toISOString()
+            }
+          })
+          .eq('id', session.user.id);
+        
+        if (metadataError) throw metadataError;
+        
+        // Success! Hide modal and enable UI
+        document.getElementById('password-change-modal').style.display = 'none';
+        document.querySelector('.sidebar').style.pointerEvents = 'auto';
+        document.querySelector('.topbar').style.pointerEvents = 'auto';
+        document.querySelector('.main-content').style.pointerEvents = 'auto';
+        
+        showToast('Password changed successfully! Welcome to Memorio.');
+        
+        // Re-run checkAuth to proceed with dashboard
+        await checkAuth();
+        
+      } catch (error) {
+        console.error('Error changing password:', error);
+        errorBox.textContent = `Error: ${error.message}`;
+        errorBox.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'CHANGE PASSWORD';
+      }
+    });
     
     // Make functions global
     window.switchSection = switchSection;
