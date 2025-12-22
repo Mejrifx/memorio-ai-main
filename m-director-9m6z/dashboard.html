@@ -850,7 +850,12 @@
        ============================================================================ -->
   <div class="topbar">
     <div class="topbar-left">
-      <h1 class="topbar-title" id="topbar-page-title">Create Case</h1>
+      <div>
+        <h1 class="topbar-title" id="topbar-page-title">Create Case</h1>
+        <div id="funeral-home-name" style="font-size: 14px; color: #436481; font-weight: 500; margin-top: 4px;">
+          Loading funeral home...
+        </div>
+      </div>
       <div class="topbar-search">
         <svg class="topbar-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -887,17 +892,86 @@
     <div id="create-case-section" class="content-section active">
       <div class="action-card">
         <h2 class="card-title">Create New Case</h2>
-        <p class="card-description">Start a new memorial tribute case. After creating the case, you can invite the family to complete the intake form.</p>
+        <p class="card-description">Start a new memorial tribute case by providing the decedent's core information. This ensures we can create a complete obituary even if the family doesn't complete their portion.</p>
         
         <form id="create-case-form">
+          <!-- Full Name -->
           <div class="form-row-single">
             <div class="form-group">
-              <label for="deceased-name" class="form-label">Loved One's Name*</label>
+              <label for="deceased-name" class="form-label">Full Name (Loved One)*</label>
               <input 
                 class="form-input" 
                 type="text" 
                 id="deceased-name" 
-                placeholder="John Doe" 
+                placeholder="John Michael Doe" 
+                required>
+            </div>
+          </div>
+          
+          <!-- Gender -->
+          <div class="form-row-single">
+            <div class="form-group">
+              <label for="deceased-gender" class="form-label">Gender*</label>
+              <select class="form-input" id="deceased-gender" required>
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer_not_to_say">Prefer not to say</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Date of Birth & Date of Death -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="deceased-dob" class="form-label">Date of Birth*</label>
+              <input 
+                class="form-input" 
+                type="date" 
+                id="deceased-dob" 
+                required>
+            </div>
+            <div class="form-group">
+              <label for="deceased-dod" class="form-label">Date of Death*</label>
+              <input 
+                class="form-input" 
+                type="date" 
+                id="deceased-dod" 
+                required>
+            </div>
+          </div>
+          
+          <!-- City of Birth & City of Death -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="deceased-birth-city" class="form-label">City of Birth*</label>
+              <input 
+                class="form-input" 
+                type="text" 
+                id="deceased-birth-city" 
+                placeholder="New York, NY" 
+                required>
+            </div>
+            <div class="form-group">
+              <label for="deceased-death-city" class="form-label">City of Death*</label>
+              <input 
+                class="form-input" 
+                type="text" 
+                id="deceased-death-city" 
+                placeholder="Los Angeles, CA" 
+                required>
+            </div>
+          </div>
+          
+          <!-- Service Date -->
+          <div class="form-row-single">
+            <div class="form-group">
+              <label for="deceased-service-date" class="form-label">Service Date*</label>
+              <input 
+                class="form-input" 
+                type="date" 
+                id="deceased-service-date" 
                 required>
             </div>
           </div>
@@ -1177,10 +1251,10 @@
         // Store session globally
         currentSession = session;
         
-        // Verify director role from database
+        // Verify director role from database and fetch organization name
         const { data: userData, error } = await supabaseClient
           .from('users')
-          .select('role, org_id')
+          .select('role, org_id, organizations (name)')
           .eq('id', session.user.id)
           .single();
         
@@ -1191,6 +1265,14 @@
           await supabaseClient.auth.signOut();
           window.location.href = 'login.html';
           return false;
+        }
+        
+        // Display funeral home name in topbar
+        const funeralHomeElement = document.getElementById('funeral-home-name');
+        if (userData.organizations && userData.organizations.name) {
+          funeralHomeElement.textContent = `🏢 ${userData.organizations.name}`;
+        } else {
+          funeralHomeElement.textContent = '🏢 Funeral Home';
         }
         
         // Check JWT role (secondary check)
@@ -1512,7 +1594,17 @@
     document.getElementById('create-case-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const deceasedName = document.getElementById('deceased-name').value;
+      // Capture all required decedent information
+      const caseData = {
+        deceased_name: document.getElementById('deceased-name').value,
+        gender: document.getElementById('deceased-gender').value,
+        date_of_birth: document.getElementById('deceased-dob').value,
+        date_of_death: document.getElementById('deceased-dod').value,
+        city_of_birth: document.getElementById('deceased-birth-city').value,
+        city_of_death: document.getElementById('deceased-death-city').value,
+        service_date: document.getElementById('deceased-service-date').value
+      };
+      
       const createBtn = document.getElementById('create-case-btn');
       const successBox = document.getElementById('case-success-box');
       const errorBox = document.getElementById('case-error-box');
@@ -1536,9 +1628,7 @@
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON_KEY
           },
-          body: JSON.stringify({
-            deceased_name: deceasedName
-          })
+          body: JSON.stringify(caseData)
         });
         
         const result = await response.json();
