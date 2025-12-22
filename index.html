@@ -1156,7 +1156,7 @@
         }
         
         /**
-         * Handle password change form submission
+         * Handle password change form submission (Same logic as Director Portal)
          */
         async function handlePasswordChange(e) {
             e.preventDefault();
@@ -1188,38 +1188,40 @@
             changeBtn.textContent = 'Updating Password...';
             
             try {
-                // Update password
-                const { error: updateError } = await supabaseClient.auth.updateUser({
+                // Update password in Supabase Auth
+                const { error: passwordError } = await supabaseClient.auth.updateUser({
                     password: newPassword
                 });
                 
-                if (updateError) throw updateError;
+                if (passwordError) throw passwordError;
                 
-                // Clear the requires_password_change flag
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if (user) {
-                    // Update app_metadata to remove requires_password_change flag
-                    // Note: This requires service role access, so we'll use an Edge Function
-                    const { data: { session } } = await supabaseClient.auth.getSession();
-                    await fetch(`${SUPABASE_URL}/functions/v1/clear-password-change-flag`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${session.access_token}`,
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_ANON_KEY
-                        },
-                        body: JSON.stringify({ user_id: user.id })
-                    });
-                }
+                // Clear the requires_password_change flag in user metadata (same as Director Portal)
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) throw new Error('Session expired');
+                
+                const { error: metadataError } = await supabaseClient
+                    .from('users')
+                    .update({
+                        metadata: {
+                            ...currentUser?.metadata,
+                            requires_password_change: false,
+                            password_changed_at: new Date().toISOString()
+                        }
+                    })
+                    .eq('id', session.user.id);
+                
+                if (metadataError) throw metadataError;
                 
                 console.log('✅ Password changed successfully');
                 
                 // Hide modal and continue to form
                 hidePasswordChangeModal();
-                await loadFamilyCase();
                 
                 // Show success message
                 alert('Password updated successfully! You can now proceed with the form.');
+                
+                // Load the family case and continue
+                await loadFamilyCase();
                 
             } catch (error) {
                 console.error('Password change error:', error);
@@ -1270,13 +1272,22 @@
                 currentUser = data.user;
                 console.log('✅ Login successful:', currentUser.email);
                 
-                // Check if password change is required (first-time login)
-                const requiresPasswordChange = currentUser.app_metadata?.requires_password_change;
-                if (requiresPasswordChange === true) {
-                    console.log('⚠️ Password change required for first-time login');
-                    hideLoginModal();
-                    showPasswordChangeModal();
-                    return; // Stop execution until password is changed
+                // Check if password change is required (first-time login) - Check database metadata
+                try {
+                    const { data: userData } = await supabaseClient
+                        .from('users')
+                        .select('metadata')
+                        .eq('id', currentUser.id)
+                        .single();
+                    
+                    if (userData?.metadata?.requires_password_change === true) {
+                        console.log('⚠️ Password change required for first-time login');
+                        hideLoginModal();
+                        showPasswordChangeModal();
+                        return; // Stop execution until password is changed
+                    }
+                } catch (e) {
+                    console.error('Error checking password change requirement:', e);
                 }
                 
                 // Fetch and display user's name for personalized greeting
@@ -1370,12 +1381,21 @@
                     return false;
                 }
                 
-                // Check if password change is required (first-time login)
-                const requiresPasswordChange = currentUser.app_metadata?.requires_password_change;
-                if (requiresPasswordChange === true) {
-                    console.log('⚠️ Password change required for first-time login');
-                    showPasswordChangeModal();
-                    return false; // Stop execution until password is changed
+                // Check if password change is required (first-time login) - Check database metadata
+                try {
+                    const { data: userData } = await supabaseClient
+                        .from('users')
+                        .select('metadata')
+                        .eq('id', currentUser.id)
+                        .single();
+                    
+                    if (userData?.metadata?.requires_password_change === true) {
+                        console.log('⚠️ Password change required for first-time login');
+                        showPasswordChangeModal();
+                        return false; // Stop execution until password is changed
+                    }
+                } catch (e) {
+                    console.error('Error checking password change requirement:', e);
                 }
                 
                 // Fetch user's name for personalized greeting

@@ -107,8 +107,7 @@ serve(async (req) => {
       email_confirm: true,
       app_metadata: {
         role: 'family',
-        org_id: userData.org_id,
-        requires_password_change: true
+        org_id: userData.org_id
       },
       user_metadata: {
         name,
@@ -139,7 +138,12 @@ serve(async (req) => {
         role: 'family',
         org_id: userData.org_id,
         status: 'invited',
-        metadata: { name, phone, case_id }
+        metadata: { 
+          name, 
+          phone, 
+          case_id,
+          requires_password_change: true  // Flag for first-time password change
+        }
       });
 
     if (insertError) {
