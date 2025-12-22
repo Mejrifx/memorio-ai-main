@@ -116,6 +116,28 @@
   <div class="form-slider-padding">
     <div class="w-form">
       <form id="wf-form-memorio_obituary_form" name="wf-form-memorio_obituary_form" data-name="memorio_obituary_form" method="get" class="form-2" data-wf-page-id="683b63acf5908465c8825cb3" data-wf-element-id="faaf2315-7be8-4814-9169-c55030b0674d">
+        
+        <!-- ========================================== -->
+        <!-- HIDDEN FIELDS (Pre-filled by Director)    -->
+        <!-- These are submitted to n8n for obituary    -->
+        <!-- ========================================== -->
+        <input type="hidden" id="hidden_loved_ones_name" name="loved_ones_name" value="">
+        <input type="hidden" id="hidden_loved_ones_last_name" name="loved_ones_last_name" value="">
+        <input type="hidden" id="hidden_loved_ones_gender" name="loved_ones_gender" value="">
+        
+        <input type="hidden" id="hidden_month_of_birth" name="month_of_birth" value="">
+        <input type="hidden" id="hidden_day_of_birth" name="day_of_birth" value="">
+        <input type="hidden" id="hidden_year_of_birth" name="year_of_birth" value="">
+        <input type="hidden" id="hidden_date_of_birth" name="date_of_birth" value="">
+        <input type="hidden" id="hidden_city_of_birth" name="city_of_birth" value="">
+        
+        <input type="hidden" id="hidden_month_of_passing" name="month_of_passing" value="">
+        <input type="hidden" id="hidden_day_of_passing" name="day_of_passing" value="">
+        <input type="hidden" id="hidden_year_of_passing" name="year_of_passing" value="">
+        <input type="hidden" id="hidden_date_of_passing" name="date_of_passing" value="">
+        <input type="hidden" id="hidden_city_of_passing" name="city_of_passing" value="">
+        <!-- ========================================== -->
+        
         <!-- Step 1 removed: customer name/email (collected by director) -->
         <div data-w-id="d026be39-46e7-e794-7d04-b04fb7e8fd1c" class="form-slider-step-1">
           <div class="form-title">
@@ -2308,10 +2330,16 @@
          * Hide the funeral home question step (collected by director)
          */
         function hideFuneralHomeStep() {
-            // Find the funeral home step by looking for the input field
+            // Find the funeral home input field
             const funeralHomeInput = document.getElementById('funeral_home');
             if (funeralHomeInput) {
-                // Find the parent step container
+                // Disable the field so it doesn't block submission
+                funeralHomeInput.removeAttribute('name');
+                funeralHomeInput.removeAttribute('required');
+                funeralHomeInput.disabled = true;
+                console.log('✅ Disabled funeral_home field');
+                
+                // Find and hide the parent step container
                 const stepContainer = funeralHomeInput.closest('.form-slider-step-1');
                 if (stepContainer) {
                     stepContainer.style.display = 'none';
@@ -2324,9 +2352,33 @@
          * Hide DOB and DOD steps (collected by director)
          */
         function hideDateSteps() {
-            console.log('🔍 Attempting to hide date steps...');
+            console.log('🔍 Hiding date steps and disabling visible date fields...');
             
-            // Find and hide all form step containers by their heading text
+            // STEP 1: Disable all visible date/city fields (remove name and required)
+            const visibleFieldsToDisable = [
+                // DOD fields
+                'month_of_passing', 'day_of_passing', 'year_of_passing',
+                'city_of_passing', 'state_of_passing', 'country_of_passing',
+                // DOB fields  
+                'month_of_birth', 'day_of_birth', 'year_of_birth',
+                'city_of_birth', 'state_of_birth', 'country_of_birth'
+            ];
+            
+            visibleFieldsToDisable.forEach(fieldName => {
+                // Find visible fields (not our hidden ones)
+                const visibleFields = document.querySelectorAll(`select[name="${fieldName}"], input[name="${fieldName}"]`);
+                visibleFields.forEach(field => {
+                    // Only disable if it's NOT a hidden field
+                    if (field.type !== 'hidden') {
+                        field.removeAttribute('name'); // Won't be submitted
+                        field.removeAttribute('required'); // Won't block submission
+                        field.disabled = true; // Extra safety
+                        console.log(`✅ Disabled visible field: ${fieldName}`);
+                    }
+                });
+            });
+            
+            // STEP 2: Find and hide the step containers
             const allSteps = document.querySelectorAll('.form-slider-step-1');
             let hiddenCount = 0;
             
@@ -2337,15 +2389,14 @@
                     
                     // Hide DOD step
                     if (headingText.includes('When Did Your Loved One Pass') || 
-                        headingText.includes('date') && headingText.includes('pass')) {
+                        (headingText.toLowerCase().includes('pass') && headingText.toLowerCase().includes('loved one'))) {
                         step.style.display = 'none';
                         console.log('✅ Hidden step:', headingText);
                         hiddenCount++;
                     }
                     
-                    // Hide DOB step
-                    if (headingText.includes('Please provide more details about their birth') ||
-                        headingText.includes('birth')) {
+                    // Hide DOB step  
+                    if (headingText.includes('birth') && headingText.toLowerCase().includes('details')) {
                         step.style.display = 'none';
                         console.log('✅ Hidden step:', headingText);
                         hiddenCount++;
@@ -2378,77 +2429,77 @@
             
             const metadata = currentCase.metadata || {};
             
-            // ===== POPULATE NAME FIELDS =====
+            // ===== POPULATE NAME FIELDS (HIDDEN) =====
             let fullName = metadata.full_name || currentCase.deceased_name || '';
             
             if (fullName) {
                 const nameParts = fullName.trim().split(' ');
-                const firstNameField = document.getElementById('loved_ones_name');
-                const lastNameField = document.getElementById('loved_ones_last_name');
+                const firstNameField = document.getElementById('hidden_loved_ones_name');
+                const lastNameField = document.getElementById('hidden_loved_ones_last_name');
                 
                 if (firstNameField) {
                     firstNameField.value = nameParts[0] || '';
-                    console.log('✅ Pre-populated loved_ones_name:', nameParts[0]);
+                    console.log('✅ Pre-populated hidden loved_ones_name:', nameParts[0]);
                 }
                 if (lastNameField && nameParts.length > 1) {
                     lastNameField.value = nameParts.slice(1).join(' ') || '';
-                    console.log('✅ Pre-populated loved_ones_last_name:', nameParts.slice(1).join(' '));
+                    console.log('✅ Pre-populated hidden loved_ones_last_name:', nameParts.slice(1).join(' '));
                 }
             } else {
                 console.warn('⚠️ No name found in case metadata or deceased_name');
             }
             
-            // ===== POPULATE GENDER =====
+            // ===== POPULATE GENDER (HIDDEN) =====
             if (metadata.gender) {
-                const genderField = document.getElementById('loved_ones_gender');
+                const genderField = document.getElementById('hidden_loved_ones_gender');
                 if (genderField) {
                     genderField.value = metadata.gender;
-                    console.log('✅ Pre-populated loved_ones_gender:', metadata.gender);
+                    console.log('✅ Pre-populated hidden loved_ones_gender:', metadata.gender);
                 }
             }
             
-            // ===== POPULATE DATE OF BIRTH =====
+            // ===== POPULATE DATE OF BIRTH (HIDDEN) =====
             if (metadata.date_of_birth) {
                 // Parse YYYY-MM-DD format
                 const dobParts = metadata.date_of_birth.split('-');
                 if (dobParts.length === 3) {
                     const [year, month, day] = dobParts;
                     
-                    document.getElementById('year_of_birth').value = year;
-                    document.getElementById('month_of_birth').value = month;
-                    document.getElementById('day_of_birth').value = day;
-                    document.getElementById('date_of_birth').value = metadata.date_of_birth;
+                    document.getElementById('hidden_year_of_birth').value = year;
+                    document.getElementById('hidden_month_of_birth').value = month;
+                    document.getElementById('hidden_day_of_birth').value = day;
+                    document.getElementById('hidden_date_of_birth').value = metadata.date_of_birth;
                     
-                    console.log('✅ Pre-populated DOB:', metadata.date_of_birth);
+                    console.log('✅ Pre-populated hidden DOB:', metadata.date_of_birth);
                 }
             }
             
-            // ===== POPULATE DATE OF DEATH =====
+            // ===== POPULATE DATE OF DEATH (HIDDEN) =====
             if (metadata.date_of_death) {
                 // Parse YYYY-MM-DD format
                 const dodParts = metadata.date_of_death.split('-');
                 if (dodParts.length === 3) {
                     const [year, month, day] = dodParts;
                     
-                    document.getElementById('year_of_passing').value = year;
-                    document.getElementById('month_of_passing').value = month;
-                    document.getElementById('day_of_passing').value = day;
-                    document.getElementById('date_of_passing').value = metadata.date_of_death;
+                    document.getElementById('hidden_year_of_passing').value = year;
+                    document.getElementById('hidden_month_of_passing').value = month;
+                    document.getElementById('hidden_day_of_passing').value = day;
+                    document.getElementById('hidden_date_of_passing').value = metadata.date_of_death;
                     
-                    console.log('✅ Pre-populated DOD:', metadata.date_of_death);
+                    console.log('✅ Pre-populated hidden DOD:', metadata.date_of_death);
                 }
             }
             
-            // ===== POPULATE CITY OF BIRTH =====
+            // ===== POPULATE CITY OF BIRTH (HIDDEN) =====
             if (metadata.city_of_birth) {
-                document.getElementById('city_of_birth').value = metadata.city_of_birth;
-                console.log('✅ Pre-populated city_of_birth:', metadata.city_of_birth);
+                document.getElementById('hidden_city_of_birth').value = metadata.city_of_birth;
+                console.log('✅ Pre-populated hidden city_of_birth:', metadata.city_of_birth);
             }
             
-            // ===== POPULATE CITY OF DEATH =====
+            // ===== POPULATE CITY OF DEATH (HIDDEN) =====
             if (metadata.city_of_death) {
-                document.getElementById('city_of_passing').value = metadata.city_of_death;
-                console.log('✅ Pre-populated city_of_passing:', metadata.city_of_death);
+                document.getElementById('hidden_city_of_passing').value = metadata.city_of_death;
+                console.log('✅ Pre-populated hidden city_of_passing:', metadata.city_of_death);
             }
             
             // Log summary
