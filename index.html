@@ -1268,27 +1268,34 @@
                     throw new Error('Access denied: This form is only for family members.');
                 }
                 
-                // Success! Hide modal and load case
-                currentUser = data.user;
-                console.log('✅ Login successful:', currentUser.email);
+                // Fetch user data from database (EXACT same as Director Portal)
+                const { data: userData, error: userError } = await supabaseClient
+                    .from('users')
+                    .select('role, metadata')
+                    .eq('id', data.user.id)
+                    .single();
                 
-                // Check if password change is required (first-time login) - Check database metadata
-                try {
-                    const { data: userData } = await supabaseClient
-                        .from('users')
-                        .select('metadata')
-                        .eq('id', currentUser.id)
-                        .single();
-                    
-                    if (userData?.metadata?.requires_password_change === true) {
-                        console.log('⚠️ Password change required for first-time login');
-                        hideLoginModal();
-                        showPasswordChangeModal();
-                        return; // Stop execution until password is changed
-                    }
-                } catch (e) {
-                    console.error('Error checking password change requirement:', e);
+                console.log('✅ Login successful:', data.user.email);
+                console.log('🔐 Database user data:', userData);
+                
+                if (userError || !userData || userData.role !== 'family') {
+                    throw new Error('Access denied: This form is only for family members.');
                 }
+                
+                // Check if user needs to change password (EXACT same check as Director Portal)
+                if (userData.metadata?.requires_password_change === true) {
+                    console.log('⚠️ First login detected - forcing password change');
+                    hideLoginModal();
+                    showPasswordChangeModal();
+                    return; // Stop execution until password is changed
+                }
+                
+                // Set currentUser with full data
+                currentUser = {
+                    id: data.user.id,
+                    email: data.user.email,
+                    ...userData
+                };
                 
                 // Fetch and display user's name for personalized greeting
                 try {
@@ -1367,36 +1374,35 @@
                     return false;
                 }
                 
-                currentUser = session.user;
-                console.log('✅ User authenticated:', currentUser.email);
-                console.log('🔐 JWT app_metadata:', currentUser.app_metadata);
-                console.log('🔐 User ID:', currentUser.id);
+                // Fetch user data from database (EXACT same as Director Portal)
+                const { data: userData, error: userError } = await supabaseClient
+                    .from('users')
+                    .select('role, metadata')
+                    .eq('id', session.user.id)
+                    .single();
                 
-                // Get user's role from app_metadata
-                const role = currentUser.app_metadata?.role;
+                console.log('✅ User authenticated:', session.user.email);
+                console.log('🔐 Database user data:', userData);
                 
-                if (role !== 'family') {
-                    console.log('User is not a family member, showing login modal');
+                if (userError || !userData || userData.role !== 'family') {
+                    console.error('❌ Not a family member or user not found:', userError);
                     showLoginModal();
                     return false;
                 }
                 
-                // Check if password change is required (first-time login) - Check database metadata
-                try {
-                    const { data: userData } = await supabaseClient
-                        .from('users')
-                        .select('metadata')
-                        .eq('id', currentUser.id)
-                        .single();
-                    
-                    if (userData?.metadata?.requires_password_change === true) {
-                        console.log('⚠️ Password change required for first-time login');
-                        showPasswordChangeModal();
-                        return false; // Stop execution until password is changed
-                    }
-                } catch (e) {
-                    console.error('Error checking password change requirement:', e);
+                // Check if user needs to change password (EXACT same check as Director Portal)
+                if (userData.metadata?.requires_password_change === true) {
+                    console.log('⚠️ First login detected - forcing password change');
+                    showPasswordChangeModal();
+                    return false; // Block form access until password is changed
                 }
+                
+                // Set currentUser with full data
+                currentUser = {
+                    id: session.user.id,
+                    email: session.user.email,
+                    ...userData
+                };
                 
                 // Fetch user's name for personalized greeting
                 try {
