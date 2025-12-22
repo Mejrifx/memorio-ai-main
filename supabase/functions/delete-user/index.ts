@@ -18,11 +18,14 @@ serve(async (req) => {
   }
 
   try {
-    // Get auth header
+    // Get auth header and extract JWT token
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       throw new Error('Missing authorization header');
     }
+
+    // Extract JWT token (format: "Bearer TOKEN")
+    const jwt = authHeader.replace('Bearer ', '');
 
     // Create Supabase client with service role for admin operations
     const supabaseAdmin = createClient(
@@ -36,29 +39,17 @@ serve(async (req) => {
       }
     );
 
-    // Create regular client to verify caller
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-        global: {
-          headers: { Authorization: authHeader },
-        },
-      }
-    );
-
-    // Verify the caller is authenticated
-    const { data: { user: caller }, error: authError } = await supabaseClient.auth.getUser();
+    // Verify the caller is authenticated using service role
+    const { data: { user: caller }, error: authError } = await supabaseAdmin.auth.getUser(jwt);
     if (authError || !caller) {
-      throw new Error('Unauthorized');
+      console.error('Auth error:', authError);
+      throw new Error('Unauthorized: ' + (authError?.message || 'Invalid token'));
     }
 
     // Verify the caller is an admin
     const callerRole = caller.app_metadata?.role;
+    console.log('Caller role:', callerRole, 'User:', caller.email);
+    
     if (callerRole !== 'admin') {
       throw new Error('Only admins can delete users');
     }
