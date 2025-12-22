@@ -1167,6 +1167,30 @@
         </div>
       </div>
       
+      <!-- Obituary Draft Section (Only shown when draft exists) -->
+      <div class="modal-section" id="obituary-section" style="display: none;">
+        <h3 class="modal-section-title">📝 Obituary Draft</h3>
+        <div style="
+          background-color: #f4e8de;
+          border: 1.5px solid #436481;
+          border-radius: 8px;
+          padding: 20px;
+          max-height: 400px;
+          overflow-y: auto;
+        ">
+          <div id="obituary-content" style="
+            font-size: 15px;
+            line-height: 1.8;
+            color: #32343a;
+          ">
+            <!-- Obituary HTML will be inserted here -->
+          </div>
+        </div>
+        <div style="margin-top: 12px; font-size: 13px; color: rgba(50, 52, 58, 0.6);">
+          Last updated: <span id="obituary-updated">-</span>
+        </div>
+      </div>
+      
       <div style="margin-top: 24px; display: flex; gap: 12px;">
         <button class="btn-secondary" onclick="deleteCase(currentCaseDetails.id, currentCaseDetails.deceased_name)">
           Delete Case
@@ -1529,6 +1553,27 @@
           document.getElementById('modal-family-password').textContent = familyPassword;
         } else {
           document.getElementById('modal-family-password').textContent = 'Password not available';
+        }
+        
+        // Fetch obituary content if it exists
+        const { data: obituaryData, error: obituaryError } = await supabaseClient
+          .from('obituary_content')
+          .select('content_html, updated_at')
+          .eq('case_id', caseId)
+          .single();
+        
+        const obituarySection = document.getElementById('obituary-section');
+        const obituaryContent = document.getElementById('obituary-content');
+        const obituaryUpdated = document.getElementById('obituary-updated');
+        
+        if (!obituaryError && obituaryData && obituaryData.content_html) {
+          // Show obituary section
+          obituarySection.style.display = 'block';
+          obituaryContent.innerHTML = obituaryData.content_html;
+          obituaryUpdated.textContent = new Date(obituaryData.updated_at).toLocaleString();
+        } else {
+          // Hide obituary section if no content
+          obituarySection.style.display = 'none';
         }
         
       } catch (error) {
