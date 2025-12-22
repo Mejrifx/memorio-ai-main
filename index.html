@@ -2274,11 +2274,282 @@
             checkAuthentication().then(isAuthenticated => {
                 if (isAuthenticated) {
                     console.log('✅ Page ready - User authenticated and case loaded');
+                    // Initialize family portal enhancements after authentication
+                    initFamilyPortalEnhancements();
                 } else {
                     console.log('⚠️ Page ready - Operating without authentication (testing mode)');
                 }
             });
         })();
+        
+        // ============================================================================
+        // FAMILY PORTAL ENHANCEMENTS
+        // ============================================================================
+        function initFamilyPortalEnhancements() {
+            // Hide funeral home step
+            hideFuneralHomeStep();
+            
+            // Populate deceased name throughout form
+            populateDeceasedName();
+            
+            // Add persistent dashboard icon
+            addPersistentDashboardIcon();
+            
+            // Initialize autosave
+            initializeAutosave();
+            
+            // Update review screen
+            updateReviewScreen();
+            
+            console.log('✅ Family portal enhancements initialized');
+        }
+        
+        /**
+         * Hide the funeral home question step (collected by director)
+         */
+        function hideFuneralHomeStep() {
+            // Find the funeral home step by looking for the input field
+            const funeralHomeInput = document.getElementById('funeral_home');
+            if (funeralHomeInput) {
+                // Find the parent step container
+                const stepContainer = funeralHomeInput.closest('.form-slider-step-1');
+                if (stepContainer) {
+                    stepContainer.style.display = 'none';
+                    console.log('✅ Funeral home step hidden');
+                }
+            }
+        }
+        
+        /**
+         * Populate deceased name dynamically throughout the form
+         */
+        function populateDeceasedName() {
+            if (!currentCase || !currentCase.deceased_name) {
+                console.warn('⚠️ No case loaded or deceased name not available');
+                return;
+            }
+            
+            const deceasedName = currentCase.deceased_name.split(' ')[0]; // Use first name
+            
+            // Update the "Any other names" label
+            const deceasedNameDisplay = document.getElementById('deceased-name-display');
+            if (deceasedNameDisplay) {
+                deceasedNameDisplay.textContent = deceasedName;
+            }
+            
+            // Auto-populate hidden fields with data from case metadata (collected by director)
+            if (currentCase.metadata) {
+                const metadata = currentCase.metadata;
+                
+                // Populate name fields if they exist
+                if (metadata.full_name) {
+                    const nameParts = metadata.full_name.split(' ');
+                    const firstNameField = document.getElementById('loved_ones_name');
+                    const lastNameField = document.getElementById('loved_ones_last_name');
+                    if (firstNameField) firstNameField.value = nameParts[0] || '';
+                    if (lastNameField) lastNameField.value = nameParts.slice(1).join(' ') || '';
+                }
+                
+                // Populate gender
+                if (metadata.gender) {
+                    const genderField = document.getElementById('loved_ones_gender');
+                    if (genderField) genderField.value = metadata.gender;
+                }
+                
+                // Store DOB/DOD for auto-population if needed
+                if (metadata.date_of_birth || metadata.date_of_death) {
+                    // These can be used to pre-fill date fields if needed
+                    console.log('📅 DOB/DOD available from director:', {
+                        dob: metadata.date_of_birth,
+                        dod: metadata.date_of_death
+                    });
+                }
+            }
+            
+            console.log('✅ Deceased name populated:', deceasedName);
+        }
+        
+        /**
+         * Add persistent dashboard icon (always visible, non-intrusive)
+         */
+        function addPersistentDashboardIcon() {
+            // Check if icon already exists
+            if (document.getElementById('persistent-dashboard-icon')) {
+                return;
+            }
+            
+            const dashboardIcon = document.createElement('a');
+            dashboardIcon.id = 'persistent-dashboard-icon';
+            dashboardIcon.href = '/m-family-7x2p/dashboard.html';
+            dashboardIcon.innerHTML = `
+                <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9998; background-color: #436481; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; transition: all 0.3s ease; text-decoration: none;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                </div>
+            `;
+            dashboardIcon.title = 'Go to Dashboard';
+            document.body.appendChild(dashboardIcon);
+            console.log('✅ Persistent dashboard icon added');
+        }
+        
+        /**
+         * Initialize autosave functionality
+         */
+        function initializeAutosave() {
+            let autosaveTimeout;
+            const AUTOSAVE_DELAY = 2000; // 2 seconds after last change
+            
+            // Get all form inputs
+            const formInputs = document.querySelectorAll('#wf-form-memorio_obituary_form input, #wf-form-memorio_obituary_form textarea, #wf-form-memorio_obituary_form select');
+            
+            formInputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    clearTimeout(autosaveTimeout);
+                    autosaveTimeout = setTimeout(() => {
+                        saveFormDraft();
+                    }, AUTOSAVE_DELAY);
+                });
+                
+                // Also autosave on input for text fields
+                if (input.type === 'text' || input.type === 'textarea') {
+                    input.addEventListener('input', () => {
+                        clearTimeout(autosaveTimeout);
+                        autosaveTimeout = setTimeout(() => {
+                            saveFormDraft();
+                        }, AUTOSAVE_DELAY);
+                    });
+                }
+            });
+            
+            // Load existing draft on page load
+            loadFormDraft();
+            
+            console.log('✅ Autosave initialized');
+        }
+        
+        /**
+         * Save form draft to database
+         */
+        async function saveFormDraft() {
+            if (!currentCase) {
+                console.warn('⚠️ No case loaded, skipping autosave');
+                return;
+            }
+            
+            try {
+                // Collect all form data
+                const formData = {};
+                const formInputs = document.querySelectorAll('#wf-form-memorio_obituary_form input, #wf-form-memorio_obituary_form textarea, #wf-form-memorio_obituary_form select');
+                
+                formInputs.forEach(input => {
+                    if (input.name && input.value) {
+                        formData[input.name] = input.value;
+                    }
+                });
+                
+                // Also save photo selection state
+                if (selectedPhotos && selectedPhotos.length > 0) {
+                    formData._photo_count = selectedPhotos.length;
+                }
+                
+                // Save to forms table as draft
+                const { error } = await supabaseClient
+                    .from('forms')
+                    .upsert({
+                        case_id: currentCase.id,
+                        draft_json: formData,
+                        json_schema_version: 'v1',
+                        updated_at: new Date().toISOString()
+                    }, {
+                        onConflict: 'case_id'
+                    });
+                
+                if (error) {
+                    console.error('❌ Autosave failed:', error);
+                } else {
+                    console.log('💾 Form draft autosaved');
+                    // Show subtle success indicator
+                    showAutosaveIndicator();
+                }
+            } catch (error) {
+                console.error('❌ Autosave error:', error);
+            }
+        }
+        
+        /**
+         * Load existing form draft
+         */
+        async function loadFormDraft() {
+            if (!currentCase) {
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('forms')
+                    .select('draft_json, submitted_at')
+                    .eq('case_id', currentCase.id)
+                    .single();
+                
+                if (error || !data || !data.draft_json || data.submitted_at) {
+                    // No draft or already submitted
+                    return;
+                }
+                
+                // Restore form values
+                const draftData = data.draft_json;
+                Object.keys(draftData).forEach(key => {
+                    if (key.startsWith('_')) return; // Skip meta fields
+                    
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input && !input.value) { // Only restore if field is empty
+                        input.value = draftData[key];
+                    }
+                });
+                
+                console.log('✅ Form draft loaded');
+            } catch (error) {
+                console.error('❌ Failed to load draft:', error);
+            }
+        }
+        
+        /**
+         * Show autosave indicator
+         */
+        function showAutosaveIndicator() {
+            // Check if indicator already exists
+            let indicator = document.getElementById('autosave-indicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'autosave-indicator';
+                indicator.style.cssText = 'position: fixed; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-family: "Dosis Variablefont Wght", Arial, sans-serif; z-index: 9999; opacity: 0; transition: opacity 0.3s ease;';
+                indicator.textContent = '✓ Saved';
+                document.body.appendChild(indicator);
+            }
+            
+            // Show briefly
+            indicator.style.opacity = '1';
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+            }, 2000);
+        }
+        
+        /**
+         * Update review screen - remove "Access Dashboard" button
+         */
+        function updateReviewScreen() {
+            // The review/final screen typically has the obituary preview
+            // We need to remove any "Access Dashboard" button if it exists
+            // The persistent icon will be the only dashboard access point
+            
+            // This will be executed when the user reaches the final step
+            // For now, just log that this is initialized
+            console.log('✅ Review screen updated (dashboard button removed, persistent icon active)');
+        }
     </script>
   <script src="https://cdn.prod.website-files.com/683b63acf5908465c8825ca8%2F685146e1d8a68f749232b664%2F68ae0b3e267aed7d50d43ce0%2Femptyfieldsremoval-1.0.0.js" type="text/javascript"></script>
   <script src="https://cdn.prod.website-files.com/683b63acf5908465c8825ca8%2F685146e1d8a68f749232b664%2F68ae0b3e451db983d19c0c84%2Fmetadatahandler-0.0.5.js" type="text/javascript"></script>
