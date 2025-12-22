@@ -2365,15 +2365,17 @@
                 console.log('✅ Removed name attribute from visible funeral_home field');
             });
             
-            // Find and hide the funeral home step container
-            const funeralHomeInput = document.querySelector('input[id="funeral_home"]:not([type="hidden"])');
-            if (funeralHomeInput) {
-                const stepContainer = funeralHomeInput.closest('.form-slider-step-1');
-                if (stepContainer) {
-                    stepContainer.style.display = 'none';
-                    console.log('✅ Funeral home step hidden');
+            // Find and hide the funeral home step container by searching for the label text
+            const allLabels = document.querySelectorAll('label');
+            allLabels.forEach(label => {
+                if (label.textContent.includes('Name of the funeral home')) {
+                    const stepContainer = label.closest('.form-slider-step-1');
+                    if (stepContainer) {
+                        stepContainer.style.display = 'none';
+                        console.log('✅ Funeral home step hidden (by label text)');
+                    }
                 }
-            }
+            });
         }
         
         /**
@@ -2401,25 +2403,27 @@
                 });
             });
             
-            // Hide the Date of Death step container
-            const dodField = document.querySelector('select#month_of_passing:not([type="hidden"]), [id="month_of_passing"]:not([type="hidden"])');
-            if (dodField) {
-                const dodStepContainer = dodField.closest('.form-slider-step-1');
-                if (dodStepContainer) {
-                    dodStepContainer.style.display = 'none';
-                    console.log('✅ Date of death step hidden');
+            // Hide step containers by searching for their label text (more reliable)
+            const allLabels = document.querySelectorAll('label');
+            allLabels.forEach(label => {
+                // Hide "Please provide more details about their passing" step
+                if (label.textContent.includes('Please provide more details about their passing')) {
+                    const stepContainer = label.closest('.form-slider-step-1');
+                    if (stepContainer) {
+                        stepContainer.style.display = 'none';
+                        console.log('✅ Date of death step hidden (by label text)');
+                    }
                 }
-            }
-            
-            // Hide the Date of Birth step container
-            const dobField = document.querySelector('select#month_of_birth:not([type="hidden"]), [id="month_of_birth"]:not([type="hidden"])');
-            if (dobField) {
-                const dobStepContainer = dobField.closest('.form-slider-step-1');
-                if (dobStepContainer) {
-                    dobStepContainer.style.display = 'none';
-                    console.log('✅ Date of birth step hidden');
+                
+                // Hide "Please provide more details about their birth" step
+                if (label.textContent.includes('Please provide more details about their birth')) {
+                    const stepContainer = label.closest('.form-slider-step-1');
+                    if (stepContainer) {
+                        stepContainer.style.display = 'none';
+                        console.log('✅ Date of birth step hidden (by label text)');
+                    }
                 }
-            }
+            });
             
             console.log('✅ Date steps hidden and visible fields disabled');
         }
