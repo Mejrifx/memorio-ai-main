@@ -135,7 +135,24 @@
                 <input type="hidden" id="loved_ones_last_name" name="loved_ones_last_name" value="">
                 <input type="hidden" id="loved_ones_gender" name="loved_ones_gender" value="">
                 
-                <!-- Loved one's name/gender removed from UI: collected by director in case creation -->
+                <!-- Hidden date/city fields for n8n (auto-populated from director's input) -->
+                <input type="hidden" id="month_of_birth" name="month_of_birth" value="">
+                <input type="hidden" id="day_of_birth" name="day_of_birth" value="">
+                <input type="hidden" id="year_of_birth" name="year_of_birth" value="">
+                <input type="hidden" id="date_of_birth" name="date_of_birth" value="">
+                <input type="hidden" id="city_of_birth" name="city_of_birth" value="">
+                <input type="hidden" id="state_of_birth" name="state_of_birth" value="">
+                <input type="hidden" id="country_of_birth" name="country_of_birth" value="United States">
+                
+                <input type="hidden" id="month_of_passing" name="month_of_passing" value="">
+                <input type="hidden" id="day_of_passing" name="day_of_passing" value="">
+                <input type="hidden" id="year_of_passing" name="year_of_passing" value="">
+                <input type="hidden" id="date_of_passing" name="date_of_passing" value="">
+                <input type="hidden" id="city_of_passing" name="city_of_passing" value="">
+                <input type="hidden" id="state_of_passing" name="state_of_passing" value="">
+                <input type="hidden" id="country_of_passing" name="country_of_passing" value="United States">
+                
+                <!-- Loved one's name/gender/dates removed from UI: collected by director in case creation -->
                 <label for="loved_ones_salutation" class="field-label loved-ones-name other-names">Any other names you&#x27;d like to include for <span id="deceased-name-display"></span>?</label><input class="text-field loved-ones-first-name salutation w-input" maxlength="256" name="loved_ones_salutation" data-name="loved_ones_salutation" placeholder="Salutation" type="text" id="loved_ones_salutation"><input class="text-field loved-ones-first-name middle-name w-input" maxlength="256" name="loved_ones_middle_name" data-name="loved_ones_middle_name" placeholder="Middle Name" type="text" id="loved_ones_middle_name"><input class="text-field loved-ones-first-name nickname w-input" maxlength="256" name="loved_ones_nickname" data-name="loved_ones_nickname" placeholder="Nickname" type="text" id="loved_ones_nickname"><input class="text-field loved-ones-first-name maiden-name w-input" maxlength="256" name="loved_ones_maiden_name" data-name="loved_ones_maiden_name" placeholder="Maiden Name" type="text" id="loved_ones_maiden_name"><select id="loved_ones_suffix" name="loved_ones_suffix" data-name="loved_ones_suffix" class="select-field suffix w-select">
                   <option value="Another option">Suffix (Jr, Sr, etc.)</option>
                   <option value="Junior">Jr.</option>
@@ -2320,6 +2337,9 @@
             // Hide funeral home step
             hideFuneralHomeStep();
             
+            // Hide DOB and DOD steps
+            hideDateSteps();
+            
             // Populate deceased name throughout form
             populateDeceasedName();
             
@@ -2352,6 +2372,48 @@
         }
         
         /**
+         * Hide DOB and DOD steps (collected by director)
+         */
+        function hideDateSteps() {
+            // List of visible field selectors that need to be disabled
+            const visibleDateFields = [
+                'month_of_passing', 'day_of_passing', 'year_of_passing',
+                'city_of_passing', 'state_of_passing', 'country_of_passing',
+                'month_of_birth', 'day_of_birth', 'year_of_birth',
+                'city_of_birth', 'state_of_birth', 'country_of_birth'
+            ];
+            
+            // Remove name and required attributes from visible fields to prevent submission
+            visibleDateFields.forEach(fieldName => {
+                const visibleFields = document.querySelectorAll(`[name="${fieldName}"]:not([type="hidden"])`);
+                visibleFields.forEach(field => {
+                    field.removeAttribute('name'); // Won't be submitted
+                    field.removeAttribute('required'); // Won't block submission
+                });
+            });
+            
+            // Hide DOD step (date of passing)
+            const dateOfPassingField = document.querySelector('select#month_of_passing, [id="month_of_passing"]:not([type="hidden"])');
+            if (dateOfPassingField) {
+                const dodStepContainer = dateOfPassingField.closest('.form-slider-step-1');
+                if (dodStepContainer) {
+                    dodStepContainer.style.display = 'none';
+                    console.log('✅ Date of death step hidden');
+                }
+            }
+            
+            // Hide DOB step (date of birth)
+            const dateOfBirthField = document.querySelector('select#month_of_birth, [id="month_of_birth"]:not([type="hidden"])');
+            if (dateOfBirthField) {
+                const dobStepContainer = dateOfBirthField.closest('.form-slider-step-1');
+                if (dobStepContainer) {
+                    dobStepContainer.style.display = 'none';
+                    console.log('✅ Date of birth step hidden');
+                }
+            }
+        }
+        
+        /**
          * Populate deceased name dynamically throughout the form
          */
         function populateDeceasedName() {
@@ -2371,8 +2433,10 @@
             // Auto-populate hidden fields with data from case metadata (collected by director)
             // These hidden fields are required for n8n to generate the obituary correctly
             
-            // Get the name from metadata.full_name OR deceased_name as fallback
-            let fullName = currentCase.metadata?.full_name || currentCase.deceased_name || '';
+            const metadata = currentCase.metadata || {};
+            
+            // ===== POPULATE NAME FIELDS =====
+            let fullName = metadata.full_name || currentCase.deceased_name || '';
             
             if (fullName) {
                 const nameParts = fullName.trim().split(' ');
@@ -2391,25 +2455,69 @@
                 console.warn('⚠️ No name found in case metadata or deceased_name');
             }
             
-            // Populate gender if available
-            if (currentCase.metadata?.gender) {
+            // ===== POPULATE GENDER =====
+            if (metadata.gender) {
                 const genderField = document.getElementById('loved_ones_gender');
                 if (genderField) {
-                    genderField.value = currentCase.metadata.gender;
-                    console.log('✅ Pre-populated loved_ones_gender:', currentCase.metadata.gender);
+                    genderField.value = metadata.gender;
+                    console.log('✅ Pre-populated loved_ones_gender:', metadata.gender);
                 }
             }
             
-            // Log available data for debugging
-            if (currentCase.metadata?.date_of_birth || currentCase.metadata?.date_of_death) {
-                console.log('📅 DOB/DOD available from director:', {
-                    dob: currentCase.metadata.date_of_birth,
-                    dod: currentCase.metadata.date_of_death,
-                    city_of_birth: currentCase.metadata.city_of_birth,
-                    city_of_death: currentCase.metadata.city_of_death,
-                    service_date: currentCase.metadata.service_date
-                });
+            // ===== POPULATE DATE OF BIRTH =====
+            if (metadata.date_of_birth) {
+                // Parse YYYY-MM-DD format
+                const dobParts = metadata.date_of_birth.split('-');
+                if (dobParts.length === 3) {
+                    const [year, month, day] = dobParts;
+                    
+                    document.getElementById('year_of_birth').value = year;
+                    document.getElementById('month_of_birth').value = month;
+                    document.getElementById('day_of_birth').value = day;
+                    document.getElementById('date_of_birth').value = metadata.date_of_birth;
+                    
+                    console.log('✅ Pre-populated DOB:', metadata.date_of_birth);
+                }
             }
+            
+            // ===== POPULATE DATE OF DEATH =====
+            if (metadata.date_of_death) {
+                // Parse YYYY-MM-DD format
+                const dodParts = metadata.date_of_death.split('-');
+                if (dodParts.length === 3) {
+                    const [year, month, day] = dodParts;
+                    
+                    document.getElementById('year_of_passing').value = year;
+                    document.getElementById('month_of_passing').value = month;
+                    document.getElementById('day_of_passing').value = day;
+                    document.getElementById('date_of_passing').value = metadata.date_of_death;
+                    
+                    console.log('✅ Pre-populated DOD:', metadata.date_of_death);
+                }
+            }
+            
+            // ===== POPULATE CITY OF BIRTH =====
+            if (metadata.city_of_birth) {
+                document.getElementById('city_of_birth').value = metadata.city_of_birth;
+                console.log('✅ Pre-populated city_of_birth:', metadata.city_of_birth);
+            }
+            
+            // ===== POPULATE CITY OF DEATH =====
+            if (metadata.city_of_death) {
+                document.getElementById('city_of_passing').value = metadata.city_of_death;
+                console.log('✅ Pre-populated city_of_passing:', metadata.city_of_death);
+            }
+            
+            // Log summary
+            console.log('📋 Director-provided data loaded:', {
+                name: fullName,
+                gender: metadata.gender,
+                dob: metadata.date_of_birth,
+                dod: metadata.date_of_death,
+                city_of_birth: metadata.city_of_birth,
+                city_of_death: metadata.city_of_death,
+                service_date: metadata.service_date
+            });
             
             console.log('✅ Deceased name populated:', deceasedName);
         }
