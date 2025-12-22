@@ -701,36 +701,29 @@
         <button class="modal-close" onclick="closeCaseModal()">&times;</button>
       </div>
       
+      <!-- Revision Notice (if applicable) -->
+      <div id="revision-notice" class="revision-notice" style="display: none; margin: 20px;">
+        <!-- Revision details will be loaded here -->
+      </div>
+      
+      <!-- Quote/Memory from Family (Primary Content for Editors) -->
       <div class="modal-section">
-        <h3 class="modal-section-title">Case Information</h3>
-        <div class="modal-detail-item">
-          <div class="modal-detail-label">Case ID:</div>
-          <div class="modal-detail-value" id="modal-case-id">-</div>
-        </div>
-        <div class="modal-detail-item">
-          <div class="modal-detail-label">Funeral Home:</div>
-          <div class="modal-detail-value" id="modal-org-name">-</div>
-        </div>
-        <div class="modal-detail-item">
-          <div class="modal-detail-label">Status:</div>
-          <div class="modal-detail-value" id="modal-status">-</div>
-        </div>
-        <div class="modal-detail-item">
-          <div class="modal-detail-label">Created:</div>
-          <div class="modal-detail-value" id="modal-created">-</div>
+        <h3 class="modal-section-title">💬 Family's Message / Short Memory</h3>
+        <div id="quote-section" class="quote-section">
+          <!-- Quote will be loaded here -->
         </div>
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title">Family Information</h3>
-        <div id="family-info-content">
-          <!-- Family information will be loaded here -->
+        <h3 class="modal-section-title">📋 Case Metadata</h3>
+        <div id="case-metadata-content">
+          <!--  Assignment date, photo count, version will be loaded here -->
         </div>
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title">Uploaded Photos</h3>
-        <div id="photos-content" class="photos-grid">
+        <h3 class="modal-section-title">📷 Uploaded Photos</h3>
+        <div id="photos-content" class="photo-gallery">
           <!-- Photos will be loaded here -->
         </div>
       </div>
@@ -1149,7 +1142,7 @@
       }
     }
     
-    // Open case modal
+    // Open case modal - Enhanced for Editor with Quote + Photos
     async function openCaseModal(caseId) {
       const modal = document.getElementById('case-modal');
       modal.style.display = 'flex';
@@ -1169,58 +1162,127 @@
         
         if (caseError) throw caseError;
         
-        currentCase = caseData;
+        // Get assignment details
+        const { data: assignment } = await supabaseClient
+          .from('editor_assignments')
+          .select('assigned_at')
+          .eq('case_id', caseId)
+          .eq('editor_user_id', currentUser.id)
+          .single();
         
-        // Populate modal
+        // Get video submission history
+        const { data: submissions } = await supabaseClient
+          .from('video_submissions')
+          .select('*')
+          .eq('case_id', caseId)
+          .order('created_at', { ascending: false });
+        
+        const latestSubmission = submissions?.[0];
+        
+        currentCase = {
+          ...caseData,
+          assignment,
+          submissions,
+          latestSubmission
+        };
+        
+        // Populate modal header
         document.getElementById('modal-case-name').textContent = caseData.deceased_name;
-        document.getElementById('modal-case-id').textContent = caseData.id;
-        document.getElementById('modal-org-name').textContent = caseData.organizations?.name || 'Unknown';
-        document.getElementById('modal-status').textContent = caseData.status.replace(/_/g, ' ');
-        document.getElementById('modal-created').textContent = new Date(caseData.created_at).toLocaleDateString();
         
-        // Display family information
+        // Extract form data
         const formData = caseData.forms?.[0]?.submitted_json || {};
-        const familyInfoHtml = `
-          <div class="modal-detail-item">
-            <div class="modal-detail-label">Full Name:</div>
-            <div class="modal-detail-value">${formData.loved_ones_name || 'N/A'}</div>
-          </div>
-          <div class="modal-detail-item">
-            <div class="modal-detail-label">Age:</div>
-            <div class="modal-detail-value">${formData.loved_ones_age || 'N/A'}</div>
-          </div>
-          <div class="modal-detail-item">
-            <div class="modal-detail-label">Career:</div>
-            <div class="modal-detail-value">${formData.loved_ones_career || 'N/A'}</div>
-          </div>
-          <div class="modal-detail-item">
-            <div class="modal-detail-label">Hobbies:</div>
-            <div class="modal-detail-value">${formData.loved_ones_hobbies || 'N/A'}</div>
-          </div>
-        `;
-        document.getElementById('family-info-content').innerHTML = familyInfoHtml;
         
-        // Display photos
+        // DISPLAY QUOTE/MEMORY PROMINENTLY (Top Priority for Editors)
+        const quoteSection = document.getElementById('quote-section');
+        const familyQuote = formData.loved_ones_quote || formData.favorite_memory || formData.loved_ones_description || '';
+        
+        if (familyQuote) {
+          quoteSection.innerHTML = `
+            <div class="quote-label">FAMILY'S MESSAGE / SHORT MEMORY</div>
+            <p class="quote-text">"${familyQuote}"</p>
+          `;
+          quoteSection.style.display = 'block';
+        } else {
+          quoteSection.innerHTML = '<p style="color: #999; font-style: italic;">No quote or memory provided by family yet.</p>';
+          quoteSection.style.display = 'block';
+        }
+        
+        // DISPLAY REVISION NOTICE IF APPLICABLE
+        const revisionNotice = document.getElementById('revision-notice');
+        if (latestSubmission && latestSubmission.qc_status === 'revision_requested') {
+          revisionNotice.innerHTML = `
+            <div class="revision-notice-title">
+              ⚠️ REVISION REQUESTED
+              <span class="version-badge">v${latestSubmission.revision_number + 1} needed</span>
+            </div>
+            <div class="revision-notice-text">${latestSubmission.qc_notes || 'Please make revisions and resubmit.'}</div>
+          `;
+          revisionNotice.style.display = 'block';
+        } else {
+          revisionNotice.style.display = 'none';
+        }
+        
+        // DISPLAY PHOTOS WITH INDIVIDUAL DOWNLOAD BUTTONS
         const photosContent = document.getElementById('photos-content');
-        if (caseData.assets && caseData.assets.length > 0) {
-          photosContent.innerHTML = caseData.assets.map((asset, index) => `
-            <div class="photo-item" onclick="viewPhoto('${asset.file_key}', ${index + 1})" style="cursor: pointer;" title="Click to view full size">
-              <img src="${asset.file_key}" alt="Family photo ${index + 1}" loading="lazy">
+        const photos = caseData.assets?.filter(a => a.mime_type?.startsWith('image/')) || [];
+        
+        if (photos.length > 0) {
+          photosContent.innerHTML = photos.map((asset, index) => `
+            <div class="photo-item" onclick="viewPhoto('${asset.file_key}', ${index + 1})">
+              <img src="${asset.file_key}" alt="Photo ${index + 1}" loading="lazy">
+              <button class="photo-download-btn" onclick="event.stopPropagation(); downloadPhoto('${asset.file_key}', ${index + 1})">
+                ⬇
+              </button>
             </div>
           `).join('');
         } else {
-          photosContent.innerHTML = '<p style="color: #666;">No photos uploaded yet.</p>';
+          photosContent.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No photos uploaded yet.</p>';
         }
         
-        // Update download button state
+        // Update download all button
         const downloadBtn = document.getElementById('download-all-btn');
-        if (caseData.assets && caseData.assets.length > 0) {
+        if (photos.length > 0) {
           downloadBtn.disabled = false;
-          downloadBtn.textContent = `📥 Download All Photos (${caseData.assets.length})`;
+          downloadBtn.textContent = `📥 Download All Photos as ZIP (${photos.length})`;
         } else {
           downloadBtn.disabled = true;
           downloadBtn.textContent = '📥 No Photos Available';
         }
+        
+        // Display case metadata
+        const metadataHtml = `
+          <div class="modal-detail-item">
+            <div class="modal-detail-label">Case ID:</div>
+            <div class="modal-detail-value">${caseData.id}</div>
+          </div>
+          <div class="modal-detail-item">
+            <div class="modal-detail-label">Funeral Home:</div>
+            <div class="modal-detail-value">${caseData.organizations?.name || 'Unknown'}</div>
+          </div>
+          <div class="modal-detail-item">
+            <div class="modal-detail-label">Assignment Date:</div>
+            <div class="modal-detail-value">${new Date(assignment?.assigned_at || caseData.created_at).toLocaleString()}</div>
+          </div>
+          <div class="modal-detail-item">
+            <div class="modal-detail-label">Photo Count:</div>
+            <div class="modal-detail-value">${photos.length} photo${photos.length !== 1 ? 's' : ''}</div>
+          </div>
+          ${latestSubmission ? `
+          <div class="modal-detail-item">
+            <div class="modal-detail-label">Current Version:</div>
+            <div class="modal-detail-value">v${latestSubmission.revision_number}</div>
+          </div>
+          <div class="modal-detail-item">
+            <div class="modal-detail-label">Last Submission:</div>
+            <div class="modal-detail-value">${new Date(latestSubmission.submitted_at).toLocaleString()}</div>
+          </div>
+          <div class="modal-detail-item">
+            <div class="modal-detail-label">QC Status:</div>
+            <div class="modal-detail-value">${latestSubmission.qc_status.replace(/_/g, ' ').toUpperCase()}</div>
+          </div>
+          ` : ''}
+        `;
+        document.getElementById('case-metadata-content').innerHTML = metadataHtml;
         
         // Load video submission status
         await loadSubmissionStatus(caseId);
@@ -1243,6 +1305,26 @@
     function viewPhoto(photoUrl, photoNumber) {
       console.log(`🖼️ Opening photo ${photoNumber} in new tab: ${photoUrl}`);
       window.open(photoUrl, '_blank');
+    }
+    
+    // Download individual photo
+    async function downloadPhoto(photoUrl, photoNumber) {
+      try {
+        const response = await fetch(photoUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentCase.deceased_name.replace(/\s+/g, '_')}_photo_${photoNumber}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        showToast(`Photo ${photoNumber} downloaded!`);
+      } catch (error) {
+        console.error('Error downloading photo:', error);
+        showToast('Failed to download photo', true);
+      }
     }
     
     // Download all photos for video creation as ZIP file
