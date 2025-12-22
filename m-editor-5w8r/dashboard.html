@@ -108,11 +108,18 @@
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
+      border: 2px solid transparent;
     }
     
     .case-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-color: #436481;
+    }
+    
+    .case-card.urgent {
+      border-color: #ff6b6b;
+      background-color: #ffe5e5;
     }
     
     .case-name {
@@ -122,10 +129,63 @@
       margin-bottom: 10px;
     }
     
+    .case-id {
+      color: #999;
+      font-size: 12px;
+      font-family: monospace;
+      margin-bottom: 10px;
+    }
+    
     .case-org {
       color: #33333373;
       font-size: 14px;
       margin-bottom: 10px;
+    }
+    
+    .case-meta {
+      display: flex;
+      gap: 15px;
+      margin: 10px 0;
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .case-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .urgency-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    
+    .urgency-new {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+    
+    .urgency-normal {
+      background-color: #fff9c4;
+      color: #f57f17;
+    }
+    
+    .urgency-urgent {
+      background-color: #ffebee;
+      color: #c62828;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
     }
     
     .case-status {
@@ -138,6 +198,11 @@
       letter-spacing: 0.5px;
     }
     
+    .status-assigned {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+    
     .status-submitted {
       background-color: #fff3cd;
       color: #856404;
@@ -148,6 +213,12 @@
       color: #0c5460;
     }
     
+    .status-revision {
+      background-color: #ffe0b2;
+      color: #e65100;
+      font-weight: 700;
+    }
+    
     .status-awaiting {
       background-color: #cce5ff;
       color: #004085;
@@ -156,6 +227,11 @@
     .status-delivered {
       background-color: #d4edda;
       color: #155724;
+    }
+    
+    .status-completed {
+      background-color: #c8e6c9;
+      color: #2e7d32;
     }
     
     .empty-state {
@@ -275,6 +351,154 @@
       font-size: 16px;
     }
     
+    .quote-section {
+      background-color: #fff3e9;
+      border-left: 4px solid #436481;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 8px;
+    }
+    
+    .quote-text {
+      font-size: 18px;
+      font-style: italic;
+      color: #32343a;
+      line-height: 1.6;
+      margin: 0;
+    }
+    
+    .quote-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .photo-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .photo-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #ddd;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .photo-item:hover {
+      transform: scale(1.05);
+      border-color: #436481;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .photo-download-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: rgba(67, 100, 129, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+    }
+    
+    .photo-item:hover .photo-download-btn {
+      opacity: 1;
+    }
+    
+    .revision-notice {
+      background-color: #fff3e0;
+      border: 2px solid #ff9800;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+    
+    .revision-notice-title {
+      color: #e65100;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .revision-notice-text {
+      color: #333;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    
+    .video-upload-section {
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 15px;
+    }
+    
+    .upload-area {
+      border: 2px dashed #436481;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .upload-area:hover {
+      background-color: #f0f7ff;
+      border-color: #1976d2;
+    }
+    
+    .upload-area.dragover {
+      background-color: #e3f2fd;
+      border-color: #1976d2;
+    }
+    
+    .file-input-hidden {
+      display: none;
+    }
+    
+    .upload-icon {
+      font-size: 48px;
+      color: #436481;
+      margin-bottom: 10px;
+    }
+    
+    .version-badge {
+      display: inline-block;
+      background-color: #e3f2fd;
+      color: #1976d2;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
     
     .modal-actions {
       padding: 20px;
@@ -763,7 +987,7 @@
       casesList.innerHTML = '<p>Loading cases...</p>';
       
       try {
-        // Get editor assignments
+        // Get editor assignments with full case data including assets and submissions
         const { data: assignments, error: assignError } = await supabaseClient
           .from('editor_assignments')
           .select(`
@@ -778,6 +1002,10 @@
               ),
               forms (
                 submitted_json
+              ),
+              assets (
+                id,
+                mime_type
               )
             )
           `)
@@ -789,21 +1017,47 @@
           throw assignError;
         }
         
+        // Get all video submissions for these cases to check status
+        const caseIds = assignments.filter(a => a.cases).map(a => a.case_id);
+        const { data: submissions } = await supabaseClient
+          .from('video_submissions')
+          .select('case_id, qc_status, revision_number')
+          .in('case_id', caseIds)
+          .order('created_at', { ascending: false });
+        
+        // Create map of latest submissions by case
+        const submissionMap = {};
+        if (submissions) {
+          submissions.forEach(sub => {
+            if (!submissionMap[sub.case_id]) {
+              submissionMap[sub.case_id] = sub;
+            }
+          });
+        }
+        
         // Extract cases from assignments
         assignedCases = assignments
           .filter(a => a.cases)
           .map(a => ({
             ...a.cases,
             assignment_id: a.id,
-            assigned_at: a.assigned_at
+            assigned_at: a.assigned_at,
+            photo_count: a.cases.assets?.filter(asset => asset.mime_type?.startsWith('image/')).length || 0,
+            latest_submission: submissionMap[a.case_id]
           }));
         
         console.log(`Loaded ${assignedCases.length} assigned cases`);
         
-        // Update stats
-        document.getElementById('total-assignments').textContent = assignedCases.length;
-        const inProgress = assignedCases.filter(c => c.status === 'in_production').length;
-        const completed = assignedCases.filter(c => c.status === 'delivered').length;
+        // Update stats with accurate counts
+        const totalAssignments = assignedCases.length;
+        const inProgress = assignedCases.filter(c => 
+          c.status === 'in_production' || c.status === 'submitted'
+        ).length;
+        const completed = assignedCases.filter(c => 
+          c.latest_submission?.qc_status === 'approved' || c.status === 'delivered'
+        ).length;
+        
+        document.getElementById('total-assignments').textContent = totalAssignments;
         document.getElementById('in-progress-count').textContent = inProgress;
         document.getElementById('completed-count').textContent = completed;
         
@@ -815,17 +1069,76 @@
         
         emptyState.style.display = 'none';
         
-        // Display cases
-        casesList.innerHTML = assignedCases.map(c => `
-          <div class="case-card" onclick="openCaseModal('${c.id}')">
-            <div class="case-name">${c.deceased_name}</div>
-            <div class="case-org">🏠 ${c.organizations?.name || 'Unknown Funeral Home'}</div>
-            <div class="case-status status-${c.status.split('_')[0]}">${c.status.replace(/_/g, ' ')}</div>
-            <p class="paragraph" style="margin-top: 10px; font-size: 14px;">
-              Assigned: ${new Date(assignedCases.find(ac => ac.id === c.id)?.assigned_at).toLocaleDateString()}
-            </p>
-          </div>
-        `).join('');
+        // Display cases with enhanced information
+        casesList.innerHTML = assignedCases.map(c => {
+          const assignedDate = new Date(c.assigned_at);
+          const hoursAgo = Math.floor((Date.now() - assignedDate.getTime()) / (1000 * 60 * 60));
+          const daysAgo = Math.floor(hoursAgo / 24);
+          
+          // Determine urgency
+          let urgencyClass = '';
+          let urgencyText = '';
+          let urgencyBadgeClass = 'urgency-new';
+          
+          if (hoursAgo < 24) {
+            urgencyText = `${hoursAgo}h ago`;
+            urgencyBadgeClass = 'urgency-new';
+          } else if (hoursAgo < 72) {
+            urgencyText = `${daysAgo}d ago`;
+            urgencyBadgeClass = 'urgency-normal';
+          } else {
+            urgencyText = `${daysAgo}d ago`;
+            urgencyBadgeClass = 'urgency-urgent';
+            urgencyClass = 'urgent';
+          }
+          
+          // Determine display status
+          let displayStatus = 'Assigned';
+          let statusClass = 'status-assigned';
+          
+          if (c.latest_submission) {
+            if (c.latest_submission.qc_status === 'revision_requested') {
+              displayStatus = '⚠️ Revision Needed';
+              statusClass = 'status-revision';
+            } else if (c.latest_submission.qc_status === 'approved') {
+              displayStatus = '✓ Completed';
+              statusClass = 'status-completed';
+            } else if (c.latest_submission.qc_status === 'in_review' || c.latest_submission.qc_status === 'pending') {
+              displayStatus = 'In QC Review';
+              statusClass = 'status-awaiting';
+            }
+          } else if (c.status === 'in_production') {
+            displayStatus = 'In Progress';
+            statusClass = 'status-in';
+          } else if (c.status === 'submitted') {
+            displayStatus = 'Ready to Start';
+            statusClass = 'status-submitted';
+          }
+          
+          const versionBadge = c.latest_submission && c.latest_submission.revision_number > 1 
+            ? `<span class="version-badge">v${c.latest_submission.revision_number}</span>` 
+            : '';
+          
+          return `
+            <div class="case-card ${urgencyClass}" onclick="openCaseModal('${c.id}')">
+              <div class="urgency-badge ${urgencyBadgeClass}">${urgencyText}</div>
+              <div class="case-name">${c.deceased_name} ${versionBadge}</div>
+              <div class="case-id">ID: ${c.id.substring(0, 8)}...</div>
+              <div class="case-org">🏠 ${c.organizations?.name || 'Unknown'}</div>
+              <div class="case-meta">
+                <div class="case-meta-item">
+                  <span>📷</span>
+                  <span>${c.photo_count} photo${c.photo_count !== 1 ? 's' : ''}</span>
+                </div>
+                <div class="case-meta-item">
+                  <span>📅</span>
+                  <span>${assignedDate.toLocaleDateString()}</span>
+                </div>
+              </div>
+              <div class="case-status ${statusClass}">${displayStatus}</div>
+            </div>
+          `;
+        }).join('');
         
       } catch (error) {
         console.error('Error loading cases:', error);
