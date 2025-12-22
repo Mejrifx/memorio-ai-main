@@ -71,53 +71,67 @@
     </div>
   </div>
 
+  <!-- Password Change Modal (First-time Login) -->
+  <div id="passwordChangeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
+    <div style="background-color: #fff3e9; border: 3px solid #436481; border-radius: 20px; padding: 48px; max-width: 500px; width: 90%; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);">
+      <h1 style="color: #32343a; text-align: center; font-size: 32px; font-weight: 600; margin-bottom: 10px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Create Your Password</h1>
+      <p style="color: #32343a; text-align: center; font-size: 16px; margin-bottom: 30px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">For security, please create a new permanent password</p>
+      
+      <div id="passwordChangeError" style="display: none; background-color: #ffebee; border: 1px solid #ef5350; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></div>
+      
+      <form id="passwordChangeForm" onsubmit="handlePasswordChange(event)">
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #32343a; font-size: 14px; font-weight: 600; margin-bottom: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">New Password</label>
+          <input type="password" 
+                 id="newPassword" 
+                 style="width: 100%; padding: 12px; border: 2px solid #436481; border-radius: 8px; font-size: 16px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; background-color: #ffffff; box-sizing: border-box;"
+                 placeholder="Enter a strong password"
+                 required
+                 minlength="8">
+          <small style="display: block; color: #666; font-size: 12px; margin-top: 4px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Minimum 8 characters</small>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #32343a; font-size: 14px; font-weight: 600; margin-bottom: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Confirm Password</label>
+          <input type="password" 
+                 id="confirmPassword" 
+                 style="width: 100%; padding: 12px; border: 2px solid #436481; border-radius: 8px; font-size: 16px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; background-color: #ffffff; box-sizing: border-box;"
+                 placeholder="Re-enter your password"
+                 required
+                 minlength="8">
+        </div>
+        
+        <button type="submit" 
+                id="passwordChangeBtn"
+                style="width: 100%; padding: 14px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; transition: background-color 0.2s;">
+          Set New Password
+        </button>
+      </form>
+    </div>
+  </div>
+
   <div class="nav">
     <div class="logo-wrapper"><img src="images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" loading="lazy" width="166" sizes="166px" alt="The Memorio Logo" srcset="images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w"></div>
   </div>
   <div class="form-slider-padding">
     <div class="w-form">
       <form id="wf-form-memorio_obituary_form" name="wf-form-memorio_obituary_form" data-name="memorio_obituary_form" method="get" class="form-2" data-wf-page-id="683b63acf5908465c8825cb3" data-wf-element-id="faaf2315-7be8-4814-9169-c55030b0674d">
-        <div data-w-id="86196f90-a25f-a17c-ed10-b72b29827283" class="form-slider-step-1">
+        <!-- Step 1 removed: customer name/email (collected by director) -->
+        <div data-w-id="d026be39-46e7-e794-7d04-b04fb7e8fd1c" class="form-slider-step-1">
           <div class="form-title">
             <div class="text-block">Memorios Obituary Writer</div>
             <h1 class="heading-2" id="welcome-heading">Lets begin!</h1>
           </div>
           <div class="form-bubbles">
             <div class="bubble-container">
-              <p class="paragraph">Take your time, each question helps us gently piece together a heartfelt memory. There’s no rush, and you can always go back.</p>
+              <p class="paragraph">Take your time, each question helps us gently piece together a heartfelt memory. There's no rush, and you can always go back.</p>
             </div>
           </div>
           <div class="form-questions">
             <div class="form-box">
-              <div class="form-fields"><label for="customer_name" class="field-label">What&#x27;s your name?</label><input class="text-field w-input" maxlength="256" name="customer_name" data-name="customer_name" placeholder="Your First Name*" type="text" id="customer_name" required=""><label for="customer_email" class="field-label email">What&#x27;s your email?</label><input class="text-field w-input" maxlength="256" name="customer_email" data-name="customer_email" placeholder="Your Preferred Email*" type="text" id="customer_email" required="">
-                <div class="text-block-2">*Required Fields</div>
-              </div>
-              <div class="form-button">
-                <a href="#" class="button-primary get-started w-button">Get Started</a>
-                <div data-w-id="6f3f3f24-2a1c-c9c9-c1dc-eddf41091c86" class="div-block">GET STARTED</div><input type="submit" data-wait="Please wait..." class="submit-button w-button" value="SUBMIT">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div data-w-id="d026be39-46e7-e794-7d04-b04fb7e8fd1c" class="form-slider-step-1 step-2">
-          <div class="form-title">
-            <div class="text-block">Memorios Obituary Writer</div>
-            <h1 class="heading-2 step-2">Tell us about your loved one</h1>
-          </div>
-          <div class="form-bubbles">
-            <div class="bubble-container">
-              <p class="paragraph">Every name tells a story. Whether it&#x27;s the name they were born with, the one they chose, or what you lovingly called them, we want to capture it all.</p>
-            </div>
-          </div>
-          <div class="form-questions">
-            <div class="form-box">
-              <div class="form-fields"><label for="loved_ones_name" class="field-label loved-ones-name">What&#x27;s your loved one&#x27;s name?</label><input class="text-field loved-ones-first-name w-input" maxlength="256" name="loved_ones_name" data-name="loved_ones_name" placeholder="First Name*" type="text" id="loved_ones_name" required=""><input class="text-field loved-ones-last-name w-input" maxlength="256" name="loved_ones_last_name" data-name="loved_ones_last_name" placeholder="Last Name*" type="text" id="loved_ones_last_name" required=""><select id="loved_ones_gender" name="loved_ones_gender" data-name="loved_ones_gender" required="" class="select-field w-select">
-                  <option value="Another option">Gender*</option>
-                  <option value="He/Him">He/Him</option>
-                  <option value="She/Her">She/Her</option>
-                  <option value="They/Them">They/Them</option>
-                  <option value="Other">Other</option>
-                </select><label for="loved_ones_salutation" class="field-label loved-ones-name other-names">Any other names you&#x27;d like to include?</label><input class="text-field loved-ones-first-name salutation w-input" maxlength="256" name="loved_ones_salutation" data-name="loved_ones_salutation" placeholder="Salutation" type="text" id="loved_ones_salutation"><input class="text-field loved-ones-first-name middle-name w-input" maxlength="256" name="loved_ones_middle_name" data-name="loved_ones_middle_name" placeholder="Middle Name" type="text" id="loved_ones_middle_name"><input class="text-field loved-ones-first-name nickname w-input" maxlength="256" name="loved_ones_nickname" data-name="loved_ones_nickname" placeholder="Nickname" type="text" id="loved_ones_nickname"><input class="text-field loved-ones-first-name maiden-name w-input" maxlength="256" name="loved_ones_maiden_name" data-name="loved_ones_maiden_name" placeholder="Maiden Name" type="text" id="loved_ones_maiden_name"><select id="loved_ones_suffix" name="loved_ones_suffix" data-name="loved_ones_suffix" class="select-field suffix w-select">
+              <div class="form-fields">
+                <!-- Loved one's name/gender removed: collected by director in case creation -->
+                <label for="loved_ones_salutation" class="field-label loved-ones-name other-names">Any other names you&#x27;d like to include for <span id="deceased-name-display"></span>?</label><input class="text-field loved-ones-first-name salutation w-input" maxlength="256" name="loved_ones_salutation" data-name="loved_ones_salutation" placeholder="Salutation" type="text" id="loved_ones_salutation"><input class="text-field loved-ones-first-name middle-name w-input" maxlength="256" name="loved_ones_middle_name" data-name="loved_ones_middle_name" placeholder="Middle Name" type="text" id="loved_ones_middle_name"><input class="text-field loved-ones-first-name nickname w-input" maxlength="256" name="loved_ones_nickname" data-name="loved_ones_nickname" placeholder="Nickname" type="text" id="loved_ones_nickname"><input class="text-field loved-ones-first-name maiden-name w-input" maxlength="256" name="loved_ones_maiden_name" data-name="loved_ones_maiden_name" placeholder="Maiden Name" type="text" id="loved_ones_maiden_name"><select id="loved_ones_suffix" name="loved_ones_suffix" data-name="loved_ones_suffix" class="select-field suffix w-select">
                   <option value="Another option">Suffix (Jr, Sr, etc.)</option>
                   <option value="Junior">Jr.</option>
                   <option value="Senior">Sr.</option>
@@ -1118,6 +1132,107 @@
         }
         
         /**
+         * Show password change modal (first-time login)
+         */
+        function showPasswordChangeModal() {
+            const modal = document.getElementById('passwordChangeModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // Hide both login modal and form
+                hideLoginModal();
+                const formSlider = document.querySelector('.form-slider-padding');
+                if (formSlider) formSlider.style.display = 'none';
+            }
+        }
+        
+        /**
+         * Hide password change modal
+         */
+        function hidePasswordChangeModal() {
+            const modal = document.getElementById('passwordChangeModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        /**
+         * Handle password change form submission
+         */
+        async function handlePasswordChange(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const changeBtn = document.getElementById('passwordChangeBtn');
+            const errorMessage = document.getElementById('passwordChangeError');
+            
+            // Hide previous errors
+            errorMessage.style.display = 'none';
+            
+            // Validate passwords match
+            if (newPassword !== confirmPassword) {
+                errorMessage.textContent = 'Passwords do not match. Please try again.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Validate password strength
+            if (newPassword.length < 8) {
+                errorMessage.textContent = 'Password must be at least 8 characters long.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Disable button and show loading
+            changeBtn.disabled = true;
+            changeBtn.textContent = 'Updating Password...';
+            
+            try {
+                // Update password
+                const { error: updateError } = await supabaseClient.auth.updateUser({
+                    password: newPassword
+                });
+                
+                if (updateError) throw updateError;
+                
+                // Clear the requires_password_change flag
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    // Update app_metadata to remove requires_password_change flag
+                    // Note: This requires service role access, so we'll use an Edge Function
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    await fetch(`${SUPABASE_URL}/functions/v1/clear-password-change-flag`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${session.access_token}`,
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_ANON_KEY
+                        },
+                        body: JSON.stringify({ user_id: user.id })
+                    });
+                }
+                
+                console.log('✅ Password changed successfully');
+                
+                // Hide modal and continue to form
+                hidePasswordChangeModal();
+                await loadFamilyCase();
+                
+                // Show success message
+                alert('Password updated successfully! You can now proceed with the form.');
+                
+            } catch (error) {
+                console.error('Password change error:', error);
+                errorMessage.textContent = error.message || 'Failed to update password. Please try again.';
+                errorMessage.style.display = 'block';
+                
+                // Re-enable button
+                changeBtn.disabled = false;
+                changeBtn.textContent = 'Set New Password';
+            }
+        }
+        
+        /**
          * Handle login form submission
          */
         async function handleLogin(e) {
@@ -1154,6 +1269,15 @@
                 // Success! Hide modal and load case
                 currentUser = data.user;
                 console.log('✅ Login successful:', currentUser.email);
+                
+                // Check if password change is required (first-time login)
+                const requiresPasswordChange = currentUser.app_metadata?.requires_password_change;
+                if (requiresPasswordChange === true) {
+                    console.log('⚠️ Password change required for first-time login');
+                    hideLoginModal();
+                    showPasswordChangeModal();
+                    return; // Stop execution until password is changed
+                }
                 
                 // Fetch and display user's name for personalized greeting
                 try {
@@ -1244,6 +1368,14 @@
                     console.log('User is not a family member, showing login modal');
                     showLoginModal();
                     return false;
+                }
+                
+                // Check if password change is required (first-time login)
+                const requiresPasswordChange = currentUser.app_metadata?.requires_password_change;
+                if (requiresPasswordChange === true) {
+                    console.log('⚠️ Password change required for first-time login');
+                    showPasswordChangeModal();
+                    return false; // Stop execution until password is changed
                 }
                 
                 // Fetch user's name for personalized greeting
