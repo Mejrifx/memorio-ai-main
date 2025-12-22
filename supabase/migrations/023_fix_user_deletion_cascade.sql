@@ -34,11 +34,8 @@ ALTER TABLE video_submissions DROP CONSTRAINT IF EXISTS video_submissions_qc_rev
 ALTER TABLE video_submissions ADD CONSTRAINT video_submissions_qc_reviewer_id_fkey 
   FOREIGN KEY (qc_reviewer_id) REFERENCES users(id) ON DELETE SET NULL;
 
--- 4. OBITUARY_CONTENT - SET NULL for generated_by and approved_by
-ALTER TABLE obituary_content DROP CONSTRAINT IF EXISTS obituary_content_generated_by_fkey;
-ALTER TABLE obituary_content ADD CONSTRAINT obituary_content_generated_by_fkey 
-  FOREIGN KEY (generated_by) REFERENCES users(id) ON DELETE SET NULL;
-
+-- 4. OBITUARY_CONTENT - SET NULL for approved_by only
+-- Note: generated_by is TEXT (stores 'AI' or user_id), not a UUID FK, so we skip it
 ALTER TABLE obituary_content DROP CONSTRAINT IF EXISTS obituary_content_approved_by_fkey;
 ALTER TABLE obituary_content ADD CONSTRAINT obituary_content_approved_by_fkey 
   FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL;
