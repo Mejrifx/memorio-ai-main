@@ -1759,21 +1759,64 @@
       }
     });
     
-    // Delete case function
+    // Delete case function (also deletes associated family user)
     async function deleteCase(caseId, caseName) {
-      if (!confirm(`Are you sure you want to delete the case for "${caseName}"? This action cannot be undone.`)) {
+      if (!confirm(`Are you sure you want to delete the case for "${caseName}"?\n\nThis will also permanently delete the associated family member's account.\n\nThis action cannot be undone.`)) {
         return;
       }
       
       try {
-        const { error } = await supabaseClient
+        // First, get the case to find the assigned family user
+        const { data: caseData, error: caseError } = await supabaseClient
+          .from('cases')
+          .select('assigned_family_user_id')
+          .eq('id', caseId)
+          .single();
+        
+        if (caseError) throw caseError;
+        
+        const familyUserId = caseData?.assigned_family_user_id;
+        
+        // Delete the case first (this will cascade to related records)
+        const { error: deleteError } = await supabaseClient
           .from('cases')
           .delete()
           .eq('id', caseId);
         
-        if (error) throw error;
+        if (deleteError) throw deleteError;
         
-        showToast(`Case for "${caseName}" deleted successfully`);
+        // If there was a family user assigned, delete them completely
+        if (familyUserId) {
+          console.log(`Deleting associated family user: ${familyUserId}`);
+          
+          const session = await getValidSession();
+          const response = await fetch(`${SUPABASE_URL}/functions/v1/delete-user`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_ANON_KEY
+            },
+            body: JSON.stringify({
+              user_id: familyUserId,
+              reason: 'Case deleted by director'
+            })
+          });
+          
+          const result = await response.json();
+          
+          if (!response.ok || !result.success) {
+            console.warn('Failed to delete family user:', result.error);
+            // Don't throw error - case is already deleted, this is cleanup
+            showToast(`Case deleted, but failed to delete family account: ${result.error}`, true);
+          } else {
+            console.log('✅ Family user deleted successfully');
+            showToast(`Case and family account for "${caseName}" deleted successfully`);
+          }
+        } else {
+          showToast(`Case for "${caseName}" deleted successfully`);
+        }
+        
         closeCaseModal();
         await loadCases();
         
