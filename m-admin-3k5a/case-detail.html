@@ -1086,25 +1086,26 @@
           return;
         }
         
-        // Load case with all relationships
+        // Load case with all relationships (with proper aliases for multiple users joins)
         const { data: caseData, error: caseError } = await supabaseClient
           .from('cases')
           .select(`
             *,
             organizations (id, name),
-            users!cases_assigned_family_user_id_fkey (id, email, metadata),
-            users!cases_created_by_fkey (email),
-            editor_assignments!inner (
+            family_user:users!cases_assigned_family_user_id_fkey (id, email, metadata),
+            created_by:users!cases_created_by_fkey (email),
+            editor_assignments (
               id,
               editor_user_id,
               assigned_at,
-              users!editor_assignments_editor_user_id_fkey (id, email, metadata)
+              unassigned_at,
+              editor:users!editor_assignments_editor_user_id_fkey (id, email, metadata)
             ),
             video_submissions (
               id,
               qc_status,
               qc_reviewer_id,
-              users!video_submissions_qc_reviewer_id_fkey (email, metadata)
+              qc_reviewer:users!video_submissions_qc_reviewer_id_fkey (email, metadata)
             )
           `)
           .eq('id', currentCaseId)
@@ -1148,13 +1149,14 @@
         slaContainer.innerHTML = '<div class="sla-badge" style="background-color: #e9ecef; color: #6c757d; border-color: #6c757d;">No SLA</div>';
       }
       
-      // Meta information
-      const editor = c.editor_assignments?.[0]?.users;
-      const editorId = c.editor_assignments?.[0]?.editor_user_id;
+      // Meta information (using new aliases)
+      const editorAssignment = c.editor_assignments?.find(ea => !ea.unassigned_at);
+      const editor = editorAssignment?.editor;
+      const editorId = editorAssignment?.editor_user_id;
       const editorName = editor?.metadata?.name || editor?.email || 'Unassigned';
       
       const qcSubmission = c.video_submissions?.[0];
-      const qcReviewer = qcSubmission?.users;
+      const qcReviewer = qcSubmission?.qc_reviewer;
       const qcName = qcReviewer?.metadata?.name || qcReviewer?.email || 'Unassigned';
       
       document.getElementById('caseMeta').innerHTML = `
@@ -1182,7 +1184,7 @@
         </div>
         <div class="meta-item">
           <span class="meta-label">Family Contact</span>
-          <span class="meta-value">${c.users?.email || 'N/A'}</span>
+          <span class="meta-value">${c.family_user?.email || 'N/A'}</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Created</span>
@@ -1782,7 +1784,7 @@
         if (!session) return;
         
         // Get family user email
-        const familyEmail = currentCaseData.users?.email;
+        const familyEmail = currentCaseData.family_user?.email;
         if (!familyEmail) {
           throw new Error('No family email found');
         }
