@@ -1551,11 +1551,8 @@
                     formContent.classList.add('show');
                 }
                 
-                // Optionally pre-fill deceased name in form if needed
-                // const deceasedNameField = document.querySelector('[name="loved_ones_name"]');
-                // if (deceasedNameField && !deceasedNameField.value) {
-                //     deceasedNameField.value = currentCase.deceased_name;
-                // }
+                // Initialize all family portal enhancements (hide steps, populate fields, etc.)
+                initFamilyPortalEnhancements();
                 
             } catch (error) {
                 console.error('Error loading case:', error);
