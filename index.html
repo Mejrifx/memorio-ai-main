@@ -1336,13 +1336,24 @@
                     ...userData
                 };
                 
+                // #region agent log - Hypothesis A & B: Check password change flag in handleLogin
+                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:handleLogin',message:'Password change check in handleLogin',data:{metadata:userData.metadata,flagValue:userData.metadata?.requires_password_change,flagType:typeof userData.metadata?.requires_password_change},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A-B'})}).catch(()=>{});
+                // #endregion
+                
                 // Check if user needs to change password (BEFORE loading anything else)
                 if (userData.metadata?.requires_password_change === true) {
                     console.log('⚠️ First login - password change required');
+                    // #region agent log - Hypothesis A: Password modal should show
+                    fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:handleLogin',message:'PASSWORD MODAL SHOULD SHOW NOW',data:{showingModal:true},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
                     hideLoginModal();
                     showPasswordChangeModal();
                     return; // STOP HERE - don't load form until password changed
                 }
+                
+                // #region agent log - Hypothesis A: No password change needed
+                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:handleLogin',message:'No password change required, proceeding to form',data:{flagValue:userData.metadata?.requires_password_change},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
                 
                 console.log('✅ Login complete - proceeding to form');
                 
@@ -2228,6 +2239,13 @@
                 // Ensure date fields are combined before submission
                 combineDateInputsOnSubmit();
                 
+                // #region agent log - Hypothesis D: Check which fields are in form before serialization
+                const allFormFields = form.querySelectorAll('input, select, textarea');
+                const fieldsWithName = Array.from(allFormFields).filter(f => f.name).map(f => ({name:f.name, id:f.id, type:f.type, value:f.value, disabled:f.disabled}));
+                const dateFieldsInForm = fieldsWithName.filter(f => f.name.includes('birth') || f.name.includes('passing'));
+                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:formSubmit',message:'BEFORE FormData serialization',data:{totalFields:allFormFields.length,fieldsWithName:fieldsWithName.length,dateFields:dateFieldsInForm},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
+                // #endregion
+                
                 // Swap to success area immediately, then mount loader UI so it shows right away
                 form.style.display = 'none';
                 success.style.display = 'block';
@@ -2235,6 +2253,10 @@
                 mountUIIntoSuccess();
                 
                 const payload = Object.fromEntries(new FormData(form).entries());
+                // #region agent log - Hypothesis D & E: Check which date fields ended up in payload
+                const dateFieldsInPayload = Object.keys(payload).filter(k => k.includes('birth') || k.includes('passing')).map(k => ({name:k, value:payload[k]}));
+                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:formSubmit',message:'AFTER FormData serialization',data:{payloadKeys:Object.keys(payload).length,dateFieldsInPayload:dateFieldsInPayload},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D-E'})}).catch(()=>{});
+                // #endregion
                 console.log('Form payload:', payload);
                 console.log('Date fields check:');
                 console.log('- date_of_birth:', payload.date_of_birth);
@@ -2367,16 +2389,28 @@
                 'city_of_birth', 'state_of_birth', 'country_of_birth'
             ];
             
+            // #region agent log - Hypothesis C: Check visible fields before disabling
+            fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:hideDateSteps',message:'BEFORE disabling visible fields',data:{fieldsToDisable:visibleFieldsToDisable},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
+            // #endregion
+            
             visibleFieldsToDisable.forEach(fieldName => {
                 // Find visible fields (not our hidden ones)
                 const visibleFields = document.querySelectorAll(`select[name="${fieldName}"], input[name="${fieldName}"]`);
+                // #region agent log - Hypothesis C: Check how many fields found
+                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:hideDateSteps',message:'Found visible fields for name',data:{fieldName:fieldName,count:visibleFields.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
+                // #endregion
                 visibleFields.forEach(field => {
                     // Only disable if it's NOT a hidden field
                     if (field.type !== 'hidden') {
+                        const beforeName = field.getAttribute('name');
                         field.removeAttribute('name'); // Won't be submitted
                         field.removeAttribute('required'); // Won't block submission
                         field.disabled = true; // Extra safety
+                        const afterName = field.getAttribute('name');
                         console.log(`✅ Disabled visible field: ${fieldName}`);
+                        // #region agent log - Hypothesis C: Verify name attribute removed
+                        fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:hideDateSteps',message:'Disabled visible field',data:{fieldName:fieldName,fieldId:field.id,beforeName:beforeName,afterName:afterName,disabled:field.disabled},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
+                        // #endregion
                     }
                 });
             });
