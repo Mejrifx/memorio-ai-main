@@ -104,7 +104,8 @@ serve(async (req) => {
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id);
 
     if (deleteError) {
-      throw new Error(`Failed to delete user: ${deleteError.message}`);
+      console.error('Delete error details:', JSON.stringify(deleteError, null, 2));
+      throw new Error(`Failed to delete user: ${deleteError.message || JSON.stringify(deleteError)}`);
     }
 
     return new Response(

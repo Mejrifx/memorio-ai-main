@@ -5,7 +5,19 @@
 --          CASCADE/SET NULL rules on foreign keys that reference users table.
 -- ============================================================================
 
--- Drop existing foreign key constraints and recreate with proper DELETE rules
+-- ============================================================================
+-- STEP 1: Make NOT NULL columns nullable (so they can be set to NULL on delete)
+-- ============================================================================
+
+ALTER TABLE cases ALTER COLUMN created_by DROP NOT NULL;
+ALTER TABLE assets ALTER COLUMN uploader_user_id DROP NOT NULL;
+ALTER TABLE editor_assignments ALTER COLUMN assigned_by DROP NOT NULL;
+ALTER TABLE exports ALTER COLUMN created_by DROP NOT NULL;
+ALTER TABLE case_notes ALTER COLUMN author_user_id DROP NOT NULL;
+
+-- ============================================================================
+-- STEP 2: Drop existing FK constraints and recreate with proper DELETE rules
+-- ============================================================================
 
 -- 1. CASES TABLE - Set created_by and assigned_family_user_id to NULL on delete
 ALTER TABLE cases DROP CONSTRAINT IF EXISTS cases_created_by_fkey;
