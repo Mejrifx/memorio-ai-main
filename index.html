@@ -1411,6 +1411,7 @@
                     .single();
                 
                 console.log('🔐 Database user data:', userData);
+                console.log('🔐 User metadata:', JSON.stringify(userData?.metadata, null, 2));
                 
                 if (userError || !userData || userData.role !== 'family') {
                     console.error('❌ Not a family member or user not found:', userError);
@@ -1426,13 +1427,15 @@
                 };
                 
                 // Check if user needs to change password (BEFORE loading form)
+                console.log('🔍 Checking requires_password_change flag:', userData.metadata?.requires_password_change);
                 if (userData.metadata?.requires_password_change === true) {
                     console.log('⚠️ First login - password change required');
+                    console.log('📋 Showing password change modal...');
                     showPasswordChangeModal();
                     return false; // STOP - password must be changed first
                 }
                 
-                console.log('✅ Authentication complete');
+                console.log('✅ Authentication complete (no password change needed)');
                 
                 // Update welcome heading with user name if available
                 const userName = userData.metadata?.name;
@@ -2416,6 +2419,10 @@
                 return;
             }
             
+            console.log('📝 Starting to populate deceased name and hidden fields...');
+            console.log('📝 Current case:', currentCase);
+            console.log('📝 Case metadata:', currentCase.metadata);
+            
             const deceasedName = currentCase.deceased_name.split(' ')[0]; // Use first name
             
             // Update the "Any other names" label
@@ -2428,6 +2435,7 @@
             // These hidden fields are required for n8n to generate the obituary correctly
             
             const metadata = currentCase.metadata || {};
+            console.log('📝 Using metadata for population:', metadata);
             
             // ===== POPULATE NAME FIELDS (HIDDEN) =====
             let fullName = metadata.full_name || currentCase.deceased_name || '';
@@ -2511,6 +2519,33 @@
                 city_of_birth: metadata.city_of_birth,
                 city_of_death: metadata.city_of_death,
                 service_date: metadata.service_date
+            });
+            
+            // Verify all hidden fields are populated
+            console.log('🔍 Verifying hidden fields exist and have values:');
+            const hiddenFieldsToCheck = [
+                'hidden_loved_ones_name',
+                'hidden_loved_ones_last_name',
+                'hidden_loved_ones_gender',
+                'hidden_month_of_birth',
+                'hidden_day_of_birth',
+                'hidden_year_of_birth',
+                'hidden_date_of_birth',
+                'hidden_city_of_birth',
+                'hidden_month_of_passing',
+                'hidden_day_of_passing',
+                'hidden_year_of_passing',
+                'hidden_date_of_passing',
+                'hidden_city_of_passing'
+            ];
+            
+            hiddenFieldsToCheck.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    console.log(`  ✅ ${fieldId}: "${field.value}" (name="${field.name}")`);
+                } else {
+                    console.error(`  ❌ ${fieldId}: FIELD NOT FOUND IN DOM!`);
+                }
             });
             
             console.log('✅ Deceased name populated:', deceasedName);
