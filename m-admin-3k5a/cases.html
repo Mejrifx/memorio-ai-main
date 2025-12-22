@@ -939,7 +939,7 @@
     function createCaseCard(c) {
       const card = document.createElement('div');
       card.className = 'case-card';
-      card.onclick = () => openCaseDetail(c.id);
+      card.onclick = () => window.location.href = `case-detail.html?case_id=${c.id}`;
       
       const editor = c.editor_assignments?.[0]?.users;
       const editorName = editor?.metadata?.name || editor?.email || 'Unassigned';

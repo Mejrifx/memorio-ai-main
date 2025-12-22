@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Case Detail - Memorio Admin</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <!-- Preload Dosis font -->
+  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link href="../css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="../css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
+  <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="../images/webclip.png" rel="apple-touch-icon">
+  
+  <style>
+    /* ============================================================================
+       MEMORIO ADMIN CASE DETAIL PAGE
+       ============================================================================ */
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      background-color: #f4e8de;
+      min-height: 100vh;
+    }
+    
+    /* ============================================================================
+       SIDEBAR - Matches admin dashboard
+       ============================================================================ */
+    
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background-color: #fff3e9;
+      border-right: 3px solid #436481;
+      box-shadow: 4px 0 15px rgba(67, 100, 129, 0.1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-logo {
+      height: 70px;
+      padding: 0;
+      border-bottom: 2px solid #436481;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .sidebar-logo img {
+      width: 140px;
+      height: auto;
+      max-height: 60px;
+      object-fit: contain;
+    }
+    
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 24px;
+      margin: 4px 12px;
+      color: #32343a;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+      border: 1.5px solid transparent;
+    }
+    
+    .sidebar-nav-item:hover {
+      background-color: #f4e8de;
+      border-color: #6ca7d3;
+      color: #436481;
+    }
+    
+    .sidebar-nav-item.active {
+      background-color: #f4e8de;
+      border-color: #436481;
+      color: #436481;
+    }
+    
+    /* ============================================================================
+       TOP NAVBAR
+       ============================================================================ */
+    
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 280px;
+      right: 0;
+      height: 70px;
+      background-color: #fff3e9;
+      border-bottom: 2px solid #436481;
+      box-shadow: 0 2px 8px rgba(67, 100, 129, 0.1);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+    
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    
+    .topbar-back-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background-color: #f4e8de;
+      border: 1.5px solid #436481;
+      border-radius: 60px;
+      color: #436481;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .topbar-back-btn:hover {
+      background-color: #436481;
+      color: #fff3e9;
+    }
+    
+    .topbar-title {
+      color: #32343a;
+      font-size: 22px;
+      font-weight: 600;
+    }
+    
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background-color: #f4e8de;
+      border: 1.5px solid #436481;
+      border-radius: 60px;
+    }
+    
+    .topbar-user-email {
+      font-size: 14px;
+      color: #32343a;
+      font-weight: 500;
+    }
+    
+    .logout-btn {
+      padding: 10px 20px;
+      background-color: #436481;
+      color: #fff3e9;
+      border: none;
+      border-radius: 60px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+    }
+    
+    .logout-btn:hover {
+      background-color: #32343a;
+    }
+    
+    /* ============================================================================
+       MAIN CONTENT
+       ============================================================================ */
+    
+    .main-content {
+      margin-left: 280px;
+      margin-top: 70px;
+      padding: 32px;
+      min-height: calc(100vh - 70px);
+    }
+    
+    .case-detail-container {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    /* ============================================================================
+       CASE HEADER
+       ============================================================================ */
+    
+    .case-header {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      padding: 24px 32px;
+      margin-bottom: 24px;
+    }
+    
+    .case-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .case-header-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #32343a;
+    }
+    
+    .case-header-sla {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .sla-badge {
+      padding: 10px 20px;
+      border-radius: 60px;
+      font-size: 16px;
+      font-weight: 700;
+      border: 2px solid;
+    }
+    
+    .sla-badge.green {
+      background-color: #d4f4dd;
+      color: #2d7738;
+      border-color: #2d7738;
+    }
+    
+    .sla-badge.yellow {
+      background-color: #fff3cd;
+      color: #856404;
+      border-color: #856404;
+    }
+    
+    .sla-badge.orange {
+      background-color: #ffe5cc;
+      color: #cc5500;
+      border-color: #cc5500;
+    }
+    
+    .sla-badge.red {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-color: #721c24;
+    }
+    
+    .case-header-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .meta-label {
+      font-size: 13px;
+      color: rgba(50, 52, 58, 0.6);
+      font-weight: 500;
+    }
+    
+    .meta-value {
+      font-size: 16px;
+      color: #32343a;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .reassign-btn {
+      padding: 4px 12px;
+      background-color: #f4e8de;
+      border: 1.5px solid #436481;
+      border-radius: 60px;
+      font-size: 12px;
+      color: #436481;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-weight: 600;
+    }
+    
+    .reassign-btn:hover {
+      background-color: #436481;
+      color: #fff3e9;
+    }
+    
+    /* ============================================================================
+       TABS
+       ============================================================================ */
+    
+    .tabs {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .tab-nav {
+      display: flex;
+      border-bottom: 2px solid #436481;
+      background-color: #f4e8de;
+    }
+    
+    .tab-btn {
+      flex: 1;
+      padding: 16px 24px;
+      background-color: transparent;
+      border: none;
+      border-right: 1.5px solid #436481;
+      color: #32343a;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+    }
+    
+    .tab-btn:last-child {
+      border-right: none;
+    }
+    
+    .tab-btn:hover {
+      background-color: #fff3e9;
+    }
+    
+    .tab-btn.active {
+      background-color: #fff3e9;
+      color: #436481;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 24px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* ============================================================================
+       TIMELINE
+       ============================================================================ */
+    
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #436481;
+    }
+    
+    .timeline-item {
+      position: relative;
+      margin-bottom: 24px;
+      padding-left: 24px;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -27px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      background-color: #436481;
+      border: 2px solid #fff3e9;
+      border-radius: 50%;
+    }
+    
+    .timeline-time {
+      font-size: 13px;
+      color: rgba(50, 52, 58, 0.6);
+      margin-bottom: 4px;
+    }
+    
+    .timeline-event {
+      font-size: 15px;
+      color: #32343a;
+      font-weight: 500;
+    }
+    
+    .timeline-actor {
+      font-size: 14px;
+      color: #436481;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    
+    /* ============================================================================
+       ASSETS & FORMS
+       ============================================================================ */
+    
+    .assets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .asset-item {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #436481;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    
+    .asset-item:hover {
+      transform: scale(1.05);
+    }
+    
+    .asset-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .form-data-section {
+      margin-bottom: 24px;
+    }
+    
+    .form-data-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #32343a;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #436481;
+    }
+    
+    .form-data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+    }
+    
+    .form-data-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .form-data-label {
+      font-size: 13px;
+      color: rgba(50, 52, 58, 0.6);
+      font-weight: 500;
+    }
+    
+    .form-data-value {
+      font-size: 15px;
+      color: #32343a;
+      font-weight: 500;
+    }
+    
+    /* ============================================================================
+       NOTES
+       ============================================================================ */
+    
+    .notes-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .add-note-section {
+      background-color: #f4e8de;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1.5px solid #436481;
+    }
+    
+    .note-type-select {
+      width: 100%;
+      padding: 10px 16px;
+      border: 1.5px solid #436481;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      background-color: #fff3e9;
+      color: #32343a;
+      margin-bottom: 12px;
+    }
+    
+    .note-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px 16px;
+      border: 1.5px solid #436481;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      background-color: #fff3e9;
+      color: #32343a;
+      resize: vertical;
+      margin-bottom: 12px;
+    }
+    
+    .add-note-btn {
+      padding: 10px 24px;
+      background-color: #436481;
+      color: #fff3e9;
+      border: none;
+      border-radius: 60px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+    }
+    
+    .add-note-btn:hover {
+      background-color: #32343a;
+    }
+    
+    .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .note-item {
+      background-color: #f4e8de;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1.5px solid #436481;
+    }
+    
+    .note-item.pinned {
+      border-color: #cc5500;
+      border-width: 2px;
+    }
+    
+    .note-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .note-author {
+      font-size: 14px;
+      font-weight: 600;
+      color: #436481;
+    }
+    
+    .note-type-badge {
+      padding: 4px 12px;
+      border-radius: 60px;
+      font-size: 12px;
+      font-weight: 600;
+      background-color: #fff3e9;
+      border: 1px solid #436481;
+      color: #436481;
+    }
+    
+    .note-content {
+      font-size: 14px;
+      color: #32343a;
+      margin-bottom: 8px;
+      white-space: pre-wrap;
+    }
+    
+    .note-time {
+      font-size: 12px;
+      color: rgba(50, 52, 58, 0.6);
+    }
+    
+    /* ============================================================================
+       SUPPORT ACTIONS PANEL
+       ============================================================================ */
+    
+    .support-panel {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      padding: 24px;
+      height: fit-content;
+      position: sticky;
+      top: 102px;
+    }
+    
+    .support-panel-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #32343a;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #436481;
+    }
+    
+    .support-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .support-action-btn {
+      width: 100%;
+      padding: 14px 20px;
+      background-color: #f4e8de;
+      border: 1.5px solid #436481;
+      border-radius: 8px;
+      color: #436481;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .support-action-btn:hover {
+      background-color: #436481;
+      color: #fff3e9;
+    }
+    
+    .support-action-btn.danger {
+      border-color: #d9534f;
+      color: #d9534f;
+    }
+    
+    .support-action-btn.danger:hover {
+      background-color: #d9534f;
+      color: #fff3e9;
+    }
+    
+    /* ============================================================================
+       LOADING & EMPTY STATES
+       ============================================================================ */
+    
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: #436481;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: rgba(50, 52, 58, 0.5);
+      font-size: 16px;
+    }
+    
+    /* ============================================================================
+       MODAL
+       ============================================================================ */
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background-color: #fff3e9;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #32343a;
+      margin-bottom: 20px;
+    }
+    
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .modal-label {
+      font-size: 14px;
+      color: #32343a;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    
+    .modal-input,
+    .modal-select,
+    .modal-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid #436481;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      background-color: #fff3e9;
+      color: #32343a;
+    }
+    
+    .modal-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .modal-btn {
+      flex: 1;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 60px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+    }
+    
+    .modal-btn.primary {
+      background-color: #436481;
+      color: #fff3e9;
+    }
+    
+    .modal-btn.primary:hover {
+      background-color: #32343a;
+    }
+    
+    .modal-btn.secondary {
+      background-color: #f4e8de;
+      color: #436481;
+      border: 1.5px solid #436481;
+    }
+    
+    .modal-btn.secondary:hover {
+      background-color: #fff3e9;
+    }
+    
+    /* ============================================================================
+       TOAST NOTIFICATIONS
+       ============================================================================ */
+    
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background-color: #436481;
+      color: #fff3e9;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 10000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .toast.error {
+      background-color: #d9534f;
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../images/Memorio-Logo.svg" alt="Memorio">
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="sidebar-nav-item">
+        <span>🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="cases.html" class="sidebar-nav-item active">
+        <span>📋</span>
+        <span>All Cases</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="cases.html" class="topbar-back-btn">
+        <span>←</span>
+        <span>Back to Cases</span>
+      </a>
+      <h1 class="topbar-title">Case Detail</h1>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <span class="topbar-user-email" id="userEmail">Loading...</span>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div id="loadingState" class="loading">Loading case details...</div>
+    
+    <div id="caseContent" style="display: none;">
+      <!-- CASE HEADER -->
+      <div class="case-header">
+        <div class="case-header-top">
+          <h1 class="case-header-title" id="caseName">Loading...</h1>
+          <div class="case-header-sla" id="caseSLA"></div>
+        </div>
+        <div class="case-header-meta" id="caseMeta"></div>
+      </div>
+
+      <!-- MAIN LAYOUT -->
+      <div class="case-detail-container">
+        <!-- LEFT: TABS -->
+        <div class="tabs">
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('timeline')">Timeline</button>
+            <button class="tab-btn" onclick="switchTab('uploads')">Uploads & Forms</button>
+            <button class="tab-btn" onclick="switchTab('notes')">Notes</button>
+            <button class="tab-btn" onclick="switchTab('audit')">Audit</button>
+          </div>
+          
+          <div id="tab-timeline" class="tab-content active">
+            <div class="timeline" id="timelineContent">
+              <div class="loading">Loading timeline...</div>
+            </div>
+          </div>
+          
+          <div id="tab-uploads" class="tab-content">
+            <div id="uploadsContent">
+              <div class="loading">Loading uploads...</div>
+            </div>
+          </div>
+          
+          <div id="tab-notes" class="tab-content">
+            <div class="notes-container">
+              <div class="add-note-section">
+                <select id="noteType" class="note-type-select">
+                  <option value="general">General Note</option>
+                  <option value="support">Support Action</option>
+                  <option value="internal">Internal Only</option>
+                </select>
+                <textarea id="noteContent" class="note-textarea" placeholder="Add a note..."></textarea>
+                <button class="add-note-btn" onclick="addNote()">Add Note</button>
+              </div>
+              <div class="notes-list" id="notesList">
+                <div class="loading">Loading notes...</div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="tab-audit" class="tab-content">
+            <div class="timeline" id="auditContent">
+              <div class="loading">Loading audit trail...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: SUPPORT ACTIONS -->
+        <div class="support-panel">
+          <h2 class="support-panel-title">Support Actions</h2>
+          <div class="support-actions">
+            <button class="support-action-btn" onclick="openReassignEditorModal()">
+              <span>✏️</span>
+              <span>Reassign Editor</span>
+            </button>
+            <button class="support-action-btn" onclick="openReassignQCModal()">
+              <span>🔍</span>
+              <span>Reassign QC</span>
+            </button>
+            <button class="support-action-btn danger" onclick="pushToRevision()">
+              <span>🔄</span>
+              <span>Push to Revision</span>
+            </button>
+            <button class="support-action-btn" onclick="regenerateFamilyLink()">
+              <span>🔗</span>
+              <span>Regenerate Family Link</span>
+            </button>
+            <button class="support-action-btn" onclick="resendFamilyLink()">
+              <span>📧</span>
+              <span>Resend Family Link</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REASSIGN EDITOR MODAL -->
+  <div id="reassignEditorModal" class="modal">
+    <div class="modal-content">
+      <h2 class="modal-title">Reassign Editor</h2>
+      <div class="modal-form">
+        <div>
+          <label class="modal-label">Select Editor</label>
+          <select id="editorSelect" class="modal-select">
+            <option value="">Loading editors...</option>
+          </select>
+        </div>
+        <div>
+          <label class="modal-label">Reason (optional)</label>
+          <textarea id="reassignEditorReason" class="modal-textarea" placeholder="Why are you reassigning this editor?"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" onclick="closeModal('reassignEditorModal')">Cancel</button>
+        <button class="modal-btn primary" onclick="confirmReassignEditor()">Reassign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REASSIGN QC MODAL -->
+  <div id="reassignQCModal" class="modal">
+    <div class="modal-content">
+      <h2 class="modal-title">Reassign QC Reviewer</h2>
+      <div class="modal-form">
+        <div>
+          <label class="modal-label">Select QC User</label>
+          <select id="qcSelect" class="modal-select">
+            <option value="">Loading QC users...</option>
+          </select>
+        </div>
+        <div>
+          <label class="modal-label">Reason (optional)</label>
+          <textarea id="reassignQCReason" class="modal-textarea" placeholder="Why are you reassigning this QC reviewer?"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" onclick="closeModal('reassignQCModal')">Cancel</button>
+        <button class="modal-btn primary" onclick="confirmReassignQC()">Reassign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ============================================================================
+    // SUPABASE INITIALIZATION
+    // ============================================================================
+    
+    const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdrYWJ0dnF3d3V2aWdjZHVid3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzNjE5NjgsImV4cCI6MjA0OTkzNzk2OH0.KV1EYOaYOFKcMUuZ6mB1VYvpxCjFfIHxCUzPLvk1Ww4';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        storageKey: 'memorio-admin-auth'
+      }
+    });
+
+    // ============================================================================
+    // GLOBAL STATE
+    // ============================================================================
+    
+    let currentCaseId = null;
+    let currentCaseData = null;
+    let currentUser = null;
+
+    // ============================================================================
+    // AUTH & INITIALIZATION
+    // ============================================================================
+    
+    async function checkAuth() {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      
+      if (error || !session) {
+        window.location.href = 'login.html';
+        return false;
+      }
+      
+      const role = session.user.app_metadata?.role;
+      if (role !== 'admin') {
+        alert('Access denied. Admin only.');
+        window.location.href = '../index.html';
+        return false;
+      }
+      
+      currentUser = session.user;
+      document.getElementById('userEmail').textContent = currentUser.email;
+      
+      return true;
+    }
+    
+    async function getValidSession() {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (error || !session) {
+        window.location.href = 'login.html';
+        return null;
+      }
+      return session;
+    }
+    
+    async function handleLogout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+    
+    // Listen for auth state changes (but don't redirect)
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      console.log('🔐 Auth state changed:', event, session?.user?.email);
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('✅ Session refreshed successfully');
+      }
+    });
+
+    // ============================================================================
+    // CASE DATA LOADING
+    // ============================================================================
+    
+    async function loadCaseData() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        currentCaseId = urlParams.get('case_id');
+        
+        if (!currentCaseId) {
+          alert('No case ID provided');
+          window.location.href = 'cases.html';
+          return;
+        }
+        
+        // Load case with all relationships
+        const { data: caseData, error: caseError } = await supabaseClient
+          .from('cases')
+          .select(`
+            *,
+            organizations (id, name),
+            users!cases_assigned_family_user_id_fkey (id, email, metadata),
+            users!cases_created_by_fkey (email),
+            editor_assignments!inner (
+              id,
+              editor_user_id,
+              assigned_at,
+              users!editor_assignments_editor_user_id_fkey (id, email, metadata)
+            ),
+            video_submissions (
+              id,
+              qc_status,
+              qc_reviewer_id,
+              users!video_submissions_qc_reviewer_id_fkey (email, metadata)
+            )
+          `)
+          .eq('id', currentCaseId)
+          .single();
+        
+        if (caseError) throw caseError;
+        
+        currentCaseData = caseData;
+        
+        // Render header
+        renderCaseHeader();
+        
+        // Load tab content
+        await loadTimeline();
+        await loadUploadsAndForms();
+        await loadNotes();
+        await loadAudit();
+        
+        // Show content
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('caseContent').style.display = 'block';
+        
+      } catch (error) {
+        console.error('Error loading case:', error);
+        alert('Failed to load case: ' + error.message);
+      }
+    }
+    
+    function renderCaseHeader() {
+      const c = currentCaseData;
+      
+      // Case name
+      document.getElementById('caseName').textContent = c.deceased_name;
+      
+      // SLA Badge
+      const slaContainer = document.getElementById('caseSLA');
+      if (c.sla_state) {
+        const hours = Math.floor(c.sla_hours_elapsed || 0);
+        slaContainer.innerHTML = `<div class="sla-badge ${c.sla_state}">${hours}h elapsed</div>`;
+      } else {
+        slaContainer.innerHTML = '<div class="sla-badge" style="background-color: #e9ecef; color: #6c757d; border-color: #6c757d;">No SLA</div>';
+      }
+      
+      // Meta information
+      const editor = c.editor_assignments?.[0]?.users;
+      const editorId = c.editor_assignments?.[0]?.editor_user_id;
+      const editorName = editor?.metadata?.name || editor?.email || 'Unassigned';
+      
+      const qcSubmission = c.video_submissions?.[0];
+      const qcReviewer = qcSubmission?.users;
+      const qcName = qcReviewer?.metadata?.name || qcReviewer?.email || 'Unassigned';
+      
+      document.getElementById('caseMeta').innerHTML = `
+        <div class="meta-item">
+          <span class="meta-label">Funeral Home</span>
+          <span class="meta-value">🏢 ${c.organizations?.name || 'Unknown'}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Status</span>
+          <span class="meta-value">${c.status.replace(/_/g, ' ')}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Assigned Editor</span>
+          <span class="meta-value">
+            ${editorName}
+            <button class="reassign-btn" onclick="openReassignEditorModal()">Change</button>
+          </span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">QC Reviewer</span>
+          <span class="meta-value">
+            ${qcName}
+            <button class="reassign-btn" onclick="openReassignQCModal()">Change</button>
+          </span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Family Contact</span>
+          <span class="meta-value">${c.users?.email || 'N/A'}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Created</span>
+          <span class="meta-value">${new Date(c.created_at).toLocaleString()}</span>
+        </div>
+      `;
+    }
+
+    // ============================================================================
+    // TIMELINE TAB
+    // ============================================================================
+    
+    async function loadTimeline() {
+      try {
+        // Load key events (status changes, assignments, submissions)
+        const { data: events, error } = await supabaseClient
+          .from('events')
+          .select('*')
+          .eq('target_id', currentCaseId)
+          .order('timestamp', { ascending: false })
+          .limit(50);
+        
+        if (error) throw error;
+        
+        const timelineContainer = document.getElementById('timelineContent');
+        
+        if (!events || events.length === 0) {
+          timelineContainer.innerHTML = '<div class="empty-state">No timeline events yet</div>';
+          return;
+        }
+        
+        timelineContainer.innerHTML = events.map(e => `
+          <div class="timeline-item">
+            <div class="timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
+            <div class="timeline-event">${formatEventAction(e.action_type)}</div>
+            <div class="timeline-actor">By: ${e.actor_role || 'System'}</div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading timeline:', error);
+        document.getElementById('timelineContent').innerHTML = '<div class="empty-state">Error loading timeline</div>';
+      }
+    }
+    
+    function formatEventAction(action) {
+      const actionMap = {
+        'INSERT': 'Case created',
+        'UPDATE': 'Case updated',
+        'case_created': 'Case created',
+        'status_changed': 'Status changed',
+        'editor_assigned': 'Editor assigned',
+        'video_submitted': 'Video submitted to QC',
+        'qc_approved': 'QC approved',
+        'qc_revision': 'QC requested revision',
+        'form_submitted': 'Intake form submitted'
+      };
+      return actionMap[action] || action;
+    }
+
+    // ============================================================================
+    // UPLOADS & FORMS TAB
+    // ============================================================================
+    
+    async function loadUploadsAndForms() {
+      try {
+        // Load assets
+        const { data: assets, error: assetsError } = await supabaseClient
+          .from('assets')
+          .select('*')
+          .eq('case_id', currentCaseId)
+          .order('uploaded_at', { ascending: false });
+        
+        if (assetsError) throw assetsError;
+        
+        // Load form data
+        const { data: formData, error: formError } = await supabaseClient
+          .from('forms')
+          .select('*')
+          .eq('case_id', currentCaseId)
+          .single();
+        
+        const uploadsContainer = document.getElementById('uploadsContent');
+        let html = '';
+        
+        // Render assets
+        if (assets && assets.length > 0) {
+          html += '<h3 class="form-data-title">Uploaded Photos</h3>';
+          html += '<div class="assets-grid">';
+          assets.forEach(asset => {
+            const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/case-assets/${asset.file_key}`;
+            html += `
+              <div class="asset-item" onclick="window.open('${imageUrl}', '_blank')">
+                <img src="${imageUrl}" alt="Asset" loading="lazy">
+              </div>
+            `;
+          });
+          html += '</div>';
+        } else {
+          html += '<div class="empty-state">No photos uploaded yet</div>';
+        }
+        
+        // Render form data
+        if (formData && formData.submitted_json) {
+          const data = formData.submitted_json;
+          html += '<div class="form-data-section">';
+          html += '<h3 class="form-data-title">Intake Form Data</h3>';
+          html += '<div class="form-data-grid">';
+          
+          Object.entries(data).forEach(([key, value]) => {
+            if (typeof value === 'object') {
+              value = JSON.stringify(value);
+            }
+            html += `
+              <div class="form-data-item">
+                <span class="form-data-label">${formatFieldName(key)}</span>
+                <span class="form-data-value">${value || 'N/A'}</span>
+              </div>
+            `;
+          });
+          
+          html += '</div></div>';
+        } else {
+          html += '<div class="empty-state">No form data submitted yet</div>';
+        }
+        
+        uploadsContainer.innerHTML = html;
+        
+      } catch (error) {
+        console.error('Error loading uploads:', error);
+        document.getElementById('uploadsContent').innerHTML = '<div class="empty-state">Error loading uploads</div>';
+      }
+    }
+    
+    function formatFieldName(key) {
+      return key
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    // ============================================================================
+    // NOTES TAB
+    // ============================================================================
+    
+    async function loadNotes() {
+      try {
+        const { data: notes, error } = await supabaseClient
+          .from('case_notes')
+          .select(`
+            *,
+            users!case_notes_author_user_id_fkey (email, metadata)
+          `)
+          .eq('case_id', currentCaseId)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        const notesContainer = document.getElementById('notesList');
+        
+        if (!notes || notes.length === 0) {
+          notesContainer.innerHTML = '<div class="empty-state">No notes yet</div>';
+          return;
+        }
+        
+        notesContainer.innerHTML = notes.map(note => `
+          <div class="note-item ${note.is_pinned ? 'pinned' : ''}">
+            <div class="note-header">
+              <span class="note-author">${note.users?.metadata?.name || note.users?.email || 'Unknown'}</span>
+              <span class="note-type-badge">${note.note_type}</span>
+            </div>
+            <div class="note-content">${note.content}</div>
+            <div class="note-time">${new Date(note.created_at).toLocaleString()}</div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading notes:', error);
+        document.getElementById('notesList').innerHTML = '<div class="empty-state">Error loading notes</div>';
+      }
+    }
+    
+    async function addNote() {
+      try {
+        const noteType = document.getElementById('noteType').value;
+        const content = document.getElementById('noteContent').value.trim();
+        
+        if (!content) {
+          alert('Please enter a note');
+          return;
+        }
+        
+        const session = await getValidSession();
+        if (!session) return;
+        
+        const { error } = await supabaseClient
+          .from('case_notes')
+          .insert({
+            case_id: currentCaseId,
+            author_user_id: session.user.id,
+            note_type: noteType,
+            content: content
+          });
+        
+        if (error) throw error;
+        
+        // Log to audit trail
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'note_added',
+            target_type: 'case',
+            target_id: currentCaseId,
+            payload: { note_type: noteType, content: content }
+          });
+        
+        // Clear form and reload
+        document.getElementById('noteContent').value = '';
+        await loadNotes();
+        showToast('Note added successfully');
+        
+      } catch (error) {
+        console.error('Error adding note:', error);
+        showToast('Error adding note', true);
+      }
+    }
+
+    // ============================================================================
+    // AUDIT TAB
+    // ============================================================================
+    
+    async function loadAudit() {
+      try {
+        // Load ALL events for this case (more detailed than timeline)
+        const { data: events, error } = await supabaseClient
+          .from('events')
+          .select('*')
+          .eq('target_id', currentCaseId)
+          .order('timestamp', { ascending: false });
+        
+        if (error) throw error;
+        
+        const auditContainer = document.getElementById('auditContent');
+        
+        if (!events || events.length === 0) {
+          auditContainer.innerHTML = '<div class="empty-state">No audit events</div>';
+          return;
+        }
+        
+        auditContainer.innerHTML = events.map(e => `
+          <div class="timeline-item">
+            <div class="timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
+            <div class="timeline-event">
+              <strong>${e.action_type}</strong>
+              ${e.payload ? `<br><small>${JSON.stringify(e.payload).substring(0, 100)}...</small>` : ''}
+            </div>
+            <div class="timeline-actor">
+              Actor: ${e.actor_role || 'System'} 
+              ${e.actor_user_id ? `(ID: ${e.actor_user_id.substring(0, 8)})` : ''}
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading audit:', error);
+        document.getElementById('auditContent').innerHTML = '<div class="empty-state">Error loading audit trail</div>';
+      }
+    }
+
+    // ============================================================================
+    // TAB SWITCHING
+    // ============================================================================
+    
+    function switchTab(tabName) {
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Update tab content
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    // ============================================================================
+    // SUPPORT ACTIONS - REASSIGN EDITOR
+    // ============================================================================
+    
+    async function openReassignEditorModal() {
+      try {
+        // Load all editors
+        const { data: editors, error } = await supabaseClient
+          .from('users')
+          .select('id, email, metadata')
+          .eq('role', 'editor')
+          .eq('status', 'active')
+          .order('email');
+        
+        if (error) throw error;
+        
+        const select = document.getElementById('editorSelect');
+        select.innerHTML = '<option value="">Select an editor...</option>' + 
+          editors.map(e => `<option value="${e.id}">${e.metadata?.name || e.email}</option>`).join('');
+        
+        // Show modal
+        document.getElementById('reassignEditorModal').classList.add('active');
+        
+      } catch (error) {
+        console.error('Error loading editors:', error);
+        showToast('Error loading editors', true);
+      }
+    }
+    
+    async function confirmReassignEditor() {
+      try {
+        const newEditorId = document.getElementById('editorSelect').value;
+        const reason = document.getElementById('reassignEditorReason').value;
+        
+        if (!newEditorId) {
+          alert('Please select an editor');
+          return;
+        }
+        
+        const session = await getValidSession();
+        if (!session) return;
+        
+        // Unassign current editor
+        const currentAssignment = currentCaseData.editor_assignments?.[0];
+        if (currentAssignment) {
+          await supabaseClient
+            .from('editor_assignments')
+            .update({ unassigned_at: new Date().toISOString() })
+            .eq('id', currentAssignment.id);
+        }
+        
+        // Assign new editor
+        const { error: assignError } = await supabaseClient
+          .from('editor_assignments')
+          .insert({
+            case_id: currentCaseId,
+            editor_user_id: newEditorId,
+            assigned_by: session.user.id
+          });
+        
+        if (assignError) throw assignError;
+        
+        // Log to audit
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'editor_reassigned',
+            target_type: 'case',
+            target_id: currentCaseId,
+            payload: { 
+              old_editor: currentAssignment?.editor_user_id,
+              new_editor: newEditorId,
+              reason: reason
+            }
+          });
+        
+        closeModal('reassignEditorModal');
+        showToast('Editor reassigned successfully');
+        
+        // Reload case data
+        await loadCaseData();
+        
+      } catch (error) {
+        console.error('Error reassigning editor:', error);
+        showToast('Error reassigning editor', true);
+      }
+    }
+
+    // ============================================================================
+    // SUPPORT ACTIONS - REASSIGN QC
+    // ============================================================================
+    
+    async function openReassignQCModal() {
+      try {
+        // Load all QC users
+        const { data: qcUsers, error } = await supabaseClient
+          .from('users')
+          .select('id, email, metadata')
+          .eq('role', 'qc')
+          .eq('status', 'active')
+          .order('email');
+        
+        if (error) throw error;
+        
+        const select = document.getElementById('qcSelect');
+        select.innerHTML = '<option value="">Select a QC reviewer...</option>' + 
+          qcUsers.map(q => `<option value="${q.id}">${q.metadata?.name || q.email}</option>`).join('');
+        
+        // Show modal
+        document.getElementById('reassignQCModal').classList.add('active');
+        
+      } catch (error) {
+        console.error('Error loading QC users:', error);
+        showToast('Error loading QC users', true);
+      }
+    }
+    
+    async function confirmReassignQC() {
+      try {
+        const newQCId = document.getElementById('qcSelect').value;
+        const reason = document.getElementById('reassignQCReason').value;
+        
+        if (!newQCId) {
+          alert('Please select a QC reviewer');
+          return;
+        }
+        
+        const session = await getValidSession();
+        if (!session) return;
+        
+        // Find the latest video submission for this case
+        const { data: submission, error: findError } = await supabaseClient
+          .from('video_submissions')
+          .select('id, qc_reviewer_id')
+          .eq('case_id', currentCaseId)
+          .order('submitted_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (submission) {
+          // Update QC reviewer
+          const { error: updateError } = await supabaseClient
+            .from('video_submissions')
+            .update({ 
+              qc_reviewer_id: newQCId,
+              qc_status: 'in_review'
+            })
+            .eq('id', submission.id);
+          
+          if (updateError) throw updateError;
+          
+          // Log to audit
+          await supabaseClient
+            .from('events')
+            .insert({
+              actor_user_id: session.user.id,
+              actor_role: 'admin',
+              action_type: 'qc_reassigned',
+              target_type: 'case',
+              target_id: currentCaseId,
+              payload: { 
+                old_qc: submission.qc_reviewer_id,
+                new_qc: newQCId,
+                reason: reason
+              }
+            });
+          
+          closeModal('reassignQCModal');
+          showToast('QC reviewer reassigned successfully');
+          
+          // Reload case data
+          await loadCaseData();
+        } else {
+          throw new Error('No video submission found for this case');
+        }
+        
+      } catch (error) {
+        console.error('Error reassigning QC:', error);
+        showToast('Error reassigning QC: ' + error.message, true);
+      }
+    }
+
+    // ============================================================================
+    // SUPPORT ACTIONS - PUSH TO REVISION
+    // ============================================================================
+    
+    async function pushToRevision() {
+      if (!confirm('Push this case to revision? The editor will be notified.')) {
+        return;
+      }
+      
+      try {
+        const session = await getValidSession();
+        if (!session) return;
+        
+        // Update case status
+        const { error: updateError } = await supabaseClient
+          .from('cases')
+          .update({ status: 'revision_requested' })
+          .eq('id', currentCaseId);
+        
+        if (updateError) throw updateError;
+        
+        // Log to audit
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'pushed_to_revision',
+            target_type: 'case',
+            target_id: currentCaseId,
+            payload: { reason: 'Admin support action' }
+          });
+        
+        // Add system note
+        await supabaseClient
+          .from('case_notes')
+          .insert({
+            case_id: currentCaseId,
+            author_user_id: session.user.id,
+            note_type: 'support',
+            content: 'Case pushed to revision by admin support'
+          });
+        
+        showToast('Case pushed to revision');
+        await loadCaseData();
+        
+      } catch (error) {
+        console.error('Error pushing to revision:', error);
+        showToast('Error pushing to revision', true);
+      }
+    }
+
+    // ============================================================================
+    // SUPPORT ACTIONS - REGENERATE FAMILY LINK
+    // ============================================================================
+    
+    async function regenerateFamilyLink() {
+      if (!confirm('Regenerate the family login link? This will invalidate the old link.')) {
+        return;
+      }
+      
+      try {
+        const session = await getValidSession();
+        if (!session) return;
+        
+        // Get family user
+        const familyUserId = currentCaseData.assigned_family_user_id;
+        if (!familyUserId) {
+          throw new Error('No family user assigned to this case');
+        }
+        
+        // Call create-case edge function to regenerate link
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-case`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            action: 'regenerate_link',
+            case_id: currentCaseId,
+            family_user_id: familyUserId
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to regenerate link');
+        }
+        
+        // Log to audit
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'link_regenerated',
+            target_type: 'case',
+            target_id: currentCaseId,
+            payload: { family_user_id: familyUserId }
+          });
+        
+        showToast(`New login link: ${result.login_url}`);
+        
+        // Copy to clipboard
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(result.login_url);
+          showToast('Link copied to clipboard!');
+        }
+        
+      } catch (error) {
+        console.error('Error regenerating link:', error);
+        showToast('Error: ' + error.message, true);
+      }
+    }
+
+    // ============================================================================
+    // SUPPORT ACTIONS - RESEND FAMILY LINK
+    // ============================================================================
+    
+    async function resendFamilyLink() {
+      if (!confirm('Resend the family login link via email?')) {
+        return;
+      }
+      
+      try {
+        const session = await getValidSession();
+        if (!session) return;
+        
+        // Get family user email
+        const familyEmail = currentCaseData.users?.email;
+        if (!familyEmail) {
+          throw new Error('No family email found');
+        }
+        
+        // Call create-case edge function to resend
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/create-case`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            action: 'resend_link',
+            case_id: currentCaseId,
+            family_email: familyEmail
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to resend link');
+        }
+        
+        // Log to audit
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'link_resent',
+            target_type: 'case',
+            target_id: currentCaseId,
+            payload: { family_email: familyEmail }
+          });
+        
+        showToast('Login link resent to ' + familyEmail);
+        
+      } catch (error) {
+        console.error('Error resending link:', error);
+        showToast('Error: ' + error.message, true);
+      }
+    }
+
+    // ============================================================================
+    // MODAL CONTROLS
+    // ============================================================================
+    
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+    
+    // Close modals on background click
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+    });
+
+    // ============================================================================
+    // TOAST NOTIFICATIONS
+    // ============================================================================
+    
+    function showToast(message, isError = false) {
+      const toast = document.createElement('div');
+      toast.className = `toast ${isError ? 'error' : ''}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => toast.classList.add('show'), 100);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ============================================================================
+    // PAGE INITIALIZATION
+    // ============================================================================
+    
+    async function init() {
+      const authenticated = await checkAuth();
+      if (authenticated) {
+        await loadCaseData();
+      }
+    }
+    
+    // Start the app
+    init();
+  </script>
+</body>
+</html>
+
