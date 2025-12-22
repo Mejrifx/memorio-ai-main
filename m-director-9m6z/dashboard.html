@@ -1498,9 +1498,11 @@
           .eq('case_id', caseId)
           .single();
         
+        const stage = getCaseStage(caseData.status);
+        
         document.getElementById('modal-case-name').textContent = caseData.deceased_name;
         document.getElementById('modal-case-id').textContent = caseData.id;
-        document.getElementById('modal-case-status').textContent = caseData.status.replace(/_/g, ' ');
+        document.getElementById('modal-case-status').textContent = `${stage.emoji} ${stage.label}`;
         document.getElementById('modal-case-created').textContent = new Date(caseData.created_at).toLocaleDateString();
         document.getElementById('modal-case-updated').textContent = new Date(caseData.updated_at).toLocaleDateString();
         
@@ -1736,6 +1738,52 @@
     
     // Load cases
     // Get video/QC status badge HTML
+    // Map database status to workflow stage
+    function getCaseStage(status) {
+      // Waiting on Family: Case created, waiting for family to complete intake
+      if (['created', 'waiting_on_family', 'intake_in_progress'].includes(status)) {
+        return {
+          label: 'Waiting on Family',
+          color: '#ff9800', // Orange
+          emoji: '⏳'
+        };
+      }
+      
+      // In Progress: Family submitted, editor working
+      if (['submitted', 'in_production'].includes(status)) {
+        return {
+          label: 'In Progress',
+          color: '#2196f3', // Blue
+          emoji: '🎬'
+        };
+      }
+      
+      // Awaiting Review: Video submitted to QC
+      if (['awaiting_review', 'revision_requested'].includes(status)) {
+        return {
+          label: 'Awaiting Review',
+          color: '#9c27b0', // Purple
+          emoji: '🔍'
+        };
+      }
+      
+      // Complete: Delivered to family
+      if (['delivered', 'closed'].includes(status)) {
+        return {
+          label: 'Complete',
+          color: '#4caf50', // Green
+          emoji: '✅'
+        };
+      }
+      
+      // Fallback
+      return {
+        label: status.replace(/_/g, ' '),
+        color: '#9e9e9e', // Grey
+        emoji: '📝'
+      };
+    }
+    
     function getVideoStatusBadge(status) {
       const statusConfig = {
         'in_production': { text: '🎬 Editor Working', color: '#9c27b0' },
@@ -1784,19 +1832,34 @@
           return;
         }
         
-        casesList.innerHTML = cases.map(c => `
-          <div class="case-card" onclick="openCaseModal('${c.id}')">
-            <div class="case-name">${c.deceased_name}</div>
-            <span class="case-status status-${c.status.split('_')[0]}">${c.status.replace(/_/g, ' ')}</span>
-            ${getVideoStatusBadge(c.status)}
-            <p class="case-meta">Created: ${new Date(c.created_at).toLocaleDateString()}</p>
-            <div class="credential-box" style="margin-top: 12px;">
-              <div class="credential-label">Case ID</div>
-              <div class="credential-value" id="case-id-${c.id}" style="font-size: 11px; word-break: break-all;">${c.id}</div>
-              <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('case-id-${c.id}')">Copy</button>
+        casesList.innerHTML = cases.map(c => {
+          const stage = getCaseStage(c.status);
+          return `
+            <div class="case-card" onclick="openCaseModal('${c.id}')">
+              <div class="case-name">${c.deceased_name}</div>
+              <div style="
+                background-color: ${stage.color}15;
+                border: 1.5px solid ${stage.color};
+                color: ${stage.color};
+                padding: 8px 14px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 600;
+                margin-top: 8px;
+                display: inline-block;
+              ">
+                ${stage.emoji} ${stage.label}
+              </div>
+              ${getVideoStatusBadge(c.status)}
+              <p class="case-meta">Created: ${new Date(c.created_at).toLocaleDateString()}</p>
+              <div class="credential-box" style="margin-top: 12px;">
+                <div class="credential-label">Case ID</div>
+                <div class="credential-value" id="case-id-${c.id}" style="font-size: 11px; word-break: break-all;">${c.id}</div>
+                <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('case-id-${c.id}')">Copy</button>
+              </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
         
       } catch (error) {
         errorBox.textContent = `Error loading cases: ${error.message}`;
