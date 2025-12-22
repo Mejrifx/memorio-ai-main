@@ -1006,6 +1006,61 @@
       </div>
     </div>
   </div>
+  
+  <!-- INLINE STEP REMOVAL - Executes IMMEDIATELY after form HTML is parsed -->
+  <script>
+    (function() {
+        console.log('🗑️ INLINE: Removing unwanted form steps...');
+        let removedCount = 0;
+        
+        // Find all labels in the document
+        const allLabels = document.querySelectorAll('label');
+        console.log(`Found ${allLabels.length} labels to check`);
+        
+        allLabels.forEach((label, index) => {
+            const labelText = label.textContent || '';
+            
+            // Remove "Please provide more details about their passing"
+            if (labelText.includes('Please provide more details about their passing')) {
+                const stepContainer = label.closest('.form-slider-step-1');
+                if (stepContainer) {
+                    console.log(`Found DOD step at label ${index}, removing...`);
+                    stepContainer.parentNode.removeChild(stepContainer);
+                    removedCount++;
+                    console.log('✅ INLINE: Removed Date of death step');
+                }
+            }
+            
+            // Remove "Please provide more details about their birth"
+            if (labelText.includes('Please provide more details about their birth')) {
+                const stepContainer = label.closest('.form-slider-step-1');
+                if (stepContainer) {
+                    console.log(`Found DOB step at label ${index}, removing...`);
+                    stepContainer.parentNode.removeChild(stepContainer);
+                    removedCount++;
+                    console.log('✅ INLINE: Removed Date of birth step');
+                }
+            }
+            
+            // Remove "Name of the funeral home?"
+            if (labelText.includes('Name of the funeral home')) {
+                const stepContainer = label.closest('.form-slider-step-1');
+                if (stepContainer) {
+                    console.log(`Found funeral home step at label ${index}, removing...`);
+                    stepContainer.parentNode.removeChild(stepContainer);
+                    removedCount++;
+                    console.log('✅ INLINE: Removed Funeral home step');
+                }
+            }
+        });
+        
+        console.log(`✅ INLINE: Removed ${removedCount} unwanted steps`);
+        if (removedCount === 0) {
+            console.warn('⚠️ INLINE: No steps were removed! Check if labels exist.');
+        }
+    })();
+  </script>
+  
   <style id="memorio-styles">
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -1082,61 +1137,6 @@
         .memorial-info { background:#fff3e9; border-radius:20px; padding:25px; margin-bottom:20px; font-size:16px; color:#32343a; text-align:center; box-shadow:0 2px 8px -2px rgba(0,0,0,.2); }
         .memorio-container { max-width: 800px; margin: 0 auto; }
     </style>
-    
-    <!-- IMMEDIATE STEP REMOVAL SCRIPT -->
-    <!-- Runs synchronously BEFORE Webflow slider initializes -->
-    <script>
-        (function() {
-            // Wait for DOM to be ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', removeUnwantedSteps);
-            } else {
-                removeUnwantedSteps();
-            }
-            
-            function removeUnwantedSteps() {
-                console.log('🗑️ Removing unwanted form steps...');
-                
-                // Find and REMOVE date of death step
-                const allLabels = document.querySelectorAll('label');
-                let removedCount = 0;
-                
-                allLabels.forEach(label => {
-                    // Remove "Please provide more details about their passing"
-                    if (label.textContent.includes('Please provide more details about their passing')) {
-                        const stepContainer = label.closest('.form-slider-step-1');
-                        if (stepContainer) {
-                            stepContainer.remove();
-                            removedCount++;
-                            console.log('✅ Removed: Date of death step');
-                        }
-                    }
-                    
-                    // Remove "Please provide more details about their birth"
-                    if (label.textContent.includes('Please provide more details about their birth')) {
-                        const stepContainer = label.closest('.form-slider-step-1');
-                        if (stepContainer) {
-                            stepContainer.remove();
-                            removedCount++;
-                            console.log('✅ Removed: Date of birth step');
-                        }
-                    }
-                    
-                    // Remove "Name of the funeral home?"
-                    if (label.textContent.includes('Name of the funeral home')) {
-                        const stepContainer = label.closest('.form-slider-step-1');
-                        if (stepContainer) {
-                            stepContainer.remove();
-                            removedCount++;
-                            console.log('✅ Removed: Funeral home step');
-                        }
-                    }
-                });
-                
-                console.log(`✅ Removed ${removedCount} unwanted steps from DOM`);
-            }
-        })();
-    </script>
     
             <script>
         // Production endpoints - will work when deployed to memorio.ai domain
