@@ -45,17 +45,44 @@ serve(async (req) => {
 
     // Parse request body
     const body: CreateCaseRequest = await req.json();
-    const { deceased_name, service_date, service_location, metadata } = body;
+    const { 
+      deceased_name, 
+      gender,
+      date_of_birth,
+      date_of_death,
+      city_of_birth,
+      city_of_death,
+      service_date,
+      service_location, 
+      metadata 
+    } = body;
 
     // Validate required fields
-    if (!deceased_name) {
+    const requiredFields = {
+      deceased_name,
+      gender,
+      date_of_birth,
+      date_of_death,
+      city_of_birth,
+      city_of_death,
+      service_date
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([key, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Missing required field: deceased_name' }),
+        JSON.stringify({ 
+          success: false, 
+          error: `Missing required fields: ${missingFields.join(', ')}` 
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Create case
+    // Create case with all decedent information in metadata
     const { data: caseData, error: caseError } = await supabase
       .from('cases')
       .insert({
@@ -64,9 +91,18 @@ serve(async (req) => {
         created_by: user.id,
         status: 'created',
         metadata: {
+          // Core decedent information (required)
+          gender,
+          date_of_birth,
+          date_of_death,
+          city_of_birth,
+          city_of_death,
           service_date,
           service_location,
-          ...metadata
+          // Additional metadata
+          ...metadata,
+          // Flag that core info was provided by director
+          director_provided_core_info: true
         }
       })
       .select()
@@ -106,6 +142,11 @@ serve(async (req) => {
         target_id: caseData.id,
         payload: {
           deceased_name,
+          gender,
+          date_of_birth,
+          date_of_death,
+          city_of_birth,
+          city_of_death,
           service_date,
           service_location
         }
