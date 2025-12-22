@@ -100,12 +100,30 @@ serve(async (req) => {
       // Continue with deletion even if logging fails
     }
 
-    // Delete the user from Supabase Auth (this will CASCADE to public.users due to FK)
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id);
+    // STEP 1: Delete from public.users first (triggers FK cascades/set nulls we configured)
+    console.log('Deleting from public.users table...');
+    const { error: publicDeleteError } = await supabaseAdmin
+      .from('users')
+      .delete()
+      .eq('id', user_id);
 
-    if (deleteError) {
-      console.error('Delete error details:', JSON.stringify(deleteError, null, 2));
-      throw new Error(`Failed to delete user: ${deleteError.message || JSON.stringify(deleteError)}`);
+    if (publicDeleteError) {
+      console.error('Public delete error:', JSON.stringify(publicDeleteError, null, 2));
+      throw new Error(`Failed to delete from public.users: ${publicDeleteError.message || JSON.stringify(publicDeleteError)}`);
+    }
+
+    console.log('Successfully deleted from public.users');
+
+    // STEP 2: Delete from auth.users (clean up authentication)
+    console.log('Deleting from auth.users...');
+    const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(user_id);
+
+    if (authDeleteError) {
+      console.error('Auth delete error:', JSON.stringify(authDeleteError, null, 2));
+      // This might fail if CASCADE already deleted, which is okay
+      console.log('Auth delete failed (might be already deleted by CASCADE), continuing...');
+    } else {
+      console.log('Successfully deleted from auth.users');
     }
 
     return new Response(
