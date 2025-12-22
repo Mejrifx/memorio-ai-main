@@ -2365,14 +2365,20 @@
                 console.log('✅ Removed name attribute from visible funeral_home field');
             });
             
-            // REMOVE (not just hide) the funeral home step container entirely from DOM
+            // Hide funeral home step and mark it for slider to skip
             const allLabels = document.querySelectorAll('label');
             allLabels.forEach(label => {
                 if (label.textContent.includes('Name of the funeral home')) {
                     const stepContainer = label.closest('.form-slider-step-1');
                     if (stepContainer) {
-                        stepContainer.remove(); // Completely remove from DOM
-                        console.log('✅ Funeral home step REMOVED from DOM');
+                        // Keep in DOM but make completely invisible and non-interactive
+                        stepContainer.style.display = 'none';
+                        stepContainer.style.visibility = 'hidden';
+                        stepContainer.style.position = 'absolute';
+                        stepContainer.style.pointerEvents = 'none';
+                        stepContainer.setAttribute('data-skip-step', 'true'); // Mark for skipping
+                        stepContainer.setAttribute('aria-hidden', 'true');
+                        console.log('✅ Funeral home step hidden and marked for skipping');
                     }
                 }
             });
@@ -2403,29 +2409,89 @@
                 });
             });
             
-            // REMOVE (not just hide) step containers entirely from DOM
+            // Hide date step containers and mark them for slider to skip
             const allLabels = document.querySelectorAll('label');
             allLabels.forEach(label => {
-                // REMOVE "Please provide more details about their passing" step
+                // Hide "Please provide more details about their passing" step
                 if (label.textContent.includes('Please provide more details about their passing')) {
                     const stepContainer = label.closest('.form-slider-step-1');
                     if (stepContainer) {
-                        stepContainer.remove(); // Completely remove from DOM
-                        console.log('✅ Date of death step REMOVED from DOM');
+                        // Keep in DOM but make completely invisible and non-interactive
+                        stepContainer.style.display = 'none';
+                        stepContainer.style.visibility = 'hidden';
+                        stepContainer.style.position = 'absolute';
+                        stepContainer.style.pointerEvents = 'none';
+                        stepContainer.setAttribute('data-skip-step', 'true'); // Mark for skipping
+                        stepContainer.setAttribute('aria-hidden', 'true');
+                        console.log('✅ Date of death step hidden and marked for skipping');
                     }
                 }
                 
-                // REMOVE "Please provide more details about their birth" step
+                // Hide "Please provide more details about their birth" step
                 if (label.textContent.includes('Please provide more details about their birth')) {
                     const stepContainer = label.closest('.form-slider-step-1');
                     if (stepContainer) {
-                        stepContainer.remove(); // Completely remove from DOM
-                        console.log('✅ Date of birth step REMOVED from DOM');
+                        // Keep in DOM but make completely invisible and non-interactive
+                        stepContainer.style.display = 'none';
+                        stepContainer.style.visibility = 'hidden';
+                        stepContainer.style.position = 'absolute';
+                        stepContainer.style.pointerEvents = 'none';
+                        stepContainer.setAttribute('data-skip-step', 'true'); // Mark for skipping
+                        stepContainer.setAttribute('aria-hidden', 'true');
+                        console.log('✅ Date of birth step hidden and marked for skipping');
                     }
                 }
             });
             
             console.log('✅ Date steps hidden and visible fields disabled');
+            
+            // Setup navigation interceptor to auto-skip hidden steps
+            setupStepSkipper();
+        }
+        
+        /**
+         * Setup navigation to automatically skip steps marked with data-skip-step="true"
+         */
+        function setupStepSkipper() {
+            // Find all NEXT buttons in the form
+            const nextButtons = document.querySelectorAll('.next, .button-primary.next, a.next');
+            
+            nextButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Small delay to let the slider navigate first
+                    setTimeout(() => {
+                        skipHiddenSteps();
+                    }, 50);
+                });
+            });
+            
+            console.log('✅ Step skipper initialized');
+        }
+        
+        /**
+         * Skip any currently visible step that's marked as data-skip-step="true"
+         */
+        function skipHiddenSteps() {
+            const allSteps = document.querySelectorAll('.form-slider-step-1');
+            let foundSkippableStep = false;
+            
+            allSteps.forEach((step, index) => {
+                // Check if this step is marked to skip and is currently the "active" step
+                const shouldSkip = step.getAttribute('data-skip-step') === 'true';
+                const isVisible = window.getComputedStyle(step).display !== 'none' || 
+                                 step.style.display !== 'none';
+                
+                if (shouldSkip && !foundSkippableStep) {
+                    foundSkippableStep = true;
+                    console.log(`⏭️ Auto-skipping hidden step ${index + 1}`);
+                    
+                    // Find and click the NEXT button again to skip this step
+                    const nextButton = step.querySelector('.next, .button-primary.next, a.next');
+                    if (nextButton) {
+                        nextButton.click();
+                    }
+                }
+            });
         }
         
         /**
