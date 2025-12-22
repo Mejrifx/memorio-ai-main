@@ -1814,6 +1814,10 @@
         // Get valid session (will auto-refresh if needed)
         const session = await getValidSession();
         
+        console.log('=== CREATING CASE ===');
+        console.log('Case Data:', caseData);
+        console.log('Session:', session?.user?.email);
+        
         const response = await fetch(`${SUPABASE_URL}/functions/v1/create-case`, {
           method: 'POST',
           headers: {
@@ -1824,17 +1828,24 @@
           body: JSON.stringify(caseData)
         });
         
+        console.log('Response Status:', response.status);
         const result = await response.json();
+        console.log('Response Result:', result);
         
         if (!response.ok || !result.success) {
           throw new Error(result.error || 'Failed to create case');
         }
         
+        console.log('✅ Case created successfully:', result.data.case_id);
         document.getElementById('created-case-id').textContent = result.data.case_id;
         successBox.style.display = 'block';
         document.getElementById('create-case-form').reset();
         
+        // Reload cases to show the new case
+        await loadCases();
+        
       } catch (error) {
+        console.error('❌ Error creating case:', error);
         errorBox.textContent = `Error: ${error.message}`;
         errorBox.style.display = 'block';
       } finally {
