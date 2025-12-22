@@ -116,28 +116,6 @@
   <div class="form-slider-padding">
     <div class="w-form">
       <form id="wf-form-memorio_obituary_form" name="wf-form-memorio_obituary_form" data-name="memorio_obituary_form" method="get" class="form-2" data-wf-page-id="683b63acf5908465c8825cb3" data-wf-element-id="faaf2315-7be8-4814-9169-c55030b0674d">
-        
-        <!-- ========================================== -->
-        <!-- HIDDEN FIELDS (Pre-filled by Director)    -->
-        <!-- These are submitted to n8n for obituary    -->
-        <!-- ========================================== -->
-        <input type="hidden" id="hidden_loved_ones_name" name="loved_ones_name" value="">
-        <input type="hidden" id="hidden_loved_ones_last_name" name="loved_ones_last_name" value="">
-        <input type="hidden" id="hidden_loved_ones_gender" name="loved_ones_gender" value="">
-        
-        <input type="hidden" id="hidden_month_of_birth" name="month_of_birth" value="">
-        <input type="hidden" id="hidden_day_of_birth" name="day_of_birth" value="">
-        <input type="hidden" id="hidden_year_of_birth" name="year_of_birth" value="">
-        <input type="hidden" id="hidden_date_of_birth" name="date_of_birth" value="">
-        <input type="hidden" id="hidden_city_of_birth" name="city_of_birth" value="">
-        
-        <input type="hidden" id="hidden_month_of_passing" name="month_of_passing" value="">
-        <input type="hidden" id="hidden_day_of_passing" name="day_of_passing" value="">
-        <input type="hidden" id="hidden_year_of_passing" name="year_of_passing" value="">
-        <input type="hidden" id="hidden_date_of_passing" name="date_of_passing" value="">
-        <input type="hidden" id="hidden_city_of_passing" name="city_of_passing" value="">
-        <!-- ========================================== -->
-        
         <!-- Step 1 removed: customer name/email (collected by director) -->
         <div data-w-id="d026be39-46e7-e794-7d04-b04fb7e8fd1c" class="form-slider-step-1">
           <div class="form-title">
@@ -1258,22 +1236,14 @@
                 
                 console.log('✅ Password changed successfully');
                 
-                // Update currentUser metadata to reflect password change
-                if (currentUser) {
-                    currentUser.metadata.requires_password_change = false;
-                }
-                
-                // Hide modal
+                // Hide modal and continue to form
                 hidePasswordChangeModal();
                 
-                // Load the family case and continue to form
-                console.log('📋 Loading case after password change...');
-                await loadFamilyCase();
+                // Show success message
+                alert('Password updated successfully! You can now proceed with the form.');
                 
-                // Show success message (non-blocking)
-                setTimeout(() => {
-                    console.log('✅ Password updated - form ready');
-                }, 500);
+                // Load the family case and continue
+                await loadFamilyCase();
                 
             } catch (error) {
                 console.error('Password change error:', error);
@@ -1313,20 +1283,33 @@
                 
                 if (error) throw error;
                 
-                console.log('✅ Auth successful:', data.user.email);
+                // Check if user is a family member
+                const role = data.user.app_metadata?.role;
                 
-                // Fetch user data from database (SINGLE query like Director Portal)
+                if (role !== 'family') {
+                    throw new Error('Access denied: This form is only for family members.');
+                }
+                
+                // Fetch user data from database (EXACT same as Director Portal)
                 const { data: userData, error: userError } = await supabaseClient
                     .from('users')
                     .select('role, metadata')
                     .eq('id', data.user.id)
                     .single();
                 
+                console.log('✅ Login successful:', data.user.email);
                 console.log('🔐 Database user data:', userData);
                 
                 if (userError || !userData || userData.role !== 'family') {
-                    console.error('❌ Role check failed:', userError);
                     throw new Error('Access denied: This form is only for family members.');
+                }
+                
+                // Check if user needs to change password (EXACT same check as Director Portal)
+                if (userData.metadata?.requires_password_change === true) {
+                    console.log('⚠️ First login detected - forcing password change');
+                    hideLoginModal();
+                    showPasswordChangeModal();
+                    return; // Stop execution until password is changed
                 }
                 
                 // Set currentUser with full data
@@ -1336,34 +1319,35 @@
                     ...userData
                 };
                 
-                // #region agent log - Hypothesis A & B: Check password change flag in handleLogin
-                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:handleLogin',message:'Password change check in handleLogin',data:{metadata:userData.metadata,flagValue:userData.metadata?.requires_password_change,flagType:typeof userData.metadata?.requires_password_change},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A-B'})}).catch(()=>{});
-                // #endregion
-                
-                // Check if user needs to change password (BEFORE loading anything else)
-                if (userData.metadata?.requires_password_change === true) {
-                    console.log('⚠️ First login - password change required');
-                    // #region agent log - Hypothesis A: Password modal should show
-                    fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:handleLogin',message:'PASSWORD MODAL SHOULD SHOW NOW',data:{showingModal:true},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
-                    // #endregion
-                    hideLoginModal();
-                    showPasswordChangeModal();
-                    return; // STOP HERE - don't load form until password changed
-                }
-                
-                // #region agent log - Hypothesis A: No password change needed
-                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:handleLogin',message:'No password change required, proceeding to form',data:{flagValue:userData.metadata?.requires_password_change},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
-                
-                console.log('✅ Login complete - proceeding to form');
-                
-                // Update welcome heading with user name if available
-                const userName = userData.metadata?.name;
-                if (userName) {
-                    const welcomeHeading = document.getElementById('welcome-heading');
-                    if (welcomeHeading) {
-                        welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
+                // Fetch and display user's name for personalized greeting
+                try {
+                    const { data: userData, error: userError } = await supabaseClient
+                        .from('users')
+                        .select('metadata')
+                        .eq('id', currentUser.id)
+                        .single();
+                    
+                    if (!userError && userData?.metadata?.name) {
+                        const userName = userData.metadata.name;
+                        console.log('✅ User name loaded:', userName);
+                        
+                        // Update the welcome heading with personalized greeting
+                        const welcomeHeading = document.getElementById('welcome-heading');
+                        if (welcomeHeading) {
+                            welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
+                        }
+                    } else {
+                        // Fallback to JWT user_metadata
+                        const fallbackName = currentUser.user_metadata?.name;
+                        if (fallbackName) {
+                            const welcomeHeading = document.getElementById('welcome-heading');
+                            if (welcomeHeading) {
+                                welcomeHeading.textContent = `Hey ${fallbackName}, Let's begin.`;
+                            }
+                        }
                     }
+                } catch (e) {
+                    console.error('❌ Error fetching user name:', e);
                 }
                 
                 hideLoginModal();
@@ -1412,22 +1396,27 @@
                     return false;
                 }
                 
-                console.log('✅ Session found:', session.user.email);
-                
-                // Fetch user data from database (SINGLE query)
+                // Fetch user data from database (EXACT same as Director Portal)
                 const { data: userData, error: userError } = await supabaseClient
                     .from('users')
                     .select('role, metadata')
                     .eq('id', session.user.id)
                     .single();
                 
+                console.log('✅ User authenticated:', session.user.email);
                 console.log('🔐 Database user data:', userData);
-                console.log('🔐 User metadata:', JSON.stringify(userData?.metadata, null, 2));
                 
                 if (userError || !userData || userData.role !== 'family') {
                     console.error('❌ Not a family member or user not found:', userError);
                     showLoginModal();
                     return false;
+                }
+                
+                // Check if user needs to change password (EXACT same check as Director Portal)
+                if (userData.metadata?.requires_password_change === true) {
+                    console.log('⚠️ First login detected - forcing password change');
+                    showPasswordChangeModal();
+                    return false; // Block form access until password is changed
                 }
                 
                 // Set currentUser with full data
@@ -1437,24 +1426,47 @@
                     ...userData
                 };
                 
-                // Check if user needs to change password (BEFORE loading form)
-                console.log('🔍 Checking requires_password_change flag:', userData.metadata?.requires_password_change);
-                if (userData.metadata?.requires_password_change === true) {
-                    console.log('⚠️ First login - password change required');
-                    console.log('📋 Showing password change modal...');
-                    showPasswordChangeModal();
-                    return false; // STOP - password must be changed first
-                }
-                
-                console.log('✅ Authentication complete (no password change needed)');
-                
-                // Update welcome heading with user name if available
-                const userName = userData.metadata?.name;
-                if (userName) {
-                    const welcomeHeading = document.getElementById('welcome-heading');
-                    if (welcomeHeading) {
-                        welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
+                // Fetch user's name for personalized greeting
+                try {
+                    console.log('📡 Attempting to fetch user data from database...');
+                    const { data: userData, error: userError } = await supabaseClient
+                        .from('users')
+                        .select('metadata')
+                        .eq('id', currentUser.id)
+                        .single();
+                    
+                    if (userError) {
+                        console.error('❌ Database query failed:', userError);
+                        console.error('❌ Error code:', userError.code);
+                        console.error('❌ Error message:', userError.message);
+                        console.error('❌ Error details:', userError.details);
+                        console.error('❌ Error hint:', userError.hint);
                     }
+                    
+                    if (!userError && userData?.metadata?.name) {
+                        const userName = userData.metadata.name;
+                        console.log('✅ User name loaded:', userName);
+                        
+                        // Update the welcome heading with personalized greeting
+                        const welcomeHeading = document.getElementById('welcome-heading');
+                        if (welcomeHeading) {
+                            welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
+                        }
+                    } else {
+                        console.warn('⚠️ Could not load user name from database:', userError);
+                        // Fallback: try to get name from user_metadata (JWT)
+                        const fallbackName = currentUser.user_metadata?.name;
+                        if (fallbackName) {
+                            console.log('✅ User name loaded from JWT:', fallbackName);
+                            const welcomeHeading = document.getElementById('welcome-heading');
+                            if (welcomeHeading) {
+                                welcomeHeading.textContent = `Hey ${fallbackName}, Let's begin.`;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error('❌ Error fetching user name:', e);
+                    // Continue without personalization - will show default "Lets begin!"
                 }
                 
                 // Check if form is already completed BEFORE loading the page
@@ -1539,10 +1551,11 @@
                     formContent.classList.add('show');
                 }
                 
-                // Initialize family portal enhancements (hide steps, populate data)
-                // This runs after case is loaded (whether from login or after password change)
-                console.log('🎨 Initializing family portal enhancements...');
-                initFamilyPortalEnhancements();
+                // Optionally pre-fill deceased name in form if needed
+                // const deceasedNameField = document.querySelector('[name="loved_ones_name"]');
+                // if (deceasedNameField && !deceasedNameField.value) {
+                //     deceasedNameField.value = currentCase.deceased_name;
+                // }
                 
             } catch (error) {
                 console.error('Error loading case:', error);
@@ -2239,13 +2252,6 @@
                 // Ensure date fields are combined before submission
                 combineDateInputsOnSubmit();
                 
-                // #region agent log - Hypothesis D: Check which fields are in form before serialization
-                const allFormFields = form.querySelectorAll('input, select, textarea');
-                const fieldsWithName = Array.from(allFormFields).filter(f => f.name).map(f => ({name:f.name, id:f.id, type:f.type, value:f.value, disabled:f.disabled}));
-                const dateFieldsInForm = fieldsWithName.filter(f => f.name.includes('birth') || f.name.includes('passing'));
-                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:formSubmit',message:'BEFORE FormData serialization',data:{totalFields:allFormFields.length,fieldsWithName:fieldsWithName.length,dateFields:dateFieldsInForm},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
-                
                 // Swap to success area immediately, then mount loader UI so it shows right away
                 form.style.display = 'none';
                 success.style.display = 'block';
@@ -2253,10 +2259,6 @@
                 mountUIIntoSuccess();
                 
                 const payload = Object.fromEntries(new FormData(form).entries());
-                // #region agent log - Hypothesis D & E: Check which date fields ended up in payload
-                const dateFieldsInPayload = Object.keys(payload).filter(k => k.includes('birth') || k.includes('passing')).map(k => ({name:k, value:payload[k]}));
-                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:formSubmit',message:'AFTER FormData serialization',data:{payloadKeys:Object.keys(payload).length,dateFieldsInPayload:dateFieldsInPayload},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D-E'})}).catch(()=>{});
-                // #endregion
                 console.log('Form payload:', payload);
                 console.log('Date fields check:');
                 console.log('- date_of_birth:', payload.date_of_birth);
@@ -2320,6 +2322,8 @@
             checkAuthentication().then(isAuthenticated => {
                 if (isAuthenticated) {
                     console.log('✅ Page ready - User authenticated and case loaded');
+                    // Initialize family portal enhancements after authentication
+                    initFamilyPortalEnhancements();
                 } else {
                     console.log('⚠️ Page ready - Operating without authentication (testing mode)');
                 }
@@ -2355,16 +2359,10 @@
          * Hide the funeral home question step (collected by director)
          */
         function hideFuneralHomeStep() {
-            // Find the funeral home input field
+            // Find the funeral home step by looking for the input field
             const funeralHomeInput = document.getElementById('funeral_home');
             if (funeralHomeInput) {
-                // Disable the field so it doesn't block submission
-                funeralHomeInput.removeAttribute('name');
-                funeralHomeInput.removeAttribute('required');
-                funeralHomeInput.disabled = true;
-                console.log('✅ Disabled funeral_home field');
-                
-                // Find and hide the parent step container
+                // Find the parent step container
                 const stepContainer = funeralHomeInput.closest('.form-slider-step-1');
                 if (stepContainer) {
                     stepContainer.style.display = 'none';
@@ -2377,71 +2375,42 @@
          * Hide DOB and DOD steps (collected by director)
          */
         function hideDateSteps() {
-            console.log('🔍 Hiding date steps and disabling visible date fields...');
-            
-            // STEP 1: Disable all visible date/city fields (remove name and required)
-            const visibleFieldsToDisable = [
-                // DOD fields
+            // List of visible field selectors that need to be disabled
+            const visibleDateFields = [
                 'month_of_passing', 'day_of_passing', 'year_of_passing',
                 'city_of_passing', 'state_of_passing', 'country_of_passing',
-                // DOB fields  
                 'month_of_birth', 'day_of_birth', 'year_of_birth',
                 'city_of_birth', 'state_of_birth', 'country_of_birth'
             ];
             
-            // #region agent log - Hypothesis C: Check visible fields before disabling
-            fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:hideDateSteps',message:'BEFORE disabling visible fields',data:{fieldsToDisable:visibleFieldsToDisable},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-            // #endregion
-            
-            visibleFieldsToDisable.forEach(fieldName => {
-                // Find visible fields (not our hidden ones)
-                const visibleFields = document.querySelectorAll(`select[name="${fieldName}"], input[name="${fieldName}"]`);
-                // #region agent log - Hypothesis C: Check how many fields found
-                fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:hideDateSteps',message:'Found visible fields for name',data:{fieldName:fieldName,count:visibleFields.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-                // #endregion
+            // Remove name and required attributes from visible fields to prevent submission
+            visibleDateFields.forEach(fieldName => {
+                const visibleFields = document.querySelectorAll(`[name="${fieldName}"]:not([type="hidden"])`);
                 visibleFields.forEach(field => {
-                    // Only disable if it's NOT a hidden field
-                    if (field.type !== 'hidden') {
-                        const beforeName = field.getAttribute('name');
-                        field.removeAttribute('name'); // Won't be submitted
-                        field.removeAttribute('required'); // Won't block submission
-                        field.disabled = true; // Extra safety
-                        const afterName = field.getAttribute('name');
-                        console.log(`✅ Disabled visible field: ${fieldName}`);
-                        // #region agent log - Hypothesis C: Verify name attribute removed
-                        fetch('http://127.0.0.1:7242/ingest/3246519b-a691-4621-8a9c-c475f9859a58',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.html:hideDateSteps',message:'Disabled visible field',data:{fieldName:fieldName,fieldId:field.id,beforeName:beforeName,afterName:afterName,disabled:field.disabled},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-                        // #endregion
-                    }
+                    field.removeAttribute('name'); // Won't be submitted
+                    field.removeAttribute('required'); // Won't block submission
                 });
             });
             
-            // STEP 2: Find and hide the step containers
-            const allSteps = document.querySelectorAll('.form-slider-step-1');
-            let hiddenCount = 0;
-            
-            allSteps.forEach(step => {
-                const heading = step.querySelector('.heading-2');
-                if (heading) {
-                    const headingText = heading.textContent.trim();
-                    
-                    // Hide DOD step
-                    if (headingText.includes('When Did Your Loved One Pass') || 
-                        (headingText.toLowerCase().includes('pass') && headingText.toLowerCase().includes('loved one'))) {
-                        step.style.display = 'none';
-                        console.log('✅ Hidden step:', headingText);
-                        hiddenCount++;
-                    }
-                    
-                    // Hide DOB step  
-                    if (headingText.includes('birth') && headingText.toLowerCase().includes('details')) {
-                        step.style.display = 'none';
-                        console.log('✅ Hidden step:', headingText);
-                        hiddenCount++;
-                    }
+            // Hide DOD step (date of passing)
+            const dateOfPassingField = document.querySelector('select#month_of_passing, [id="month_of_passing"]:not([type="hidden"])');
+            if (dateOfPassingField) {
+                const dodStepContainer = dateOfPassingField.closest('.form-slider-step-1');
+                if (dodStepContainer) {
+                    dodStepContainer.style.display = 'none';
+                    console.log('✅ Date of death step hidden');
                 }
-            });
+            }
             
-            console.log(`✅ Total date/birth steps hidden: ${hiddenCount}`);
+            // Hide DOB step (date of birth)
+            const dateOfBirthField = document.querySelector('select#month_of_birth, [id="month_of_birth"]:not([type="hidden"])');
+            if (dateOfBirthField) {
+                const dobStepContainer = dateOfBirthField.closest('.form-slider-step-1');
+                if (dobStepContainer) {
+                    dobStepContainer.style.display = 'none';
+                    console.log('✅ Date of birth step hidden');
+                }
+            }
         }
         
         /**
@@ -2452,10 +2421,6 @@
                 console.warn('⚠️ No case loaded or deceased name not available');
                 return;
             }
-            
-            console.log('📝 Starting to populate deceased name and hidden fields...');
-            console.log('📝 Current case:', currentCase);
-            console.log('📝 Case metadata:', currentCase.metadata);
             
             const deceasedName = currentCase.deceased_name.split(' ')[0]; // Use first name
             
@@ -2469,79 +2434,78 @@
             // These hidden fields are required for n8n to generate the obituary correctly
             
             const metadata = currentCase.metadata || {};
-            console.log('📝 Using metadata for population:', metadata);
             
-            // ===== POPULATE NAME FIELDS (HIDDEN) =====
+            // ===== POPULATE NAME FIELDS =====
             let fullName = metadata.full_name || currentCase.deceased_name || '';
             
             if (fullName) {
                 const nameParts = fullName.trim().split(' ');
-                const firstNameField = document.getElementById('hidden_loved_ones_name');
-                const lastNameField = document.getElementById('hidden_loved_ones_last_name');
+                const firstNameField = document.getElementById('loved_ones_name');
+                const lastNameField = document.getElementById('loved_ones_last_name');
                 
                 if (firstNameField) {
                     firstNameField.value = nameParts[0] || '';
-                    console.log('✅ Pre-populated hidden loved_ones_name:', nameParts[0]);
+                    console.log('✅ Pre-populated loved_ones_name:', nameParts[0]);
                 }
                 if (lastNameField && nameParts.length > 1) {
                     lastNameField.value = nameParts.slice(1).join(' ') || '';
-                    console.log('✅ Pre-populated hidden loved_ones_last_name:', nameParts.slice(1).join(' '));
+                    console.log('✅ Pre-populated loved_ones_last_name:', nameParts.slice(1).join(' '));
                 }
             } else {
                 console.warn('⚠️ No name found in case metadata or deceased_name');
             }
             
-            // ===== POPULATE GENDER (HIDDEN) =====
+            // ===== POPULATE GENDER =====
             if (metadata.gender) {
-                const genderField = document.getElementById('hidden_loved_ones_gender');
+                const genderField = document.getElementById('loved_ones_gender');
                 if (genderField) {
                     genderField.value = metadata.gender;
-                    console.log('✅ Pre-populated hidden loved_ones_gender:', metadata.gender);
+                    console.log('✅ Pre-populated loved_ones_gender:', metadata.gender);
                 }
             }
             
-            // ===== POPULATE DATE OF BIRTH (HIDDEN) =====
+            // ===== POPULATE DATE OF BIRTH =====
             if (metadata.date_of_birth) {
                 // Parse YYYY-MM-DD format
                 const dobParts = metadata.date_of_birth.split('-');
                 if (dobParts.length === 3) {
                     const [year, month, day] = dobParts;
                     
-                    document.getElementById('hidden_year_of_birth').value = year;
-                    document.getElementById('hidden_month_of_birth').value = month;
-                    document.getElementById('hidden_day_of_birth').value = day;
-                    document.getElementById('hidden_date_of_birth').value = metadata.date_of_birth;
+                    document.getElementById('year_of_birth').value = year;
+                    document.getElementById('month_of_birth').value = month;
+                    document.getElementById('day_of_birth').value = day;
+                    document.getElementById('date_of_birth').value = metadata.date_of_birth;
                     
-                    console.log('✅ Pre-populated hidden DOB:', metadata.date_of_birth);
+                    console.log('✅ Pre-populated DOB:', metadata.date_of_birth);
                 }
             }
             
-            // ===== POPULATE DATE OF DEATH (HIDDEN) =====
+            // ===== POPULATE DATE OF DEATH =====
             if (metadata.date_of_death) {
                 // Parse YYYY-MM-DD format
                 const dodParts = metadata.date_of_death.split('-');
                 if (dodParts.length === 3) {
                     const [year, month, day] = dodParts;
                     
-                    document.getElementById('hidden_year_of_passing').value = year;
-                    document.getElementById('hidden_month_of_passing').value = month;
-                    document.getElementById('hidden_day_of_passing').value = day;
-                    document.getElementById('hidden_date_of_passing').value = metadata.date_of_death;
+                    document.getElementById('year_of_passing').value = year;
+                    document.getElementById('month_of_passing').value = month;
+                    document.getElementById('day_of_passing').value = day;
+                    document.getElementById('date_of_passing').value = metadata.date_of_death;
                     
-                    console.log('✅ Pre-populated hidden DOD:', metadata.date_of_death);
+                    console.log('✅ Pre-populated DOD:', metadata.date_of_death);
                 }
             }
             
-            // ===== POPULATE CITY OF BIRTH (HIDDEN) =====
+            // ===== POPULATE CITY OF BIRTH =====
             if (metadata.city_of_birth) {
-                document.getElementById('hidden_city_of_birth').value = metadata.city_of_birth;
-                console.log('✅ Pre-populated hidden city_of_birth:', metadata.city_of_birth);
+                document.getElementById('city_of_birth').value = metadata.city_of_birth;
+                console.log('✅ Pre-populated city_of_birth:', metadata.city_of_birth);
             }
             
-            // ===== POPULATE CITY OF DEATH (HIDDEN) =====
+            // ===== POPULATE CITY OF DEATH =====
             if (metadata.city_of_death) {
-                document.getElementById('hidden_city_of_passing').value = metadata.city_of_death;
-                console.log('✅ Pre-populated hidden city_of_passing:', metadata.city_of_death);
+                document.getElementById('city_of_passing').value = metadata.city_of_death;
+                console.log('✅ Pre-populated city_of_passing:', metadata.city_of_death);
             }
             
             // Log summary
@@ -2553,33 +2517,6 @@
                 city_of_birth: metadata.city_of_birth,
                 city_of_death: metadata.city_of_death,
                 service_date: metadata.service_date
-            });
-            
-            // Verify all hidden fields are populated
-            console.log('🔍 Verifying hidden fields exist and have values:');
-            const hiddenFieldsToCheck = [
-                'hidden_loved_ones_name',
-                'hidden_loved_ones_last_name',
-                'hidden_loved_ones_gender',
-                'hidden_month_of_birth',
-                'hidden_day_of_birth',
-                'hidden_year_of_birth',
-                'hidden_date_of_birth',
-                'hidden_city_of_birth',
-                'hidden_month_of_passing',
-                'hidden_day_of_passing',
-                'hidden_year_of_passing',
-                'hidden_date_of_passing',
-                'hidden_city_of_passing'
-            ];
-            
-            hiddenFieldsToCheck.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    console.log(`  ✅ ${fieldId}: "${field.value}" (name="${field.name}")`);
-                } else {
-                    console.error(`  ❌ ${fieldId}: FIELD NOT FOUND IN DOM!`);
-                }
             });
             
             console.log('✅ Deceased name populated:', deceasedName);
