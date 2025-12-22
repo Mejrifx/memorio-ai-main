@@ -46,12 +46,13 @@ serve(async (req) => {
       throw new Error('Unauthorized: ' + (authError?.message || 'Invalid token'));
     }
 
-    // Verify the caller is an admin
+    // Verify the caller is an admin or director
     const callerRole = caller.app_metadata?.role;
-    console.log('Caller role:', callerRole, 'User:', caller.email);
+    const callerOrgId = caller.app_metadata?.org_id;
+    console.log('Caller role:', callerRole, 'User:', caller.email, 'Org:', callerOrgId);
     
-    if (callerRole !== 'admin') {
-      throw new Error('Only admins can delete users');
+    if (callerRole !== 'admin' && callerRole !== 'director') {
+      throw new Error('Only admins and directors can delete users');
     }
 
     // Parse request body
@@ -78,12 +79,22 @@ serve(async (req) => {
       throw new Error('Cannot delete admin users');
     }
 
+    // Directors can only delete family users in their own organization
+    if (callerRole === 'director') {
+      if (userData.role !== 'family') {
+        throw new Error('Directors can only delete family users');
+      }
+      if (userData.org_id !== callerOrgId) {
+        throw new Error('Directors can only delete family users in their own organization');
+      }
+    }
+
     // Log the deletion event BEFORE deleting (so we still have the user_id reference)
     const { error: eventError } = await supabaseAdmin
       .from('events')
       .insert({
         actor_user_id: caller.id,
-        actor_role: 'admin',
+        actor_role: callerRole,
         action_type: 'user_deleted',
         target_type: 'user',
         target_id: user_id,
@@ -92,6 +103,7 @@ serve(async (req) => {
           deleted_user_role: userData.role,
           deleted_user_org_id: userData.org_id,
           reason: reason || 'No reason provided',
+          deleted_by: caller.email
         },
       });
 
