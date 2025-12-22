@@ -130,7 +130,12 @@
           <div class="form-questions">
             <div class="form-box">
               <div class="form-fields">
-                <!-- Loved one's name/gender removed: collected by director in case creation -->
+                <!-- Hidden fields for n8n (auto-populated from director's input) -->
+                <input type="hidden" id="loved_ones_name" name="loved_ones_name" value="">
+                <input type="hidden" id="loved_ones_last_name" name="loved_ones_last_name" value="">
+                <input type="hidden" id="loved_ones_gender" name="loved_ones_gender" value="">
+                
+                <!-- Loved one's name/gender removed from UI: collected by director in case creation -->
                 <label for="loved_ones_salutation" class="field-label loved-ones-name other-names">Any other names you&#x27;d like to include for <span id="deceased-name-display"></span>?</label><input class="text-field loved-ones-first-name salutation w-input" maxlength="256" name="loved_ones_salutation" data-name="loved_ones_salutation" placeholder="Salutation" type="text" id="loved_ones_salutation"><input class="text-field loved-ones-first-name middle-name w-input" maxlength="256" name="loved_ones_middle_name" data-name="loved_ones_middle_name" placeholder="Middle Name" type="text" id="loved_ones_middle_name"><input class="text-field loved-ones-first-name nickname w-input" maxlength="256" name="loved_ones_nickname" data-name="loved_ones_nickname" placeholder="Nickname" type="text" id="loved_ones_nickname"><input class="text-field loved-ones-first-name maiden-name w-input" maxlength="256" name="loved_ones_maiden_name" data-name="loved_ones_maiden_name" placeholder="Maiden Name" type="text" id="loved_ones_maiden_name"><select id="loved_ones_suffix" name="loved_ones_suffix" data-name="loved_ones_suffix" class="select-field suffix w-select">
                   <option value="Another option">Suffix (Jr, Sr, etc.)</option>
                   <option value="Junior">Jr.</option>
@@ -2364,32 +2369,46 @@
             }
             
             // Auto-populate hidden fields with data from case metadata (collected by director)
-            if (currentCase.metadata) {
-                const metadata = currentCase.metadata;
+            // These hidden fields are required for n8n to generate the obituary correctly
+            
+            // Get the name from metadata.full_name OR deceased_name as fallback
+            let fullName = currentCase.metadata?.full_name || currentCase.deceased_name || '';
+            
+            if (fullName) {
+                const nameParts = fullName.trim().split(' ');
+                const firstNameField = document.getElementById('loved_ones_name');
+                const lastNameField = document.getElementById('loved_ones_last_name');
                 
-                // Populate name fields if they exist
-                if (metadata.full_name) {
-                    const nameParts = metadata.full_name.split(' ');
-                    const firstNameField = document.getElementById('loved_ones_name');
-                    const lastNameField = document.getElementById('loved_ones_last_name');
-                    if (firstNameField) firstNameField.value = nameParts[0] || '';
-                    if (lastNameField) lastNameField.value = nameParts.slice(1).join(' ') || '';
+                if (firstNameField) {
+                    firstNameField.value = nameParts[0] || '';
+                    console.log('✅ Pre-populated loved_ones_name:', nameParts[0]);
                 }
-                
-                // Populate gender
-                if (metadata.gender) {
-                    const genderField = document.getElementById('loved_ones_gender');
-                    if (genderField) genderField.value = metadata.gender;
+                if (lastNameField && nameParts.length > 1) {
+                    lastNameField.value = nameParts.slice(1).join(' ') || '';
+                    console.log('✅ Pre-populated loved_ones_last_name:', nameParts.slice(1).join(' '));
                 }
-                
-                // Store DOB/DOD for auto-population if needed
-                if (metadata.date_of_birth || metadata.date_of_death) {
-                    // These can be used to pre-fill date fields if needed
-                    console.log('📅 DOB/DOD available from director:', {
-                        dob: metadata.date_of_birth,
-                        dod: metadata.date_of_death
-                    });
+            } else {
+                console.warn('⚠️ No name found in case metadata or deceased_name');
+            }
+            
+            // Populate gender if available
+            if (currentCase.metadata?.gender) {
+                const genderField = document.getElementById('loved_ones_gender');
+                if (genderField) {
+                    genderField.value = currentCase.metadata.gender;
+                    console.log('✅ Pre-populated loved_ones_gender:', currentCase.metadata.gender);
                 }
+            }
+            
+            // Log available data for debugging
+            if (currentCase.metadata?.date_of_birth || currentCase.metadata?.date_of_death) {
+                console.log('📅 DOB/DOD available from director:', {
+                    dob: currentCase.metadata.date_of_birth,
+                    dod: currentCase.metadata.date_of_death,
+                    city_of_birth: currentCase.metadata.city_of_birth,
+                    city_of_death: currentCase.metadata.city_of_death,
+                    service_date: currentCase.metadata.service_date
+                });
             }
             
             console.log('✅ Deceased name populated:', deceasedName);
