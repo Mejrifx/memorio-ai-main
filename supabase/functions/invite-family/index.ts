@@ -107,7 +107,8 @@ serve(async (req) => {
       email_confirm: true,
       app_metadata: {
         role: 'family',
-        org_id: userData.org_id
+        org_id: userData.org_id,
+        requires_password_change: true
       },
       user_metadata: {
         name,
