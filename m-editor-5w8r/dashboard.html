@@ -1194,7 +1194,7 @@
         
         // DISPLAY QUOTE/MEMORY PROMINENTLY (Top Priority for Editors)
         const quoteSection = document.getElementById('quote-section');
-        const familyQuote = formData.loved_ones_quote || formData.favorite_memory || formData.loved_ones_description || '';
+        const familyQuote = formData.tribute_quote || formData.loved_ones_quote || formData.favorite_memory || formData.loved_ones_description || '';
         
         if (familyQuote) {
           quoteSection.innerHTML = `
