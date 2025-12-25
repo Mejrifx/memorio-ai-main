@@ -513,6 +513,12 @@
             if (modal) {
                 modal.style.display = 'none';
             }
+            
+            // Restore form visibility (it was hidden when modal was shown)
+            const formSlider = document.querySelector('.form-slider-padding');
+            if (formSlider) {
+                formSlider.style.display = 'block';
+            }
         }
         
         /**
@@ -581,14 +587,24 @@
                 
                 console.log('✅ Password changed successfully');
                 
-                // Hide modal
+                // Hide modal and restore form visibility
                 hidePasswordChangeModal();
                 
                 // Show success message  
                 alert('Password updated successfully! You can now proceed with the form.');
                 
                 // Re-run checkAuthentication to proceed with normal flow (same as Director Portal)
-                await checkAuthentication();
+                const authSuccess = await checkAuthentication();
+                
+                if (authSuccess) {
+                    console.log('✅ Authentication successful after password change, form should now be visible');
+                    // Ensure form is visible
+                    const formSlider = document.querySelector('.form-slider-padding');
+                    if (formSlider) {
+                        formSlider.style.display = 'block';
+                        console.log('✅ Form visibility explicitly set to block');
+                    }
+                }
                 
             } catch (error) {
                 console.error('Password change error:', error);
