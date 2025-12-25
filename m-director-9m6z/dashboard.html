@@ -1951,10 +1951,19 @@
           
           if (result.data.user_id) {
             try {
+              // Fetch existing metadata first to preserve requires_password_change flag
+              const { data: existingUser } = await supabaseClient
+                .from('users')
+                .select('metadata')
+                .eq('id', result.data.user_id)
+                .single();
+              
+              // Merge new fields with existing metadata (preserve requires_password_change)
               await supabaseClient
                 .from('users')
                 .update({ 
                   metadata: { 
+                    ...(existingUser?.metadata || {}),  // Keep all existing fields
                     temp_password: result.data.temp_password,
                     password_created_at: new Date().toISOString()
                   }
