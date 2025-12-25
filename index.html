@@ -174,7 +174,7 @@
         <div data-w-id="fc0a8b98-fbbd-79d8-65f0-f4ae52dcb201" class="form-slider-step-1 upload">
           <div class="form-title">
             <div class="text-block">Memorios Obituary Writer</div>
-            <h1 class="heading-2">Visualize Your Loved Ones Story</h1>
+            <h1 class="heading-2" id="visualize-story-heading">Visualize Your Loved Ones Story</h1>
           </div>
           <div class="form-bubbles">
             <div class="bubble-container">
@@ -184,7 +184,7 @@
           <div class="form-questions">
             <div class="form-box optionals">
               <div class="form-fields">
-                <label for="photo_upload" class="field-label">Upload your images below</label>
+                <label for="photo_upload" class="field-label" id="upload-images-label">Upload your images below</label>
                 <div style="margin-bottom: 20px;">
                   <input 
                     type="file" 
@@ -1849,6 +1849,7 @@
             }
             
             const deceasedName = currentCase.deceased_name.split(' ')[0]; // Use first name
+            const fullName = currentCase.metadata?.full_name || currentCase.deceased_name || '';
             
             // Update the "Any other names" label
             const deceasedNameDisplay = document.getElementById('deceased-name-display');
@@ -1856,11 +1857,23 @@
                 deceasedNameDisplay.textContent = deceasedName;
             }
             
+            // Update "Visualize Your Loved Ones Story" to "Visualize {full name's} Story"
+            const visualizeHeading = document.getElementById('visualize-story-heading');
+            if (visualizeHeading && fullName) {
+                const possessiveName = fullName.endsWith('s') ? fullName + "'" : fullName + "'s";
+                visualizeHeading.textContent = `Visualize ${possessiveName} Story`;
+                console.log('✅ Updated heading to:', visualizeHeading.textContent);
+            }
+            
+            // Update "Upload your images below" to "Upload your images of {name} below"
+            const uploadLabel = document.getElementById('upload-images-label');
+            if (uploadLabel && deceasedName) {
+                uploadLabel.textContent = `Upload your images of ${deceasedName} below`;
+                console.log('✅ Updated upload label to:', uploadLabel.textContent);
+            }
+            
             // Auto-populate hidden fields with data from case metadata (collected by director)
             // These hidden fields are required for n8n to generate the obituary correctly
-            
-            // Get the name from metadata.full_name OR deceased_name as fallback
-            let fullName = currentCase.metadata?.full_name || currentCase.deceased_name || '';
             
             if (fullName) {
                 const nameParts = fullName.trim().split(' ');
