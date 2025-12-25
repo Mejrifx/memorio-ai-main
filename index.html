@@ -27,6 +27,16 @@
     .form-container.show, .form-wrapper.show, .w-form.show {
       display: block !important;
     }
+    
+    /* Password change success modal button hover effect */
+    #passwordChangeProceedBtn:hover {
+      background-color: #355a6f !important;
+    }
+    
+    #passwordChangeProceedBtn:active {
+      background-color: #2a4758 !important;
+      transform: scale(0.98);
+    }
   </style>
 </head>
 <body class="body">
@@ -75,7 +85,7 @@
   <div id="passwordChangeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
     <div style="background-color: #fff3e9; border: 3px solid #436481; border-radius: 20px; padding: 48px; max-width: 500px; width: 90%; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);">
       <h1 style="color: #32343a; text-align: center; font-size: 32px; font-weight: 600; margin-bottom: 10px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Create Your Password</h1>
-      <p style="color: #32343a; text-align: center; font-size: 16px; margin-bottom: 30px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">For security, please create a new permanent password</p>
+      <p style="color: #32343a; text-align: center; font-size: 16px; margin-bottom: 30px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">For security reasons, you must change your temporary password before accessing your account.</p>
       
       <div id="passwordChangeError" style="display: none; background-color: #ffebee; border: 1px solid #ef5350; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></div>
       
@@ -107,6 +117,28 @@
           Set New Password
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- Password Change Success Modal -->
+  <div id="passwordChangeSuccessModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10001; justify-content: center; align-items: center;">
+    <div style="background-color: #fff3e9; border: 3px solid #436481; border-radius: 20px; padding: 48px; max-width: 500px; width: 90%; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2); text-align: center;">
+      <!-- Success Icon -->
+      <div style="width: 80px; height: 80px; margin: 0 auto 24px; background-color: #4caf50; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+        <svg style="width: 48px; height: 48px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      
+      <h1 style="color: #32343a; text-align: center; font-size: 32px; font-weight: 600; margin-bottom: 10px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Password Updated!</h1>
+      <p style="color: #32343a; text-align: center; font-size: 16px; margin-bottom: 30px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Your password has been successfully changed. You can now proceed with the form.</p>
+      
+      <button type="button" 
+              id="passwordChangeProceedBtn"
+              onclick="hidePasswordChangeSuccessModal()"
+              style="width: 100%; padding: 14px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; transition: background-color 0.2s;">
+        Proceed
+      </button>
     </div>
   </div>
 
@@ -522,6 +554,39 @@
         }
         
         /**
+         * Show password change success modal
+         */
+        function showPasswordChangeSuccessModal() {
+            const modal = document.getElementById('passwordChangeSuccessModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+        
+        /**
+         * Hide password change success modal and proceed with form
+         */
+        async function hidePasswordChangeSuccessModal() {
+            const modal = document.getElementById('passwordChangeSuccessModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            
+            // Proceed with authentication and form loading
+            const authSuccess = await checkAuthentication();
+            
+            if (authSuccess) {
+                console.log('✅ Authentication successful after password change, form should now be visible');
+                // Ensure form is visible
+                const formSlider = document.querySelector('.form-slider-padding');
+                if (formSlider) {
+                    formSlider.style.display = 'block';
+                    console.log('✅ Form visibility explicitly set to block');
+                }
+            }
+        }
+        
+        /**
          * Handle password change form submission (Same logic as Director Portal)
          */
         async function handlePasswordChange(e) {
@@ -587,24 +652,11 @@
                 
                 console.log('✅ Password changed successfully');
                 
-                // Hide modal and restore form visibility
+                // Hide password change modal
                 hidePasswordChangeModal();
                 
-                // Show success message  
-                alert('Password updated successfully! You can now proceed with the form.');
-                
-                // Re-run checkAuthentication to proceed with normal flow (same as Director Portal)
-                const authSuccess = await checkAuthentication();
-                
-                if (authSuccess) {
-                    console.log('✅ Authentication successful after password change, form should now be visible');
-                    // Ensure form is visible
-                    const formSlider = document.querySelector('.form-slider-padding');
-                    if (formSlider) {
-                        formSlider.style.display = 'block';
-                        console.log('✅ Form visibility explicitly set to block');
-                    }
-                }
+                // Show success modal (replaces browser alert)
+                showPasswordChangeSuccessModal();
                 
             } catch (error) {
                 console.error('Password change error:', error);
