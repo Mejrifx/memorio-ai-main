@@ -1008,7 +1008,11 @@
           .order('assigned_at', { ascending: false });
         
         console.log('📦 Raw assignments data:', assignments);
-        console.log('🏠 First case organizations:', assignments?.[0]?.cases?.organizations);
+        if (assignments && assignments.length > 0) {
+          console.log('🏠 First case full object:', assignments[0].cases);
+          console.log('🏢 First case org_id:', assignments[0].cases?.org_id);
+          console.log('🏢 First case organizations:', assignments[0].cases?.organizations);
+        }
         
         if (assignError) {
           throw assignError;
