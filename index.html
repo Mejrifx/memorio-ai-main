@@ -555,15 +555,22 @@
                 
                 if (passwordError) throw passwordError;
                 
-                // Clear the requires_password_change flag in user metadata (same as Director Portal)
+                // Clear the requires_password_change flag in user metadata (EXACT same as Director Portal)
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (!session) throw new Error('Session expired');
+                
+                // Fetch current user metadata to preserve other fields
+                const { data: currentUserData } = await supabaseClient
+                    .from('users')
+                    .select('metadata')
+                    .eq('id', session.user.id)
+                    .single();
                 
                 const { error: metadataError } = await supabaseClient
                     .from('users')
                     .update({
                         metadata: {
-                            ...currentUser?.metadata,
+                            ...(currentUserData?.metadata || {}),
                             requires_password_change: false,
                             password_changed_at: new Date().toISOString()
                         }
@@ -574,14 +581,14 @@
                 
                 console.log('✅ Password changed successfully');
                 
-                // Hide modal and continue to form
+                // Hide modal
                 hidePasswordChangeModal();
                 
-                // Show success message
+                // Show success message  
                 alert('Password updated successfully! You can now proceed with the form.');
                 
-                // Load the family case and continue
-                await loadFamilyCase();
+                // Re-run checkAuthentication to proceed with normal flow (same as Director Portal)
+                await checkAuthentication();
                 
             } catch (error) {
                 console.error('Password change error:', error);
@@ -637,6 +644,11 @@
                 
                 console.log('✅ Login successful:', data.user.email);
                 console.log('🔐 Database user data:', userData);
+                console.log('🔑 Checking password change requirement:', {
+                    hasMetadata: !!userData?.metadata,
+                    requiresChange: userData?.metadata?.requires_password_change,
+                    metadataType: typeof userData?.metadata?.requires_password_change
+                });
                 
                 if (userError || !userData || userData.role !== 'family') {
                     throw new Error('Access denied: This form is only for family members.');
@@ -649,6 +661,8 @@
                     showPasswordChangeModal();
                     return; // Stop execution until password is changed
                 }
+                
+                console.log('✅ No password change required, proceeding to form');
                 
                 // Set currentUser with full data
                 currentUser = {
@@ -743,6 +757,11 @@
                 
                 console.log('✅ User authenticated:', session.user.email);
                 console.log('🔐 Database user data:', userData);
+                console.log('🔑 Checking password change requirement:', {
+                    hasMetadata: !!userData?.metadata,
+                    requiresChange: userData?.metadata?.requires_password_change,
+                    metadataType: typeof userData?.metadata?.requires_password_change
+                });
                 
                 if (userError || !userData || userData.role !== 'family') {
                     console.error('❌ Not a family member or user not found:', userError);
@@ -756,6 +775,8 @@
                     showPasswordChangeModal();
                     return false; // Block form access until password is changed
                 }
+                
+                console.log('✅ No password change required, proceeding to form');
                 
                 // Set currentUser with full data
                 currentUser = {
