@@ -78,6 +78,7 @@ DROP POLICY IF EXISTS "Editors read assigned cases" ON cases;
 DROP POLICY IF EXISTS "Editors update assigned cases" ON cases;
 DROP POLICY IF EXISTS "Support read all cases" ON cases;
 DROP POLICY IF EXISTS "QC users read cases in their org" ON cases;
+DROP POLICY IF EXISTS "QC users read all cases" ON cases;
 DROP POLICY IF EXISTS "QC users update case status" ON cases;
 
 -- Admin full access to all cases using database role
