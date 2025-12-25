@@ -1819,6 +1819,26 @@
         
         if (error) throw error;
         
+        // Also update obituary_content table for director/QC access
+        const { error: obituaryError } = await supabaseClient
+          .from('obituary_content')
+          .upsert({
+            case_id: currentCase.id,
+            content_html: `<div>${content.split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>`,
+            content_plain: content,
+            generated_by: currentUser?.id || 'AI',
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'case_id'
+          });
+        
+        if (obituaryError) {
+          console.error('Error updating obituary_content:', obituaryError);
+          // Don't fail the whole operation if this update fails
+        } else {
+          console.log('✅ Obituary_content table updated successfully');
+        }
+        
         // Update local state
         currentForm.submitted_json = updatedJson;
         
