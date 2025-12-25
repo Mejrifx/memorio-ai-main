@@ -1426,14 +1426,25 @@
             const container = document.getElementById('memorio-success-container');
             if (!container) return;
             if (!container.querySelector('#obituaryCard')) {
+                // Get deceased person's name for personalization
+                let deceasedFirstName = 'your loved one';
+                let deceasedPossessiveName = 'your loved one\'s';
+                
+                if (currentCase && currentCase.deceased_name) {
+                    const firstName = currentCase.deceased_name.split(' ')[0];
+                    deceasedFirstName = firstName;
+                    // Handle possessive form correctly (e.g., "James' story" vs "John's story")
+                    deceasedPossessiveName = firstName.endsWith('s') ? firstName + "'" : firstName + "'s";
+                }
+                
                 container.innerHTML = `
                     <div class="memorio-container">
                         <div id="writingStatus" class="writing-status">
-                            <div class="status-text">Crafting your loved one's story...</div>
+                            <div class="status-text">Crafting ${deceasedPossessiveName} story...</div>
                             <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
                         </div>
                         <div id="memorialInfo" class="memorial-info hidden">
-                            Thank you for sharing about your loved one. Here's the tribute we've crafted based on the memories you provided.
+                            Thank you for sharing about ${deceasedFirstName}. Here's the tribute we've crafted based on the memories you provided.
                         </div>
                         <div id="obituaryCard" class="obituary-card hidden">
                             <div id="obituaryTitle" class="obituary-title">Here's your updated obituary</div>
