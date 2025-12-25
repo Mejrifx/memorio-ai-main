@@ -1671,7 +1671,95 @@
             // Update review screen
             updateReviewScreen();
             
+            // Initialize custom form navigation (MUST run after form is shown)
+            initCustomFormNavigation();
+            
             console.log('✅ Family portal enhancements initialized');
+        }
+        
+        /**
+         * Initialize custom form step navigation
+         * This bypasses Webflow's slider and manually controls step visibility
+         */
+        function initCustomFormNavigation() {
+            console.log('🔧 Initializing custom form navigation');
+            
+            // Get all form steps
+            const steps = document.querySelectorAll('.form-slider-step-1');
+            let currentStepIndex = 0;
+            
+            console.log(`📊 Found ${steps.length} form steps`);
+            
+            if (steps.length === 0) {
+                console.error('❌ No form steps found! Navigation cannot be initialized.');
+                return;
+            }
+            
+            // Function to show a specific step
+            function showStep(index) {
+                if (index < 0 || index >= steps.length) {
+                    console.warn(`⚠️ Invalid step index: ${index}`);
+                    return;
+                }
+                
+                console.log(`➡️ Navigating to step ${index + 1} of ${steps.length}`);
+                
+                // Hide all steps
+                steps.forEach((step, i) => {
+                    if (i === index) {
+                        step.style.display = 'flex';
+                        console.log(`✅ Showing step ${i + 1}`);
+                    } else {
+                        step.style.display = 'none';
+                    }
+                });
+                
+                currentStepIndex = index;
+            }
+            
+            // Function to go to next step
+            function nextStep() {
+                if (currentStepIndex < steps.length - 1) {
+                    showStep(currentStepIndex + 1);
+                } else {
+                    console.log('📝 At last step - form ready to submit');
+                }
+            }
+            
+            // Function to go to previous step
+            function prevStep() {
+                if (currentStepIndex > 0) {
+                    showStep(currentStepIndex - 1);
+                }
+            }
+            
+            // Remove any existing event listeners by cloning and replacing buttons
+            // This prevents duplicate handlers if function is called multiple times
+            document.querySelectorAll('.next').forEach(button => {
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+                newButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🖱️ Next button clicked');
+                    nextStep();
+                });
+            });
+            
+            document.querySelectorAll('.div-block.back').forEach(button => {
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+                newButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🖱️ Back button clicked');
+                    prevStep();
+                });
+            });
+            
+            // Initialize - show first step
+            showStep(0);
+            console.log('✅ Custom form navigation initialized');
         }
         
         /**
@@ -1990,80 +2078,5 @@
   <script src="https://cdn.prod.website-files.com/683b63acf5908465c8825ca8%2F685146e1d8a68f749232b664%2F68ae0b3e451db983d19c0c84%2Fmetadatahandler-0.0.5.js" type="text/javascript"></script>
   <script src="https://cdn.prod.website-files.com/683b63acf5908465c8825ca8%2F685146e1d8a68f749232b664%2F68ae0b3eebf6ed82e6d479bc%2Fenablevisiblebuttons-0.0.7.js" type="text/javascript"></script>
   <script src="https://cdn.prod.website-files.com/683b63acf5908465c8825ca8%2F685146e1d8a68f749232b664%2F68ae0b3e5d17346e14370d63%2Fenableuploadstateview-0.0.3.js" type="text/javascript"></script>
-  
-  <!-- Custom Form Step Navigation (after removing DOD, DOB, Funeral Home steps) -->
-  <script>
-    (function() {
-      console.log('🔧 Initializing custom form navigation');
-      
-      // Get all form steps
-      const steps = document.querySelectorAll('.form-slider-step-1');
-      let currentStepIndex = 0;
-      
-      console.log(`📊 Found ${steps.length} form steps`);
-      
-      // Function to show a specific step
-      function showStep(index) {
-        if (index < 0 || index >= steps.length) {
-          console.warn(`⚠️ Invalid step index: ${index}`);
-          return;
-        }
-        
-        console.log(`➡️ Navigating to step ${index + 1} of ${steps.length}`);
-        
-        // Hide all steps
-        steps.forEach((step, i) => {
-          if (i === index) {
-            step.style.display = 'flex';
-            console.log(`✅ Showing step ${i + 1}`);
-          } else {
-            step.style.display = 'none';
-          }
-        });
-        
-        currentStepIndex = index;
-      }
-      
-      // Function to go to next step
-      function nextStep() {
-        if (currentStepIndex < steps.length - 1) {
-          showStep(currentStepIndex + 1);
-        } else {
-          console.log('📝 At last step - form ready to submit');
-        }
-      }
-      
-      // Function to go to previous step
-      function prevStep() {
-        if (currentStepIndex > 0) {
-          showStep(currentStepIndex - 1);
-        }
-      }
-      
-      // Attach event listeners to all Next buttons
-      document.querySelectorAll('.next').forEach(button => {
-        button.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('🖱️ Next button clicked');
-          nextStep();
-        });
-      });
-      
-      // Attach event listeners to all Back buttons
-      document.querySelectorAll('.div-block.back').forEach(button => {
-        button.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('🖱️ Back button clicked');
-          prevStep();
-        });
-      });
-      
-      // Initialize - show first step
-      showStep(0);
-      console.log('✅ Custom form navigation initialized');
-    })();
-  </script>
 </body>
 </html>
