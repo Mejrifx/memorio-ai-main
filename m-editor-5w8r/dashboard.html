@@ -990,6 +990,7 @@
               deceased_name,
               status,
               created_at,
+              org_id,
               organizations (
                 name
               ),
@@ -1005,6 +1006,9 @@
           .eq('editor_user_id', currentUser.id)
           .is('unassigned_at', null)
           .order('assigned_at', { ascending: false });
+        
+        console.log('📦 Raw assignments data:', assignments);
+        console.log('🏠 First case organizations:', assignments?.[0]?.cases?.organizations);
         
         if (assignError) {
           throw assignError;

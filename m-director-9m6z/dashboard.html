@@ -1707,17 +1707,21 @@
           .eq('case_id', caseId)
           .single();
         
+        console.log('📝 Obituary query result:', { obituaryData, obituaryError });
+        
         const obituarySection = document.getElementById('obituary-section');
         const obituaryContent = document.getElementById('obituary-content');
         const obituaryUpdated = document.getElementById('obituary-updated');
         
         if (!obituaryError && obituaryData && obituaryData.content_html) {
           // Show obituary section
+          console.log('✅ Showing obituary section');
           obituarySection.style.display = 'block';
           obituaryContent.innerHTML = obituaryData.content_html;
           obituaryUpdated.textContent = new Date(obituaryData.updated_at).toLocaleString();
         } else {
           // Hide obituary section if no content
+          console.log('❌ Hiding obituary section:', obituaryError?.message || 'No content');
           obituarySection.style.display = 'none';
         }
         
