@@ -805,7 +805,7 @@
             *,
             organizations (name),
             users!cases_assigned_family_user_id_fkey (email, metadata),
-            editor_assignments!inner (
+            editor_assignments (
               editor_user_id,
               users!editor_assignments_editor_user_id_fkey (email, metadata)
             ),
