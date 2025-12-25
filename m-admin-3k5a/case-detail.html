@@ -1481,7 +1481,7 @@
       try {
         // Load all editors
         const { data: editors, error } = await supabaseClient
-          .from('users')
+          .from('admin_users_view')  // Use view to bypass RLS
           .select('id, email, metadata')
           .eq('role', 'editor')
           .eq('status', 'active')
@@ -1571,7 +1571,7 @@
       try {
         // Load all QC users
         const { data: qcUsers, error } = await supabaseClient
-          .from('users')
+          .from('admin_users_view')  // Use view to bypass RLS
           .select('id, email, metadata')
           .eq('role', 'qc')
           .eq('status', 'active')

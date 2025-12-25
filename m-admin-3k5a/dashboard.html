@@ -2271,7 +2271,7 @@
       try {
         // Get editor user ID from email
         const { data: editorData, error: editorError } = await supabaseClient
-          .from('users')
+          .from('admin_users_view')  // Use view to bypass RLS
           .select('id')
           .eq('email', editorEmail)
           .eq('role', 'editor')
@@ -2319,7 +2319,7 @@
     async function loadEditors() {
       try {
         const { data: editors, error } = await supabaseClient
-          .from('users')
+          .from('admin_users_view')  // Use view to bypass RLS
           .select('email, metadata')
           .eq('role', 'editor')
           .in('status', ['active', 'invited']); // Include both active and invited editors
@@ -2610,7 +2610,7 @@
       let userCount = 0;
       try {
         const { count, error: countError } = await supabaseClient
-          .from('users')
+          .from('admin_users_view')  // Use view to bypass RLS
           .select('*', { count: 'exact', head: true })
           .eq('org_id', orgId);
         
@@ -2771,7 +2771,7 @@
         
         // Load director users for this organization
         const { data: directors, error: directorsError } = await supabaseClient
-          .from('users')
+          .from('admin_users_view')  // Use view to bypass RLS
           .select('*, temp_password')
           .eq('org_id', orgId)
           .eq('role', 'director');
