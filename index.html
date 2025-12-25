@@ -1449,7 +1449,7 @@
                         <div id="obituaryCard" class="obituary-card hidden">
                             <div id="obituaryTitle" class="obituary-title">Here's your updated obituary</div>
                             <div id="obituaryContent" class="obituary-content"></div>
-                            <div class="edit-hint">Click the text above to make edits</div>
+                            <div class="edit-hint">You can always make changes in the dashboard</div>
                             <div class="action-buttons">
                                 <a href="/m-family-7x2p/dashboard.html" class="btn" style="background: #436481; text-decoration: none;">Access Dashboard</a>
                             </div>
@@ -1510,21 +1510,22 @@
                         const speed = prev === '.' ? 80 : prev === ',' ? 60 : Math.random()*20 + 15;
                         setTimeout(typeNextChar, speed);
                     } else {
-                        i++; j = 0; if (i < paragraphs.length) setTimeout(typeNextChar, 250); else setTimeout(() => { const c = contentElement.querySelector('.typewriter-cursor'); if (c) c.remove(); makeContentEditable(); }, 600);
+                        i++; j = 0; if (i < paragraphs.length) setTimeout(typeNextChar, 250); else setTimeout(() => { const c = contentElement.querySelector('.typewriter-cursor'); if (c) c.remove(); /* makeContentEditable() - Disabled: all edits must be done in dashboard */ }, 600);
                     }
                 }
             }
             typeNextChar();
         }
-        function makeContentEditable() {
-            const el = document.getElementById('obituaryContent');
-            const paragraphs = Array.from(el.querySelectorAll('p'));
-            const plain = paragraphs.map(p => p.textContent).join('\n\n');
-            el.innerHTML = '';
-            el.textContent = plain;
-            el.contentEditable = true;
-            el.addEventListener('click', function(){ this.focus(); }, { once: true });
-        }
+        // DISABLED: Obituary editing must be done in dashboard only
+        // function makeContentEditable() {
+        //     const el = document.getElementById('obituaryContent');
+        //     const paragraphs = Array.from(el.querySelectorAll('p'));
+        //     const plain = paragraphs.map(p => p.textContent).join('\n\n');
+        //     el.innerHTML = '';
+        //     el.textContent = plain;
+        //     el.contentEditable = true;
+        //     el.addEventListener('click', function(){ this.focus(); }, { once: true });
+        // }
         // 🔧 Modified to include resumeUrl in payload sent to Email Webhook
         async function publishObituary() {
             const el = document.getElementById('obituaryContent');
