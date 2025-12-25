@@ -1582,8 +1582,8 @@
                             .upsert({
                                 case_id: currentCase.id,
                                 content_html: `<div>${finalContent.split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>`,
-                                content_text: finalContent,
-                                generated_by: currentUser?.id || null,
+                                content_plain: finalContent,
+                                generated_by: currentUser?.id || 'AI',
                                 updated_at: new Date().toISOString()
                             }, {
                                 onConflict: 'case_id'  // Update if exists, insert if new
@@ -1727,8 +1727,8 @@
                     .upsert({
                         case_id: currentCase.id,
                         content_html: `<div>${obituaryContent.split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>`,
-                        content_text: obituaryContent,
-                        generated_by: currentUser?.id || null,
+                        content_plain: obituaryContent,
+                        generated_by: currentUser?.id || 'AI',
                         updated_at: new Date().toISOString()
                     }, {
                         onConflict: 'case_id'  // Update if exists, insert if new
