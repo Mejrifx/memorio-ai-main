@@ -782,7 +782,7 @@
       
       // Verify admin role
       const { data: userData, error: userError } = await supabaseClient
-        .from('users')
+        .from('admin_users_view')  // Use view to bypass RLS
         .select('role')
         .eq('id', session.user.id)
         .single();
@@ -848,7 +848,7 @@
       
       // Load editors
       const { data: editors } = await supabaseClient
-        .from('users')
+        .from('admin_users_view')  // Use view to bypass RLS
         .select('id, email, metadata')
         .eq('role', 'editor')
         .in('status', ['active', 'invited']);
@@ -1286,7 +1286,7 @@
     
     async function loadEditorsForReassign() {
       const { data: editors } = await supabaseClient
-        .from('users')
+        .from('admin_users_view')  // Use view to bypass RLS
         .select('id, email, metadata')
         .eq('role', 'editor')
         .in('status', ['active', 'invited']);
