@@ -1704,13 +1704,15 @@
                 
                 console.log(`➡️ Navigating to step ${index + 1} of ${steps.length}`);
                 
-                // Hide all steps
+                // Force hide all steps and show target step with !important styles
                 steps.forEach((step, i) => {
                     if (i === index) {
-                        step.style.display = 'flex';
+                        step.style.cssText = 'display: flex !important;';
+                        step.classList.add('active-step');
                         console.log(`✅ Showing step ${i + 1}`);
                     } else {
-                        step.style.display = 'none';
+                        step.style.cssText = 'display: none !important;';
+                        step.classList.remove('active-step');
                     }
                 });
                 
@@ -1718,7 +1720,13 @@
             }
             
             // Function to go to next step
-            function nextStep() {
+            function nextStep(e) {
+                console.log('🖱️ nextStep called, current:', currentStepIndex);
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                }
                 if (currentStepIndex < steps.length - 1) {
                     showStep(currentStepIndex + 1);
                 } else {
@@ -1727,39 +1735,48 @@
             }
             
             // Function to go to previous step
-            function prevStep() {
+            function prevStep(e) {
+                console.log('🖱️ prevStep called, current:', currentStepIndex);
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                }
                 if (currentStepIndex > 0) {
                     showStep(currentStepIndex - 1);
                 }
             }
             
-            // Remove any existing event listeners by cloning and replacing buttons
-            // This prevents duplicate handlers if function is called multiple times
-            document.querySelectorAll('.next').forEach(button => {
-                const newButton = button.cloneNode(true);
-                button.parentNode.replaceChild(newButton, button);
-                newButton.addEventListener('click', function(e) {
+            // Use capturing phase and attach to document to catch ALL clicks
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                
+                // Check if click is on Next button or its parent
+                if (target.classList.contains('next') || 
+                    target.closest('.next') ||
+                    (target.classList.contains('div-block') && !target.classList.contains('back'))) {
+                    console.log('🖱️ Next button DETECTED via document listener');
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('🖱️ Next button clicked');
-                    nextStep();
-                });
-            });
-            
-            document.querySelectorAll('.div-block.back').forEach(button => {
-                const newButton = button.cloneNode(true);
-                button.parentNode.replaceChild(newButton, button);
-                newButton.addEventListener('click', function(e) {
+                    e.stopImmediatePropagation();
+                    nextStep(e);
+                    return false;
+                }
+                
+                // Check if click is on Back button
+                if (target.classList.contains('back') || target.closest('.back')) {
+                    console.log('🖱️ Back button DETECTED via document listener');
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('🖱️ Back button clicked');
-                    prevStep();
-                });
-            });
+                    e.stopImmediatePropagation();
+                    prevStep(e);
+                    return false;
+                }
+            }, true); // Use CAPTURING phase (true) to catch events early
             
-            // Initialize - show first step
+            // Initialize - show first step with !important
             showStep(0);
-            console.log('✅ Custom form navigation initialized');
+            console.log('✅ Custom form navigation initialized with document-level capturing');
         }
         
         /**
