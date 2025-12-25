@@ -642,13 +642,20 @@
                     .eq('id', data.user.id)
                     .single();
                 
+                console.log('===== FAMILY LOGIN DEBUG START =====');
                 console.log('✅ Login successful:', data.user.email);
-                console.log('🔐 Database user data:', userData);
-                console.log('🔑 Checking password change requirement:', {
+                console.log('🔐 Raw database user data:', JSON.stringify(userData, null, 2));
+                console.log('🔐 Metadata object:', JSON.stringify(userData?.metadata, null, 2));
+                console.log('🔑 Password change flag check:', {
+                    hasUserData: !!userData,
                     hasMetadata: !!userData?.metadata,
+                    metadataKeys: userData?.metadata ? Object.keys(userData.metadata) : [],
                     requiresChange: userData?.metadata?.requires_password_change,
-                    metadataType: typeof userData?.metadata?.requires_password_change
+                    requiresChangeType: typeof userData?.metadata?.requires_password_change,
+                    strictCheck: userData?.metadata?.requires_password_change === true,
+                    looseCheck: userData?.metadata?.requires_password_change == true
                 });
+                console.log('===== FAMILY LOGIN DEBUG END =====');
                 
                 if (userError || !userData || userData.role !== 'family') {
                     throw new Error('Access denied: This form is only for family members.');
@@ -656,7 +663,7 @@
                 
                 // Check if user needs to change password (EXACT same check as Director Portal)
                 if (userData.metadata?.requires_password_change === true) {
-                    console.log('⚠️ First login detected - forcing password change');
+                    console.log('🚨🚨🚨 FORCING PASSWORD CHANGE 🚨🚨🚨');
                     hideLoginModal();
                     showPasswordChangeModal();
                     return; // Stop execution until password is changed
@@ -755,13 +762,20 @@
                     .eq('id', session.user.id)
                     .single();
                 
+                console.log('===== CHECK AUTHENTICATION DEBUG START =====');
                 console.log('✅ User authenticated:', session.user.email);
-                console.log('🔐 Database user data:', userData);
-                console.log('🔑 Checking password change requirement:', {
+                console.log('🔐 Raw database user data:', JSON.stringify(userData, null, 2));
+                console.log('🔐 Metadata object:', JSON.stringify(userData?.metadata, null, 2));
+                console.log('🔑 Password change flag check:', {
+                    hasUserData: !!userData,
                     hasMetadata: !!userData?.metadata,
+                    metadataKeys: userData?.metadata ? Object.keys(userData.metadata) : [],
                     requiresChange: userData?.metadata?.requires_password_change,
-                    metadataType: typeof userData?.metadata?.requires_password_change
+                    requiresChangeType: typeof userData?.metadata?.requires_password_change,
+                    strictCheck: userData?.metadata?.requires_password_change === true,
+                    looseCheck: userData?.metadata?.requires_password_change == true
                 });
+                console.log('===== CHECK AUTHENTICATION DEBUG END =====');
                 
                 if (userError || !userData || userData.role !== 'family') {
                     console.error('❌ Not a family member or user not found:', userError);
@@ -771,7 +785,7 @@
                 
                 // Check if user needs to change password (EXACT same check as Director Portal)
                 if (userData.metadata?.requires_password_change === true) {
-                    console.log('⚠️ First login detected - forcing password change');
+                    console.log('🚨🚨🚨 FORCING PASSWORD CHANGE 🚨🚨🚨');
                     showPasswordChangeModal();
                     return false; // Block form access until password is changed
                 }
