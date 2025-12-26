@@ -799,24 +799,75 @@
     // Load all cases with relationships
     async function loadCases() {
       try {
-        const { data: cases, error } = await supabaseClient
-          .from('cases')
-          .select(`
-            *,
-            organizations (name),
-            users!cases_assigned_family_user_id_fkey (email, metadata),
-            editor_assignments (
-              editor_user_id,
-              users!editor_assignments_editor_user_id_fkey (email, metadata)
-            ),
-            video_submissions (qc_status, qc_reviewer_id)
-          `)
+        console.log('📊 Loading cases from admin_cases_view...');
+        
+        // Query 1: Get cases with org and user info from view (bypasses RLS)
+        const { data: cases, error: casesError } = await supabaseClient
+          .from('admin_cases_view')  // Use view instead of cases table
+          .select('*')
           .order('created_at', { ascending: false });
         
-        if (error) throw error;
+        if (casesError) {
+          console.error('❌ Error loading cases:', casesError);
+          throw casesError;
+        }
         
-        allCases = cases || [];
+        console.log(`✅ Loaded ${cases?.length || 0} cases from view`);
+        
+        // Query 2: Get editor assignments for all cases
+        const { data: assignments, error: assignmentsError } = await supabaseClient
+          .from('admin_editor_assignments_view')  // Use view for editor info
+          .select('*')
+          .is('unassigned_at', null);  // Only active assignments
+        
+        if (assignmentsError) {
+          console.warn('⚠️ Error loading editor assignments:', assignmentsError);
+          // Don't fail, just continue without assignments
+        }
+        
+        console.log(`✅ Loaded ${assignments?.length || 0} editor assignments`);
+        
+        // Query 3: Get video submissions for QC status
+        const { data: submissions, error: submissionsError } = await supabaseClient
+          .from('video_submissions')
+          .select('case_id, qc_status, qc_reviewer_id')
+          .order('created_at', { ascending: false });
+        
+        if (submissionsError) {
+          console.warn('⚠️ Error loading video submissions:', submissionsError);
+          // Don't fail, just continue without submissions
+        }
+        
+        console.log(`✅ Loaded ${submissions?.length || 0} video submissions`);
+        
+        // Combine data: Add editor_assignments and video_submissions to each case
+        allCases = (cases || []).map(c => ({
+          ...c,
+          // Map view columns back to nested structure for compatibility
+          organizations: c.org_name ? { name: c.org_name } : null,
+          users: c.family_email ? { 
+            email: c.family_email, 
+            metadata: c.family_metadata 
+          } : null,
+          // Add editor assignments for this case
+          editor_assignments: (assignments || [])
+            .filter(a => a.case_id === c.id)
+            .map(a => ({
+              editor_user_id: a.editor_user_id,
+              users: {
+                email: a.editor_email,
+                metadata: a.editor_metadata
+              }
+            })),
+          // Add latest video submission for this case
+          video_submissions: (submissions || [])
+            .filter(s => s.case_id === c.id)
+            .slice(0, 1) // Only latest submission
+        }));
+        
         filteredCases = allCases;
+        
+        console.log('✅ Cases processed and combined with related data');
         
         // Load filter dropdowns
         await loadFilterOptions();
@@ -825,7 +876,7 @@
         renderKanban();
         
       } catch (error) {
-        console.error('Error loading cases:', error);
+        console.error('❌ Error loading cases:', error);
         alert('Failed to load cases: ' + error.message);
       }
     }
