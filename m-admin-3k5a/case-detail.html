@@ -1535,6 +1535,20 @@
         
         if (assignError) throw assignError;
         
+        // Update case status to 'in_production' when editor is (re)assigned
+        const { error: statusError } = await supabaseClient
+          .from('cases')
+          .update({ 
+            status: 'in_production',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentCaseId);
+        
+        if (statusError) {
+          console.warn('⚠️ Failed to update case status:', statusError);
+          // Don't throw - assignment was successful
+        }
+        
         // Log to audit
         await supabaseClient
           .from('events')

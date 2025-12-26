@@ -947,7 +947,7 @@
       // Map statuses to Kanban columns
       const columns = {
         waiting: ['waiting_on_family', 'intake_in_progress'],
-        progress: ['in_production'],
+        progress: ['submitted', 'in_production'],  // 'submitted' = family completed form, waiting for editor
         review: ['awaiting_review', 'revision_requested'],
         complete: ['delivered', 'closed']
       };
