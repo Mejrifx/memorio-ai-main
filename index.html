@@ -1203,6 +1203,9 @@
                 // Update case status to 'submitted'
                 await updateCaseStatus('submitted');
                 
+                // Auto-assign an editor to the case
+                await autoAssignEditor(currentCase.id);
+                
             } catch (error) {
                 console.error('❌ Error in saveFormToDatabase:', error);
                 // Don't block the user experience
@@ -1361,6 +1364,50 @@
                 
             } catch (error) {
                 console.error('❌ Error in updateCaseStatus:', error);
+            }
+        }
+        
+        /**
+         * Auto-assign an editor to the case using load balancing
+         */
+        async function autoAssignEditor(caseId) {
+            try {
+                console.log('🤖 Auto-assigning editor to case...');
+                
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    console.warn('⚠️ No session for auto-assign');
+                    return;
+                }
+                
+                const response = await fetch(
+                    `${SUPABASE_URL}/functions/v1/auto-assign-editor`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${session.access_token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ case_id: caseId })
+                    }
+                );
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.assigned) {
+                        console.log(`✅ Editor auto-assigned: ${result.editor_name}`);
+                    } else {
+                        console.log('⚠️ No editors available - admin notified');
+                    }
+                } else {
+                    console.error('❌ Auto-assign failed:', result.error);
+                    // Don't block user experience
+                }
+                
+            } catch (error) {
+                console.error('❌ Error in autoAssignEditor:', error);
+                // Don't block user experience - case can be manually assigned later
             }
         }
         

@@ -106,6 +106,32 @@
       fill: currentColor;
     }
     
+    .notification-badge {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .notification-badge::after {
+      content: attr(data-count);
+      position: absolute;
+      top: -8px;
+      right: -12px;
+      background-color: #e74c3c;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .notification-badge[data-count="0"]::after,
+    .notification-badge:not([data-count])::after {
+      display: none;
+    }
+    
     /* ============================================================================
        TOP NAVBAR - MEMORIO THEMED
        ============================================================================ */
@@ -1204,7 +1230,7 @@
 
     <!-- Navigation -->
     <div class="sidebar-nav">
-      <a href="cases.html" class="sidebar-nav-item" style="text-decoration: none;">
+      <a href="cases.html" class="sidebar-nav-item notification-badge" id="allCasesNavLink" data-count="0" style="text-decoration: none;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
         </svg>
@@ -1325,6 +1351,19 @@
 
     <!-- Organizations Tab -->
     <div id="organizations-tab" class="tab-content active">
+      <!-- Unassigned Cases Notification -->
+      <div id="unassigned-cases-alert" class="error-box" style="display: none; margin-bottom: 24px; background-color: #fff3cd; border-color: #ffc107; color: #856404;">
+        <h3 style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 24px;">⚠️</span>
+          <span id="unassigned-count">0</span> Cases Need Editor Assignment
+        </h3>
+        <p style="margin-bottom: 12px;">The following cases were submitted by families but could not be auto-assigned because no editors were available.</p>
+        <div id="unassigned-cases-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px;"></div>
+        <a href="cases.html" class="button-primary w-button" style="display: inline-block; margin-top: 8px;">
+          Go to All Cases to Assign
+        </a>
+      </div>
+      
       <div class="invite-section">
         <h2 class="section-title">Create New Organization</h2>
         <p class="paragraph">Add a new funeral home to the Memorio platform. Each organization can have multiple Directors and manage their own cases.</p>
@@ -1986,7 +2025,8 @@
       
       if (authSuccess) {
         // Only load data after successful authentication
-        console.log('🚀 Loading organizations...');
+        console.log('🚀 Loading organizations and notifications...');
+        await loadUnassignedCasesNotifications();
         await loadOrganizations();
         console.log('✅ App initialization complete');
       }
@@ -2408,6 +2448,7 @@
       
       // Load data based on tab
       if (tabName === 'organizations') {
+        loadUnassignedCasesNotifications();
         loadOrganizations();
       } else if (tabName === 'assign-editor') {
         loadEditors();
@@ -2522,6 +2563,71 @@
         createBtn.textContent = 'CREATE ORGANIZATION';
       }
     });
+    
+    // Load unassigned cases notifications
+    async function loadUnassignedCasesNotifications() {
+      try {
+        const { data: notifications, error } = await supabaseClient
+          .from('notifications')
+          .select('case_id, created_at')
+          .eq('event_type', 'no_editors_available')
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error loading notifications:', error);
+          return;
+        }
+        
+        const count = notifications?.length || 0;
+        
+        // Update badge on "All Cases" nav link
+        const navLink = document.getElementById('allCasesNavLink');
+        if (navLink) {
+          navLink.setAttribute('data-count', count);
+        }
+        
+        // Show/hide alert box
+        const alertBox = document.getElementById('unassigned-cases-alert');
+        const countElement = document.getElementById('unassigned-count');
+        const listElement = document.getElementById('unassigned-cases-list');
+        
+        if (count === 0 || !notifications) {
+          alertBox.style.display = 'none';
+          return;
+        }
+        
+        alertBox.style.display = 'block';
+        countElement.textContent = count;
+        
+        // Load case details for each notification
+        const caseIds = notifications.map(n => n.case_id);
+        const { data: cases, error: casesError } = await supabaseClient
+          .from('cases')
+          .select('id, deceased_name, created_at, org_id, organizations(name)')
+          .in('id', caseIds);
+        
+        if (casesError) {
+          console.error('Error loading case details:', casesError);
+          listElement.innerHTML = '<p style="color: #666;">Unable to load case details.</p>';
+          return;
+        }
+        
+        // Display case list
+        listElement.innerHTML = cases.map(c => `
+          <div style="padding: 12px; background: white; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #ffc107;">
+            <strong>${c.deceased_name}</strong><br>
+            <small style="color: #666;">
+              ${c.organizations?.name || 'Unknown Org'} • 
+              Submitted ${new Date(c.created_at).toLocaleDateString()}
+            </small>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error in loadUnassignedCasesNotifications:', error);
+      }
+    }
     
     // Load organizations list
     async function loadOrganizations() {

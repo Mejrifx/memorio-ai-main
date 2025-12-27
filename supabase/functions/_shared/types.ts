@@ -109,6 +109,19 @@ export interface InviteQCRequest {
   // No org_id - QC users are global
 }
 
+export interface AutoAssignEditorRequest {
+  case_id: string;
+}
+
+export interface AutoAssignEditorResponse {
+  success: boolean;
+  assigned: boolean;
+  editor_id?: string;
+  editor_name?: string;
+  message?: string;
+  error?: string;
+}
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
