@@ -989,13 +989,14 @@
     }
     
     .org-card-id {
-      background-color: #fff3e9;
+      background-color: var(--bg-active);
       border-radius: 5px;
       padding: 10px;
       margin-top: 10px;
       font-family: monospace;
       font-size: 12px;
       word-break: break-all;
+      transition: background-color 0.3s ease;
     }
     
     /* Custom Confirmation Modal */
@@ -3892,7 +3893,7 @@
             <div class="org-card-detail" style="margin-top: 10px;">Created: ${new Date(org.created_at).toLocaleDateString()}</div>
             <div class="org-card-id">
               <div class="credential-label">Organization ID (copy this when inviting Directors)</div>
-              <div class="credential-value" id="org-${org.id}" style="color: #32343a; margin-top: 5px;">${org.id}</div>
+              <div class="credential-value" id="org-${org.id}" style="margin-top: 5px;">${org.id}</div>
               <button class="copy-btn" onclick="event.stopPropagation(); copyOrgId('org-${org.id}')">Copy ID</button>
             </div>
             <div style="display: flex; gap: 8px; margin-top: 12px;">
