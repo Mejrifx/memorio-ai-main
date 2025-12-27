@@ -579,7 +579,7 @@
     
     .topbar-profile-dropdown-item {
       padding: 10px 14px;
-      color: #32343a;
+      color: var(--text-primary);
       font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
       font-size: 14px;
       font-weight: 600;
@@ -626,16 +626,18 @@
     }
     
     .dashboard-title {
-      color: #2d3748;
+      color: var(--text-primary);
       font-size: 28px;
       font-weight: 700;
       margin-bottom: 8px;
       letter-spacing: -0.5px;
+      transition: color 0.3s ease;
     }
     
     .dashboard-subtitle {
-      color: #718096;
+      color: var(--text-secondary);
       font-size: 15px;
+      transition: color 0.3s ease;
     }
     
     /* ============================================================================
@@ -653,19 +655,21 @@
     }
     
     .section-title {
-      color: #32343a;
+      color: var(--text-primary);
       font-size: 24px;
       font-weight: 600;
       font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
       margin-bottom: 20px;
+      transition: color 0.3s ease;
     }
     
     .paragraph {
-      color: #32343a;
+      color: var(--text-primary);
       font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
       font-size: 16px;
       line-height: 1.6;
       margin-bottom: 24px;
+      transition: color 0.3s ease;
     }
     
     .form-row {
@@ -685,11 +689,12 @@
     
     .field-label {
       display: block;
-      color: #32343a;
+      color: var(--text-primary);
       font-size: 14px;
       font-weight: 600;
       font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
       margin-bottom: 8px;
+      transition: color 0.3s ease;
     }
     
     .text-field {
@@ -935,9 +940,9 @@
     .tab-btn {
       padding: 12px 24px;
       background-color: transparent;
-      border: 2px solid #32343a;
+      border: 2px solid var(--border-primary);
       border-radius: 60px;
-      color: #32343a;
+      color: var(--text-primary);
       cursor: pointer;
       transition: all 0.3s ease;
       font-weight: 600;
@@ -946,13 +951,13 @@
     }
     
     .tab-btn.active {
-      background-color: #32343a;
-      color: #f2eadd;
+      background-color: var(--accent-secondary);
+      color: var(--text-inverse);
     }
     
     .tab-btn:hover {
-      background-color: #32343a;
-      color: #f2eadd;
+      background-color: var(--accent-secondary);
+      color: var(--text-inverse);
     }
     
     .tab-content {
@@ -1032,17 +1037,19 @@
     }
     
     .confirmation-title {
-      color: #32343a;
+      color: var(--text-primary);
       font-size: 24px;
       font-weight: 600;
       margin-bottom: 16px;
+      transition: color 0.3s ease;
     }
     
     .confirmation-message {
-      color: #666;
+      color: var(--text-secondary);
       font-size: 16px;
       line-height: 1.5;
       margin-bottom: 24px;
+      transition: color 0.3s ease;
     }
     
     .confirmation-warning {
@@ -1131,17 +1138,19 @@
     }
     
     .success-title {
-      color: #32343a;
+      color: var(--text-primary);
       font-size: 24px;
       font-weight: 600;
       margin-bottom: 16px;
+      transition: color 0.3s ease;
     }
     
     .success-message {
-      color: #666;
+      color: var(--text-secondary);
       font-size: 16px;
       line-height: 1.5;
       margin-bottom: 24px;
+      transition: color 0.3s ease;
     }
     
     .btn-success-ok {
@@ -1246,13 +1255,14 @@
     }
     
     .modal-section-title {
-      color: #32343a;
+      color: var(--text-primary);
       font-size: 18px;
       font-weight: 600;
       margin: 0 0 15px 0;
       display: flex;
       align-items: center;
       gap: 10px;
+      transition: color 0.3s ease;
     }
     
     .modal-icon {
@@ -1288,16 +1298,18 @@
     
     .modal-detail-label {
       font-weight: 600;
-      color: #666;
+      color: var(--text-secondary);
       min-width: 120px;
       font-size: 14px;
+      transition: color 0.3s ease;
     }
     
     .modal-detail-value {
-      color: #32343a;
+      color: var(--text-primary);
       font-size: 14px;
       flex: 1;
       word-break: break-all;
+      transition: color 0.3s ease;
     }
     
     .reveal-btn {
