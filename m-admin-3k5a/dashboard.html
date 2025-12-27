@@ -5025,6 +5025,9 @@
     async function openCaseDetailModal(caseId) {
       currentCaseDetailId = caseId;
       
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+      
       // Show modal immediately
       document.getElementById('case-detail-modal').classList.add('active');
       
@@ -5222,6 +5225,9 @@
     }
     
     function closeCaseDetailModal() {
+      // Re-enable body scroll
+      document.body.style.overflow = '';
+      
       document.getElementById('case-detail-modal').classList.remove('active');
       currentCaseDetailId = null;
       currentModalCaseData = null;
@@ -5329,6 +5335,8 @@
     document.addEventListener('click', (e) => {
       const modal = document.getElementById('case-detail-modal');
       if (e.target === modal) {
+        // Re-enable body scroll
+        document.body.style.overflow = '';
         closeCaseDetailModal();
       }
     });
