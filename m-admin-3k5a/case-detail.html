@@ -1090,37 +1090,53 @@
           return;
         }
         
-        // Load case with all relationships (with proper aliases for multiple users joins)
+        // Load case with all relationships
+        // Note: We query cases directly, then load assignments/submissions separately
+        // to avoid RLS issues with PostgREST joins to users table
         const { data: caseData, error: caseError } = await supabaseClient
           .from('cases')
           .select(`
             *,
             organizations (id, name),
             family_user:users!cases_assigned_family_user_id_fkey (id, email, metadata),
-            created_by:users!cases_created_by_fkey (email),
-            editor_assignments (
-              id,
-              editor_user_id,
-              assigned_at,
-              unassigned_at,
-              editor:users!editor_assignments_editor_user_id_fkey (id, email, metadata)
-            ),
-            video_submissions (
-              id,
-              submitted_at,
-              qc_status,
-              qc_reviewer_id,
-              qc_reviewer:users!video_submissions_qc_reviewer_id_fkey (email, metadata)
-            )
+            created_by:users!cases_created_by_fkey (email)
           `)
           .eq('id', currentCaseId)
-          .order('assigned_at', { foreignTable: 'editor_assignments', ascending: false })
-          .order('submitted_at', { foreignTable: 'video_submissions', ascending: false })
           .single();
         
         if (caseError) throw caseError;
         
-        currentCaseData = caseData;
+        // Load editor assignments separately using the view (bypasses RLS)
+        const { data: editorAssignments, error: assignError } = await supabaseClient
+          .from('admin_editor_assignments_view')
+          .select('*')
+          .eq('case_id', currentCaseId)
+          .order('assigned_at', { ascending: false });
+        
+        if (assignError) {
+          console.error('Error loading editor assignments:', assignError);
+        }
+        
+        // Load video submissions separately (with proper RLS)
+        const { data: videoSubmissions, error: videoError } = await supabaseClient
+          .from('video_submissions')
+          .select(`
+            *,
+            qc_reviewer:users!video_submissions_qc_reviewer_id_fkey (email, metadata)
+          `)
+          .eq('case_id', currentCaseId)
+          .order('submitted_at', { ascending: false });
+        
+        if (videoError) {
+          console.error('Error loading video submissions:', videoError);
+        }
+        
+        // Combine the data
+        currentCaseData = {
+          ...caseData,
+          editor_assignments: editorAssignments || [],
+          video_submissions: videoSubmissions || []
+        };
         
         // Debug: Log the loaded data
         console.log('📊 Case Data Loaded:', {
@@ -1164,19 +1180,22 @@
         slaContainer.innerHTML = '<div class="sla-badge" style="background-color: #e9ecef; color: #6c757d; border-color: #6c757d;">No SLA</div>';
       }
       
-      // Meta information (using new aliases)
+      // Meta information
+      // Editor assignment from admin_editor_assignments_view
       const editorAssignment = c.editor_assignments?.find(ea => !ea.unassigned_at);
-      const editor = editorAssignment?.editor;
+      const editorName = editorAssignment?.editor_metadata?.name 
+        || editorAssignment?.editor_email 
+        || 'Unassigned';
       const editorId = editorAssignment?.editor_user_id;
-      const editorName = editor?.metadata?.name || editor?.email || 'Unassigned';
       
       console.log('👤 Editor Assignment:', {
-        editorAssignment,
-        editor,
-        editorName
+        allAssignments: c.editor_assignments,
+        activeAssignment: editorAssignment,
+        editorName,
+        editorId
       });
       
-      // Get the most recent video submission with QC reviewer (or any submission)
+      // Get the most recent video submission with QC reviewer
       const qcSubmission = c.video_submissions?.sort((a, b) => 
         new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0)
       )[0];
