@@ -1117,18 +1117,32 @@
           console.error('Error loading editor assignments:', assignError);
         }
         
-        // Load video submissions separately (with proper RLS)
+        // Load video submissions separately (without joins - RLS issue)
         const { data: videoSubmissions, error: videoError } = await supabaseClient
           .from('video_submissions')
-          .select(`
-            *,
-            qc_reviewer:users!video_submissions_qc_reviewer_id_fkey (email, metadata)
-          `)
+          .select('*')
           .eq('case_id', currentCaseId)
           .order('submitted_at', { ascending: false });
         
         if (videoError) {
           console.error('Error loading video submissions:', videoError);
+        }
+        
+        // For each submission with qc_reviewer_id, fetch the QC user details
+        if (videoSubmissions && videoSubmissions.length > 0) {
+          for (const submission of videoSubmissions) {
+            if (submission.qc_reviewer_id) {
+              const { data: qcUser } = await supabaseClient
+                .from('admin_users_view')
+                .select('email, metadata')
+                .eq('id', submission.qc_reviewer_id)
+                .single();
+              
+              if (qcUser) {
+                submission.qc_reviewer = qcUser;
+              }
+            }
+          }
         }
         
         // Combine the data
