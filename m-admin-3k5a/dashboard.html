@@ -4982,8 +4982,23 @@
     function createAccountCard(account) {
       const name = account.metadata?.name || account.email.split('@')[0];
       const orgName = account.org_name || 'No Organization';
-      const createdDate = new Date(account.created_at).toLocaleDateString();
-      const lastLogin = account.last_login_at ? new Date(account.last_login_at).toLocaleDateString() : 'Never';
+      const createdDate = new Date(account.created_at).toLocaleDateString('en-US', { 
+        timeZone: 'America/New_York',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+      const lastLogin = account.last_login_at 
+        ? new Date(account.last_login_at).toLocaleString('en-US', { 
+            timeZone: 'America/New_York',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          })
+        : 'Never';
       
       return `
         <div class="account-card">
