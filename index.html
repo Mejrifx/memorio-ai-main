@@ -848,7 +848,7 @@
                 // Fetch user data from database (EXACT same as Director Portal)
                 const { data: userData, error: userError } = await supabaseClient
                     .from('users')
-                    .select('role, metadata')
+                    .select('role, status, metadata')
                     .eq('id', data.user.id)
                     .single();
                 
@@ -869,6 +869,25 @@
                 
                 if (userError || !userData || userData.role !== 'family') {
                     throw new Error('Access denied: This form is only for family members.');
+                }
+                
+                // Update user status to 'active' on first successful login
+                if (userData.status === 'invited') {
+                    await supabaseClient
+                        .from('users')
+                        .update({ 
+                            status: 'active',
+                            last_login_at: new Date().toISOString()
+                        })
+                        .eq('id', data.user.id);
+                } else {
+                    // Just update last login time for already active users
+                    await supabaseClient
+                        .from('users')
+                        .update({ 
+                            last_login_at: new Date().toISOString()
+                        })
+                        .eq('id', data.user.id);
                 }
                 
                 // Check if user needs to change password (EXACT same check as Director Portal)

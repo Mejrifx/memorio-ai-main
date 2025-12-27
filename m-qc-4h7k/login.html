@@ -241,6 +241,36 @@
           throw new Error('Access denied: This portal is only for QC users.');
         }
         
+        // Fetch user data from database to check status
+        const { data: userData, error: userError } = await supabaseClient
+          .from('users')
+          .select('role, status, metadata')
+          .eq('id', data.user.id)
+          .single();
+        
+        if (userError) {
+          console.warn('Could not fetch user data:', userError);
+        }
+        
+        // Update user status to 'active' on first successful login
+        if (userData && userData.status === 'invited') {
+          await supabaseClient
+            .from('users')
+            .update({ 
+              status: 'active',
+              last_login_at: new Date().toISOString()
+            })
+            .eq('id', data.user.id);
+        } else if (userData) {
+          // Just update last login time for already active users
+          await supabaseClient
+            .from('users')
+            .update({ 
+              last_login_at: new Date().toISOString()
+            })
+            .eq('id', data.user.id);
+        }
+        
         // Success - redirect to dashboard
         successMessage.textContent = '✓ Login successful! Redirecting to dashboard...';
         successMessage.style.display = 'block';
