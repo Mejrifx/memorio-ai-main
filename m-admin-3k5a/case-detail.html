@@ -1107,17 +1107,28 @@
             ),
             video_submissions (
               id,
+              submitted_at,
               qc_status,
               qc_reviewer_id,
               qc_reviewer:users!video_submissions_qc_reviewer_id_fkey (email, metadata)
             )
           `)
           .eq('id', currentCaseId)
+          .order('assigned_at', { foreignTable: 'editor_assignments', ascending: false })
+          .order('submitted_at', { foreignTable: 'video_submissions', ascending: false })
           .single();
         
         if (caseError) throw caseError;
         
         currentCaseData = caseData;
+        
+        // Debug: Log the loaded data
+        console.log('📊 Case Data Loaded:', {
+          case_id: caseData.id,
+          deceased_name: caseData.deceased_name,
+          editor_assignments: caseData.editor_assignments,
+          video_submissions: caseData.video_submissions
+        });
         
         // Render header
         renderCaseHeader();
@@ -1159,9 +1170,25 @@
       const editorId = editorAssignment?.editor_user_id;
       const editorName = editor?.metadata?.name || editor?.email || 'Unassigned';
       
-      const qcSubmission = c.video_submissions?.[0];
+      console.log('👤 Editor Assignment:', {
+        editorAssignment,
+        editor,
+        editorName
+      });
+      
+      // Get the most recent video submission with QC reviewer (or any submission)
+      const qcSubmission = c.video_submissions?.sort((a, b) => 
+        new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0)
+      )[0];
       const qcReviewer = qcSubmission?.qc_reviewer;
       const qcName = qcReviewer?.metadata?.name || qcReviewer?.email || 'Unassigned';
+      
+      console.log('🔍 QC Submission:', {
+        allSubmissions: c.video_submissions,
+        latestSubmission: qcSubmission,
+        qcReviewer,
+        qcName
+      });
       
       document.getElementById('caseMeta').innerHTML = `
         <div class="meta-item">
