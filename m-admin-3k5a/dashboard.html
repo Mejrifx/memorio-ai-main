@@ -2046,6 +2046,143 @@
       font-weight: 600;
       color: var(--text-secondary);
     }
+    
+    /* ============================================================================
+       CASE DETAIL MODAL
+       ============================================================================ */
+    
+    .case-detail-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--modal-overlay);
+      z-index: 10000;
+      overflow-y: auto;
+      padding: 40px 20px;
+    }
+    
+    .case-detail-modal.active {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    
+    .case-detail-content {
+      background-color: var(--bg-secondary);
+      border: 3px solid var(--border-primary);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 900px;
+      width: 100%;
+      position: relative;
+      margin: 40px 0;
+    }
+    
+    .case-detail-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 32px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+    
+    .case-detail-close:hover {
+      background-color: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    
+    .case-detail-header {
+      border-bottom: 2px solid var(--border-secondary);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .case-detail-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    
+    .case-detail-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .case-detail-section {
+      margin-bottom: 30px;
+    }
+    
+    .case-detail-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .case-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    .case-detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .case-detail-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .case-detail-value {
+      font-size: 15px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    .case-detail-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px solid var(--border-secondary);
+    }
+    
+    @media (max-width: 768px) {
+      .case-detail-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .case-detail-content {
+        padding: 24px;
+      }
+    }
   </style>
   
   <!-- Supabase Client -->
@@ -4419,7 +4556,7 @@
       let slaBadge = '<span class="sla-badge green">On Time</span>';
       
       return `
-        <div class="case-card" onclick="window.open('case-detail.html?id=${caseData.id}', '_blank')">
+        <div class="case-card" onclick="openCaseDetailModal('${caseData.id}')">
           <div class="case-card-header">
             <div class="case-card-name">${caseData.deceased_name}</div>
             ${slaBadge}
@@ -4588,7 +4725,172 @@
     // Make filter function global
     window.filterManageAccounts = filterManageAccounts;
     
+    // ============================================================================
+    // CASE DETAIL MODAL
+    // ============================================================================
+    
+    let currentCaseDetailId = null;
+    
+    async function openCaseDetailModal(caseId) {
+      currentCaseDetailId = caseId;
+      
+      // Show modal immediately
+      document.getElementById('case-detail-modal').classList.add('active');
+      
+      // Find case data from allCasesData
+      const caseData = allCasesData.find(c => c.id === caseId);
+      
+      if (!caseData) {
+        console.error('Case not found:', caseId);
+        return;
+      }
+      
+      // Populate modal with data
+      document.getElementById('case-modal-name').textContent = caseData.deceased_name;
+      document.getElementById('case-modal-org').textContent = caseData.organizations?.name || caseData.org_name || 'Unknown Org';
+      document.getElementById('case-modal-status').textContent = formatStatus(caseData.status);
+      document.getElementById('case-modal-date').textContent = new Date(caseData.created_at).toLocaleDateString();
+      
+      // Case Information
+      document.getElementById('case-modal-id').textContent = caseData.id;
+      document.getElementById('case-modal-status-full').textContent = formatStatus(caseData.status);
+      document.getElementById('case-modal-created').textContent = new Date(caseData.created_at).toLocaleString();
+      document.getElementById('case-modal-updated').textContent = new Date(caseData.updated_at).toLocaleString();
+      
+      // Organization
+      document.getElementById('case-modal-org-name').textContent = caseData.organizations?.name || caseData.org_name || 'Unknown Org';
+      document.getElementById('case-modal-org-id').textContent = caseData.org_id || '-';
+      
+      // Team
+      document.getElementById('case-modal-family').textContent = caseData.family_email || 'Not assigned';
+      
+      const editorEmail = caseData.editor_assignments?.[0]?.editor_email || caseData.editor_assignments?.[0]?.users?.email;
+      document.getElementById('case-modal-editor').textContent = editorEmail || 'Unassigned';
+      
+      const qcReviewer = caseData.video_submissions?.[0]?.qc_reviewer_id;
+      document.getElementById('case-modal-qc').textContent = qcReviewer ? 'Assigned' : 'Not assigned';
+    }
+    
+    function closeCaseDetailModal() {
+      document.getElementById('case-detail-modal').classList.remove('active');
+      currentCaseDetailId = null;
+    }
+    
+    function formatStatus(status) {
+      const statusMap = {
+        'waiting_on_family': 'Waiting on Family',
+        'intake_in_progress': 'Intake in Progress',
+        'submitted': 'Submitted',
+        'in_production': 'In Production',
+        'awaiting_review': 'Awaiting Review',
+        'revision_requested': 'Revision Requested',
+        'delivered': 'Delivered',
+        'closed': 'Closed'
+      };
+      return statusMap[status] || status;
+    }
+    
+    // Close modal when clicking outside
+    document.addEventListener('click', (e) => {
+      const modal = document.getElementById('case-detail-modal');
+      if (e.target === modal) {
+        closeCaseDetailModal();
+      }
+    });
+    
+    // Make functions global
+    window.openCaseDetailModal = openCaseDetailModal;
+    window.closeCaseDetailModal = closeCaseDetailModal;
+    
   </script>
+  
+  <!-- Case Detail Modal -->
+  <div id="case-detail-modal" class="case-detail-modal">
+    <div class="case-detail-content">
+      <button class="case-detail-close" onclick="closeCaseDetailModal()">&times;</button>
+      
+      <div class="case-detail-header">
+        <h2 class="case-detail-title" id="case-modal-name">Loading...</h2>
+        <div class="case-detail-subtitle">
+          <span id="case-modal-org">-</span>
+          <span>•</span>
+          <span id="case-modal-status">-</span>
+          <span>•</span>
+          <span id="case-modal-date">-</span>
+        </div>
+      </div>
+      
+      <div class="case-detail-section">
+        <h3 class="case-detail-section-title">
+          📋 Case Information
+        </h3>
+        <div class="case-detail-grid">
+          <div class="case-detail-item">
+            <span class="case-detail-label">Case ID</span>
+            <span class="case-detail-value" id="case-modal-id">-</span>
+          </div>
+          <div class="case-detail-item">
+            <span class="case-detail-label">Status</span>
+            <span class="case-detail-value" id="case-modal-status-full">-</span>
+          </div>
+          <div class="case-detail-item">
+            <span class="case-detail-label">Created</span>
+            <span class="case-detail-value" id="case-modal-created">-</span>
+          </div>
+          <div class="case-detail-item">
+            <span class="case-detail-label">Last Updated</span>
+            <span class="case-detail-value" id="case-modal-updated">-</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="case-detail-section">
+        <h3 class="case-detail-section-title">
+          🏢 Organization
+        </h3>
+        <div class="case-detail-grid">
+          <div class="case-detail-item">
+            <span class="case-detail-label">Funeral Home</span>
+            <span class="case-detail-value" id="case-modal-org-name">-</span>
+          </div>
+          <div class="case-detail-item">
+            <span class="case-detail-label">Organization ID</span>
+            <span class="case-detail-value" id="case-modal-org-id">-</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="case-detail-section">
+        <h3 class="case-detail-section-title">
+          👥 Team
+        </h3>
+        <div class="case-detail-grid">
+          <div class="case-detail-item">
+            <span class="case-detail-label">Family Contact</span>
+            <span class="case-detail-value" id="case-modal-family">-</span>
+          </div>
+          <div class="case-detail-item">
+            <span class="case-detail-label">Assigned Editor</span>
+            <span class="case-detail-value" id="case-modal-editor">-</span>
+          </div>
+          <div class="case-detail-item">
+            <span class="case-detail-label">QC Reviewer</span>
+            <span class="case-detail-value" id="case-modal-qc">-</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="case-detail-actions">
+        <button class="button-primary" onclick="window.open('case-detail.html?id=' + currentCaseDetailId, '_blank')">
+          Open Full Details
+        </button>
+        <button class="btn-secondary" onclick="closeCaseDetailModal()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  
 </body>
 </html>
 
