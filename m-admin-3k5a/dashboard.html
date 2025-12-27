@@ -2061,7 +2061,7 @@
       background-color: var(--modal-overlay);
       z-index: 10000;
       overflow-y: auto;
-      padding: 40px 20px;
+      padding: 20px;
     }
     
     .case-detail-modal.active {
@@ -2074,21 +2074,24 @@
       background-color: var(--bg-secondary);
       border: 3px solid var(--border-primary);
       border-radius: 20px;
-      padding: 40px;
-      max-width: 900px;
+      padding: 0;
+      max-width: 1400px;
       width: 100%;
       position: relative;
-      margin: 40px 0;
+      margin: 20px 0;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
     }
     
     .case-detail-close {
       position: absolute;
       top: 20px;
       right: 20px;
-      background: none;
-      border: none;
-      font-size: 32px;
-      color: var(--text-secondary);
+      background: var(--bg-active);
+      border: 2px solid var(--border-primary);
+      font-size: 24px;
+      color: var(--text-primary);
       cursor: pointer;
       width: 40px;
       height: 40px;
@@ -2097,17 +2100,20 @@
       justify-content: center;
       border-radius: 50%;
       transition: all 0.2s;
+      z-index: 10;
     }
     
     .case-detail-close:hover {
-      background-color: var(--bg-hover);
-      color: var(--text-primary);
+      background-color: var(--accent-primary);
+      color: white;
+      transform: scale(1.1);
     }
     
     .case-detail-header {
       border-bottom: 2px solid var(--border-secondary);
-      padding-bottom: 20px;
-      margin-bottom: 30px;
+      padding: 30px 40px;
+      background-color: var(--bg-active);
+      border-radius: 20px 20px 0 0;
     }
     
     .case-detail-title {
@@ -2115,17 +2121,107 @@
       font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 10px;
+      padding-right: 50px;
     }
     
     .case-detail-subtitle {
-      font-size: 16px;
+      font-size: 15px;
       color: var(--text-secondary);
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       flex-wrap: wrap;
+      margin-bottom: 20px;
     }
     
+    .case-detail-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    
+    .case-detail-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .case-detail-meta-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .case-detail-meta-value {
+      font-size: 15px;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    .case-detail-body {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .case-detail-main {
+      overflow-y: auto;
+      max-height: calc(90vh - 250px);
+    }
+    
+    .case-detail-sidebar {
+      background-color: var(--bg-active);
+      border-left: 2px solid var(--border-secondary);
+      padding: 24px;
+      overflow-y: auto;
+      max-height: calc(90vh - 250px);
+    }
+    
+    /* Tabs in Modal */
+    .modal-tabs {
+      display: flex;
+      border-bottom: 2px solid var(--border-secondary);
+      background-color: var(--bg-tertiary);
+      padding: 0 20px;
+    }
+    
+    .modal-tab-btn {
+      padding: 16px 24px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+    }
+    
+    .modal-tab-btn:hover {
+      color: var(--text-primary);
+      background-color: var(--bg-hover);
+    }
+    
+    .modal-tab-btn.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+    }
+    
+    .modal-tab-content {
+      display: none;
+      padding: 24px 40px;
+    }
+    
+    .modal-tab-content.active {
+      display: block;
+    }
+    
+    /* Section Styling */
     .case-detail-section {
       margin-bottom: 30px;
     }
@@ -2166,21 +2262,215 @@
       font-weight: 500;
     }
     
-    .case-detail-actions {
-      display: flex;
+    /* Timeline in Modal */
+    .modal-timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+    
+    .modal-timeline::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: var(--border-primary);
+    }
+    
+    .modal-timeline-item {
+      position: relative;
+      margin-bottom: 20px;
+      padding-left: 24px;
+    }
+    
+    .modal-timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -27px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      background-color: var(--accent-primary);
+      border: 2px solid var(--bg-secondary);
+      border-radius: 50%;
+    }
+    
+    .modal-timeline-time {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+    
+    .modal-timeline-event {
+      font-size: 14px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    .modal-timeline-actor {
+      font-size: 13px;
+      color: var(--accent-primary);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    
+    /* Assets Grid in Modal */
+    .modal-assets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 12px;
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 2px solid var(--border-secondary);
+    }
+    
+    .modal-asset-item {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid var(--border-primary);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .modal-asset-item:hover {
+      transform: scale(1.05);
+    }
+    
+    .modal-asset-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Form Data in Modal */
+    .modal-form-data-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 24px 0 12px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border-secondary);
+    }
+    
+    .modal-form-data-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .modal-form-data-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .modal-form-data-label {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .modal-form-data-value {
+      font-size: 14px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    /* Support Actions in Sidebar */
+    .support-actions-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-secondary);
+    }
+    
+    .support-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .support-action-btn {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: var(--bg-secondary);
+      border: 2px solid var(--border-primary);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .support-action-btn:hover {
+      background-color: var(--accent-primary);
+      color: white;
+      border-color: var(--accent-primary);
+    }
+    
+    .support-action-btn.danger {
+      border-color: var(--error-border);
+      color: var(--error-text);
+    }
+    
+    .support-action-btn.danger:hover {
+      background-color: var(--error-border);
+      color: white;
+    }
+    
+    /* Empty States */
+    .modal-empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+    
+    .modal-loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--accent-primary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 1024px) {
+      .case-detail-body {
+        grid-template-columns: 1fr;
+      }
+      
+      .case-detail-sidebar {
+        border-left: none;
+        border-top: 2px solid var(--border-secondary);
+      }
     }
     
     @media (max-width: 768px) {
-      .case-detail-grid {
+      .case-detail-grid,
+      .modal-form-data-grid {
         grid-template-columns: 1fr;
       }
       
       .case-detail-content {
-        padding: 24px;
+        padding: 0;
+        margin: 10px;
+      }
+      
+      .case-detail-header {
+        padding: 20px;
+      }
+      
+      .modal-tab-content {
+        padding: 16px 20px;
       }
     }
   </style>
@@ -4726,10 +5016,11 @@
     window.filterManageAccounts = filterManageAccounts;
     
     // ============================================================================
-    // CASE DETAIL MODAL
+    // CASE DETAIL MODAL - COMPREHENSIVE VERSION
     // ============================================================================
     
     let currentCaseDetailId = null;
+    let currentModalCaseData = null;
     
     async function openCaseDetailModal(caseId) {
       currentCaseDetailId = caseId;
@@ -4745,35 +5036,201 @@
         return;
       }
       
-      // Populate modal with data
+      currentModalCaseData = caseData;
+      
+      // Populate header with basic info
+      populateModalHeader(caseData);
+      
+      // Load tab content
+      await loadModalUploads(caseId);
+      await loadModalTimeline(caseId);
+      await loadModalAudit(caseId);
+    }
+    
+    function populateModalHeader(caseData) {
+      // Main header
       document.getElementById('case-modal-name').textContent = caseData.deceased_name;
       document.getElementById('case-modal-org').textContent = caseData.organizations?.name || caseData.org_name || 'Unknown Org';
       document.getElementById('case-modal-status').textContent = formatStatus(caseData.status);
       document.getElementById('case-modal-date').textContent = new Date(caseData.created_at).toLocaleDateString();
       
-      // Case Information
-      document.getElementById('case-modal-id').textContent = caseData.id;
-      document.getElementById('case-modal-status-full').textContent = formatStatus(caseData.status);
-      document.getElementById('case-modal-created').textContent = new Date(caseData.created_at).toLocaleString();
-      document.getElementById('case-modal-updated').textContent = new Date(caseData.updated_at).toLocaleString();
-      
-      // Organization
+      // Meta grid in header
       document.getElementById('case-modal-org-name').textContent = caseData.organizations?.name || caseData.org_name || 'Unknown Org';
-      document.getElementById('case-modal-org-id').textContent = caseData.org_id || '-';
-      
-      // Team
-      document.getElementById('case-modal-family').textContent = caseData.family_email || 'Not assigned';
       
       const editorEmail = caseData.editor_assignments?.[0]?.editor_email || caseData.editor_assignments?.[0]?.users?.email;
       document.getElementById('case-modal-editor').textContent = editorEmail || 'Unassigned';
       
-      const qcReviewer = caseData.video_submissions?.[0]?.qc_reviewer_id;
-      document.getElementById('case-modal-qc').textContent = qcReviewer ? 'Assigned' : 'Not assigned';
+      const qcReviewer = caseData.video_submissions?.[0]?.qc_reviewer;
+      document.getElementById('case-modal-qc').textContent = qcReviewer ? qcReviewer.email || 'Assigned' : 'Not assigned';
+      
+      document.getElementById('case-modal-family').textContent = caseData.family_email || 'Not assigned';
+      
+      // Overview tab
+      document.getElementById('case-modal-id').textContent = caseData.id;
+      document.getElementById('case-modal-status-full').textContent = formatStatus(caseData.status);
+      document.getElementById('case-modal-created').textContent = new Date(caseData.created_at).toLocaleString();
+      document.getElementById('case-modal-updated').textContent = new Date(caseData.updated_at).toLocaleString();
+      document.getElementById('case-modal-org-id').textContent = caseData.org_id || '-';
+    }
+    
+    async function loadModalUploads(caseId) {
+      try {
+        // Load assets
+        const { data: assets, error: assetsError } = await supabaseClient
+          .from('assets')
+          .select('*')
+          .eq('case_id', caseId)
+          .order('uploaded_at', { ascending: false });
+        
+        if (assetsError) throw assetsError;
+        
+        // Load form data
+        const { data: formData, error: formError } = await supabaseClient
+          .from('forms')
+          .select('*')
+          .eq('case_id', caseId)
+          .single();
+        
+        const uploadsContainer = document.getElementById('modal-uploads-content');
+        let html = '';
+        
+        // Render assets
+        if (assets && assets.length > 0) {
+          html += '<h3 class="modal-form-data-title">Uploaded Photos</h3>';
+          html += '<div class="modal-assets-grid">';
+          assets.forEach(asset => {
+            const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/case-assets/${asset.file_key}`;
+            html += `
+              <div class="modal-asset-item" onclick="window.open('${imageUrl}', '_blank')">
+                <img src="${imageUrl}" alt="Asset" loading="lazy">
+              </div>
+            `;
+          });
+          html += '</div>';
+        } else {
+          html += '<div class="modal-empty-state">No photos uploaded yet</div>';
+        }
+        
+        // Render form data
+        if (formData && formData.submitted_json) {
+          const data = formData.submitted_json;
+          html += '<h3 class="modal-form-data-title">Intake Form Data</h3>';
+          html += '<div class="modal-form-data-grid">';
+          
+          Object.entries(data).forEach(([key, value]) => {
+            if (typeof value === 'object') {
+              value = JSON.stringify(value);
+            }
+            html += `
+              <div class="modal-form-data-item">
+                <span class="modal-form-data-label">${formatFieldName(key)}</span>
+                <span class="modal-form-data-value">${value || 'N/A'}</span>
+              </div>
+            `;
+          });
+          
+          html += '</div>';
+        } else {
+          html += '<div class="modal-empty-state">No form data submitted yet</div>';
+        }
+        
+        uploadsContainer.innerHTML = html;
+        
+      } catch (error) {
+        console.error('Error loading uploads:', error);
+        document.getElementById('modal-uploads-content').innerHTML = '<div class="modal-empty-state">Error loading uploads</div>';
+      }
+    }
+    
+    async function loadModalTimeline(caseId) {
+      try {
+        const { data: events, error } = await supabaseClient
+          .from('events')
+          .select('*')
+          .eq('target_id', caseId)
+          .order('timestamp', { ascending: false })
+          .limit(50);
+        
+        if (error) throw error;
+        
+        const timelineContainer = document.getElementById('modal-timeline-content');
+        
+        if (!events || events.length === 0) {
+          timelineContainer.innerHTML = '<div class="modal-empty-state">No timeline events yet</div>';
+          return;
+        }
+        
+        timelineContainer.innerHTML = events.map(e => `
+          <div class="modal-timeline-item">
+            <div class="modal-timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
+            <div class="modal-timeline-event">${formatEventAction(e.action_type)}</div>
+            <div class="modal-timeline-actor">By: ${e.actor_role || 'System'}</div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading timeline:', error);
+        document.getElementById('modal-timeline-content').innerHTML = '<div class="modal-empty-state">Error loading timeline</div>';
+      }
+    }
+    
+    async function loadModalAudit(caseId) {
+      try {
+        const { data: events, error } = await supabaseClient
+          .from('events')
+          .select('*')
+          .eq('target_id', caseId)
+          .order('timestamp', { ascending: false });
+        
+        if (error) throw error;
+        
+        const auditContainer = document.getElementById('modal-audit-content');
+        
+        if (!events || events.length === 0) {
+          auditContainer.innerHTML = '<div class="modal-empty-state">No audit events</div>';
+          return;
+        }
+        
+        auditContainer.innerHTML = events.map(e => `
+          <div class="modal-timeline-item">
+            <div class="modal-timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
+            <div class="modal-timeline-event">
+              <strong>${e.action_type}</strong>
+              ${e.payload ? `<br><small style="color: var(--text-tertiary);">${JSON.stringify(e.payload).substring(0, 100)}...</small>` : ''}
+            </div>
+            <div class="modal-timeline-actor">
+              Actor: ${e.actor_role || 'System'} 
+              ${e.actor_user_id ? `(ID: ${e.actor_user_id.substring(0, 8)})` : ''}
+            </div>
+          </div>
+        `).join('');
+        
+      } catch (error) {
+        console.error('Error loading audit:', error);
+        document.getElementById('modal-audit-content').innerHTML = '<div class="modal-empty-state">Error loading audit trail</div>';
+      }
+    }
+    
+    function switchModalTab(tabName) {
+      // Update tab buttons
+      document.querySelectorAll('.modal-tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Update tab content
+      document.querySelectorAll('.modal-tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(`modal-tab-${tabName}`).classList.add('active');
     }
     
     function closeCaseDetailModal() {
       document.getElementById('case-detail-modal').classList.remove('active');
       currentCaseDetailId = null;
+      currentModalCaseData = null;
+      
+      // Reset to overview tab
+      document.querySelectorAll('.modal-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector('.modal-tab-btn').classList.add('active');
+      document.querySelectorAll('.modal-tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById('modal-tab-overview').classList.add('active');
     }
     
     function formatStatus(status) {
@@ -4790,6 +5247,84 @@
       return statusMap[status] || status;
     }
     
+    function formatEventAction(action) {
+      const actionMap = {
+        'INSERT': 'Case created',
+        'UPDATE': 'Case updated',
+        'case_created': 'Case created',
+        'status_changed': 'Status changed',
+        'editor_assigned': 'Editor assigned',
+        'video_submitted': 'Video submitted to QC',
+        'qc_approved': 'QC approved',
+        'qc_revision': 'QC requested revision',
+        'form_submitted': 'Intake form submitted'
+      };
+      return actionMap[action] || action;
+    }
+    
+    function formatFieldName(key) {
+      return key
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase());
+    }
+    
+    // Support Actions from Modal
+    async function openReassignEditorFromModal() {
+      // TODO: Implement editor reassignment modal
+      alert('Editor reassignment feature coming soon! (Currently being migrated from case-detail.html)');
+    }
+    
+    async function openReassignQCFromModal() {
+      // TODO: Implement QC reassignment modal
+      alert('QC reassignment feature coming soon! (Currently being migrated from case-detail.html)');
+    }
+    
+    async function pushToRevisionFromModal() {
+      if (!confirm('Push this case to revision? The editor will be notified.')) {
+        return;
+      }
+      
+      try {
+        const { error } = await supabaseClient
+          .from('cases')
+          .update({ status: 'revision_requested' })
+          .eq('id', currentCaseDetailId);
+        
+        if (error) throw error;
+        
+        // Log to audit
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: currentUser.id,
+            actor_role: 'admin',
+            action_type: 'pushed_to_revision',
+            target_type: 'case',
+            target_id: currentCaseDetailId,
+            payload: { reason: 'Admin support action' }
+          });
+        
+        alert('Case pushed to revision successfully!');
+        closeCaseDetailModal();
+        
+        // Reload cases
+        await loadCases();
+        
+      } catch (error) {
+        console.error('Error pushing to revision:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+    
+    function showCaseIdInfo() {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(currentCaseDetailId);
+        alert('Case ID copied to clipboard: ' + currentCaseDetailId);
+      } else {
+        alert('Case ID: ' + currentCaseDetailId);
+      }
+    }
+    
     // Close modal when clicking outside
     document.addEventListener('click', (e) => {
       const modal = document.getElementById('case-detail-modal');
@@ -4801,6 +5336,11 @@
     // Make functions global
     window.openCaseDetailModal = openCaseDetailModal;
     window.closeCaseDetailModal = closeCaseDetailModal;
+    window.switchModalTab = switchModalTab;
+    window.openReassignEditorFromModal = openReassignEditorFromModal;
+    window.openReassignQCFromModal = openReassignQCFromModal;
+    window.pushToRevisionFromModal = pushToRevisionFromModal;
+    window.showCaseIdInfo = showCaseIdInfo;
     
   </script>
   
@@ -4809,6 +5349,7 @@
     <div class="case-detail-content">
       <button class="case-detail-close" onclick="closeCaseDetailModal()">&times;</button>
       
+      <!-- Header -->
       <div class="case-detail-header">
         <h2 class="case-detail-title" id="case-modal-name">Loading...</h2>
         <div class="case-detail-subtitle">
@@ -4818,75 +5359,110 @@
           <span>•</span>
           <span id="case-modal-date">-</span>
         </div>
-      </div>
-      
-      <div class="case-detail-section">
-        <h3 class="case-detail-section-title">
-          📋 Case Information
-        </h3>
-        <div class="case-detail-grid">
-          <div class="case-detail-item">
-            <span class="case-detail-label">Case ID</span>
-            <span class="case-detail-value" id="case-modal-id">-</span>
+        <div class="case-detail-meta-grid">
+          <div class="case-detail-meta-item">
+            <span class="case-detail-meta-label">Funeral Home</span>
+            <span class="case-detail-meta-value" id="case-modal-org-name">-</span>
           </div>
-          <div class="case-detail-item">
-            <span class="case-detail-label">Status</span>
-            <span class="case-detail-value" id="case-modal-status-full">-</span>
+          <div class="case-detail-meta-item">
+            <span class="case-detail-meta-label">Assigned Editor</span>
+            <span class="case-detail-meta-value" id="case-modal-editor">-</span>
           </div>
-          <div class="case-detail-item">
-            <span class="case-detail-label">Created</span>
-            <span class="case-detail-value" id="case-modal-created">-</span>
+          <div class="case-detail-meta-item">
+            <span class="case-detail-meta-label">QC Reviewer</span>
+            <span class="case-detail-meta-value" id="case-modal-qc">-</span>
           </div>
-          <div class="case-detail-item">
-            <span class="case-detail-label">Last Updated</span>
-            <span class="case-detail-value" id="case-modal-updated">-</span>
+          <div class="case-detail-meta-item">
+            <span class="case-detail-meta-label">Family Contact</span>
+            <span class="case-detail-meta-value" id="case-modal-family">-</span>
           </div>
         </div>
       </div>
       
-      <div class="case-detail-section">
-        <h3 class="case-detail-section-title">
-          🏢 Organization
-        </h3>
-        <div class="case-detail-grid">
-          <div class="case-detail-item">
-            <span class="case-detail-label">Funeral Home</span>
-            <span class="case-detail-value" id="case-modal-org-name">-</span>
+      <!-- Body with Tabs and Sidebar -->
+      <div class="case-detail-body">
+        <!-- Main Content with Tabs -->
+        <div class="case-detail-main">
+          <div class="modal-tabs">
+            <button class="modal-tab-btn active" onclick="switchModalTab('overview')">Overview</button>
+            <button class="modal-tab-btn" onclick="switchModalTab('uploads')">Uploads & Forms</button>
+            <button class="modal-tab-btn" onclick="switchModalTab('timeline')">Timeline</button>
+            <button class="modal-tab-btn" onclick="switchModalTab('audit')">Audit</button>
           </div>
-          <div class="case-detail-item">
-            <span class="case-detail-label">Organization ID</span>
-            <span class="case-detail-value" id="case-modal-org-id">-</span>
+          
+          <!-- Overview Tab -->
+          <div id="modal-tab-overview" class="modal-tab-content active">
+            <div class="case-detail-section">
+              <h3 class="case-detail-section-title">📋 Case Information</h3>
+              <div class="case-detail-grid">
+                <div class="case-detail-item">
+                  <span class="case-detail-label">Case ID</span>
+                  <span class="case-detail-value" id="case-modal-id">-</span>
+                </div>
+                <div class="case-detail-item">
+                  <span class="case-detail-label">Status</span>
+                  <span class="case-detail-value" id="case-modal-status-full">-</span>
+                </div>
+                <div class="case-detail-item">
+                  <span class="case-detail-label">Created</span>
+                  <span class="case-detail-value" id="case-modal-created">-</span>
+                </div>
+                <div class="case-detail-item">
+                  <span class="case-detail-label">Last Updated</span>
+                  <span class="case-detail-value" id="case-modal-updated">-</span>
+                </div>
+                <div class="case-detail-item">
+                  <span class="case-detail-label">Organization ID</span>
+                  <span class="case-detail-value" id="case-modal-org-id">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Uploads & Forms Tab -->
+          <div id="modal-tab-uploads" class="modal-tab-content">
+            <div id="modal-uploads-content">
+              <div class="modal-loading">Loading uploads...</div>
+            </div>
+          </div>
+          
+          <!-- Timeline Tab -->
+          <div id="modal-tab-timeline" class="modal-tab-content">
+            <div class="modal-timeline" id="modal-timeline-content">
+              <div class="modal-loading">Loading timeline...</div>
+            </div>
+          </div>
+          
+          <!-- Audit Tab -->
+          <div id="modal-tab-audit" class="modal-tab-content">
+            <div class="modal-timeline" id="modal-audit-content">
+              <div class="modal-loading">Loading audit trail...</div>
+            </div>
           </div>
         </div>
-      </div>
-      
-      <div class="case-detail-section">
-        <h3 class="case-detail-section-title">
-          👥 Team
-        </h3>
-        <div class="case-detail-grid">
-          <div class="case-detail-item">
-            <span class="case-detail-label">Family Contact</span>
-            <span class="case-detail-value" id="case-modal-family">-</span>
-          </div>
-          <div class="case-detail-item">
-            <span class="case-detail-label">Assigned Editor</span>
-            <span class="case-detail-value" id="case-modal-editor">-</span>
-          </div>
-          <div class="case-detail-item">
-            <span class="case-detail-label">QC Reviewer</span>
-            <span class="case-detail-value" id="case-modal-qc">-</span>
+        
+        <!-- Sidebar with Support Actions -->
+        <div class="case-detail-sidebar">
+          <h3 class="support-actions-title">Support Actions</h3>
+          <div class="support-actions">
+            <button class="support-action-btn" onclick="openReassignEditorFromModal()">
+              <span>✏️</span>
+              <span>Reassign Editor</span>
+            </button>
+            <button class="support-action-btn" onclick="openReassignQCFromModal()">
+              <span>🔍</span>
+              <span>Reassign QC</span>
+            </button>
+            <button class="support-action-btn danger" onclick="pushToRevisionFromModal()">
+              <span>🔄</span>
+              <span>Push to Revision</span>
+            </button>
+            <button class="support-action-btn" onclick="showCaseIdInfo()">
+              <span>🆔</span>
+              <span>Copy Case ID</span>
+            </button>
           </div>
         </div>
-      </div>
-      
-      <div class="case-detail-actions">
-        <button class="button-primary" onclick="window.open('case-detail.html?id=' + currentCaseDetailId, '_blank')">
-          Open Full Details
-        </button>
-        <button class="btn-secondary" onclick="closeCaseDetailModal()">
-          Close
-        </button>
       </div>
     </div>
   </div>
