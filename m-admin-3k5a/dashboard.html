@@ -2894,7 +2894,7 @@
         // Load director users for this organization
         const { data: directors, error: directorsError } = await supabaseClient
           .from('admin_users_view')  // Use view to bypass RLS
-          .select('*, temp_password')
+          .select('*')
           .eq('org_id', orgId)
           .eq('role', 'director');
         
