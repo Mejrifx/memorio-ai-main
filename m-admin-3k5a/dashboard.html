@@ -244,7 +244,7 @@
       right: -4px;
       width: 18px;
       height: 18px;
-      background-color: #6ca7d3;
+      background-color: #e74c3c;
       border-radius: 50%;
       color: white;
       font-size: 10px;
@@ -253,6 +253,163 @@
       align-items: center;
       justify-content: center;
       border: 2px solid #fff3e9;
+    }
+    
+    .topbar-badge.hidden {
+      display: none;
+    }
+    
+    /* Notification Dropdown */
+    .notification-dropdown {
+      position: absolute;
+      top: 70px;
+      right: 70px;
+      width: 400px;
+      max-height: 500px;
+      background: white;
+      border: 2px solid #436481;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+      overflow: hidden;
+    }
+    
+    .notification-dropdown.active {
+      display: flex;
+    }
+    
+    .notification-header {
+      padding: 16px 20px;
+      border-bottom: 2px solid #f4e8de;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .notification-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #32343a;
+      margin: 0;
+    }
+    
+    .notification-mark-all {
+      font-size: 13px;
+      color: #6ca7d3;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .notification-mark-all:hover {
+      background-color: #f4e8de;
+      color: #436481;
+    }
+    
+    .notification-list {
+      overflow-y: auto;
+      max-height: 400px;
+    }
+    
+    .notification-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f4e8de;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    
+    .notification-item:hover {
+      background-color: #f9f9f9;
+    }
+    
+    .notification-item.unread {
+      background-color: #fff3e9;
+    }
+    
+    .notification-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: #6ca7d3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .notification-icon svg {
+      width: 16px;
+      height: 16px;
+      color: white;
+    }
+    
+    .notification-icon.warning {
+      background-color: #ffc107;
+    }
+    
+    .notification-icon.error {
+      background-color: #e74c3c;
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #32343a;
+      margin-bottom: 4px;
+    }
+    
+    .notification-text {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    
+    .notification-time {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .notification-empty {
+      padding: 48px 20px;
+      text-align: center;
+      color: #999;
+    }
+    
+    .notification-empty svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    
+    .notification-footer {
+      padding: 12px 20px;
+      border-top: 2px solid #f4e8de;
+      text-align: center;
+    }
+    
+    .notification-view-all {
+      font-size: 13px;
+      color: #6ca7d3;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .notification-view-all:hover {
+      color: #436481;
+      text-decoration: underline;
     }
     
     .topbar-profile {
@@ -1298,12 +1455,26 @@
 
     <div class="topbar-right">
       <!-- Notifications -->
-      <button class="topbar-icon-btn" title="Notifications">
+      <button class="topbar-icon-btn" id="notificationBtn" title="Notifications" onclick="toggleNotifications()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
         </svg>
-        <span class="topbar-badge">3</span>
+        <span class="topbar-badge hidden" id="notificationBadge">0</span>
       </button>
+      
+      <!-- Notification Dropdown -->
+      <div class="notification-dropdown" id="notificationDropdown">
+        <div class="notification-header">
+          <h3>Notifications</h3>
+          <button class="notification-mark-all" onclick="markAllAsRead()">Mark all as read</button>
+        </div>
+        <div class="notification-list" id="notificationList">
+          <!-- Notifications will be loaded here -->
+        </div>
+        <div class="notification-footer">
+          <a href="cases.html" class="notification-view-all">View All Cases</a>
+        </div>
+      </div>
 
       <!-- Settings -->
       <button class="topbar-icon-btn" title="Settings">
@@ -2027,6 +2198,7 @@
         // Only load data after successful authentication
         console.log('🚀 Loading organizations and notifications...');
         await loadUnassignedCasesNotifications();
+        await loadNotifications(); // Load notification dropdown data
         await loadOrganizations();
         console.log('✅ App initialization complete');
       }
@@ -2628,6 +2800,224 @@
         console.error('Error in loadUnassignedCasesNotifications:', error);
       }
     }
+    
+    // ============================================================================
+    // NOTIFICATION DROPDOWN SYSTEM
+    // ============================================================================
+    
+    let allNotifications = [];
+    
+    // Toggle notification dropdown
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notificationDropdown');
+      const isActive = dropdown.classList.contains('active');
+      
+      if (!isActive) {
+        loadNotifications();
+        dropdown.classList.add('active');
+      } else {
+        dropdown.classList.remove('active');
+      }
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('notificationDropdown');
+      const btn = document.getElementById('notificationBtn');
+      
+      if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.remove('active');
+      }
+    });
+    
+    // Load all notifications
+    async function loadNotifications() {
+      try {
+        // Get unassigned cases notifications
+        const { data: notifications, error } = await supabaseClient
+          .from('notifications')
+          .select(`
+            id,
+            case_id,
+            event_type,
+            status,
+            created_at,
+            cases (
+              id,
+              deceased_name,
+              organizations (
+                name
+              )
+            )
+          `)
+          .eq('event_type', 'no_editors_available')
+          .in('status', ['pending', 'sent'])
+          .order('created_at', { ascending: false })
+          .limit(20);
+        
+        if (error) throw error;
+        
+        allNotifications = notifications || [];
+        renderNotifications();
+        updateNotificationBadge();
+        
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+        document.getElementById('notificationList').innerHTML = `
+          <div class="notification-empty">
+            <p>Error loading notifications</p>
+          </div>
+        `;
+      }
+    }
+    
+    // Render notifications in dropdown
+    function renderNotifications() {
+      const listEl = document.getElementById('notificationList');
+      
+      if (!allNotifications || allNotifications.length === 0) {
+        listEl.innerHTML = `
+          <div class="notification-empty">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+            </svg>
+            <p>No notifications</p>
+          </div>
+        `;
+        return;
+      }
+      
+      listEl.innerHTML = allNotifications.map(notif => {
+        const isUnread = notif.status === 'pending';
+        const caseName = notif.cases?.deceased_name || 'Unknown Case';
+        const orgName = notif.cases?.organizations?.name || 'Unknown Org';
+        const timeAgo = getTimeAgo(new Date(notif.created_at));
+        
+        return `
+          <div class="notification-item ${isUnread ? 'unread' : ''}" onclick="handleNotificationClick('${notif.id}', '${notif.case_id}')">
+            <div class="notification-icon error">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+            </div>
+            <div class="notification-content">
+              <div class="notification-title">No Editors Available</div>
+              <div class="notification-text">
+                Case <strong>${caseName}</strong> from ${orgName} needs an editor assignment
+              </div>
+              <div class="notification-time">${timeAgo}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Update notification badge count
+    function updateNotificationBadge() {
+      const badge = document.getElementById('notificationBadge');
+      const unreadCount = allNotifications.filter(n => n.status === 'pending').length;
+      
+      if (unreadCount > 0) {
+        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+    
+    // Handle notification click
+    async function handleNotificationClick(notificationId, caseId) {
+      try {
+        // Mark notification as read
+        await supabaseClient
+          .from('notifications')
+          .update({ status: 'sent' })
+          .eq('id', notificationId);
+        
+        // Update local state
+        const notif = allNotifications.find(n => n.id === notificationId);
+        if (notif) notif.status = 'sent';
+        
+        renderNotifications();
+        updateNotificationBadge();
+        
+        // Navigate to case detail
+        window.location.href = `case-detail.html?id=${caseId}`;
+        
+      } catch (error) {
+        console.error('Error handling notification click:', error);
+      }
+    }
+    
+    // Mark all as read
+    async function markAllAsRead() {
+      try {
+        const pendingIds = allNotifications
+          .filter(n => n.status === 'pending')
+          .map(n => n.id);
+        
+        if (pendingIds.length === 0) return;
+        
+        await supabaseClient
+          .from('notifications')
+          .update({ status: 'sent' })
+          .in('id', pendingIds);
+        
+        // Update local state
+        allNotifications.forEach(n => {
+          if (n.status === 'pending') n.status = 'sent';
+        });
+        
+        renderNotifications();
+        updateNotificationBadge();
+        
+      } catch (error) {
+        console.error('Error marking all as read:', error);
+      }
+    }
+    
+    // Get time ago string
+    function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      
+      const intervals = {
+        year: 31536000,
+        month: 2592000,
+        week: 604800,
+        day: 86400,
+        hour: 3600,
+        minute: 60
+      };
+      
+      for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+        const interval = Math.floor(seconds / secondsInUnit);
+        if (interval >= 1) {
+          return interval === 1 ? `1 ${unit} ago` : `${interval} ${unit}s ago`;
+        }
+      }
+      
+      return 'Just now';
+    }
+    
+    // Make functions global
+    window.toggleNotifications = toggleNotifications;
+    window.markAllAsRead = markAllAsRead;
+    window.handleNotificationClick = handleNotificationClick;
+    
+    // Auto-refresh notifications every 30 seconds
+    setInterval(() => {
+      const dropdown = document.getElementById('notificationDropdown');
+      if (dropdown && dropdown.classList.contains('active')) {
+        loadNotifications();
+      } else {
+        // Just update badge count without opening dropdown
+        loadNotifications();
+      }
+    }, 30000);
+    
+    // ============================================================================
+    // END NOTIFICATION DROPDOWN SYSTEM
+    // ============================================================================
     
     // Load organizations list
     async function loadOrganizations() {
