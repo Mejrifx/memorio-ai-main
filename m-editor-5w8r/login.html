@@ -233,7 +233,7 @@
         // Get user metadata to check role
         const { data: userData, error: userError } = await supabaseClient
           .from('users')
-          .select('role, metadata')
+          .select('role, status, metadata')
           .eq('id', authData.user.id)
           .single();
         
@@ -245,6 +245,25 @@
         if (userData.role !== 'editor') {
           await supabaseClient.auth.signOut();
           throw new Error('Access denied. Editor role required.');
+        }
+        
+        // Update user status to 'active' on first successful login
+        if (userData.status === 'invited') {
+          await supabaseClient
+            .from('users')
+            .update({ 
+              status: 'active',
+              last_login_at: new Date().toISOString()
+            })
+            .eq('id', authData.user.id);
+        } else {
+          // Just update last login time for already active users
+          await supabaseClient
+            .from('users')
+            .update({ 
+              last_login_at: new Date().toISOString()
+            })
+            .eq('id', authData.user.id);
         }
         
         // Success - redirect to dashboard
