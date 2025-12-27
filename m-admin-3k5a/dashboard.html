@@ -148,8 +148,8 @@
       height: auto;
       max-height: 60px;
       object-fit: contain;
-      filter: brightness(0) saturate(100%);
-      opacity: 0.8;
+      /* No filter in light mode - keep original colors */
+      transition: filter 0.3s ease, opacity 0.3s ease;
     }
     
     [data-theme="dark"] .sidebar-logo img {
