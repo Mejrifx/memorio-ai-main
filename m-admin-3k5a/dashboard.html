@@ -4736,18 +4736,10 @@
           console.warn('⚠️ Error loading editor assignments:', assignmentsError);
         }
         
-        // Get video submissions with QC reviewer info
+        // Get video submissions with QC reviewer info from view (bypasses RLS)
         const { data: submissions, error: submissionsError } = await supabaseClient
-          .from('video_submissions')
-          .select(`
-            case_id, 
-            qc_status,
-            qc_reviewer_id,
-            qc_reviewer:qc_reviewer_id (
-              email,
-              metadata
-            )
-          `)
+          .from('admin_video_submissions_view')
+          .select('case_id, qc_status, qc_reviewer_id, qc_reviewer_email, qc_reviewer_metadata')
           .order('created_at', { ascending: false });
         
         if (submissionsError) {
@@ -4755,12 +4747,30 @@
         }
         
         // Combine data
-        allCasesData = (cases || []).map(c => ({
-          ...c,
-          organizations: c.org_name ? { name: c.org_name } : null,
-          editor_assignments: (assignments || []).filter(a => a.case_id === c.id),
-          video_submissions: (submissions || []).filter(s => s.case_id === c.id).slice(0, 1)
-        }));
+        allCasesData = (cases || []).map(c => {
+          // Find editor assignments for this case
+          const caseAssignments = (assignments || []).filter(a => a.case_id === c.id);
+          
+          // Find video submission for this case
+          const caseSubmissions = (submissions || []).filter(s => s.case_id === c.id);
+          const latestSubmission = caseSubmissions[0]; // Already ordered by created_at DESC
+          
+          // Build qc_reviewer object structure to match what populateModalHeader expects
+          const qcReviewer = latestSubmission && latestSubmission.qc_reviewer_id ? {
+            email: latestSubmission.qc_reviewer_email,
+            metadata: latestSubmission.qc_reviewer_metadata
+          } : null;
+          
+          return {
+            ...c,
+            organizations: c.org_name ? { name: c.org_name } : null,
+            editor_assignments: caseAssignments,
+            video_submissions: latestSubmission ? [{
+              ...latestSubmission,
+              qc_reviewer: qcReviewer
+            }] : []
+          };
+        });
         
         filteredCasesData = allCasesData;
         
