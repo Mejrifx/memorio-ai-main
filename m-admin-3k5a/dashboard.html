@@ -4736,10 +4736,18 @@
           console.warn('⚠️ Error loading editor assignments:', assignmentsError);
         }
         
-        // Get video submissions
+        // Get video submissions with QC reviewer info
         const { data: submissions, error: submissionsError } = await supabaseClient
           .from('video_submissions')
-          .select('case_id, qc_status')
+          .select(`
+            case_id, 
+            qc_status,
+            qc_reviewer_id,
+            qc_reviewer:qc_reviewer_id (
+              email,
+              metadata
+            )
+          `)
           .order('created_at', { ascending: false });
         
         if (submissionsError) {
@@ -4844,7 +4852,9 @@
     
     function createCaseCard(caseData) {
       const orgName = caseData.organizations?.name || caseData.org_name || 'Unknown Org';
-      const editorName = caseData.editor_assignments?.[0]?.editor_email || 'Unassigned';
+      // Show editor name from metadata, fallback to email
+      const editorAssignment = caseData.editor_assignments?.[0];
+      const editorName = editorAssignment?.editor_metadata?.name || editorAssignment?.editor_email || 'Unassigned';
       const createdDate = new Date(caseData.created_at).toLocaleDateString();
       
       // SLA badge (simplified)
@@ -5080,11 +5090,15 @@
       // Meta grid in header
       document.getElementById('case-modal-org-name').textContent = caseData.organizations?.name || caseData.org_name || 'Unknown Org';
       
-      const editorEmail = caseData.editor_assignments?.[0]?.editor_email || caseData.editor_assignments?.[0]?.users?.email;
-      document.getElementById('case-modal-editor').textContent = editorEmail || 'Unassigned';
+      // Show editor name from metadata, fallback to email
+      const editorAssignment = caseData.editor_assignments?.[0];
+      const editorName = editorAssignment?.editor_metadata?.name || editorAssignment?.editor_email || 'Unassigned';
+      document.getElementById('case-modal-editor').textContent = editorName;
       
-      const qcReviewer = caseData.video_submissions?.[0]?.qc_reviewer;
-      document.getElementById('case-modal-qc').textContent = qcReviewer ? qcReviewer.email || 'Assigned' : 'Not assigned';
+      // Show QC reviewer name from metadata, fallback to email
+      const qcReviewerData = caseData.video_submissions?.[0]?.qc_reviewer;
+      const qcReviewerName = qcReviewerData?.metadata?.name || qcReviewerData?.email || null;
+      document.getElementById('case-modal-qc').textContent = qcReviewerName || 'Not assigned';
       
       document.getElementById('case-modal-family').textContent = caseData.family_email || 'Not assigned';
       
