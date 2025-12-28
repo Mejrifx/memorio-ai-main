@@ -182,10 +182,11 @@
     }
     
     .funeral-home-name {
-      font-size: 14px;
+      font-size: 18px;
       color: #436481;
-      font-weight: 500;
+      font-weight: 700;
       white-space: nowrap;
+      letter-spacing: 0.3px;
     }
     
     .topbar-right {
@@ -1370,9 +1371,9 @@
         // Display funeral home name in topbar
         const funeralHomeElement = document.getElementById('funeral-home-name');
         if (userData.organizations && userData.organizations.name) {
-          funeralHomeElement.textContent = `🏢 ${userData.organizations.name}`;
+          funeralHomeElement.textContent = userData.organizations.name;
         } else {
-          funeralHomeElement.textContent = '🏢 Funeral Home';
+          funeralHomeElement.textContent = 'Funeral Home';
         }
         
         // Check JWT role (secondary check)
