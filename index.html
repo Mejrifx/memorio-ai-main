@@ -13,9 +13,6 @@
   <!-- Preload Dosis font -->
   <link rel="preload" href="fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
   
-  <!-- Supabase Client for Authentication -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
   <style>
     /* ============================================================================
        FONTS
@@ -1267,25 +1264,31 @@
               </div>
                 </div>
   
+  <!-- Supabase Client for Authentication -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <!-- ============================================================================
-       JAVASCRIPT
+       JAVASCRIPT v2.0 - CACHE BUSTED
        ============================================================================ -->
   <script>
+    // VERSION 2.0 - Fresh start
+    console.log('🚀 Script version 2.0 loading...');
+    
     // ============================================================================
     // CONFIGURATION
     // ============================================================================
     const SUPABASE_URL = 'https://zfakmfvmlxqvtlrtvakp.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmYWttZnZtbHhxdnRscnR2YWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5NjQ4MDcsImV4cCI6MjA1NDU0MDgwN30.qM0RKCdRw5i3s31MmdICPiZQyB2m4Hy0e4wc-hCVb-M';
     
-    // Check if Supabase library is loaded
-    if (typeof window.supabase === 'undefined') {
-      console.error('Supabase library not loaded!');
-    }
-    
-    let supabase;
+    // Initialize Supabase (use var to avoid redeclaration errors in browser cache scenarios)
+    var memorioSupabase;
     try {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      console.log('✅ Supabase client initialized');
+      if (typeof window.supabase === 'undefined') {
+        console.error('❌ Supabase library not loaded!');
+      } else {
+        memorioSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase client initialized');
+      }
     } catch (error) {
       console.error('❌ Failed to initialize Supabase:', error);
     }
@@ -1433,7 +1436,7 @@
           
           try {
             // Authenticate with Supabase
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await memorioSupabase.auth.signInWithPassword({
               email: email,
               password: password
             });
@@ -1443,7 +1446,7 @@
             }
             
             // Check if user is family role
-            const { data: userData, error: userError } = await supabase
+            const { data: userData, error: userError } = await memorioSupabase
               .from('users')
               .select('role')
               .eq('id', data.user.id)
