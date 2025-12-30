@@ -193,6 +193,21 @@
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
     
+    .hero-title .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: slideUpWord 0.6s ease forwards;
+      margin-right: 0.25em;
+    }
+    
+    @keyframes slideUpWord {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     .hero-subtitle {
       font-size: 24px;
       color: #32343a;
@@ -1058,6 +1073,38 @@
   <script>
     // VERSION 2.0 - Fresh start
     console.log('🚀 Script version 2.0 loading...');
+    
+    // ============================================================================
+    // HERO TEXT ANIMATION - Slide up by word
+    // ============================================================================
+    function animateHeroTitle() {
+      const heroTitle = document.querySelector('.hero-title');
+      if (!heroTitle) return;
+      
+      const text = heroTitle.textContent;
+      const words = text.split(' ');
+      
+      // Clear the original text and rebuild with wrapped words
+      heroTitle.innerHTML = '';
+      
+      words.forEach((word, index) => {
+        const wordSpan = document.createElement('span');
+        wordSpan.className = 'word';
+        wordSpan.textContent = word;
+        wordSpan.style.animationDelay = `${index * 0.1}s`;
+        heroTitle.appendChild(wordSpan);
+        
+        // Add space after each word (except the last one)
+        if (index < words.length - 1) {
+          heroTitle.appendChild(document.createTextNode(' '));
+        }
+      });
+      
+      console.log('✨ Hero title animation initialized');
+    }
+    
+    // Run hero animation immediately
+    animateHeroTitle();
     
     // ============================================================================
     // CONFIGURATION
