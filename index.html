@@ -125,7 +125,8 @@
       padding: 0;
       position: absolute;
       left: 50%;
-      transform: translateX(-50%);
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
     
     .nav-link {
@@ -150,37 +151,27 @@
     }
     
     .btn-login {
-      background-color: white;
+      background-color: transparent;
       color: #32343a;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      font-weight: 600;
       font-size: 14px;
       border: none;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       text-decoration: none;
       display: inline-block;
       position: relative;
-      z-index: 10;
-      box-shadow: 
-        0 0 24px rgba(34, 42, 53, 0.06),
-        0 1px 1px rgba(0, 0, 0, 0.05),
-        0 0 0 1px rgba(34, 42, 53, 0.04),
-        0 0 4px rgba(34, 42, 53, 0.08),
-        0 16px 68px rgba(47, 48, 55, 0.05),
-        0 1px 0 rgba(255, 255, 255, 0.1) inset;
     }
     
     .btn-login:hover {
-      transform: translateY(-2px);
-      box-shadow: 
-        0 0 30px rgba(34, 42, 53, 0.1),
-        0 2px 2px rgba(0, 0, 0, 0.05),
-        0 0 0 1px rgba(34, 42, 53, 0.04),
-        0 0 6px rgba(34, 42, 53, 0.12),
-        0 20px 80px rgba(47, 48, 55, 0.08),
-        0 1px 0 rgba(255, 255, 255, 0.1) inset;
+      color: #436481;
+      background-color: rgba(243, 244, 246, 0.8);
+    }
+    
+    .header.scrolled .btn-login {
+      color: #32343a;
     }
     
     /* Mobile Menu Toggle */
@@ -275,6 +266,16 @@
       margin-bottom: 40px;
       font-weight: 500;
       line-height: 1.5;
+      opacity: 0;
+      transform: translateX(-50px);
+      animation: slideInFromLeft 0.8s ease forwards 0.8s;
+    }
+    
+    @keyframes slideInFromLeft {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
     
     .hero-buttons {
@@ -282,6 +283,16 @@
       gap: 20px;
       justify-content: center;
       flex-wrap: wrap;
+      opacity: 0;
+      transform: translateX(50px);
+      animation: slideInFromRight 0.8s ease forwards 1.2s;
+    }
+    
+    @keyframes slideInFromRight {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
     
     .btn-primary {
@@ -728,8 +739,10 @@
       }
       
       .nav-menu {
-        position: static;
-        transform: none;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
         gap: 4px;
       }
       
@@ -803,6 +816,18 @@
         width: 100%;
         text-align: center;
         margin-top: 8px;
+        background-color: white;
+        box-shadow: 
+          0 0 24px rgba(34, 42, 53, 0.06),
+          0 1px 1px rgba(0, 0, 0, 0.05),
+          0 0 0 1px rgba(34, 42, 53, 0.04),
+          0 0 4px rgba(34, 42, 53, 0.08),
+          0 16px 68px rgba(47, 48, 55, 0.05),
+          0 1px 0 rgba(255, 255, 255, 0.1) inset;
+      }
+      
+      .btn-login:hover {
+        background-color: white;
       }
       
       .hero-title {
