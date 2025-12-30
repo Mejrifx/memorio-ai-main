@@ -643,170 +643,6 @@
     }
     
     /* ============================================================================
-       LOGIN MODAL
-       ============================================================================ */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      animation: fadeIn 0.3s ease;
-    }
-    
-    .modal-overlay.active {
-      display: flex;
-    }
-    
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-    
-    .modal-content {
-      background-color: #fff3e9;
-      border: 3px solid #436481;
-      border-radius: 20px;
-      padding: 48px;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      animation: modalSlideIn 0.3s ease;
-      position: relative;
-    }
-    
-    @keyframes modalSlideIn {
-      from {
-        opacity: 0;
-        transform: scale(0.95) translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-    
-    .modal-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: none;
-      border: none;
-      font-size: 28px;
-      color: #32343a;
-      cursor: pointer;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-    }
-    
-    .modal-close:hover {
-      background-color: rgba(67, 100, 129, 0.1);
-      color: #436481;
-    }
-    
-    .modal-title {
-      color: #32343a;
-      text-align: center;
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    
-    .modal-subtitle {
-      color: #32343a;
-      text-align: center;
-      font-size: 16px;
-      margin-bottom: 30px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-label {
-      display: block;
-      color: #32343a;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    
-    .form-input {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #436481;
-      border-radius: 8px;
-      font-size: 16px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      background-color: #ffffff;
-      transition: border-color 0.3s ease;
-    }
-    
-    .form-input:focus {
-      outline: none;
-      border-color: #6ca7d3;
-    }
-    
-    .error-message {
-      display: none;
-      background-color: #ffebee;
-      border: 1px solid #ef5350;
-      color: #c62828;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-    
-    .error-message.active {
-      display: block;
-    }
-    
-    .btn-submit {
-      width: 100%;
-      padding: 14px;
-      background-color: #436481;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      transition: background-color 0.2s;
-    }
-    
-    .btn-submit:hover {
-      background-color: #355a6f;
-    }
-    
-    .btn-submit:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    
-    .modal-footer {
-      text-align: center;
-      color: #666;
-      font-size: 14px;
-      margin-top: 20px;
-    }
-    
-    /* ============================================================================
        RESPONSIVE DESIGN
        ============================================================================ */
     @media (max-width: 768px) {
@@ -855,10 +691,6 @@
       .steps-container,
       .benefits-grid {
         grid-template-columns: 1fr;
-      }
-      
-      .modal-content {
-        padding: 32px 24px;
       }
     }
     
@@ -1217,53 +1049,6 @@
                       </div>
   </footer>
   
-  <!-- ============================================================================
-       LOGIN MODAL
-       ============================================================================ -->
-  <div class="modal-overlay" id="loginModal">
-    <div class="modal-content">
-      <button class="modal-close" id="closeModal" aria-label="Close modal">&times;</button>
-      
-      <h2 class="modal-title">Family Portal</h2>
-      <p class="modal-subtitle">Sign in to complete your obituary form</p>
-      
-      <div class="error-message" id="loginError"></div>
-      
-      <form id="loginForm">
-        <div class="form-group">
-          <label for="loginEmail" class="form-label">Email Address</label>
-          <input 
-            type="email" 
-            id="loginEmail" 
-            class="form-input" 
-            placeholder="Enter your email"
-            required
-          >
-                    </div>
-        
-        <div class="form-group">
-          <label for="loginPassword" class="form-label">Password</label>
-          <input 
-            type="password" 
-            id="loginPassword" 
-            class="form-input" 
-            placeholder="Enter your password"
-            required
-          >
-                  </div>
-        
-        <button type="submit" class="btn-submit" id="loginSubmitBtn">
-          Sign In
-        </button>
-      </form>
-      
-      <p class="modal-footer">
-        Don't have login credentials?<br>
-        Contact your funeral director for access.
-      </p>
-              </div>
-                </div>
-  
   <!-- Supabase Client for Authentication -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -1330,148 +1115,48 @@
       }
       
       // ============================================================================
-      // LOGIN MODAL
+      // REDIRECT TO FAMILY FORM FOR LOGIN
       // ============================================================================
-      const loginModal = document.getElementById('loginModal');
-      const closeModal = document.getElementById('closeModal');
       const loginBtn = document.getElementById('loginBtn');
       const heroLoginBtn = document.getElementById('heroLoginBtn');
       const ctaLoginBtn = document.getElementById('ctaLoginBtn');
       const footerLoginBtn = document.getElementById('footerLoginBtn');
       
-      console.log('🔍 Login elements found:', {
-        loginModal: !!loginModal,
-        closeModal: !!closeModal,
+      console.log('🔍 Login buttons found:', {
         loginBtn: !!loginBtn,
         heroLoginBtn: !!heroLoginBtn,
         ctaLoginBtn: !!ctaLoginBtn,
         footerLoginBtn: !!footerLoginBtn
       });
       
-      function showLoginModal() {
-        console.log('🔓 showLoginModal called');
-        if (loginModal) {
-          loginModal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-          console.log('✅ Login modal opened');
-        } else {
-          console.error('❌ Login modal element not found');
-        }
-      }
-      
-      function hideLoginModal() {
-        console.log('🔒 hideLoginModal called');
-        if (loginModal) {
-          loginModal.classList.remove('active');
-          document.body.style.overflow = '';
-          console.log('✅ Login modal closed');
-        }
+      function redirectToFamilyForm() {
+        console.log('🔀 Redirecting to family form...');
+        window.location.href = 'family-form.html';
       }
       
       if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
+        loginBtn.addEventListener('click', (e) => {
           console.log('🖱️ Nav login button clicked');
-          showLoginModal();
+          redirectToFamilyForm();
         });
       }
       if (heroLoginBtn) {
-        heroLoginBtn.addEventListener('click', () => {
+        heroLoginBtn.addEventListener('click', (e) => {
           console.log('🖱️ Hero login button clicked');
-          showLoginModal();
+          redirectToFamilyForm();
         });
       }
       if (ctaLoginBtn) {
-        ctaLoginBtn.addEventListener('click', () => {
+        ctaLoginBtn.addEventListener('click', (e) => {
           console.log('🖱️ CTA login button clicked');
-          showLoginModal();
+          redirectToFamilyForm();
         });
       }
       if (footerLoginBtn) {
         footerLoginBtn.addEventListener('click', (e) => {
           console.log('🖱️ Footer login link clicked');
           e.preventDefault();
-          showLoginModal();
-        });
-      }
-      
-      if (closeModal) closeModal.addEventListener('click', hideLoginModal);
-      
-      // Close modal when clicking outside
-      if (loginModal) {
-        loginModal.addEventListener('click', (e) => {
-          if (e.target === loginModal) {
-            hideLoginModal();
-          }
-        });
-      }
-      
-      // Close modal on Escape key
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && loginModal && loginModal.classList.contains('active')) {
-          hideLoginModal();
-        }
-      });
-      
-      // ============================================================================
-      // LOGIN FORM HANDLER
-      // ============================================================================
-      const loginForm = document.getElementById('loginForm');
-      const loginError = document.getElementById('loginError');
-      const loginSubmitBtn = document.getElementById('loginSubmitBtn');
-      
-      if (loginForm && loginError && loginSubmitBtn) {
-        loginForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          
-          const email = document.getElementById('loginEmail').value.trim();
-          const password = document.getElementById('loginPassword').value;
-          
-          // Reset error message
-          loginError.classList.remove('active');
-          loginError.textContent = '';
-          
-          // Disable submit button
-          loginSubmitBtn.disabled = true;
-          loginSubmitBtn.textContent = 'Signing In...';
-          
-          try {
-            // Authenticate with Supabase
-            const { data, error } = await memorioSupabase.auth.signInWithPassword({
-              email: email,
-              password: password
-            });
-            
-            if (error) {
-              throw error;
-            }
-            
-            // Check if user is family role
-            const { data: userData, error: userError } = await memorioSupabase
-              .from('users')
-              .select('role')
-              .eq('id', data.user.id)
-              .single();
-            
-            if (userError) {
-              throw new Error('Failed to verify user role');
-            }
-            
-            if (userData.role !== 'family') {
-              throw new Error('Access denied. This portal is for family members only.');
-            }
-            
-            // Success! Redirect to family form
-            window.location.href = 'family-form.html';
-            
-          } catch (error) {
-            console.error('Login error:', error);
-            loginError.textContent = error.message || 'Invalid email or password. Please try again.';
-            loginError.classList.add('active');
-            
-            // Re-enable submit button
-            loginSubmitBtn.disabled = false;
-            loginSubmitBtn.textContent = 'Sign In';
-          }
+          redirectToFamilyForm();
         });
       }
       
