@@ -41,32 +41,52 @@
     }
     
     /* ============================================================================
-       HEADER / NAVIGATION
+       HEADER / NAVIGATION - Animated Resizable Navbar
        ============================================================================ */
     .header {
       position: fixed;
-      top: 0;
+      top: 20px;
       left: 0;
       right: 0;
-      background-color: rgba(255, 243, 233, 0.98);
-      backdrop-filter: blur(10px);
-      border-bottom: 2px solid #436481;
-      padding: 16px 0;
+      display: flex;
+      justify-content: center;
       z-index: 1000;
-      transition: all 0.3s ease;
+      padding: 0 16px;
+      transition: top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     
     .header.scrolled {
-      box-shadow: 0 4px 20px rgba(67, 100, 129, 0.15);
+      top: 20px;
     }
     
     .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
+      width: 100%;
+      max-width: 100%;
+      background-color: transparent;
+      border-radius: 9999px;
+      padding: 12px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      min-width: 280px;
+    }
+    
+    .header.scrolled .nav-container {
+      width: 60%;
+      min-width: 800px;
+      max-width: 1200px;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 
+        0 0 24px rgba(34, 42, 53, 0.06),
+        0 1px 1px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(34, 42, 53, 0.04),
+        0 0 4px rgba(34, 42, 53, 0.08),
+        0 16px 68px rgba(47, 48, 55, 0.05),
+        0 1px 0 rgba(255, 255, 255, 0.1) inset;
     }
     
     .logo {
@@ -74,11 +94,19 @@
       align-items: center;
       gap: 12px;
       text-decoration: none;
+      position: relative;
+      z-index: 20;
+      transition: all 0.3s ease;
     }
     
     .logo img {
-      height: 45px;
+      height: 40px;
       width: auto;
+      transition: all 0.3s ease;
+    }
+    
+    .header.scrolled .logo img {
+      height: 35px;
     }
     
     .logo-text {
@@ -90,42 +118,69 @@
     
     .nav-menu {
       display: flex;
-      gap: 32px;
+      gap: 8px;
       align-items: center;
       list-style: none;
+      margin: 0;
+      padding: 0;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
     
     .nav-link {
       color: #32343a;
       text-decoration: none;
       font-weight: 600;
-      font-size: 16px;
-      transition: color 0.3s ease;
+      font-size: 14px;
+      transition: all 0.3s ease;
       cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      position: relative;
     }
     
     .nav-link:hover {
       color: #436481;
+      background-color: rgba(243, 244, 246, 0.8);
+    }
+    
+    .header.scrolled .nav-link {
+      color: #32343a;
     }
     
     .btn-login {
-      background-color: #436481;
-      color: white;
-      padding: 12px 28px;
+      background-color: white;
+      color: #32343a;
+      padding: 10px 20px;
       border-radius: 8px;
-      font-weight: 600;
-      font-size: 16px;
+      font-weight: 700;
+      font-size: 14px;
       border: none;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       text-decoration: none;
       display: inline-block;
+      position: relative;
+      z-index: 10;
+      box-shadow: 
+        0 0 24px rgba(34, 42, 53, 0.06),
+        0 1px 1px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(34, 42, 53, 0.04),
+        0 0 4px rgba(34, 42, 53, 0.08),
+        0 16px 68px rgba(47, 48, 55, 0.05),
+        0 1px 0 rgba(255, 255, 255, 0.1) inset;
     }
     
     .btn-login:hover {
-      background-color: #355a6f;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.3);
+      box-shadow: 
+        0 0 30px rgba(34, 42, 53, 0.1),
+        0 2px 2px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(34, 42, 53, 0.04),
+        0 0 6px rgba(34, 42, 53, 0.12),
+        0 20px 80px rgba(47, 48, 55, 0.08),
+        0 1px 0 rgba(255, 255, 255, 0.1) inset;
     }
     
     /* Mobile Menu Toggle */
@@ -135,16 +190,22 @@
       border: none;
       cursor: pointer;
       padding: 8px;
+      position: relative;
+      z-index: 20;
     }
     
     .mobile-menu-toggle span {
       display: block;
-      width: 28px;
-      height: 3px;
-      background-color: #436481;
+      width: 24px;
+      height: 2px;
+      background-color: #32343a;
       margin: 5px 0;
       transition: 0.3s;
       border-radius: 3px;
+    }
+    
+    .header.scrolled .mobile-menu-toggle span {
+      background-color: #32343a;
     }
     
     /* ============================================================================
@@ -161,7 +222,7 @@
       background-position: center;
       background-repeat: no-repeat;
       background-attachment: fixed;
-      padding-top: 80px;
+      padding-top: 0;
     }
     
     .hero::before {
@@ -660,30 +721,88 @@
     /* ============================================================================
        RESPONSIVE DESIGN
        ============================================================================ */
+    @media (max-width: 1024px) {
+      .header.scrolled .nav-container {
+        width: 90%;
+        min-width: 280px;
+      }
+      
+      .nav-menu {
+        position: static;
+        transform: none;
+        gap: 4px;
+      }
+      
+      .nav-link {
+        font-size: 13px;
+        padding: 6px 12px;
+      }
+    }
+    
     @media (max-width: 768px) {
       .mobile-menu-toggle {
         display: block;
       }
       
+      .nav-container {
+        padding: 12px 16px;
+      }
+      
+      .header.scrolled .nav-container {
+        width: calc(100% - 32px);
+        min-width: auto;
+        border-radius: 16px;
+      }
+      
+      nav {
+        position: static;
+      }
+      
       .nav-menu {
         position: fixed;
-        top: 77px;
-        left: 0;
-        right: 0;
-        background-color: #fff3e9;
+        top: 90px;
+        left: 16px;
+        right: 16px;
+        background-color: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
         flex-direction: column;
         padding: 24px;
-        border-bottom: 2px solid #436481;
-        transform: translateY(-100%);
+        border-radius: 16px;
+        transform: translateY(-20px);
         opacity: 0;
         transition: all 0.3s ease;
         pointer-events: none;
+        box-shadow: 
+          0 0 24px rgba(34, 42, 53, 0.06),
+          0 1px 1px rgba(0, 0, 0, 0.05),
+          0 0 0 1px rgba(34, 42, 53, 0.04),
+          0 0 4px rgba(34, 42, 53, 0.08),
+          0 16px 68px rgba(47, 48, 55, 0.05),
+          0 1px 0 rgba(255, 255, 255, 0.1) inset;
       }
       
       .nav-menu.active {
         transform: translateY(0);
         opacity: 1;
         pointer-events: all;
+      }
+      
+      .nav-menu li {
+        width: 100%;
+      }
+      
+      .nav-link {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 12px 16px;
+        font-size: 15px;
+      }
+      
+      .btn-login {
+        width: 100%;
+        text-align: center;
+        margin-top: 8px;
       }
       
       .hero-title {
