@@ -480,60 +480,124 @@
        ============================================================================ */
     .how-it-works {
       padding: 100px 24px;
-      background-color: #f4e8de;
+      background: linear-gradient(180deg, #f4e8de 0%, #fff3e9 100%);
+      position: relative;
+      overflow: hidden;
     }
     
     .steps-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 50px;
+      gap: 30px;
       margin-top: 60px;
+      position: relative;
     }
     
     .step {
       position: relative;
+      background-color: white;
+      border-radius: 24px;
+      padding: 40px 32px;
       text-align: center;
+      box-shadow: 0 4px 20px rgba(67, 100, 129, 0.08);
+      border: 2px solid transparent;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0;
+      transform: translateY(60px);
+      will-change: transform, opacity;
+    }
+    
+    .step.animate-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .step:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(67, 100, 129, 0.15);
+      border-color: #6ca7d3;
     }
     
     .step-number {
-      width: 70px;
-      height: 70px;
+      width: 80px;
+      height: 80px;
       margin: 0 auto 24px;
       background: linear-gradient(135deg, #436481 0%, #6ca7d3 100%);
-      border-radius: 50%;
+      border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 800;
       color: white;
-      box-shadow: 0 6px 16px rgba(67, 100, 129, 0.3);
+      box-shadow: 0 8px 24px rgba(67, 100, 129, 0.25);
       position: relative;
+      transition: all 0.3s ease;
     }
     
-    .step-number::after {
+    .step:hover .step-number {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 12px 32px rgba(67, 100, 129, 0.35);
+    }
+    
+    .step-number::before {
       content: '';
       position: absolute;
       width: 100%;
       height: 100%;
-      border: 3px solid #436481;
-      border-radius: 50%;
-      top: -8px;
-      left: -8px;
-      opacity: 0.3;
+      background: linear-gradient(135deg, #6ca7d3 0%, #436481 100%);
+      border-radius: 20px;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .step:hover .step-number::before {
+      opacity: 1;
+    }
+    
+    .step-number span {
+      position: relative;
+      z-index: 1;
     }
     
     .step-title {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       color: #32343a;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      transition: color 0.3s ease;
+    }
+    
+    .step:hover .step-title {
+      color: #436481;
     }
     
     .step-description {
       font-size: 16px;
       color: #32343a;
       line-height: 1.7;
+      opacity: 0.9;
+    }
+    
+    /* Connecting line between steps (desktop only) */
+    @media (min-width: 1024px) {
+      .steps-container {
+        gap: 20px;
+      }
+      
+      .step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: -20px;
+        width: 40px;
+        height: 2px;
+        background: linear-gradient(90deg, #6ca7d3 0%, transparent 100%);
+        transform: translateY(-50%);
+        opacity: 0.3;
+      }
     }
     
     /* ============================================================================
@@ -856,6 +920,24 @@
       .benefits-grid {
         grid-template-columns: 1fr;
       }
+      
+      .step {
+        padding: 32px 24px;
+      }
+      
+      .step-number {
+        width: 70px;
+        height: 70px;
+        font-size: 32px;
+      }
+      
+      .step-title {
+        font-size: 22px;
+      }
+      
+      .step-description {
+        font-size: 15px;
+      }
     }
     
     /* ============================================================================
@@ -1025,42 +1107,42 @@
           </div>
       
       <div class="steps-container">
-        <div class="step">
-          <div class="step-number">1</div>
+        <div class="step" data-step="1">
+          <div class="step-number"><span>1</span></div>
           <h3 class="step-title">Receive Invitation</h3>
           <p class="step-description">
             Your funeral director sends you secure login credentials via email 
             to access your personalized tribute form for you to complete.
           </p>
-              </div>
+        </div>
         
-        <div class="step">
-          <div class="step-number">2</div>
+        <div class="step" data-step="2">
+          <div class="step-number"><span>2</span></div>
           <h3 class="step-title">Share Memories</h3>
           <p class="step-description">
             Upload photos, videos, and share stories about your loved one. 
             Our guided form makes it easy to capture what matters most.
           </p>
-              </div>
+        </div>
         
-        <div class="step">
-          <div class="step-number">3</div>
+        <div class="step" data-step="3">
+          <div class="step-number"><span>3</span></div>
           <h3 class="step-title">Professional Production</h3>
           <p class="step-description">
             Our team transforms your content into a beautiful video tribute 
             with music, transitions, and professional editing.
           </p>
-            </div>
+        </div>
         
-        <div class="step">
-          <div class="step-number">4</div>
+        <div class="step" data-step="4">
+          <div class="step-number"><span>4</span></div>
           <h3 class="step-title">Review & Deliver</h3>
           <p class="step-description">
             Review the final tribute, request any changes, and receive your 
             high-quality video for the service and keepsake.
           </p>
-          </div>
         </div>
+      </div>
           </div>
   </section>
   
@@ -1399,6 +1481,41 @@
           card.style.transform = 'translateY(0) perspective(1000px) rotateX(0deg) rotateY(0deg)';
         });
       });
+      
+      // ============================================================================
+      // SLIDE-UP ANIMATION FOR HOW IT WORKS STEPS
+      // ============================================================================
+      const steps = document.querySelectorAll('.step');
+      let stepsAnimated = false;
+      
+      const animateSteps = () => {
+        if (stepsAnimated) return;
+        
+        steps.forEach((step, index) => {
+          setTimeout(() => {
+            step.classList.add('animate-in');
+          }, index * 200); // 200ms delay between each step
+        });
+        
+        stepsAnimated = true;
+      };
+      
+      // Use Intersection Observer to trigger animation when section is visible
+      const stepsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !stepsAnimated) {
+            animateSteps();
+          }
+        });
+      }, {
+        threshold: 0.2, // Trigger when 20% of section is visible
+        rootMargin: '0px 0px -100px 0px'
+      });
+      
+      const howItWorksSection = document.getElementById('how-it-works');
+      if (howItWorksSection) {
+        stepsObserver.observe(howItWorksSection);
+      }
       
     }); // End DOMContentLoaded
     </script>
