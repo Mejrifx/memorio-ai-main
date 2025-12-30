@@ -605,64 +605,116 @@
        ============================================================================ */
     .benefits {
       padding: 100px 24px;
-      background-color: #fff;
+      background: linear-gradient(180deg, #fff 0%, #f4e8de 100%);
+      position: relative;
+      overflow: hidden;
     }
     
     .benefits-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
       margin-top: 60px;
+      position: relative;
     }
     
     .benefit-item {
       display: flex;
       align-items: flex-start;
-      gap: 16px;
-      padding: 24px;
-      background-color: #fff3e9;
-      border-radius: 16px;
+      gap: 20px;
+      padding: 36px 32px;
+      background-color: white;
+      border-radius: 24px;
       border: 2px solid transparent;
-      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(67, 100, 129, 0.08);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      opacity: 0;
+      transform: translateY(60px);
+      will-change: transform, opacity;
+    }
+    
+    .benefit-item.animate-in {
+      opacity: 1;
+      transform: translateY(0);
     }
     
     .benefit-item:hover {
-      border-color: #6ca7d3;
-      transform: translateX(8px);
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(67, 100, 129, 0.15);
+      border-color: #436481;
     }
     
     .benefit-icon {
       flex-shrink: 0;
-      width: 48px;
-      height: 48px;
-      background-color: #6ca7d3;
-      border-radius: 12px;
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #436481 0%, #6ca7d3 100%);
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 6px 20px rgba(67, 100, 129, 0.2);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .benefit-item:hover .benefit-icon {
+      transform: scale(1.15) rotate(-5deg);
+      box-shadow: 0 10px 30px rgba(67, 100, 129, 0.3);
+    }
+    
+    .benefit-icon::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #6ca7d3 0%, #436481 100%);
+      border-radius: 18px;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .benefit-item:hover .benefit-icon::before {
+      opacity: 1;
     }
     
     .benefit-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       fill: white;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s ease;
+    }
+    
+    .benefit-item:hover .benefit-icon svg {
+      transform: scale(1.1);
     }
     
     .benefit-text {
       flex: 1;
+      padding-top: 4px;
     }
     
     .benefit-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 700;
       color: #32343a;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      transition: color 0.3s ease;
+    }
+    
+    .benefit-item:hover .benefit-title {
+      color: #436481;
     }
     
     .benefit-description {
       font-size: 15px;
       color: #32343a;
-      line-height: 1.6;
+      line-height: 1.7;
+      opacity: 0.85;
     }
     
     /* ============================================================================
@@ -937,6 +989,29 @@
       
       .step-description {
         font-size: 15px;
+      }
+      
+      .benefit-item {
+        padding: 28px 24px;
+        gap: 16px;
+      }
+      
+      .benefit-icon {
+        width: 56px;
+        height: 56px;
+      }
+      
+      .benefit-icon svg {
+        width: 24px;
+        height: 24px;
+      }
+      
+      .benefit-title {
+        font-size: 18px;
+      }
+      
+      .benefit-description {
+        font-size: 14px;
       }
     }
     
@@ -1515,6 +1590,41 @@
       const howItWorksSection = document.getElementById('how-it-works');
       if (howItWorksSection) {
         stepsObserver.observe(howItWorksSection);
+      }
+      
+      // ============================================================================
+      // SLIDE-UP ANIMATION FOR BENEFITS SECTION
+      // ============================================================================
+      const benefitItems = document.querySelectorAll('.benefit-item');
+      let benefitsAnimated = false;
+      
+      const animateBenefits = () => {
+        if (benefitsAnimated) return;
+        
+        benefitItems.forEach((item, index) => {
+          setTimeout(() => {
+            item.classList.add('animate-in');
+          }, index * 150); // 150ms delay between each item
+        });
+        
+        benefitsAnimated = true;
+      };
+      
+      // Use Intersection Observer to trigger animation when section is visible
+      const benefitsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !benefitsAnimated) {
+            animateBenefits();
+          }
+        });
+      }, {
+        threshold: 0.2, // Trigger when 20% of section is visible
+        rootMargin: '0px 0px -100px 0px'
+      });
+      
+      const benefitsSection = document.getElementById('benefits');
+      if (benefitsSection) {
+        benefitsObserver.observe(benefitsSection);
       }
       
     }); // End DOMContentLoaded
