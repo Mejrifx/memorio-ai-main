@@ -157,7 +157,7 @@
       color: #32343a;
       padding: 8px 16px;
       border-radius: 9999px;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 14px;
       font-family: 'Dosis Variablefont Wght', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
       border: none;
@@ -408,6 +408,7 @@
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 40px;
       margin-top: 60px;
+      perspective: 1000px;
     }
     
     .feature-card {
@@ -416,9 +417,11 @@
       border-radius: 20px;
       padding: 40px 32px;
       text-align: center;
-      transition: all 0.3s ease;
+      transition: transform 0.1s ease-out, box-shadow 0.3s ease;
       position: relative;
       overflow: hidden;
+      transform-style: preserve-3d;
+      will-change: transform;
     }
     
     .feature-card::before {
@@ -434,7 +437,6 @@
     }
     
     .feature-card:hover {
-      transform: translateY(-8px);
       box-shadow: 0 12px 30px rgba(67, 100, 129, 0.2);
     }
     
@@ -1370,6 +1372,31 @@
               });
             }
           }
+        });
+      });
+      
+      // ============================================================================
+      // 3D TILT EFFECT FOR FEATURE CARDS
+      // ============================================================================
+      const featureCards = document.querySelectorAll('.feature-card');
+      
+      featureCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          
+          const rotateX = (y - centerY) / 10;
+          const rotateY = (centerX - x) / 10;
+          
+          card.style.transform = `translateY(-8px) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'translateY(0) perspective(1000px) rotateX(0deg) rotateY(0deg)';
         });
       });
       
