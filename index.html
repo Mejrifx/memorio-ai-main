@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Memorio - Honoring Life Through Digital Tributes</title>
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="apple-touch-icon" href="images/webclip.png">
@@ -1274,7 +1277,18 @@
     const SUPABASE_URL = 'https://zfakmfvmlxqvtlrtvakp.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmYWttZnZtbHhxdnRscnR2YWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5NjQ4MDcsImV4cCI6MjA1NDU0MDgwN30.qM0RKCdRw5i3s31MmdICPiZQyB2m4Hy0e4wc-hCVb-M';
     
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Check if Supabase library is loaded
+    if (typeof window.supabase === 'undefined') {
+      console.error('Supabase library not loaded!');
+    }
+    
+    let supabase;
+    try {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log('✅ Supabase client initialized');
+    } catch (error) {
+      console.error('❌ Failed to initialize Supabase:', error);
+    }
     
     // ============================================================================
     // WAIT FOR DOM TO LOAD
@@ -1322,25 +1336,56 @@
       const ctaLoginBtn = document.getElementById('ctaLoginBtn');
       const footerLoginBtn = document.getElementById('footerLoginBtn');
       
+      console.log('🔍 Login elements found:', {
+        loginModal: !!loginModal,
+        closeModal: !!closeModal,
+        loginBtn: !!loginBtn,
+        heroLoginBtn: !!heroLoginBtn,
+        ctaLoginBtn: !!ctaLoginBtn,
+        footerLoginBtn: !!footerLoginBtn
+      });
+      
       function showLoginModal() {
+        console.log('🔓 showLoginModal called');
         if (loginModal) {
           loginModal.classList.add('active');
           document.body.style.overflow = 'hidden';
+          console.log('✅ Login modal opened');
+        } else {
+          console.error('❌ Login modal element not found');
         }
       }
       
       function hideLoginModal() {
+        console.log('🔒 hideLoginModal called');
         if (loginModal) {
           loginModal.classList.remove('active');
           document.body.style.overflow = '';
+          console.log('✅ Login modal closed');
         }
       }
       
-      if (loginBtn) loginBtn.addEventListener('click', showLoginModal);
-      if (heroLoginBtn) heroLoginBtn.addEventListener('click', showLoginModal);
-      if (ctaLoginBtn) ctaLoginBtn.addEventListener('click', showLoginModal);
+      if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+          console.log('🖱️ Nav login button clicked');
+          showLoginModal();
+        });
+      }
+      if (heroLoginBtn) {
+        heroLoginBtn.addEventListener('click', () => {
+          console.log('🖱️ Hero login button clicked');
+          showLoginModal();
+        });
+      }
+      if (ctaLoginBtn) {
+        ctaLoginBtn.addEventListener('click', () => {
+          console.log('🖱️ CTA login button clicked');
+          showLoginModal();
+        });
+      }
       if (footerLoginBtn) {
         footerLoginBtn.addEventListener('click', (e) => {
+          console.log('🖱️ Footer login link clicked');
           e.preventDefault();
           showLoginModal();
         });
