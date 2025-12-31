@@ -270,22 +270,40 @@
       background: linear-gradient(180deg, #f4e8de 0%, #fff3e9 100%);
     }
     
-    .workflow-steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px;
+    .workflow-diagram {
+      position: relative;
       margin-top: 60px;
+      padding: 40px 0;
+    }
+    
+    .workflow-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+      flex-wrap: wrap;
+      gap: 20px;
     }
     
     .workflow-step {
       background-color: white;
       border-radius: 20px;
-      padding: 40px 32px;
+      padding: 32px 28px;
       border: 2px solid transparent;
       box-shadow: 0 4px 20px rgba(67, 100, 129, 0.08);
       transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
       overflow: hidden;
+      flex: 1;
+      min-width: 200px;
+      max-width: 220px;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    
+    .workflow-step.animate-in {
+      opacity: 1;
+      transform: translateY(0);
     }
     
     .workflow-step::before {
@@ -298,11 +316,12 @@
       background: linear-gradient(90deg, #436481 0%, #6ca7d3 100%);
       transform: scaleX(0);
       transition: transform 0.3s ease;
+      z-index: 2;
     }
     
     .workflow-step:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 40px rgba(67, 100, 129, 0.15);
+      transform: translateY(-12px) scale(1.05);
+      box-shadow: 0 16px 48px rgba(67, 100, 129, 0.2);
       border-color: #6ca7d3;
     }
     
@@ -310,33 +329,147 @@
       transform: scaleX(1);
     }
     
-    .workflow-step-number {
+    .workflow-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
       width: 60px;
-      height: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #6ca7d3 0%, #436481 100%);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      opacity: 0.6;
+    }
+    
+    .workflow-arrow::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 12px solid #436481;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+    
+    .workflow-step-number {
+      width: 56px;
+      height: 56px;
       background: linear-gradient(135deg, #436481 0%, #6ca7d3 100%);
       border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       color: white;
-      margin-bottom: 24px;
+      margin: 0 auto 20px;
       box-shadow: 0 6px 20px rgba(67, 100, 129, 0.25);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .workflow-step:hover .workflow-step-number {
+      transform: scale(1.15) rotate(5deg);
+      box-shadow: 0 10px 30px rgba(67, 100, 129, 0.35);
+    }
+    
+    .workflow-step-number::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #6ca7d3 0%, #436481 100%);
+      border-radius: 16px;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .workflow-step:hover .workflow-step-number::before {
+      opacity: 1;
+    }
+    
+    .workflow-step-number span {
+      position: relative;
+      z-index: 1;
     }
     
     .workflow-step-title {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 700;
       color: #32343a;
       margin-bottom: 12px;
+      text-align: center;
+      transition: color 0.3s ease;
+    }
+    
+    .workflow-step:hover .workflow-step-title {
+      color: #436481;
     }
     
     .workflow-step-description {
-      font-size: 16px;
+      font-size: 15px;
       color: #32343a;
-      line-height: 1.7;
+      line-height: 1.6;
       opacity: 0.85;
+      text-align: center;
+    }
+    
+    @media (max-width: 1200px) {
+      .workflow-steps {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .workflow-step {
+        max-width: 100%;
+        width: 100%;
+      }
+      
+      .workflow-arrow {
+        display: none;
+      }
+    }
+    
+    @media (min-width: 1201px) {
+      .workflow-step:not(:last-child) {
+        position: relative;
+        margin-right: 50px;
+      }
+      
+      .workflow-step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: -50px;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, #6ca7d3 0%, #436481 100%);
+        transform: translateY(-50%);
+        opacity: 0.6;
+        z-index: 0;
+      }
+      
+      .workflow-arrow-head {
+        display: block;
+        position: absolute;
+        top: 50%;
+        right: -12px;
+        width: 0;
+        height: 0;
+        border-left: 12px solid #436481;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        transform: translateY(-50%);
+        z-index: 1;
+        opacity: 0.6;
+      }
+      
+      .workflow-step:last-child .workflow-arrow-head {
+        display: none;
+      }
     }
     
     /* ============================================================================
@@ -344,20 +477,31 @@
        ============================================================================ */
     .benefits-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 30px;
       margin-top: 60px;
     }
     
     .benefit-card {
       background-color: white;
-      border-radius: 20px;
-      padding: 36px 32px;
+      border-radius: 24px;
+      padding: 40px 36px;
       border: 2px solid transparent;
       box-shadow: 0 4px 20px rgba(67, 100, 129, 0.08);
       transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
       overflow: hidden;
+      opacity: 0;
+      transform: translateY(40px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .benefit-card.animate-in {
+      opacity: 1;
+      transform: translateY(0);
     }
     
     .benefit-card::before {
@@ -373,8 +517,8 @@
     }
     
     .benefit-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 40px rgba(67, 100, 129, 0.15);
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 16px 48px rgba(67, 100, 129, 0.2);
       border-color: #6ca7d3;
     }
     
@@ -383,28 +527,64 @@
     }
     
     .benefit-icon {
-      width: 64px;
-      height: 64px;
+      width: 80px;
+      height: 80px;
       background: linear-gradient(135deg, #436481 0%, #6ca7d3 100%);
-      border-radius: 16px;
+      border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 24px;
-      box-shadow: 0 6px 20px rgba(67, 100, 129, 0.25);
+      box-shadow: 0 8px 24px rgba(67, 100, 129, 0.25);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .benefit-card:hover .benefit-icon {
+      transform: scale(1.15) rotate(-5deg);
+      box-shadow: 0 12px 32px rgba(67, 100, 129, 0.35);
+    }
+    
+    .benefit-icon::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #6ca7d3 0%, #436481 100%);
+      border-radius: 20px;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .benefit-card:hover .benefit-icon::before {
+      opacity: 1;
     }
     
     .benefit-icon svg {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       fill: white;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s ease;
+    }
+    
+    .benefit-card:hover .benefit-icon svg {
+      transform: scale(1.1);
     }
     
     .benefit-title {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       color: #32343a;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      transition: color 0.3s ease;
+    }
+    
+    .benefit-card:hover .benefit-title {
+      color: #436481;
     }
     
     .benefit-description {
@@ -412,6 +592,16 @@
       color: #32343a;
       line-height: 1.7;
       opacity: 0.85;
+    }
+    
+    @media (max-width: 768px) {
+      .benefits-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .benefit-card {
+        padding: 32px 28px;
+      }
     }
     
     /* ============================================================================
@@ -764,7 +954,10 @@
       
       <nav>
         <ul class="nav-menu" id="navMenu">
-          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="index.html#features" class="nav-link">Features</a></li>
+          <li><a href="index.html#how-it-works" class="nav-link">How It Works</a></li>
+          <li><a href="index.html#benefits" class="nav-link">Benefits</a></li>
+          <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
           <li><a href="services.html" class="nav-link active">Services</a></li>
           <li><button class="btn-login" id="loginBtn">Family Login</button></li>
         </ul>
@@ -796,45 +989,51 @@
         </p>
       </div>
       
-      <div class="workflow-steps">
-        <div class="workflow-step">
-          <div class="workflow-step-number">1</div>
-          <h3 class="workflow-step-title">Case Creation</h3>
-          <p class="workflow-step-description">
-            Create cases in seconds. Our system captures all essential information and automatically organizes everything for you.
-          </p>
-        </div>
-        
-        <div class="workflow-step">
-          <div class="workflow-step-number">2</div>
-          <h3 class="workflow-step-title">Family Intake</h3>
-          <p class="workflow-step-description">
-            Send secure invitations to families. They complete the intake form at their own pace, uploading photos and sharing memories.
-          </p>
-        </div>
-        
-        <div class="workflow-step">
-          <div class="workflow-step-number">3</div>
-          <h3 class="workflow-step-title">AI Obituary</h3>
-          <p class="workflow-step-description">
-            Our AI automatically generates a personalized obituary from the family's input, saving you hours of writing and editing time.
-          </p>
-        </div>
-        
-        <div class="workflow-step">
-          <div class="workflow-step-number">4</div>
-          <h3 class="workflow-step-title">Editing & QC</h3>
-          <p class="workflow-step-description">
-            Professional editors create beautiful video tributes, then our quality control team reviews everything before delivery.
-          </p>
-        </div>
-        
-        <div class="workflow-step">
-          <div class="workflow-step-number">5</div>
-          <h3 class="workflow-step-title">Delivery</h3>
-          <p class="workflow-step-description">
-            Families receive their completed tribute and obituary through a secure portal, ready for the service and as a keepsake.
-          </p>
+      <div class="workflow-diagram">
+        <div class="workflow-steps">
+          <div class="workflow-step" data-step="1">
+            <div class="workflow-arrow-head"></div>
+            <div class="workflow-step-number"><span>1</span></div>
+            <h3 class="workflow-step-title">Case Creation</h3>
+            <p class="workflow-step-description">
+              Create cases in seconds. Our system captures all essential information and automatically organizes everything for you.
+            </p>
+          </div>
+          
+          <div class="workflow-step" data-step="2">
+            <div class="workflow-arrow-head"></div>
+            <div class="workflow-step-number"><span>2</span></div>
+            <h3 class="workflow-step-title">Family Intake</h3>
+            <p class="workflow-step-description">
+              Send secure invitations to families. They complete the intake form at their own pace, uploading photos and sharing memories.
+            </p>
+          </div>
+          
+          <div class="workflow-step" data-step="3">
+            <div class="workflow-arrow-head"></div>
+            <div class="workflow-step-number"><span>3</span></div>
+            <h3 class="workflow-step-title">AI Obituary</h3>
+            <p class="workflow-step-description">
+              Our AI automatically generates a personalized obituary from the family's input, saving you hours of writing and editing time.
+            </p>
+          </div>
+          
+          <div class="workflow-step" data-step="4">
+            <div class="workflow-arrow-head"></div>
+            <div class="workflow-step-number"><span>4</span></div>
+            <h3 class="workflow-step-title">Editing & QC</h3>
+            <p class="workflow-step-description">
+              Professional editors create beautiful video tributes, then our quality control team reviews everything before delivery.
+            </p>
+          </div>
+          
+          <div class="workflow-step" data-step="5">
+            <div class="workflow-step-number"><span>5</span></div>
+            <h3 class="workflow-step-title">Delivery</h3>
+            <p class="workflow-step-description">
+              Families receive their completed tribute and obituary through a secure portal, ready for the service and as a keepsake.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -1117,6 +1316,91 @@
       loginBtn.addEventListener('click', () => {
         window.location.href = 'family-form.html';
       });
+    }
+    
+    // ============================================================================
+    // WORKFLOW STEPS ANIMATION
+    // ============================================================================
+    const workflowSteps = document.querySelectorAll('.workflow-step');
+    let workflowAnimated = false;
+    
+    const animateWorkflow = () => {
+      if (workflowAnimated) return;
+      
+      workflowSteps.forEach((step, index) => {
+        setTimeout(() => {
+          step.classList.add('animate-in');
+        }, index * 150);
+      });
+      
+      workflowAnimated = true;
+    };
+    
+    const workflowSection = document.querySelector('.workflow');
+    if (workflowSection) {
+      const workflowObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !workflowAnimated) {
+            animateWorkflow();
+          }
+        });
+      }, {
+        threshold: 0.2,
+        rootMargin: '0px 0px -100px 0px'
+      });
+      
+      workflowObserver.observe(workflowSection);
+    }
+    
+    // ============================================================================
+    // BENEFITS CARDS ANIMATION
+    // ============================================================================
+    const benefitCards = document.querySelectorAll('.benefit-card');
+    let benefitsAnimated = false;
+    
+    const animateBenefits = () => {
+      if (benefitsAnimated) return;
+      
+      benefitCards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('animate-in');
+        }, index * 100);
+      });
+      
+      benefitsAnimated = true;
+    };
+    
+    const benefitsSection = document.querySelector('.section:has(.benefits-grid)');
+    if (benefitsSection) {
+      const benefitsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !benefitsAnimated) {
+            animateBenefits();
+          }
+        });
+      }, {
+        threshold: 0.2,
+        rootMargin: '0px 0px -100px 0px'
+      });
+      
+      benefitsObserver.observe(benefitsSection);
+    } else {
+      // Fallback: find by class if :has() is not supported
+      const benefitsGrid = document.querySelector('.benefits-grid');
+      if (benefitsGrid) {
+        const benefitsObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && !benefitsAnimated) {
+              animateBenefits();
+            }
+          });
+        }, {
+          threshold: 0.2,
+          rootMargin: '0px 0px -100px 0px'
+        });
+        
+        benefitsObserver.observe(benefitsGrid.closest('.section'));
+      }
     }
   </script>
 </body>
