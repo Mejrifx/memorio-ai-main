@@ -69,10 +69,7 @@
       justify-content: space-between;
       align-items: center;
       position: relative;
-      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  background-color 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  box-shadow 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  backdrop-filter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       min-width: 280px;
     }
     
@@ -90,13 +87,6 @@
         0 0 4px rgba(34, 42, 53, 0.08),
         0 16px 68px rgba(47, 48, 55, 0.05),
         0 1px 0 rgba(255, 255, 255, 0.1) inset;
-    }
-    
-    /* Ensure min-width is applied early to prevent wrapping */
-    @media (min-width: 1200px) {
-      .header.scrolled .nav-container {
-        min-width: 800px;
-      }
     }
     
     .logo {
