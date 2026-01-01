@@ -1285,15 +1285,19 @@
     
     async function loadTimeline() {
       try {
-        // Load enhanced timeline view with actor details
+        console.log('📊 Loading timeline for case:', currentCaseId);
+        
+        // Load raw events first to inspect payload
         const { data: events, error } = await supabaseClient
-          .from('timeline_view')
+          .from('events')
           .select('*')
           .eq('target_id', currentCaseId)
           .order('timestamp', { ascending: false })
           .limit(50);
         
         if (error) throw error;
+        
+        console.log('📋 Raw events:', events);
         
         const timelineContainer = document.getElementById('timelineContent');
         
@@ -1302,18 +1306,20 @@
           return;
         }
         
-        timelineContainer.innerHTML = events.map(e => {
-          const actorDisplay = formatActorDisplay(e);
-          const eventDescription = formatEventDescription(e);
-          
-          return `
-            <div class="timeline-item">
-              <div class="timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
-              <div class="timeline-event">${eventDescription}</div>
-              <div class="timeline-actor">${actorDisplay}</div>
-            </div>
-          `;
-        }).join('');
+        // Process each event to get detailed information
+        const processedEvents = await Promise.all(events.map(async (e) => {
+          const description = await formatEventDescription(e);
+          const actor = await formatActorDisplay(e);
+          return { ...e, description, actor };
+        }));
+        
+        timelineContainer.innerHTML = processedEvents.map(e => `
+          <div class="timeline-item">
+            <div class="timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
+            <div class="timeline-event">${e.description}</div>
+            <div class="timeline-actor">${e.actor}</div>
+          </div>
+        `).join('');
         
       } catch (error) {
         console.error('Error loading timeline:', error);
@@ -1321,104 +1327,233 @@
       }
     }
     
-    function formatEventDescription(event) {
-      // Use the description from the view if available
-      if (event.description) {
-        return event.description;
-      }
-      
-      // Fallback to action_type formatting
+    async function formatEventDescription(event) {
+      const action = event.action_type;
       const payload = event.payload || {};
+      const newData = payload.new || {};
+      const oldData = payload.old || {};
       const changes = payload.changes || {};
       
-      const actionMap = {
-        'cases_created': 'Case created',
-        'status_changed': `Status changed from "${changes.from || 'unknown'}" to "${changes.to || 'unknown'}"`,
-        'family_assigned': 'Family member assigned to case',
-        'form_submitted': 'Intake form submitted by family',
-        'form_draft_updated': 'Form draft saved',
-        'editor_assigned': 'Editor assigned to case',
-        'editor_unassigned': 'Editor unassigned from case',
-        'editor_reassigned': 'Editor reassigned',
-        'AUTO_ASSIGN_EDITOR': 'Editor automatically assigned',
-        'CREATE_CASE': 'Case created',
-        'qc_reassigned': 'QC reviewer reassigned',
-        'pushed_to_revision': 'Case pushed to revision',
-        'link_regenerated': 'Family login link regenerated',
-        'link_resent': 'Family login link resent',
-        'note_added': 'Note added to case',
-        'case_updated': 'Case details updated',
-        'form_updated': 'Form updated',
-        'INSERT': 'Created',
-        'UPDATE': 'Updated',
-        'DELETE': 'Deleted'
-      };
+      console.log('🔍 Formatting event:', action, 'payload:', payload);
       
-      return actionMap[event.action_type] || formatActionType(event.action_type);
+      // Handle specific event types with detailed descriptions
+      switch(action) {
+        case 'cases_created':
+        case 'CREATE_CASE':
+          return `<strong>Case created</strong> for ${newData.deceased_name || 'deceased'}`;
+        
+        case 'status_changed':
+          const fromStatus = (changes.from || oldData.status || '').replace(/_/g, ' ');
+          const toStatus = (changes.to || newData.status || '').replace(/_/g, ' ');
+          return `<strong>Status changed</strong> from "<em>${fromStatus}</em>" to "<em>${toStatus}</em>"`;
+        
+        case 'case_updated':
+        case 'UPDATE':
+          // Detect what actually changed
+          if (oldData.status !== newData.status) {
+            const from = (oldData.status || '').replace(/_/g, ' ');
+            const to = (newData.status || '').replace(/_/g, ' ');
+            return `<strong>Status changed</strong> from "<em>${from}</em>" to "<em>${to}</em>"`;
+          }
+          return '<strong>Case updated</strong>';
+        
+        case 'form_submitted':
+          return '<strong>Intake form completed and submitted</strong> by family';
+        
+        case 'form_draft_updated':
+          return '<strong>Form draft saved</strong>';
+        
+        case 'AUTO_ASSIGN_EDITOR':
+          // Check payload first (most reliable)
+          const editorEmail = payload.editor_email;
+          const editorName = payload.editor_name || editorEmail;
+          
+          if (editorName) {
+            return `<strong>Editor automatically assigned:</strong> ${editorName}`;
+          }
+          
+          // Fallback: Look up editor from assignments
+          try {
+            const { data: assignments } = await supabaseClient
+              .from('admin_editor_assignments_view')
+              .select('editor_email, editor_metadata')
+              .eq('case_id', event.target_id)
+              .order('assigned_at', { ascending: false })
+              .limit(1)
+              .single();
+            
+            if (assignments) {
+              const name = assignments.editor_metadata?.name || assignments.editor_email;
+              return `<strong>Editor automatically assigned:</strong> ${name}`;
+            }
+          } catch (err) {
+            console.log('Could not fetch editor details:', err);
+          }
+          return '<strong>Editor automatically assigned</strong>';
+        
+        case 'editor_assigned':
+          // Look up editor details from payload
+          const editorId = payload.new_editor || newData.editor_user_id;
+          if (editorId) {
+            try {
+              const { data: editor } = await supabaseClient
+                .from('admin_users_view')
+                .select('email, metadata')
+                .eq('id', editorId)
+                .single();
+              
+              if (editor) {
+                const editorName = editor.metadata?.name || editor.email;
+                return `<strong>Editor assigned:</strong> ${editorName}`;
+              }
+            } catch (err) {
+              console.log('Could not fetch editor details:', err);
+            }
+          }
+          return '<strong>Editor assigned</strong>';
+        
+        case 'editor_reassigned':
+          const newEditorId = payload.new_editor;
+          if (newEditorId) {
+            try {
+              const { data: editor } = await supabaseClient
+                .from('admin_users_view')
+                .select('email, metadata')
+                .eq('id', newEditorId)
+                .single();
+              
+              if (editor) {
+                const editorName = editor.metadata?.name || editor.email;
+                return `<strong>Editor reassigned to:</strong> ${editorName}`;
+              }
+            } catch (err) {
+              console.log('Could not fetch editor details:', err);
+            }
+          }
+          return '<strong>Editor reassigned</strong>';
+        
+        case 'qc_reassigned':
+          const qcId = payload.new_qc;
+          if (qcId) {
+            try {
+              const { data: qc } = await supabaseClient
+                .from('admin_users_view')
+                .select('email, metadata')
+                .eq('id', qcId)
+                .single();
+              
+              if (qc) {
+                const qcName = qc.metadata?.name || qc.email;
+                return `<strong>QC reviewer reassigned to:</strong> ${qcName}`;
+              }
+            } catch (err) {
+              console.log('Could not fetch QC details:', err);
+            }
+          }
+          return '<strong>QC reviewer reassigned</strong>';
+        
+        case 'video_submitted':
+          const editorEmailSub = payload.editor_email || 'Editor';
+          const revisionNum = payload.revision_number || 1;
+          return `<strong>Video submitted to QC</strong> by ${editorEmailSub} (Revision #${revisionNum})`;
+        
+        case 'qc_approved':
+          const qcEmailApp = payload.qc_reviewer_email || 'QC Reviewer';
+          return `<strong>QC approved video - delivered to family</strong> by ${qcEmailApp}`;
+        
+        case 'qc_revision':
+          const qcEmailRev = payload.qc_reviewer_email || 'QC Reviewer';
+          return `<strong>QC requested revision</strong> - returned to editor by ${qcEmailRev}`;
+        
+        case 'qc_rejected':
+          const qcEmailRej = payload.qc_reviewer_email || 'QC Reviewer';
+          return `<strong>QC rejected video</strong> - escalated to admin by ${qcEmailRej}`;
+        
+        case 'pushed_to_revision':
+          return '<strong>Case pushed to revision</strong> by admin';
+        
+        case 'link_regenerated':
+          return '<strong>Family login link regenerated</strong>';
+        
+        case 'link_resent':
+          return '<strong>Family login link resent</strong> via email';
+        
+        case 'note_added':
+          return '<strong>Note added</strong> to case';
+        
+        case 'family_assigned':
+          return '<strong>Family member assigned</strong> to case';
+        
+        default:
+          return action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      }
     }
     
-    function formatActionType(actionType) {
-      return actionType
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase());
-    }
-    
-    function formatActorDisplay(event) {
-      // Priority: actor_name > actor_email > actor_role > System
-      const parts = [];
+    async function formatActorDisplay(event) {
+      const userId = event.actor_user_id;
+      const role = event.actor_role;
       
-      // Add role badge
-      const roleBadge = formatRoleBadge(event.actor_role);
+      // Try to get user details
+      let userName = null;
+      let userEmail = null;
       
-      // Add name or email
-      if (event.actor_name) {
-        parts.push(`By: <strong>${event.actor_name}</strong>`);
-      } else if (event.actor_email) {
-        parts.push(`By: <strong>${event.actor_email}</strong>`);
-      } else if (event.actor_role) {
-        parts.push(`By: <strong>${formatRoleDisplay(event.actor_role)}</strong>`);
+      if (userId) {
+        try {
+          const { data: user } = await supabaseClient
+            .from('admin_users_view')
+            .select('email, metadata')
+            .eq('id', userId)
+            .single();
+          
+          if (user) {
+            userName = user.metadata?.name;
+            userEmail = user.email;
+          }
+        } catch (err) {
+          console.log('Could not fetch user details:', err);
+        }
+      }
+      
+      // Build display string
+      let displayName = '';
+      if (userName) {
+        displayName = userName;
+      } else if (userEmail) {
+        displayName = userEmail;
+      } else if (role && role !== 'service_role') {
+        displayName = formatRoleDisplay(role);
       } else {
-        parts.push('By: <strong>System</strong>');
+        displayName = 'System';
       }
       
-      // Add role badge if we have a role
-      if (roleBadge) {
-        parts.push(`<span class="role-badge" style="display: inline-block; margin-left: 8px; padding: 2px 8px; background-color: #f4e8de; border: 1px solid #436481; border-radius: 12px; font-size: 11px; font-weight: 600; color: #436481;">${roleBadge}</span>`);
-      }
+      const roleBadge = formatRoleBadge(role);
       
-      return parts.join(' ');
+      return `By: <strong>${displayName}</strong> ${roleBadge ? `<span class="role-badge">${roleBadge}</span>` : ''}`;
     }
     
     function formatRoleDisplay(role) {
-      if (!role) return 'System';
-      
       const roleMap = {
         'admin': 'Admin',
         'director': 'Director',
-        'family': 'Family',
+        'family': 'Family Member',
         'editor': 'Editor',
         'qc': 'QC Reviewer',
         'service_role': 'System',
         'authenticated': 'User'
       };
-      
-      return roleMap[role] || role.charAt(0).toUpperCase() + role.slice(1);
+      return roleMap[role] || role;
     }
     
     function formatRoleBadge(role) {
-      if (!role) return '';
-      
-      const roleBadges = {
+      const badges = {
         'admin': '👑 Admin',
         'director': '👔 Director',
         'family': '👨‍👩‍👧 Family',
         'editor': '✏️ Editor',
         'qc': '🔍 QC',
-        'service_role': '⚙️ System',
-        'authenticated': '🔐 User'
+        'service_role': '⚙️ System'
       };
-      
-      return roleBadges[role] || role;
+      return badges[role] ? `<span class="role-badge">${badges[role]}</span>` : '';
     }
 
     // ============================================================================
