@@ -417,14 +417,36 @@
     .timeline-event {
       font-size: 15px;
       color: #32343a;
-      font-weight: 500;
+      font-weight: 600;
+      line-height: 1.5;
     }
     
     .timeline-actor {
       font-size: 14px;
       color: #436481;
+      font-weight: 500;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .timeline-actor strong {
       font-weight: 600;
-      margin-top: 4px;
+      color: #32343a;
+    }
+    
+    .role-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      background-color: #f4e8de;
+      border: 1px solid #436481;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #436481;
+      white-space: nowrap;
     }
     
     /* ============================================================================
@@ -1263,9 +1285,9 @@
     
     async function loadTimeline() {
       try {
-        // Load key events (status changes, assignments, submissions)
+        // Load enhanced timeline view with actor details
         const { data: events, error } = await supabaseClient
-          .from('events')
+          .from('timeline_view')
           .select('*')
           .eq('target_id', currentCaseId)
           .order('timestamp', { ascending: false })
@@ -1280,13 +1302,18 @@
           return;
         }
         
-        timelineContainer.innerHTML = events.map(e => `
-          <div class="timeline-item">
-            <div class="timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
-            <div class="timeline-event">${formatEventAction(e.action_type)}</div>
-            <div class="timeline-actor">By: ${e.actor_role || 'System'}</div>
-          </div>
-        `).join('');
+        timelineContainer.innerHTML = events.map(e => {
+          const actorDisplay = formatActorDisplay(e);
+          const eventDescription = formatEventDescription(e);
+          
+          return `
+            <div class="timeline-item">
+              <div class="timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
+              <div class="timeline-event">${eventDescription}</div>
+              <div class="timeline-actor">${actorDisplay}</div>
+            </div>
+          `;
+        }).join('');
         
       } catch (error) {
         console.error('Error loading timeline:', error);
@@ -1294,19 +1321,104 @@
       }
     }
     
-    function formatEventAction(action) {
+    function formatEventDescription(event) {
+      // Use the description from the view if available
+      if (event.description) {
+        return event.description;
+      }
+      
+      // Fallback to action_type formatting
+      const payload = event.payload || {};
+      const changes = payload.changes || {};
+      
       const actionMap = {
-        'INSERT': 'Case created',
-        'UPDATE': 'Case updated',
-        'case_created': 'Case created',
-        'status_changed': 'Status changed',
-        'editor_assigned': 'Editor assigned',
-        'video_submitted': 'Video submitted to QC',
-        'qc_approved': 'QC approved',
-        'qc_revision': 'QC requested revision',
-        'form_submitted': 'Intake form submitted'
+        'cases_created': 'Case created',
+        'status_changed': `Status changed from "${changes.from || 'unknown'}" to "${changes.to || 'unknown'}"`,
+        'family_assigned': 'Family member assigned to case',
+        'form_submitted': 'Intake form submitted by family',
+        'form_draft_updated': 'Form draft saved',
+        'editor_assigned': 'Editor assigned to case',
+        'editor_unassigned': 'Editor unassigned from case',
+        'editor_reassigned': 'Editor reassigned',
+        'AUTO_ASSIGN_EDITOR': 'Editor automatically assigned',
+        'CREATE_CASE': 'Case created',
+        'qc_reassigned': 'QC reviewer reassigned',
+        'pushed_to_revision': 'Case pushed to revision',
+        'link_regenerated': 'Family login link regenerated',
+        'link_resent': 'Family login link resent',
+        'note_added': 'Note added to case',
+        'case_updated': 'Case details updated',
+        'form_updated': 'Form updated',
+        'INSERT': 'Created',
+        'UPDATE': 'Updated',
+        'DELETE': 'Deleted'
       };
-      return actionMap[action] || action;
+      
+      return actionMap[event.action_type] || formatActionType(event.action_type);
+    }
+    
+    function formatActionType(actionType) {
+      return actionType
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase());
+    }
+    
+    function formatActorDisplay(event) {
+      // Priority: actor_name > actor_email > actor_role > System
+      const parts = [];
+      
+      // Add role badge
+      const roleBadge = formatRoleBadge(event.actor_role);
+      
+      // Add name or email
+      if (event.actor_name) {
+        parts.push(`By: <strong>${event.actor_name}</strong>`);
+      } else if (event.actor_email) {
+        parts.push(`By: <strong>${event.actor_email}</strong>`);
+      } else if (event.actor_role) {
+        parts.push(`By: <strong>${formatRoleDisplay(event.actor_role)}</strong>`);
+      } else {
+        parts.push('By: <strong>System</strong>');
+      }
+      
+      // Add role badge if we have a role
+      if (roleBadge) {
+        parts.push(`<span class="role-badge" style="display: inline-block; margin-left: 8px; padding: 2px 8px; background-color: #f4e8de; border: 1px solid #436481; border-radius: 12px; font-size: 11px; font-weight: 600; color: #436481;">${roleBadge}</span>`);
+      }
+      
+      return parts.join(' ');
+    }
+    
+    function formatRoleDisplay(role) {
+      if (!role) return 'System';
+      
+      const roleMap = {
+        'admin': 'Admin',
+        'director': 'Director',
+        'family': 'Family',
+        'editor': 'Editor',
+        'qc': 'QC Reviewer',
+        'service_role': 'System',
+        'authenticated': 'User'
+      };
+      
+      return roleMap[role] || role.charAt(0).toUpperCase() + role.slice(1);
+    }
+    
+    function formatRoleBadge(role) {
+      if (!role) return '';
+      
+      const roleBadges = {
+        'admin': '👑 Admin',
+        'director': '👔 Director',
+        'family': '👨‍👩‍👧 Family',
+        'editor': '✏️ Editor',
+        'qc': '🔍 QC',
+        'service_role': '⚙️ System',
+        'authenticated': '🔐 User'
+      };
+      
+      return roleBadges[role] || role;
     }
 
     // ============================================================================
