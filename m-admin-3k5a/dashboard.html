@@ -5021,7 +5021,7 @@
         : 'Never';
       
       return `
-        <div class="account-card">
+        <div class="account-card" style="cursor: pointer;" onclick="openDeleteAccountModal('${account.id}', '${account.email.replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}', '${account.role}')">
           <div class="account-card-header">
             <div>
               <div class="account-name">${name}</div>
@@ -5048,8 +5048,81 @@
               <span>${lastLogin}</span>
             </div>
           </div>
+          
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-primary);">
+            <button 
+              class="btn-danger" 
+              style="width: 100%; padding: 10px; font-size: 14px;"
+              onclick="event.stopPropagation(); openDeleteAccountModal('${account.id}', '${account.email.replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}', '${account.role}')">
+              🗑️ Delete Account
+            </button>
+          </div>
         </div>
       `;
+    }
+    
+    // ============================================================================
+    // DELETE ACCOUNT FUNCTIONALITY
+    // ============================================================================
+    
+    function openDeleteAccountModal(userId, email, name, role) {
+      // Store the user info for deletion
+      window.pendingAccountDelete = { userId, email, name, role };
+      
+      showConfirmModal(
+        `Delete ${role.toUpperCase()} Account?`,
+        `Are you sure you want to permanently delete the account for:\n\n` +
+        `👤 ${name}\n📧 ${email}\n\n` +
+        `⚠️ This action cannot be undone. This will:\n` +
+        `• Remove the user from Supabase authentication\n` +
+        `• Delete all user data from the database\n` +
+        `• Revoke all access immediately`,
+        () => confirmDeleteAccount()
+      );
+    }
+    
+    async function confirmDeleteAccount() {
+      const { userId, email, name, role } = window.pendingAccountDelete;
+      
+      try {
+        console.log(`🗑️ Deleting account: ${email} (${userId})`);
+        
+        // Show loading state
+        showSuccessModal('⏳ Deleting account...');
+        
+        // Call the delete-user edge function
+        const { data, error } = await supabaseClient.functions.invoke('delete-user', {
+          body: { userId }
+        });
+        
+        if (error) {
+          console.error('❌ Error deleting account:', error);
+          throw error;
+        }
+        
+        console.log('✅ Account deleted successfully:', data);
+        
+        // Show success message
+        showSuccessModal(
+          `✅ Account Deleted\n\n` +
+          `${name} (${email}) has been permanently deleted.\n\n` +
+          `All authentication credentials have been removed.`
+        );
+        
+        // Reload the accounts list
+        await loadManageAccounts();
+        
+        // Clear the pending delete
+        delete window.pendingAccountDelete;
+        
+      } catch (error) {
+        console.error('❌ Failed to delete account:', error);
+        showSuccessModal(
+          `❌ Delete Failed\n\n` +
+          `Failed to delete account: ${error.message || 'Unknown error'}\n\n` +
+          `Please try again or contact support.`
+        );
+      }
     }
     
     // Make filter function global
