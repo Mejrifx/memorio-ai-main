@@ -5069,14 +5069,10 @@
       // Store the user info for deletion
       window.pendingAccountDelete = { userId, email, name, role };
       
-      showConfirmModal(
+      showConfirmationModal(
         `Delete ${role.toUpperCase()} Account?`,
-        `Are you sure you want to permanently delete the account for:\n\n` +
-        `👤 ${name}\n📧 ${email}\n\n` +
-        `⚠️ This action cannot be undone. This will:\n` +
-        `• Remove the user from Supabase authentication\n` +
-        `• Delete all user data from the database\n` +
-        `• Revoke all access immediately`,
+        `Are you sure you want to permanently delete the account for:\n\n👤 ${name}\n📧 ${email}`,
+        `⚠️ This action cannot be undone. This will:\n• Remove the user from Supabase authentication\n• Delete all user data from the database\n• Revoke all access immediately`,
         () => confirmDeleteAccount()
       );
     }
