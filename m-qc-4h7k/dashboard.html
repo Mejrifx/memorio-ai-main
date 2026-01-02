@@ -684,6 +684,23 @@
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 10000;">
+    <div style="background-color: white; border-radius: 10px; padding: 0; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);">
+      <div style="background-color: #f4e8de; padding: 20px; border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center;">
+        <h2 id="confirm-title" style="color: #32343a; font-size: 24px; font-weight: 600; margin: 0;">Confirm Action</h2>
+        <button onclick="closeConfirmModal()" style="background: none; border: none; font-size: 28px; color: #666; cursor: pointer; padding: 0; width: 30px; height: 30px;">&times;</button>
+      </div>
+      <div style="padding: 30px;">
+        <p id="confirm-message" style="color: #32343a; font-size: 16px; line-height: 1.6; margin: 0; white-space: pre-line;"></p>
+      </div>
+      <div style="padding: 0 30px 30px; display: flex; gap: 10px; justify-content: flex-end;">
+        <button onclick="closeConfirmModal()" style="background-color: transparent; color: #32343a; border: 1.35px solid #32343a; border-radius: 60px; padding: 11px 24px; cursor: pointer; font-weight: 600;">Cancel</button>
+        <button id="confirm-action-btn" style="background-color: #436481; color: white; border: none; border-radius: 60px; padding: 11px 24px; cursor: pointer; font-weight: 600;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -989,8 +1006,15 @@
     async function handleApprove() {
       if (!currentSubmission) return;
       
-      if (!confirm('Approve this video and deliver to family?')) return;
-      
+      showConfirmModal(
+        'Approve & Deliver Video',
+        'Are you sure you want to approve this video and deliver it to the family?\n\nThis action will:\n• Mark the video as approved\n• Update the case status to "delivered"\n• Notify the family',
+        () => performApprove()
+      );
+    }
+    
+    // Perform the actual approval
+    async function performApprove() {
       const notes = document.getElementById('qcNotes').value;
       
       try {
@@ -1042,11 +1066,19 @@
       const notes = document.getElementById('qcNotes').value;
       
       if (!notes || notes.trim() === '') {
-        alert('Please provide specific feedback for the requested revisions.');
+        showToast('Please provide specific feedback for the requested revisions.', true);
         return;
       }
       
-      if (!confirm('Request revision from editor?')) return;
+      showConfirmModal(
+        'Request Revision',
+        'Are you sure you want to request revisions from the editor?\n\nThe editor will be notified and will need to resubmit the video.',
+        () => performRevision(notes)
+      );
+    }
+    
+    // Perform the actual revision request
+    async function performRevision(notes) {
       
       try {
         // Update submission status
@@ -1097,11 +1129,19 @@
       const notes = document.getElementById('qcNotes').value;
       
       if (!notes || notes.trim() === '') {
-        alert('Please provide a reason for rejection.');
+        showToast('Please provide a reason for rejection.', true);
         return;
       }
       
-      if (!confirm('Reject this video? This will escalate to admin.')) return;
+      showConfirmModal(
+        'Reject Video',
+        '⚠️ Are you sure you want to reject this video?\n\nThis action will:\n• Escalate the case to admin\n• Require intervention from management\n• Notify relevant parties',
+        () => performReject(notes)
+      );
+    }
+    
+    // Perform the actual rejection
+    async function performReject(notes) {
       
       try {
         const { error } = await supabaseClient
@@ -1228,6 +1268,31 @@
         toast.classList.remove('show');
       }, 3000);
     }
+    
+    // Confirmation Modal Functions
+    function showConfirmModal(title, message, onConfirm) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-message').textContent = message;
+      document.getElementById('confirm-modal').style.display = 'flex';
+      
+      // Set up confirm button
+      const confirmBtn = document.getElementById('confirm-action-btn');
+      confirmBtn.onclick = () => {
+        closeConfirmModal();
+        onConfirm();
+      };
+    }
+    
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('confirm-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'confirm-modal') {
+        closeConfirmModal();
+      }
+    });
     
     // Event Listeners
     document.querySelectorAll('.sidebar-nav-item').forEach(item => {

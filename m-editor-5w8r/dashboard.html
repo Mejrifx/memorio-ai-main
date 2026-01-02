@@ -799,6 +799,23 @@
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="confirm-title">Confirm Action</h2>
+        <button class="modal-close" onclick="closeConfirmModal()">&times;</button>
+      </div>
+      <div class="modal-section">
+        <p id="confirm-message" style="color: #32343a; font-size: 16px; line-height: 1.6; margin: 0;"></p>
+      </div>
+      <div style="padding: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn-secondary" onclick="closeConfirmModal()" style="padding: 12px 24px;">Cancel</button>
+        <button id="confirm-action-btn" class="btn-primary" style="padding: 12px 24px;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -1538,10 +1555,18 @@
         return;
       }
       
-      if (!confirm(`Submit video "${videoFile.name}" to Quality Control?`)) {
-        return;
-      }
-      
+      // Show confirmation modal
+      showConfirmModal(
+        'Submit to Quality Control',
+        `Are you sure you want to submit "${videoFile.name}" to Quality Control?\n\nOnce submitted, the video will be reviewed by the QC team.`,
+        async () => {
+          await performVideoSubmission(videoFile, editorNotes, submitBtn, progressDiv, progressBar, statusText);
+        }
+      );
+    }
+    
+    // Separate function to perform the actual submission
+    async function performVideoSubmission(videoFile, editorNotes, submitBtn, progressDiv, progressBar, statusText) {
       try {
         // Disable button and show progress
         submitBtn.disabled = true;
@@ -1657,6 +1682,31 @@
       await supabaseClient.auth.signOut();
       window.location.href = 'login.html';
     }
+    
+    // Confirmation Modal Functions
+    function showConfirmModal(title, message, onConfirm) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-message').textContent = message;
+      document.getElementById('confirm-modal').style.display = 'flex';
+      
+      // Set up confirm button
+      const confirmBtn = document.getElementById('confirm-action-btn');
+      confirmBtn.onclick = () => {
+        closeConfirmModal();
+        onConfirm();
+      };
+    }
+    
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('confirm-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'confirm-modal') {
+        closeConfirmModal();
+      }
+    });
     
     // Run initialization on page load
     initializeApp();
