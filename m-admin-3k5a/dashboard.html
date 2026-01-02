@@ -5092,7 +5092,7 @@
         
         // Call the delete-user edge function
         const { data, error } = await supabaseClient.functions.invoke('delete-user', {
-          body: { userId }
+          body: { user_id: userId }
         });
         
         if (error) {
