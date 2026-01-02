@@ -1297,7 +1297,8 @@
         
         if (error) throw error;
         
-        console.log('📋 Raw events:', events);
+        console.log('📋 Raw events received:', events?.length || 0);
+        console.log('📋 Event action_types:', events?.map(e => e.action_type) || []);
         
         const timelineContainer = document.getElementById('timelineContent');
         
@@ -1307,29 +1308,27 @@
         }
         
         // Filter to show only key workflow events
-        const keyEventTypes = [
-          'CREATE_CASE',           // Director creates case
-          'form_submitted',        // Family completes form
-          'AUTO_ASSIGN_EDITOR',    // Editor auto-assigned
-          'editor_assigned',       // Editor manually assigned
-          'editor_reassigned',     // Editor reassigned
-          'video_submitted',       // Editor submits video to QC
-          'qc_approved',          // QC approves video - delivered
-          'qc_revision',          // QC requests revision
-          'qc_rejected',          // QC rejects video
-          'qc_reassigned',        // QC reassigned
-          'pushed_to_revision',   // Admin pushes to revision
-          'link_regenerated',     // Admin regenerates link
-          'link_resent',          // Admin resends link
-          'note_added'            // Notes added to case
+        // Exclude all generic database events and status changes
+        const excludedEventTypes = [
+          'INSERT',               // Generic database insert
+          'UPDATE',               // Generic database update  
+          'DELETE',               // Generic database delete
+          'status_changed',       // Redundant - shown via specific events
+          'case_updated',         // Generic - not useful
+          'cases_created',        // Duplicate of CREATE_CASE
+          'form_updated',         // Draft saves - not important
+          'form_draft_updated',   // Draft saves - not important
+          'editor_updated',       // Generic - not useful
+          'sla_updated'          // Automatic - not useful
         ];
         
-        const filteredEvents = events.filter(e => keyEventTypes.includes(e.action_type));
+        const filteredEvents = events.filter(e => !excludedEventTypes.includes(e.action_type));
         
-        console.log(`📋 Filtered ${events.length} events down to ${filteredEvents.length} key events`);
+        console.log(`✅ Filtered ${events.length} events down to ${filteredEvents.length} key events`);
+        console.log('✅ Remaining action_types:', filteredEvents.map(e => e.action_type));
         
         if (filteredEvents.length === 0) {
-          timelineContainer.innerHTML = '<div class="empty-state">No timeline events yet</div>';
+          timelineContainer.innerHTML = '<div class="empty-state">No key timeline events yet</div>';
           return;
         }
         
@@ -1349,7 +1348,7 @@
         `).join('');
         
       } catch (error) {
-        console.error('Error loading timeline:', error);
+        console.error('❌ Error loading timeline:', error);
         document.getElementById('timelineContent').innerHTML = '<div class="empty-state">Error loading timeline</div>';
       }
     }
