@@ -1,12 +1,52 @@
 -- ============================================================================
--- Migration: 044 - Video Submission Event Logging
+-- HOTFIX: Apply All Security Fixes for Timeline Migrations
 -- ============================================================================
--- Purpose: Log specific events for video submissions and QC reviews
+-- This fixes RLS errors for form submissions and video/QC events
+-- Run this to restore full functionality
 -- ============================================================================
 
--- ============================================================================
--- TRIGGER: Log video submission events
--- ============================================================================
+-- Fix 1: Form submission function
+CREATE OR REPLACE FUNCTION update_case_on_form_submission()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- If form is being submitted for the first time
+  IF NEW.submitted_json IS NOT NULL AND OLD.submitted_at IS NULL THEN
+    -- Update case status
+    UPDATE cases
+    SET 
+      status = 'submitted',
+      sla_start_at = COALESCE(sla_start_at, NOW()),
+      sla_state = 'on_time',
+      first_submission_at = NOW()
+    WHERE id = NEW.case_id;
+    
+    -- Log specific form submission event
+    INSERT INTO events (
+      actor_user_id,
+      actor_role,
+      action_type,
+      target_type,
+      target_id,
+      payload
+    )
+    VALUES (
+      auth.uid(),
+      (auth.jwt() -> 'app_metadata' ->> 'role'),
+      'form_submitted',
+      'case',
+      NEW.case_id,
+      jsonb_build_object(
+        'form_id', NEW.id,
+        'submission_timestamp', NEW.submitted_at
+      )
+    );
+  END IF;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Fix 2: Video submission events function
 CREATE OR REPLACE FUNCTION log_video_submission_events()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -137,17 +177,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-COMMENT ON FUNCTION log_video_submission_events IS 'Logs specific events for video submissions and QC reviews (SECURITY DEFINER bypasses RLS)';
-
--- Create trigger
-DROP TRIGGER IF EXISTS video_submission_events ON video_submissions;
-CREATE TRIGGER video_submission_events
-  AFTER INSERT OR UPDATE ON video_submissions
-  FOR EACH ROW
-  EXECUTE FUNCTION log_video_submission_events();
-
 -- ============================================================================
--- COMPLETION
+-- Verify the fixes
 -- ============================================================================
-COMMENT ON SCHEMA public IS 'Memorio video submission event logging v1.0.0 - Migration 044 complete';
+SELECT 
+  proname as function_name,
+  prosecdef as is_security_definer,
+  CASE 
+    WHEN prosecdef THEN '✅ FIXED'
+    ELSE '❌ STILL BROKEN'
+  END as status
+FROM pg_proc 
+WHERE proname IN ('update_case_on_form_submission', 'log_video_submission_events')
+ORDER BY proname;
+
+-- Expected output:
+-- Both functions should show is_security_definer = true and status = '✅ FIXED'
 
