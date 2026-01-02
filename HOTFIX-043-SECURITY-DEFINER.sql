@@ -1,11 +1,10 @@
 -- ============================================================================
--- Migration: 043 FIX - Better Form Submission Event Logging
+-- HOTFIX: Apply Security Definer to Form Submission Function
 -- ============================================================================
--- Purpose: Log specific "form_submitted" event when family completes intake form
--- FIX: Added SECURITY DEFINER to bypass RLS when inserting events
+-- This fixes the RLS error when family users submit forms
+-- Run this immediately to restore functionality
 -- ============================================================================
 
--- Update the form submission trigger to log a better event
 CREATE OR REPLACE FUNCTION update_case_on_form_submission()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -46,4 +45,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-COMMENT ON FUNCTION update_case_on_form_submission IS 'Transitions case status and logs form_submitted event';
+-- Verify the function is now SECURITY DEFINER
+SELECT 
+  proname as function_name,
+  prosecdef as is_security_definer
+FROM pg_proc 
+WHERE proname = 'update_case_on_form_submission';
+
+-- If is_security_definer = true, then it's fixed!
+
