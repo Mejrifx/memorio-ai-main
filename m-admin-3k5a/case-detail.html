@@ -1306,8 +1306,35 @@
           return;
         }
         
+        // Filter to show only key workflow events
+        const keyEventTypes = [
+          'CREATE_CASE',           // Director creates case
+          'form_submitted',        // Family completes form
+          'AUTO_ASSIGN_EDITOR',    // Editor auto-assigned
+          'editor_assigned',       // Editor manually assigned
+          'editor_reassigned',     // Editor reassigned
+          'video_submitted',       // Editor submits video to QC
+          'qc_approved',          // QC approves video - delivered
+          'qc_revision',          // QC requests revision
+          'qc_rejected',          // QC rejects video
+          'qc_reassigned',        // QC reassigned
+          'pushed_to_revision',   // Admin pushes to revision
+          'link_regenerated',     // Admin regenerates link
+          'link_resent',          // Admin resends link
+          'note_added'            // Notes added to case
+        ];
+        
+        const filteredEvents = events.filter(e => keyEventTypes.includes(e.action_type));
+        
+        console.log(`📋 Filtered ${events.length} events down to ${filteredEvents.length} key events`);
+        
+        if (filteredEvents.length === 0) {
+          timelineContainer.innerHTML = '<div class="empty-state">No timeline events yet</div>';
+          return;
+        }
+        
         // Process each event to get detailed information
-        const processedEvents = await Promise.all(events.map(async (e) => {
+        const processedEvents = await Promise.all(filteredEvents.map(async (e) => {
           const description = await formatEventDescription(e);
           const actor = await formatActorDisplay(e);
           return { ...e, description, actor };
