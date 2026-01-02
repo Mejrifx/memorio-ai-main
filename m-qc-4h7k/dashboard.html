@@ -994,9 +994,6 @@
             <button class="btn btn-revision" onclick="handleRevision()">
               ⟳ Request Revision
             </button>
-            <button class="btn btn-reject" onclick="handleReject()">
-              ✗ Reject
-            </button>
           </div>
         </div>
       `;
@@ -1119,59 +1116,6 @@
       } catch (error) {
         console.error('Error requesting revision:', error);
         showToast('Error requesting revision', true);
-      }
-    }
-    
-    // Handle Reject
-    async function handleReject() {
-      if (!currentSubmission) return;
-      
-      const notes = document.getElementById('qcNotes').value;
-      
-      if (!notes || notes.trim() === '') {
-        showToast('Please provide a reason for rejection.', true);
-        return;
-      }
-      
-      showConfirmModal(
-        'Reject Video',
-        '⚠️ Are you sure you want to reject this video?\n\nThis action will:\n• Escalate the case to admin\n• Require intervention from management\n• Notify relevant parties',
-        () => performReject(notes)
-      );
-    }
-    
-    // Perform the actual rejection
-    async function performReject(notes) {
-      
-      try {
-        const { error } = await supabaseClient
-          .from('video_submissions')
-          .update({
-            qc_status: 'rejected',
-            qc_reviewer_id: currentUser.id,
-            qc_notes: notes,
-            qc_reviewed_at: new Date().toISOString()
-          })
-          .eq('id', currentSubmission.id);
-        
-        if (error) throw error;
-        
-        showToast('Video rejected. Admin will be notified.', false);
-        
-        currentSubmission = null;
-        document.getElementById('reviewContent').innerHTML = `
-          <div class="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-            </svg>
-            <p>Select a video submission to review</p>
-          </div>
-        `;
-        loadSubmissions();
-        
-      } catch (error) {
-        console.error('Error rejecting video:', error);
-        showToast('Error rejecting video', true);
       }
     }
     
