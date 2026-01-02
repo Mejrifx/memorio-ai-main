@@ -1649,6 +1649,28 @@
       background: var(--accent-secondary);
     }
     
+    /* Fix tab-content background in dark mode */
+    [data-theme="dark"] .tab-content {
+      background-color: var(--bg-primary) !important;
+    }
+    
+    [data-theme="dark"] .tab-content.active {
+      background-color: var(--bg-primary) !important;
+    }
+    
+    /* Ensure invite-section and other section containers have dark backgrounds */
+    [data-theme="dark"] .invite-section,
+    [data-theme="dark"] .section {
+      background-color: var(--bg-secondary) !important;
+    }
+    
+    /* Fix accounts-container and other specific containers */
+    [data-theme="dark"] .accounts-container,
+    [data-theme="dark"] .filters-bar,
+    [data-theme="dark"] .kanban-board {
+      background-color: transparent !important;
+    }
+    
     /* ============================================================================
        ALL CASES TAB - KANBAN BOARD STYLES
        ============================================================================ */
