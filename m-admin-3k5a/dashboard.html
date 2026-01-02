@@ -5191,7 +5191,11 @@
     
     async function loadModalTimeline(caseId) {
       try {
-        const { data: events, error } = await supabaseClient
+        console.log('='.repeat(60));
+        console.log('🔧 TIMELINE FILTER v3.0 - MODAL - STARTING');
+        console.log('📊 Loading timeline for case:', caseId);
+        
+        const { data: allEvents, error } = await supabaseClient
           .from('events')
           .select('*')
           .eq('target_id', caseId)
@@ -5200,25 +5204,132 @@
         
         if (error) throw error;
         
+        console.log('📋 RAW EVENTS RECEIVED:', allEvents?.length || 0);
+        console.log('📋 ALL ACTION TYPES:', allEvents?.map(e => `"${e.action_type}"`) || []);
+        
         const timelineContainer = document.getElementById('modal-timeline-content');
         
-        if (!events || events.length === 0) {
+        if (!allEvents || allEvents.length === 0) {
           timelineContainer.innerHTML = '<div class="modal-empty-state">No timeline events yet</div>';
           return;
         }
         
-        timelineContainer.innerHTML = events.map(e => `
+        // ========================================================================
+        // FILTER - ONLY SHOW KEY WORKFLOW EVENTS
+        // ========================================================================
+        console.log('🔍 APPLYING FILTER...');
+        
+        const filteredEvents = allEvents.filter(event => {
+          const action = event.action_type;
+          
+          // Block unwanted events
+          if (action === 'INSERT') {
+            console.log(`❌ BLOCKED: INSERT`);
+            return false;
+          }
+          if (action === 'UPDATE') {
+            console.log(`❌ BLOCKED: UPDATE`);
+            return false;
+          }
+          if (action === 'DELETE') {
+            console.log(`❌ BLOCKED: DELETE`);
+            return false;
+          }
+          if (action === 'status_changed') {
+            console.log(`❌ BLOCKED: status_changed`);
+            return false;
+          }
+          if (action === 'case_updated') {
+            console.log(`❌ BLOCKED: case_updated`);
+            return false;
+          }
+          if (action === 'cases_created') {
+            console.log(`❌ BLOCKED: cases_created`);
+            return false;
+          }
+          if (action === 'form_updated') {
+            console.log(`❌ BLOCKED: form_updated`);
+            return false;
+          }
+          if (action === 'form_draft_updated') {
+            console.log(`❌ BLOCKED: form_draft_updated`);
+            return false;
+          }
+          if (action === 'editor_updated') {
+            console.log(`❌ BLOCKED: editor_updated`);
+            return false;
+          }
+          if (action === 'sla_updated') {
+            console.log(`❌ BLOCKED: sla_updated`);
+            return false;
+          }
+          
+          // Allow everything else
+          console.log(`✅ ALLOWED: ${action}`);
+          return true;
+        });
+        
+        console.log(`✅ FILTER COMPLETE: ${allEvents.length} → ${filteredEvents.length} events`);
+        console.log('✅ REMAINING EVENTS:', filteredEvents.map(e => `"${e.action_type}"`));
+        console.log('='.repeat(60));
+        
+        if (filteredEvents.length === 0) {
+          timelineContainer.innerHTML = '<div class="modal-empty-state">No key timeline events</div>';
+          return;
+        }
+        
+        timelineContainer.innerHTML = filteredEvents.map(e => `
           <div class="modal-timeline-item">
             <div class="modal-timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
-            <div class="modal-timeline-event">${formatEventAction(e.action_type)}</div>
-            <div class="modal-timeline-actor">By: ${e.actor_role || 'System'}</div>
+            <div class="modal-timeline-event">${formatEventAction(e.action_type, e.payload)}</div>
+            <div class="modal-timeline-actor">${formatActorDisplay(e)}</div>
           </div>
         `).join('');
         
       } catch (error) {
-        console.error('Error loading timeline:', error);
+        console.error('❌ ERROR loading timeline:', error);
         document.getElementById('modal-timeline-content').innerHTML = '<div class="modal-empty-state">Error loading timeline</div>';
       }
+    }
+    
+    function formatEventAction(action, payload = {}) {
+      const editorEmail = payload?.editor_email;
+      const qcEmail = payload?.qc_reviewer_email;
+      const revisionNum = payload?.revision_number;
+      
+      const actionMap = {
+        'CREATE_CASE': 'Case created',
+        'form_submitted': 'Intake form completed and submitted',
+        'AUTO_ASSIGN_EDITOR': editorEmail ? `Editor automatically assigned: ${editorEmail}` : 'Editor automatically assigned',
+        'editor_assigned': 'Editor assigned',
+        'editor_reassigned': 'Editor reassigned',
+        'video_submitted': editorEmail ? `Video submitted to QC by ${editorEmail}${revisionNum ? ` (Revision #${revisionNum})` : ''}` : 'Video submitted to QC',
+        'qc_approved': qcEmail ? `QC approved - delivered to family by ${qcEmail}` : 'QC approved - delivered to family',
+        'qc_revision': qcEmail ? `QC requested revision by ${qcEmail}` : 'QC requested revision',
+        'qc_rejected': qcEmail ? `QC rejected by ${qcEmail}` : 'QC rejected',
+        'qc_reassigned': 'QC reviewer reassigned',
+        'pushed_to_revision': 'Case pushed to revision',
+        'link_regenerated': 'Family login link regenerated',
+        'link_resent': 'Family login link resent',
+        'note_added': 'Note added to case'
+      };
+      
+      return actionMap[action] || action.replace(/_/g, ' ');
+    }
+    
+    function formatActorDisplay(event) {
+      const role = event.actor_role;
+      const roleBadges = {
+        'admin': '👑 Admin',
+        'director': '👔 Director',
+        'family': '👨‍👩‍👧 Family',
+        'editor': '✏️ Editor',
+        'qc': '🔍 QC',
+        'service_role': '⚙️ System'
+      };
+      
+      const badge = roleBadges[role] || role || 'System';
+      return `By: ${badge}`;
     }
     
     async function loadModalAudit(caseId) {
