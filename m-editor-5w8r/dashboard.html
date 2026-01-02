@@ -1654,8 +1654,10 @@
         showToast('✓ Video submitted to Quality Control!');
         
         // Reset form
-        fileInput.value = '';
-        notesInput.value = '';
+        const fileInput = document.getElementById('video-file-input');
+        const notesInput = document.getElementById('editor-notes-input');
+        if (fileInput) fileInput.value = '';
+        if (notesInput) notesInput.value = '';
         
         setTimeout(async () => {
           progressDiv.style.display = 'none';
