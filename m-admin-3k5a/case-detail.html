@@ -1028,6 +1028,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ============================================================================
+    // VERSION CHECK - TIMELINE FILTER FIX v3.0
+    // ============================================================================
+    console.log('🔧 TIMELINE FILTER VERSION 3.0 - LOADED');
+    console.log('📅 Build Date: 2026-01-02 01:00:00');
+    
+    // ============================================================================
     // SUPABASE INITIALIZATION
     // ============================================================================
     
@@ -1285,10 +1291,12 @@
     
     async function loadTimeline() {
       try {
+        console.log('='.repeat(60));
+        console.log('🔧 TIMELINE FILTER v3.0 - STARTING');
         console.log('📊 Loading timeline for case:', currentCaseId);
         
         // Load raw events first to inspect payload
-        const { data: events, error } = await supabaseClient
+        const { data: allEvents, error } = await supabaseClient
           .from('events')
           .select('*')
           .eq('target_id', currentCaseId)
@@ -1297,35 +1305,74 @@
         
         if (error) throw error;
         
-        console.log('📋 Raw events received:', events?.length || 0);
-        console.log('📋 Event action_types:', events?.map(e => e.action_type) || []);
+        console.log('📋 RAW EVENTS RECEIVED:', allEvents?.length || 0);
+        console.log('📋 ALL ACTION TYPES:', allEvents?.map(e => `"${e.action_type}"`) || []);
         
         const timelineContainer = document.getElementById('timelineContent');
         
-        if (!events || events.length === 0) {
+        if (!allEvents || allEvents.length === 0) {
           timelineContainer.innerHTML = '<div class="empty-state">No timeline events yet</div>';
           return;
         }
         
-        // Filter to show only key workflow events
-        // Exclude all generic database events and status changes
-        const excludedEventTypes = [
-          'INSERT',               // Generic database insert
-          'UPDATE',               // Generic database update  
-          'DELETE',               // Generic database delete
-          'status_changed',       // Redundant - shown via specific events
-          'case_updated',         // Generic - not useful
-          'cases_created',        // Duplicate of CREATE_CASE
-          'form_updated',         // Draft saves - not important
-          'form_draft_updated',   // Draft saves - not important
-          'editor_updated',       // Generic - not useful
-          'sla_updated'          // Automatic - not useful
-        ];
+        // ========================================================================
+        // FILTER LOGIC - ONLY SHOW KEY WORKFLOW EVENTS
+        // ========================================================================
+        console.log('🔍 APPLYING FILTER...');
         
-        const filteredEvents = events.filter(e => !excludedEventTypes.includes(e.action_type));
+        const filteredEvents = allEvents.filter(event => {
+          const action = event.action_type;
+          
+          // Explicitly block these unwanted events
+          if (action === 'INSERT') {
+            console.log(`❌ BLOCKED: INSERT`);
+            return false;
+          }
+          if (action === 'UPDATE') {
+            console.log(`❌ BLOCKED: UPDATE`);
+            return false;
+          }
+          if (action === 'DELETE') {
+            console.log(`❌ BLOCKED: DELETE`);
+            return false;
+          }
+          if (action === 'status_changed') {
+            console.log(`❌ BLOCKED: status_changed`);
+            return false;
+          }
+          if (action === 'case_updated') {
+            console.log(`❌ BLOCKED: case_updated`);
+            return false;
+          }
+          if (action === 'cases_created') {
+            console.log(`❌ BLOCKED: cases_created`);
+            return false;
+          }
+          if (action === 'form_updated') {
+            console.log(`❌ BLOCKED: form_updated`);
+            return false;
+          }
+          if (action === 'form_draft_updated') {
+            console.log(`❌ BLOCKED: form_draft_updated`);
+            return false;
+          }
+          if (action === 'editor_updated') {
+            console.log(`❌ BLOCKED: editor_updated`);
+            return false;
+          }
+          if (action === 'sla_updated') {
+            console.log(`❌ BLOCKED: sla_updated`);
+            return false;
+          }
+          
+          // Allow everything else
+          console.log(`✅ ALLOWED: ${action}`);
+          return true;
+        });
         
-        console.log(`✅ Filtered ${events.length} events down to ${filteredEvents.length} key events`);
-        console.log('✅ Remaining action_types:', filteredEvents.map(e => e.action_type));
+        console.log(`✅ FILTER COMPLETE: ${allEvents.length} → ${filteredEvents.length} events`);
+        console.log('✅ REMAINING EVENTS:', filteredEvents.map(e => `"${e.action_type}"`));
+        console.log('='.repeat(60));
         
         if (filteredEvents.length === 0) {
           timelineContainer.innerHTML = '<div class="empty-state">No key timeline events yet</div>';
@@ -1348,7 +1395,7 @@
         `).join('');
         
       } catch (error) {
-        console.error('❌ Error loading timeline:', error);
+        console.error('❌ ERROR LOADING TIMELINE:', error);
         document.getElementById('timelineContent').innerHTML = '<div class="empty-state">Error loading timeline</div>';
       }
     }
