@@ -5442,24 +5442,190 @@
           return;
         }
         
-        auditContainer.innerHTML = events.map(e => `
-          <div class="modal-timeline-item">
-            <div class="modal-timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
-            <div class="modal-timeline-event">
-              <strong>${e.action_type}</strong>
-              ${e.payload ? `<br><small style="color: var(--text-tertiary);">${JSON.stringify(e.payload).substring(0, 100)}...</small>` : ''}
+        // Fetch all unique user IDs to get their details
+        const userIds = [...new Set(events.map(e => e.actor_user_id).filter(Boolean))];
+        const userDetailsMap = {};
+        
+        if (userIds.length > 0) {
+          try {
+            const { data: users } = await supabaseClient
+              .from('users')
+              .select('id, email, metadata')
+              .in('id', userIds);
+            
+            if (users) {
+              users.forEach(user => {
+                userDetailsMap[user.id] = {
+                  name: user.metadata?.name || null,
+                  email: user.email
+                };
+              });
+            }
+          } catch (err) {
+            console.log('Could not fetch user details for audit:', err);
+          }
+        }
+        
+        // Render audit events with enhanced formatting
+        auditContainer.innerHTML = events.map(e => {
+          const actorDisplay = formatAuditActor(e, userDetailsMap);
+          const eventDescription = formatAuditEvent(e.action_type, e.payload, e.actor_role);
+          
+          return `
+            <div class="modal-timeline-item">
+              <div class="modal-timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
+              <div class="modal-timeline-event">${eventDescription}</div>
+              <div class="modal-timeline-actor">${actorDisplay}</div>
             </div>
-            <div class="modal-timeline-actor">
-              Actor: ${e.actor_role || 'System'} 
-              ${e.actor_user_id ? `(ID: ${e.actor_user_id.substring(0, 8)})` : ''}
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
         
       } catch (error) {
         console.error('Error loading audit:', error);
         document.getElementById('modal-audit-content').innerHTML = '<div class="modal-empty-state">Error loading audit trail</div>';
       }
+    }
+    
+    function formatAuditActor(event, userDetailsMap) {
+      const userId = event.actor_user_id;
+      const role = event.actor_role;
+      
+      // Get user details if available
+      let displayName = '';
+      if (userId && userDetailsMap[userId]) {
+        const user = userDetailsMap[userId];
+        displayName = user.name || user.email;
+      } else if (role && role !== 'service_role') {
+        // Use role as fallback
+        const roleMap = {
+          'admin': 'Admin',
+          'director': 'Director',
+          'family': 'Family Member',
+          'editor': 'Editor',
+          'qc': 'QC Reviewer'
+        };
+        displayName = roleMap[role] || role;
+      } else {
+        displayName = 'System';
+      }
+      
+      // Add role badge
+      const roleBadges = {
+        'admin': '👑',
+        'director': '👔',
+        'family': '👨‍👩‍👧',
+        'editor': '✏️',
+        'qc': '🔍',
+        'service_role': '⚙️'
+      };
+      
+      const badge = roleBadges[role] || '👤';
+      
+      return `<strong>${badge} ${displayName}</strong>`;
+    }
+    
+    function formatAuditEvent(actionType, payload = {}, actorRole) {
+      // Extract common payload fields
+      const editorEmail = payload?.editor_email;
+      const qcEmail = payload?.qc_reviewer_email;
+      const revisionNum = payload?.revision_number;
+      const qcNotes = payload?.qc_notes;
+      const editorNotes = payload?.editor_notes;
+      
+      // Handle status changes specifically
+      if (actionType === 'status_changed' && payload?.new && payload?.old) {
+        const oldStatus = payload.old.status;
+        const newStatus = payload.new.status;
+        
+        const statusMap = {
+          'created': 'Created',
+          'waiting_on_family': 'Waiting on Family',
+          'intake_in_progress': 'Intake in Progress',
+          'submitted': 'Submitted',
+          'in_production': 'In Production',
+          'awaiting_review': 'Awaiting Review',
+          'delivered': 'Delivered',
+          'closed': 'Closed'
+        };
+        
+        return `<strong>Status Changed:</strong> ${statusMap[oldStatus] || oldStatus} → ${statusMap[newStatus] || newStatus}`;
+      }
+      
+      // Handle case updates specifically
+      if (actionType === 'case_updated' && payload?.new && payload?.old) {
+        const changes = [];
+        const old = payload.old;
+        const newData = payload.new;
+        
+        // Check for specific field changes
+        if (old.deceased_name !== newData.deceased_name) {
+          changes.push(`Name: "${old.deceased_name}" → "${newData.deceased_name}"`);
+        }
+        if (old.status !== newData.status) {
+          changes.push(`Status: ${old.status} → ${newData.status}`);
+        }
+        if (old.assigned_family_user_id !== newData.assigned_family_user_id) {
+          changes.push('Family assignment updated');
+        }
+        
+        if (changes.length > 0) {
+          return `<strong>Case Updated:</strong> ${changes.join(', ')}`;
+        } else {
+          return '<strong>Case Updated:</strong> Internal data modified';
+        }
+      }
+      
+      // Map action types to human-readable descriptions
+      const actionDescriptions = {
+        'CREATE_CASE': '<strong>Case Created</strong> by director',
+        'cases_created': '<strong>Case Created</strong> in system',
+        'form_submitted': '<strong>Intake Form Submitted</strong> by family',
+        'form_draft_updated': '<strong>Form Draft Saved</strong> (autosave)',
+        'form_updated': '<strong>Form Updated</strong> after submission',
+        
+        'AUTO_ASSIGN_EDITOR': editorEmail 
+          ? `<strong>Editor Auto-Assigned:</strong> ${editorEmail}` 
+          : '<strong>Editor Auto-Assigned</strong> by system',
+        
+        'editor_assigned': editorEmail 
+          ? `<strong>Editor Assigned:</strong> ${editorEmail}` 
+          : '<strong>Editor Assigned</strong> to case',
+        
+        'editor_reassigned': '<strong>Editor Reassigned</strong> to different editor',
+        'editor_unassigned': '<strong>Editor Unassigned</strong> from case',
+        
+        'video_submitted': editorEmail 
+          ? `<strong>Video Submitted to QC</strong> by ${editorEmail}${revisionNum ? ` (Revision #${revisionNum})` : ''}${editorNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${editorNotes}</small>` : ''}`
+          : `<strong>Video Submitted to QC</strong>${revisionNum ? ` (Revision #${revisionNum})` : ''}`,
+        
+        'qc_approved': qcEmail 
+          ? `<strong>QC Approved - Delivered to Family</strong> by ${qcEmail}${qcNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${qcNotes}</small>` : ''}`
+          : '<strong>QC Approved - Delivered to Family</strong>',
+        
+        'qc_revision': qcEmail 
+          ? `<strong>QC Requested Revision</strong> by ${qcEmail}${qcNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${qcNotes}</small>` : ''}`
+          : '<strong>QC Requested Revision</strong>',
+        
+        'qc_rejected': qcEmail 
+          ? `<strong>QC Rejected</strong> by ${qcEmail}${qcNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${qcNotes}</small>` : ''}`
+          : '<strong>QC Rejected</strong>',
+        
+        'qc_reassigned': '<strong>QC Reviewer Reassigned</strong>',
+        'pushed_to_revision': '<strong>Case Pushed to Revision</strong> by admin',
+        'link_regenerated': '<strong>Family Login Link Regenerated</strong>',
+        'link_resent': '<strong>Family Login Link Resent</strong>',
+        'note_added': '<strong>Note Added to Case</strong>',
+        'sla_updated': '<strong>SLA Status Updated</strong>',
+        'family_assigned': '<strong>Family Member Assigned</strong> to case'
+      };
+      
+      // Return formatted description or fallback to cleaned action type
+      if (actionDescriptions[actionType]) {
+        return actionDescriptions[actionType];
+      }
+      
+      // Fallback: Clean up action type
+      return `<strong>${actionType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>`;
     }
     
     function switchModalTab(tabName) {
