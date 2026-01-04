@@ -5435,6 +5435,13 @@
         
         if (error) throw error;
         
+        console.log('🔍 AUDIT DEBUG - All Events:', events?.map(e => ({ 
+          action: e.action_type, 
+          timestamp: e.timestamp,
+          has_notes: !!e.payload?.qc_notes,
+          payload_keys: Object.keys(e.payload || {})
+        })));
+        
         const auditContainer = document.getElementById('modal-audit-content');
         
         if (!events || events.length === 0) {
@@ -5466,10 +5473,41 @@
           }
         }
         
+        // For status_changed events to revision_requested, we need to fetch QC notes from video_submissions
+        // Build a map of submission_id to qc_notes for quick lookup
+        const qcNotesMap = {};
+        const statusChangedEvents = events.filter(e => 
+          e.action_type === 'status_changed' && 
+          e.payload?.new?.status === 'revision_requested'
+        );
+        
+        if (statusChangedEvents.length > 0) {
+          try {
+            // Fetch the most recent video submission for this case to get QC notes
+            const { data: submissions } = await supabaseClient
+              .from('video_submissions')
+              .select('id, qc_notes, qc_status, updated_at')
+              .eq('case_id', caseId)
+              .eq('qc_status', 'revision')
+              .order('updated_at', { ascending: false });
+            
+            if (submissions && submissions.length > 0) {
+              // Map notes by timestamp - match events with submissions by approximate time
+              submissions.forEach(sub => {
+                qcNotesMap[sub.id] = sub.qc_notes;
+              });
+              
+              console.log('🔍 AUDIT DEBUG - QC Notes Map:', qcNotesMap);
+            }
+          } catch (err) {
+            console.log('Could not fetch QC notes:', err);
+          }
+        }
+        
         // Render audit events with enhanced formatting
         auditContainer.innerHTML = events.map(e => {
           const actorDisplay = formatAuditActor(e, userDetailsMap);
-          const eventDescription = formatAuditEvent(e.action_type, e.payload, e.actor_role);
+          const eventDescription = formatAuditEvent(e.action_type, e.payload, e.actor_role, qcNotesMap);
           
           return `
             <div class="modal-timeline-item">
@@ -5524,7 +5562,7 @@
       return `<strong>${badge} ${displayName}</strong>`;
     }
     
-    function formatAuditEvent(actionType, payload = {}, actorRole) {
+    function formatAuditEvent(actionType, payload = {}, actorRole, qcNotesMap = {}) {
       // Extract common payload fields
       const editorEmail = payload?.editor_email;
       const qcEmail = payload?.qc_reviewer_email;
@@ -5545,8 +5583,30 @@
           'in_production': 'In Production',
           'awaiting_review': 'Awaiting Review',
           'delivered': 'Delivered',
-          'closed': 'Closed'
+          'closed': 'Closed',
+          'revision_requested': 'Revision Requested'
         };
+        
+        // Special handling for revision_requested status - try to find QC notes
+        if (newStatus === 'revision_requested') {
+          // Try multiple sources for the notes:
+          // 1. Directly in payload.qc_notes
+          // 2. In payload.new.qc_notes  
+          // 3. From the qcNotesMap (fetched from video_submissions)
+          let notes = qcNotes || payload.new?.qc_notes;
+          
+          // If still no notes, try to get from the most recent submission in the map
+          if (!notes && Object.keys(qcNotesMap).length > 0) {
+            // Get any available notes from the map
+            const availableNotes = Object.values(qcNotesMap).find(n => n);
+            if (availableNotes) {
+              notes = availableNotes;
+            }
+          }
+          
+          const notesDisplay = notes ? `<br><small style="color: var(--text-tertiary);">QC Notes: ${notes}</small>` : '';
+          return `<strong>QC Requested Revision</strong>${notesDisplay}`;
+        }
         
         return `<strong>Status Changed:</strong> ${statusMap[oldStatus] || oldStatus} → ${statusMap[newStatus] || newStatus}`;
       }
