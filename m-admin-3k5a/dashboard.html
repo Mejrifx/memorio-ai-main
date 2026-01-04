@@ -5488,7 +5488,7 @@
               .from('video_submissions')
               .select('id, qc_notes, qc_status, updated_at')
               .eq('case_id', caseId)
-              .eq('qc_status', 'revision')
+              .eq('qc_status', 'revision_requested')
               .order('updated_at', { ascending: false });
             
             if (submissions && submissions.length > 0) {
