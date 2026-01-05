@@ -3332,6 +3332,87 @@
     </div>
   </div>
 
+  <!-- Account Details Modal -->
+  <div id="account-details-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-account-title">Account Details</h2>
+        <button class="modal-close" onclick="closeAccountDetailsModal()">&times;</button>
+      </div>
+      
+      <div class="modal-section">
+        <h3 class="modal-section-title">
+          <span class="modal-icon">👤</span>
+          User Information
+        </h3>
+        <div class="modal-details">
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Name:</span>
+            <span class="modal-detail-value" id="modal-account-name">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Email:</span>
+            <span class="modal-detail-value" id="modal-account-email">-</span>
+            <button class="copy-btn" onclick="copyToClipboard('modal-account-email')" style="margin-left: 10px;">Copy</button>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Role:</span>
+            <span class="modal-detail-value" id="modal-account-role">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Status:</span>
+            <span class="modal-detail-value" id="modal-account-status">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Organization:</span>
+            <span class="modal-detail-value" id="modal-account-org">-</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-section">
+        <h3 class="modal-section-title">
+          <span class="modal-icon">📅</span>
+          Account Activity
+        </h3>
+        <div class="modal-details">
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Created:</span>
+            <span class="modal-detail-value" id="modal-account-created">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">Last Login:</span>
+            <span class="modal-detail-value" id="modal-account-last-login">-</span>
+          </div>
+          <div class="modal-detail-item">
+            <span class="modal-detail-label">User ID:</span>
+            <span class="modal-detail-value" id="modal-account-id" style="font-family: monospace; font-size: 12px;">-</span>
+            <button class="copy-btn" onclick="copyToClipboard('modal-account-id')" style="margin-left: 10px;">Copy</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-section" style="border-top: 1px solid var(--border-primary); padding-top: 20px;">
+        <div style="background-color: #fff3cd; padding: 16px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 16px;">
+          <p style="margin: 0; color: #856404; font-size: 14px;">
+            <strong>⚠️ Note:</strong> Temporary passwords are only shown once during account creation for security reasons. 
+            If the user has lost their password, they should use the "Forgot Password" feature on their login page.
+          </p>
+        </div>
+        <div class="modal-detail-item" id="modal-login-url-container">
+          <span class="modal-detail-label">Login URL:</span>
+          <span class="modal-detail-value" id="modal-account-login-url">-</span>
+          <button class="copy-btn" onclick="copyToClipboard('modal-account-login-url')" style="margin-left: 10px;">Copy</button>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-danger" id="modal-delete-account-btn">🗑️ Delete Account</button>
+        <button class="modal-btn modal-btn-secondary" onclick="closeAccountDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
@@ -5024,7 +5105,8 @@
     }
     
     function createAccountCard(account) {
-      const name = account.metadata?.name || account.email.split('@')[0];
+      const name = account.metadata?.name || account.email.split('@')[0];      const name = account.metadata?.name || 'No name';
+      
       const orgName = account.org_name || 'Global Access'; // Editors & QC have global access
       const createdDate = new Date(account.created_at).toLocaleDateString('en-US', { 
         timeZone: 'America/New_York',
@@ -5045,7 +5127,7 @@
         : 'Never';
       
       return `
-        <div class="account-card" style="cursor: pointer;" onclick="openDeleteAccountModal('${account.id}', '${account.email.replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}', '${account.role}')">
+        <div class="account-card" style="cursor: pointer;" onclick="openAccountDetailsModal('${account.id}')">
           <div class="account-card-header">
             <div>
               <div class="account-name">${name}</div>
@@ -5083,6 +5165,82 @@
           </div>
         </div>
       `;
+    }
+    
+    // ============================================================================
+    // ACCOUNT DETAILS MODAL
+    // ============================================================================
+    
+    async function openAccountDetailsModal(userId) {
+      try {
+        console.log('👤 Opening account details for:', userId);
+        
+        // Find the account in our cached data
+        const account = allAccountsData.find(a => a.id === userId);
+        
+        if (!account) {
+          showToast('Account not found', true);
+          return;
+        }
+        
+        // Populate modal with account data
+        document.getElementById('modal-account-title').textContent = `${account.role.toUpperCase()} Account Details`;
+        document.getElementById('modal-account-name').textContent = account.metadata?.name || 'No name';
+        document.getElementById('modal-account-email').textContent = account.email;
+        document.getElementById('modal-account-role').innerHTML = `<span class="account-role-badge ${account.role}">${account.role.toUpperCase()}</span>`;
+        document.getElementById('modal-account-status').innerHTML = `<span class="account-status-badge ${account.status}">${account.status}</span>`;
+        document.getElementById('modal-account-org').textContent = account.org_name || 'Global Access';
+        
+        // Activity data
+        document.getElementById('modal-account-created').textContent = new Date(account.created_at).toLocaleString('en-US', { 
+          timeZone: 'America/New_York',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+        
+        document.getElementById('modal-account-last-login').textContent = account.last_login_at 
+          ? new Date(account.last_login_at).toLocaleString('en-US', { 
+              timeZone: 'America/New_York',
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            })
+          : 'Never';
+        
+        document.getElementById('modal-account-id').textContent = account.id;
+        
+        // Set login URL based on role
+        const loginUrls = {
+          'editor': 'https://memorio.ai/m-editor-5w8r/login.html',
+          'qc': 'https://memorio.ai/m-qc-4h7k/login.html'
+        };
+        document.getElementById('modal-account-login-url').textContent = loginUrls[account.role] || 'N/A';
+        
+        // Set up delete button
+        const deleteBtn = document.getElementById('modal-delete-account-btn');
+        deleteBtn.onclick = () => {
+          closeAccountDetailsModal();
+          openDeleteAccountModal(account.id, account.email, account.metadata?.name || 'No name', account.role);
+        };
+        
+        // Show modal
+        document.getElementById('account-details-modal').style.display = 'flex';
+        
+      } catch (error) {
+        console.error('❌ Error opening account details:', error);
+        showToast('Error loading account details', true);
+      }
+    }
+    
+    function closeAccountDetailsModal() {
+      document.getElementById('account-details-modal').style.display = 'none';
     }
     
     // ============================================================================
