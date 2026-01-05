@@ -5109,12 +5109,25 @@
         // Fetch temp passwords for all accounts (separate query to get full user data)
         if (allAccountsData.length > 0) {
           const accountIds = allAccountsData.map(a => a.id);
+          console.log('🔍 Fetching temp passwords for account IDs:', accountIds);
+          
           const { data: fullUserData, error: userError } = await supabaseClient
             .from('users')
             .select('id, temp_password')
             .in('id', accountIds);
           
-          if (!userError && fullUserData) {
+          console.log('📊 Temp password query result:', { fullUserData, userError });
+          
+          if (userError) {
+            console.error('❌ Error fetching temp passwords:', userError);
+          }
+          
+          if (fullUserData) {
+            console.log('✅ Fetched temp passwords for', fullUserData.length, 'accounts');
+            fullUserData.forEach(user => {
+              console.log(`  - ${user.id}: ${user.temp_password ? '✓ Has password' : '✗ No password'}`);
+            });
+            
             // Merge temp_password into allAccountsData
             allAccountsData = allAccountsData.map(account => {
               const userData = fullUserData.find(u => u.id === account.id);
@@ -5123,6 +5136,8 @@
                 temp_password: userData?.temp_password || null
               };
             });
+            
+            console.log('✅ Merged temp passwords into account data');
           }
         }
         
@@ -5349,6 +5364,10 @@
     
     function revealAccountCredentials() {
       if (!currentAccountDetails) return;
+      
+      console.log('🔍 Revealing credentials for:', currentAccountDetails.email);
+      console.log('📦 Account details:', currentAccountDetails);
+      console.log('🔑 Temp password value:', currentAccountDetails.temp_password);
       
       const emailEl = document.getElementById('modal-account-cred-email');
       const passwordEl = document.getElementById('modal-account-cred-password');
