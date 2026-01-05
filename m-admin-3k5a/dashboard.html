@@ -1373,6 +1373,64 @@
       background-color: #5a6268;
     }
     
+    /* Credential reveal styles */
+    .credentials-section {
+      margin-top: 16px;
+    }
+    
+    .credentials-header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+    
+    .reveal-btn {
+      background-color: var(--accent-primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .reveal-btn:hover {
+      background-color: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    .credential-value.blurred {
+      filter: blur(6px);
+      user-select: none;
+      pointer-events: none;
+      color: var(--text-tertiary);
+    }
+    
+    /* Fix dark mode for btn-danger in account cards */
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+      border: 1px solid #dc3545;
+    }
+    
+    [data-theme="dark"] .btn-danger {
+      background-color: #dc3545;
+      color: white;
+      border: 1px solid #dc3545;
+    }
+    
+    .btn-danger:hover {
+      background-color: #c82333;
+      border-color: #c82333;
+    }
+    
+    [data-theme="dark"] .btn-danger:hover {
+      background-color: #c82333;
+      border-color: #c82333;
+    }
+    
     /* Toast Notification Styles */
     .toast {
       position: fixed;
@@ -3392,17 +3450,32 @@
         </div>
       </div>
       
-      <div class="modal-section" style="border-top: 1px solid var(--border-primary); padding-top: 20px;">
-        <div style="background-color: #fff3cd; padding: 16px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 16px;">
-          <p style="margin: 0; color: #856404; font-size: 14px;">
-            <strong>⚠️ Note:</strong> Temporary passwords are only shown once during account creation for security reasons. 
-            If the user has lost their password, they should use the "Forgot Password" feature on their login page.
-          </p>
-        </div>
-        <div class="modal-detail-item" id="modal-login-url-container">
-          <span class="modal-detail-label">Login URL:</span>
-          <span class="modal-detail-value" id="modal-account-login-url">-</span>
-          <button class="copy-btn" onclick="copyToClipboard('modal-account-login-url')" style="margin-left: 10px;">Copy</button>
+      <div class="modal-section">
+        <h3 class="modal-section-title">
+          <span class="modal-icon">🔑</span>
+          Login Credentials
+        </h3>
+        <div class="credentials-section">
+          <div class="credentials-header">
+            <button class="reveal-btn" id="reveal-account-credentials-btn" onclick="revealAccountCredentials()">Reveal</button>
+          </div>
+          <div class="credentials-grid" style="display: grid; gap: 16px; margin-top: 12px;">
+            <div class="credential-item" style="display: grid; grid-template-columns: 100px 1fr auto; gap: 12px; align-items: center;">
+              <div class="credential-label" style="font-weight: 600; color: var(--text-secondary);">Email:</div>
+              <div class="credential-value blurred" id="modal-account-cred-email" style="font-family: monospace; padding: 8px 12px; background: var(--bg-secondary); border-radius: 4px; font-size: 14px;">Click Reveal</div>
+              <button class="copy-btn" onclick="copyToClipboard('modal-account-cred-email')" style="padding: 6px 12px;">Copy</button>
+            </div>
+            <div class="credential-item" style="display: grid; grid-template-columns: 100px 1fr auto; gap: 12px; align-items: center;">
+              <div class="credential-label" style="font-weight: 600; color: var(--text-secondary);">Password:</div>
+              <div class="credential-value blurred" id="modal-account-cred-password" style="font-family: monospace; padding: 8px 12px; background: var(--bg-secondary); border-radius: 4px; font-size: 14px;">Click Reveal</div>
+              <button class="copy-btn" onclick="copyToClipboard('modal-account-cred-password')" style="padding: 6px 12px;">Copy</button>
+            </div>
+            <div class="credential-item" style="display: grid; grid-template-columns: 100px 1fr auto; gap: 12px; align-items: center;">
+              <div class="credential-label" style="font-weight: 600; color: var(--text-secondary);">Login URL:</div>
+              <div class="credential-value" id="modal-account-login-url" style="font-family: monospace; padding: 8px 12px; background: var(--bg-secondary); border-radius: 4px; font-size: 13px; word-break: break-all;">-</div>
+              <button class="copy-btn" onclick="copyToClipboard('modal-account-login-url')" style="padding: 6px 12px;">Copy</button>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -5032,6 +5105,27 @@
         console.log(`✅ Loaded ${accounts?.length || 0} accounts`);
         
         allAccountsData = accounts || [];
+        
+        // Fetch temp passwords for all accounts (separate query to get full user data)
+        if (allAccountsData.length > 0) {
+          const accountIds = allAccountsData.map(a => a.id);
+          const { data: fullUserData, error: userError } = await supabaseClient
+            .from('users')
+            .select('id, temp_password')
+            .in('id', accountIds);
+          
+          if (!userError && fullUserData) {
+            // Merge temp_password into allAccountsData
+            allAccountsData = allAccountsData.map(account => {
+              const userData = fullUserData.find(u => u.id === account.id);
+              return {
+                ...account,
+                temp_password: userData?.temp_password || null
+              };
+            });
+          }
+        }
+        
         filteredAccountsData = allAccountsData;
         
         // Update stats
@@ -5171,6 +5265,9 @@
     // ACCOUNT DETAILS MODAL
     // ============================================================================
     
+    let accountCredentialsRevealed = false;
+    let currentAccountDetails = null;
+    
     async function openAccountDetailsModal(userId) {
       try {
         console.log('👤 Opening account details for:', userId);
@@ -5182,6 +5279,17 @@
           showToast('Account not found', true);
           return;
         }
+        
+        // Store current account details
+        currentAccountDetails = account;
+        
+        // Reset credentials to blurred state
+        accountCredentialsRevealed = false;
+        document.getElementById('reveal-account-credentials-btn').textContent = 'Reveal';
+        document.getElementById('modal-account-cred-email').textContent = 'Click Reveal';
+        document.getElementById('modal-account-cred-password').textContent = 'Click Reveal';
+        document.getElementById('modal-account-cred-email').classList.add('blurred');
+        document.getElementById('modal-account-cred-password').classList.add('blurred');
         
         // Populate modal with account data
         document.getElementById('modal-account-title').textContent = `${account.role.toUpperCase()} Account Details`;
@@ -5239,8 +5347,36 @@
       }
     }
     
+    function revealAccountCredentials() {
+      if (!currentAccountDetails) return;
+      
+      const emailEl = document.getElementById('modal-account-cred-email');
+      const passwordEl = document.getElementById('modal-account-cred-password');
+      const revealBtn = document.getElementById('reveal-account-credentials-btn');
+      
+      if (!accountCredentialsRevealed) {
+        // Reveal credentials
+        emailEl.textContent = currentAccountDetails.email;
+        passwordEl.textContent = currentAccountDetails.temp_password || 'Not available';
+        emailEl.classList.remove('blurred');
+        passwordEl.classList.remove('blurred');
+        revealBtn.textContent = 'Hide';
+        accountCredentialsRevealed = true;
+      } else {
+        // Hide credentials
+        emailEl.textContent = 'Click Reveal';
+        passwordEl.textContent = 'Click Reveal';
+        emailEl.classList.add('blurred');
+        passwordEl.classList.add('blurred');
+        revealBtn.textContent = 'Reveal';
+        accountCredentialsRevealed = false;
+      }
+    }
+    
     function closeAccountDetailsModal() {
       document.getElementById('account-details-modal').style.display = 'none';
+      currentAccountDetails = null;
+      accountCredentialsRevealed = false;
     }
     
     // ============================================================================
