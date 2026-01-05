@@ -5091,6 +5091,7 @@
       try {
         console.log('👥 Loading manage accounts...');
         
+        // Query the view which now includes temp_password
         const { data: accounts, error } = await supabaseClient
           .from('admin_users_view')
           .select('*')
@@ -5103,45 +5104,14 @@
         }
         
         console.log(`✅ Loaded ${accounts?.length || 0} accounts`);
+        console.log('📊 Sample account data:', accounts?.[0]);
         
         allAccountsData = accounts || [];
-        
-        // Fetch temp passwords for all accounts (separate query to get full user data)
-        if (allAccountsData.length > 0) {
-          const accountIds = allAccountsData.map(a => a.id);
-          console.log('🔍 Fetching temp passwords for account IDs:', accountIds);
-          
-          const { data: fullUserData, error: userError } = await supabaseClient
-            .from('users')
-            .select('id, temp_password')
-            .in('id', accountIds);
-          
-          console.log('📊 Temp password query result:', { fullUserData, userError });
-          
-          if (userError) {
-            console.error('❌ Error fetching temp passwords:', userError);
-          }
-          
-          if (fullUserData) {
-            console.log('✅ Fetched temp passwords for', fullUserData.length, 'accounts');
-            fullUserData.forEach(user => {
-              console.log(`  - ${user.id}: ${user.temp_password ? '✓ Has password' : '✗ No password'}`);
-            });
-            
-            // Merge temp_password into allAccountsData
-            allAccountsData = allAccountsData.map(account => {
-              const userData = fullUserData.find(u => u.id === account.id);
-              return {
-                ...account,
-                temp_password: userData?.temp_password || null
-              };
-            });
-            
-            console.log('✅ Merged temp passwords into account data');
-          }
-        }
-        
         filteredAccountsData = allAccountsData;
+        
+        // Log how many have temp passwords
+        const withPasswords = allAccountsData.filter(a => a.temp_password).length;
+        console.log(`🔑 ${withPasswords}/${allAccountsData.length} accounts have temp_password`);
         
         // Update stats
         updateAccountsStats();
