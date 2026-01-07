@@ -2182,23 +2182,25 @@
                     // Store reference to faq-title for the handler
                     addButton._faqTitle = faqTitle;
                     
-                    // Remove the Add button from blocking clicks - make it trigger faq-title
-                    // Use a simple, direct approach
-                    const handleAddClick = function() {
+                    // Handler that triggers faq-title click (preserves Webflow animation)
+                    const handleAddClick = function(e) {
                         console.log('🖱️ Add button handler fired!');
+                        
+                        // Don't prevent default or stop propagation - let Webflow handle it
+                        // Just trigger the faq-title click which has the animation
                         if (this._faqTitle) {
-                            console.log('✅ Triggering faq-title click');
-                            this._faqTitle.click();
+                            console.log('✅ Triggering faq-title click (with animation)');
+                            
+                            // Use a small delay to ensure Webflow's animation system is ready
+                            setTimeout(() => {
+                                // Trigger click on faq-title (this preserves Webflow's animation)
+                                this._faqTitle.click();
+                            }, 10);
                         }
                     };
                     
-                    // Attach handler directly to the button
-                    addButton.onclick = handleAddClick;
-                    addButton.onmousedown = handleAddClick;
-                    
-                    // Also try addEventListener
-                    addButton.addEventListener('click', handleAddClick, true);
-                    addButton.addEventListener('mousedown', handleAddClick, true);
+                    // Attach handler - use bubbling phase (not capture) to preserve Webflow interactions
+                    addButton.addEventListener('click', handleAddClick, false);
                     
                     console.log(`✅ Set up handlers for Add button ${index + 1}`);
                 });
