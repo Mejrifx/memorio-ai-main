@@ -2196,21 +2196,44 @@
                             return false;
                         }
                         
-                        console.log('✅ Found faq-title, triggering click...');
+                        // Find the faq-body
+                        const faqBody = faqItem.querySelector('.faq-body');
+                        if (!faqBody) {
+                            console.warn('⚠️ Could not find faq-body');
+                            return false;
+                        }
                         
-                        // Create a new click event and dispatch it
-                        const clickEvent = new MouseEvent('click', {
-                            bubbles: true,
-                            cancelable: true,
-                            view: window
-                        });
+                        // Check current state
+                        const computedStyle = window.getComputedStyle(faqBody);
+                        const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.height !== '0px';
                         
-                        // Trigger click on faq-title to use existing Webflow functionality
-                        faqTitle.dispatchEvent(clickEvent);
+                        console.log('📊 Current state:', { isVisible, display: computedStyle.display, visibility: computedStyle.visibility, height: computedStyle.height });
                         
-                        // Also try direct click as fallback
-                        if (typeof faqTitle.click === 'function') {
+                        // Toggle visibility directly
+                        if (isVisible) {
+                            // Hide
+                            faqBody.style.display = 'none';
+                            faqBody.style.visibility = 'hidden';
+                            faqBody.style.height = '0';
+                            faqBody.style.overflow = 'hidden';
+                            this.textContent = 'Add';
+                            console.log('✅ Accordion hidden');
+                        } else {
+                            // Show
+                            faqBody.style.display = 'block';
+                            faqBody.style.visibility = 'visible';
+                            faqBody.style.height = 'auto';
+                            faqBody.style.overflow = 'visible';
+                            this.textContent = 'Hide';
+                            console.log('✅ Accordion shown');
+                        }
+                        
+                        // Also try triggering faq-title click as backup
+                        console.log('✅ Also triggering faq-title click as backup...');
+                        try {
                             faqTitle.click();
+                        } catch (err) {
+                            console.warn('⚠️ faq-title.click() failed:', err);
                         }
                         
                         // Update button text based on state after a brief delay
