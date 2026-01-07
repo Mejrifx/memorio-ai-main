@@ -33,6 +33,28 @@
       display: none !important;
     }
     
+    /* Responsive sign-out button for mobile */
+    @media (max-width: 768px) {
+      #signOutBtn {
+        position: static !important;
+        transform: none !important;
+        margin: 10px auto;
+        display: block !important;
+        width: calc(100% - 40px);
+        max-width: 200px;
+      }
+      
+      .nav {
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 10px 20px !important;
+      }
+      
+      .logo-wrapper {
+        margin-bottom: 10px;
+      }
+    }
+    
     /* Modal styles matching Director portal */
     .modal-overlay {
       position: fixed;
