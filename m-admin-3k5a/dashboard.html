@@ -5096,31 +5096,27 @@
       const hoursElapsed = (now - submissionTime) / (1000 * 60 * 60);
       
       // Determine badge based on thresholds
-      let badgeClass, badgeText, badgeIcon;
+      let badgeClass, badgeText;
       
       if (hoursElapsed < 24) {
         // Green: < 24 hours
         badgeClass = 'green';
-        badgeIcon = '🟢';
         badgeText = `${Math.floor(hoursElapsed)}h`;
       } else if (hoursElapsed < 36) {
         // Orange: 24-36 hours
         badgeClass = 'orange';
-        badgeIcon = '🟠';
         badgeText = `${Math.floor(hoursElapsed)}h`;
       } else if (hoursElapsed < 48) {
         // Red: 36-48 hours
         badgeClass = 'red';
-        badgeIcon = '🔴';
         badgeText = `${Math.floor(hoursElapsed)}h`;
       } else {
         // Black: 48+ hours (BREACH)
         badgeClass = 'black';
-        badgeIcon = '⚫';
         badgeText = `${Math.floor(hoursElapsed)}h BREACH`;
       }
       
-      return `<span class="sla-badge ${badgeClass}">${badgeIcon} ${badgeText}</span>`;
+      return `<span class="sla-badge ${badgeClass}">${badgeText}</span>`;
     }
     
     function createCaseCard(caseData) {
