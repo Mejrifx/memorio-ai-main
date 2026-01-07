@@ -28,6 +28,11 @@
       display: block !important;
     }
     
+    /* Hide Webflow nav button (4-square grid icon) */
+    .w-nav-button {
+      display: none !important;
+    }
+    
     /* Modal styles matching Director portal */
     .modal-overlay {
       position: fixed;
@@ -284,8 +289,9 @@
     </div>
   </div>
 
-  <div class="nav">
+  <div class="nav" style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
     <div class="logo-wrapper"><img src="images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" loading="lazy" width="166" sizes="166px" alt="The Memorio Logo" srcset="images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w"></div>
+    <button id="signOutBtn" onclick="handleSignOut()" style="padding: 10px 24px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; transition: background-color 0.2s; display: none;" onmouseover="this.style.backgroundColor='#1e3a52'" onmouseout="this.style.backgroundColor='#436481'">Sign Out</button>
   </div>
   <div class="form-slider-padding">
     <div class="w-form">
@@ -952,6 +958,28 @@
                 // Re-enable button
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Sign In';
+            }
+        }
+        
+        /**
+         * Handle sign out
+         */
+        async function handleSignOut() {
+            try {
+                console.log('🔓 Signing out...');
+                
+                // Save draft before signing out
+                await saveFormDraft();
+                
+                // Sign out
+                await supabaseClient.auth.signOut();
+                
+                // Redirect to login page
+                window.location.href = 'm-family-7x2p/login.html';
+            } catch (error) {
+                console.error('❌ Sign out error:', error);
+                // Still redirect even if error
+                window.location.href = 'm-family-7x2p/login.html';
             }
         }
         
@@ -2032,8 +2060,11 @@
             // Populate deceased name throughout form
             populateDeceasedName();
             
-            // Add persistent dashboard icon
-            addPersistentDashboardIcon();
+            // Show sign-out button (removed dashboard icon as requested)
+            const signOutBtn = document.getElementById('signOutBtn');
+            if (signOutBtn) {
+                signOutBtn.style.display = 'block';
+            }
             
             // Initialize autosave
             initializeAutosave();
