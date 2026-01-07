@@ -2144,39 +2144,74 @@
         function initAccordionAddButtons() {
             // Wait a bit for Webflow interactions to initialize
             setTimeout(() => {
-                // Find all "Add" buttons in accordion sections
-                const addButtons = document.querySelectorAll('.faq-item .accordion._1, .faq-item .accordion._2, .faq-item .accordion._3, .faq-item .accordion._4, .faq-item .accordion._5, .faq-item .accordion._6');
+                // Find all "Add" buttons - try multiple selector patterns
+                let addButtons = document.querySelectorAll('.faq-item .accordion._1, .faq-item .accordion._2, .faq-item .accordion._3, .faq-item .accordion._4, .faq-item .accordion._5, .faq-item .accordion._6');
                 
-                addButtons.forEach(button => {
+                // If not found, try alternative selector (with space instead of dot)
+                if (addButtons.length === 0) {
+                    addButtons = document.querySelectorAll('.faq-item [class*="accordion"][class*="_1"], .faq-item [class*="accordion"][class*="_2"], .faq-item [class*="accordion"][class*="_3"], .faq-item [class*="accordion"][class*="_4"], .faq-item [class*="accordion"][class*="_5"], .faq-item [class*="accordion"][class*="_6"]');
+                }
+                
+                // If still not found, try finding by text content
+                if (addButtons.length === 0) {
+                    const allAccordionButtons = document.querySelectorAll('.faq-item .accordion');
+                    addButtons = Array.from(allAccordionButtons).filter(btn => btn.textContent.trim() === 'Add');
+                }
+                
+                console.log(`🔍 Found ${addButtons.length} Add buttons`);
+                
+                addButtons.forEach((button, index) => {
+                    console.log(`🔧 Setting up Add button ${index + 1}:`, button);
+                    
                     // Make button look clickable
                     button.style.cursor = 'pointer';
                     button.style.userSelect = 'none';
                     button.style.pointerEvents = 'auto';
+                    button.style.position = 'relative';
+                    button.style.zIndex = '10';
+                    
+                    // Remove any existing click handlers
+                    const newButton = button.cloneNode(true);
+                    button.parentNode.replaceChild(newButton, button);
                     
                     // Add click handler that triggers the faq-title click
-                    button.addEventListener('click', function(e) {
+                    newButton.addEventListener('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
+                        e.stopImmediatePropagation();
                         
-                        console.log('🖱️ Add button clicked');
+                        console.log('🖱️ Add button clicked!', this);
                         
                         // Find the parent faq-item
                         const faqItem = this.closest('.faq-item');
                         if (!faqItem) {
                             console.warn('⚠️ Could not find faq-item');
-                            return;
+                            return false;
                         }
                         
                         // Find the faq-title (the section header that was working before)
                         const faqTitle = faqItem.querySelector('.faq-title');
                         if (!faqTitle) {
                             console.warn('⚠️ Could not find faq-title');
-                            return;
+                            return false;
                         }
                         
+                        console.log('✅ Found faq-title, triggering click...');
+                        
+                        // Create a new click event and dispatch it
+                        const clickEvent = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                        });
+                        
                         // Trigger click on faq-title to use existing Webflow functionality
-                        console.log('✅ Triggering faq-title click');
-                        faqTitle.click();
+                        faqTitle.dispatchEvent(clickEvent);
+                        
+                        // Also try direct click as fallback
+                        if (typeof faqTitle.click === 'function') {
+                            faqTitle.click();
+                        }
                         
                         // Update button text based on state after a brief delay
                         setTimeout(() => {
@@ -2185,13 +2220,16 @@
                                 const computedStyle = window.getComputedStyle(faqBody);
                                 const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
                                 this.textContent = isVisible ? 'Hide' : 'Add';
+                                console.log('📊 Updated button text to:', this.textContent);
                             }
-                        }, 100);
-                    }, true); // Use capture phase
+                        }, 200);
+                        
+                        return false;
+                    }, true); // Use capture phase to fire before other handlers
                 });
                 
                 console.log(`✅ Initialized ${addButtons.length} accordion "Add" buttons`);
-            }, 500); // Wait 500ms for Webflow to initialize
+            }, 1000); // Wait 1 second for Webflow to fully initialize
         }
         
         /**
