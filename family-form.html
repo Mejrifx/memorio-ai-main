@@ -33,10 +33,8 @@
       display: none !important;
     }
     
-    /* Hide accordion bodies by default - show when Add is clicked */
-    .faq-item .faq-body {
-      display: none;
-    }
+    /* Don't hide accordion bodies by default - let existing functionality work */
+    /* Accordion bodies will be controlled by JavaScript */
     
     /* Responsive sign-out button for mobile */
     @media (max-width: 768px) {
@@ -2141,46 +2139,59 @@
         
         /**
          * Initialize accordion "Add" buttons functionality
+         * The Add button should trigger the same action as clicking the faq-title
          */
         function initAccordionAddButtons() {
-            // Find all "Add" buttons in accordion sections
-            const addButtons = document.querySelectorAll('.faq-item .accordion._1, .faq-item .accordion._2, .faq-item .accordion._3, .faq-item .accordion._4, .faq-item .accordion._5, .faq-item .accordion._6');
-            
-            addButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+            // Wait a bit for Webflow interactions to initialize
+            setTimeout(() => {
+                // Find all "Add" buttons in accordion sections
+                const addButtons = document.querySelectorAll('.faq-item .accordion._1, .faq-item .accordion._2, .faq-item .accordion._3, .faq-item .accordion._4, .faq-item .accordion._5, .faq-item .accordion._6');
+                
+                addButtons.forEach(button => {
+                    // Make button look clickable
+                    button.style.cursor = 'pointer';
+                    button.style.userSelect = 'none';
+                    button.style.pointerEvents = 'auto';
                     
-                    // Find the parent faq-item
-                    const faqItem = this.closest('.faq-item');
-                    if (!faqItem) return;
-                    
-                    // Find the faq-body within this item
-                    const faqBody = faqItem.querySelector('.faq-body');
-                    if (!faqBody) return;
-                    
-                    // Toggle visibility
-                    const isVisible = faqBody.style.display !== 'none' && window.getComputedStyle(faqBody).display !== 'none';
-                    
-                    if (isVisible) {
-                        // Hide
-                        faqBody.style.display = 'none';
-                        this.textContent = 'Add';
-                    } else {
-                        // Show
-                        faqBody.style.display = 'block';
-                        this.textContent = 'Hide';
-                    }
-                    
-                    console.log('✅ Accordion toggled:', faqItem.querySelector('.text-block-3')?.textContent || 'Unknown');
+                    // Add click handler that triggers the faq-title click
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log('🖱️ Add button clicked');
+                        
+                        // Find the parent faq-item
+                        const faqItem = this.closest('.faq-item');
+                        if (!faqItem) {
+                            console.warn('⚠️ Could not find faq-item');
+                            return;
+                        }
+                        
+                        // Find the faq-title (the section header that was working before)
+                        const faqTitle = faqItem.querySelector('.faq-title');
+                        if (!faqTitle) {
+                            console.warn('⚠️ Could not find faq-title');
+                            return;
+                        }
+                        
+                        // Trigger click on faq-title to use existing Webflow functionality
+                        console.log('✅ Triggering faq-title click');
+                        faqTitle.click();
+                        
+                        // Update button text based on state after a brief delay
+                        setTimeout(() => {
+                            const faqBody = faqItem.querySelector('.faq-body');
+                            if (faqBody) {
+                                const computedStyle = window.getComputedStyle(faqBody);
+                                const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+                                this.textContent = isVisible ? 'Hide' : 'Add';
+                            }
+                        }, 100);
+                    }, true); // Use capture phase
                 });
                 
-                // Make button look clickable
-                button.style.cursor = 'pointer';
-                button.style.userSelect = 'none';
-            });
-            
-            console.log(`✅ Initialized ${addButtons.length} accordion "Add" buttons`);
+                console.log(`✅ Initialized ${addButtons.length} accordion "Add" buttons`);
+            }, 500); // Wait 500ms for Webflow to initialize
         }
         
         /**
