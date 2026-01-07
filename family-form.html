@@ -2139,117 +2139,152 @@
         
         /**
          * Initialize accordion "Add" buttons functionality
-         * Use event delegation for more reliable click handling
+         * Use multiple approaches to ensure it works
          */
         function initAccordionAddButtons() {
-            // Wait a bit for Webflow interactions to initialize
-            setTimeout(() => {
-                // Find the accordion container
-                const accordionContainer = document.querySelector('.faq-container.form-accordion');
-                if (!accordionContainer) {
-                    console.warn('⚠️ Could not find accordion container');
+            console.log('🔧 Initializing accordion Add buttons...');
+            
+            // Try multiple times with increasing delays (Webflow might load slowly)
+            [500, 1000, 2000].forEach(delay => {
+                setTimeout(() => {
+                    setupAccordionButtons();
+                }, delay);
+            });
+        }
+        
+        function setupAccordionButtons() {
+            // Find the accordion container
+            const accordionContainer = document.querySelector('.faq-container.form-accordion');
+            if (!accordionContainer) {
+                console.warn('⚠️ Could not find accordion container');
+                return;
+            }
+            
+            console.log('✅ Found accordion container');
+            
+            // Find ALL elements with "Add" text inside accordion
+            const allElements = accordionContainer.querySelectorAll('*');
+            const addButtons = Array.from(allElements).filter(el => {
+                const text = el.textContent?.trim();
+                return text === 'Add' || text === 'Hide';
+            });
+            
+            console.log(`🔍 Found ${addButtons.length} elements with "Add" or "Hide" text`);
+            
+            // Also try finding by class
+            const classButtons = accordionContainer.querySelectorAll('[class*="accordion"][class*="_"]');
+            console.log(`🔍 Found ${classButtons.length} elements with accordion class`);
+            
+            // Combine both approaches
+            const allAddButtons = new Set([...addButtons, ...classButtons]);
+            console.log(`🔍 Total unique Add buttons: ${allAddButtons.size}`);
+            
+            // Use event delegation on the container
+            accordionContainer.addEventListener('click', function(e) {
+                const clickedElement = e.target;
+                const text = clickedElement.textContent?.trim();
+                
+                // Check if clicked element or its parent is an Add button
+                let addButton = null;
+                if (text === 'Add' || text === 'Hide') {
+                    addButton = clickedElement;
+                } else {
+                    // Check parent
+                    const parent = clickedElement.parentElement;
+                    if (parent && (parent.textContent?.trim() === 'Add' || parent.textContent?.trim() === 'Hide')) {
+                        addButton = parent;
+                    }
+                }
+                
+                // Also check by class
+                if (!addButton) {
+                    const hasAccordionClass = clickedElement.classList.contains('accordion') && 
+                                           (clickedElement.classList.contains('_1') || 
+                                            clickedElement.classList.contains('_2') || 
+                                            clickedElement.classList.contains('_3') || 
+                                            clickedElement.classList.contains('_4') || 
+                                            clickedElement.classList.contains('_5') || 
+                                            clickedElement.classList.contains('_6'));
+                    if (hasAccordionClass) {
+                        addButton = clickedElement;
+                    }
+                }
+                
+                if (!addButton) {
+                    return; // Not an Add button
+                }
+                
+                console.log('🖱️ Add button clicked!', addButton);
+                
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                
+                // Find the parent faq-item
+                const faqItem = addButton.closest('.faq-item');
+                if (!faqItem) {
+                    console.warn('⚠️ Could not find faq-item');
                     return;
                 }
                 
-                console.log('✅ Found accordion container, setting up event delegation');
+                // Find the faq-body
+                const faqBody = faqItem.querySelector('.faq-body');
+                if (!faqBody) {
+                    console.warn('⚠️ Could not find faq-body');
+                    return;
+                }
                 
-                // Use event delegation - listen for clicks on the container
-                accordionContainer.addEventListener('click', function(e) {
-                    // Check if the clicked element is an Add button
-                    const clickedElement = e.target;
-                    
-                    // Check if it's an Add button (has class accordion and text is "Add" or "Hide")
-                    const isAddButton = clickedElement.classList.contains('accordion') && 
-                                       (clickedElement.classList.contains('_1') || 
-                                        clickedElement.classList.contains('_2') || 
-                                        clickedElement.classList.contains('_3') || 
-                                        clickedElement.classList.contains('_4') || 
-                                        clickedElement.classList.contains('_5') || 
-                                        clickedElement.classList.contains('_6'));
-                    
-                    if (!isAddButton) {
-                        return; // Not an Add button, ignore
-                    }
-                    
-                    console.log('🖱️ Add button clicked via delegation!', clickedElement);
-                    
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    
-                    // Find the parent faq-item
-                    const faqItem = clickedElement.closest('.faq-item');
-                    if (!faqItem) {
-                        console.warn('⚠️ Could not find faq-item');
-                        return;
-                    }
-                    
-                    // Find the faq-body
-                    const faqBody = faqItem.querySelector('.faq-body');
-                    if (!faqBody) {
-                        console.warn('⚠️ Could not find faq-body');
-                        return;
-                    }
-                    
-                    // Check current state
-                    const computedStyle = window.getComputedStyle(faqBody);
-                    const isVisible = computedStyle.display !== 'none' && 
-                                     computedStyle.visibility !== 'hidden' && 
-                                     computedStyle.height !== '0px' &&
-                                     computedStyle.opacity !== '0';
-                    
-                    console.log('📊 Current state:', { 
-                        isVisible, 
-                        display: computedStyle.display, 
-                        visibility: computedStyle.visibility, 
-                        height: computedStyle.height,
-                        opacity: computedStyle.opacity
-                    });
-                    
-                    // Toggle visibility directly
-                    if (isVisible) {
-                        // Hide
-                        faqBody.style.display = 'none';
-                        faqBody.style.visibility = 'hidden';
-                        faqBody.style.height = '0';
-                        faqBody.style.overflow = 'hidden';
-                        faqBody.style.opacity = '0';
-                        clickedElement.textContent = 'Add';
-                        console.log('✅ Accordion hidden');
-                    } else {
-                        // Show
-                        faqBody.style.display = 'block';
-                        faqBody.style.visibility = 'visible';
-                        faqBody.style.height = 'auto';
-                        faqBody.style.overflow = 'visible';
-                        faqBody.style.opacity = '1';
-                        clickedElement.textContent = 'Hide';
-                        console.log('✅ Accordion shown');
-                    }
-                    
-                    // Also try triggering faq-title click as backup
-                    const faqTitle = faqItem.querySelector('.faq-title');
-                    if (faqTitle) {
-                        try {
-                            faqTitle.click();
-                        } catch (err) {
-                            console.warn('⚠️ faq-title.click() failed:', err);
-                        }
-                    }
-                }, true); // Use capture phase
+                // Find the faq-title to trigger its click
+                const faqTitle = faqItem.querySelector('.faq-title');
                 
-                // Also make all Add buttons look clickable
-                const addButtons = accordionContainer.querySelectorAll('.accordion._1, .accordion._2, .accordion._3, .accordion._4, .accordion._5, .accordion._6');
-                addButtons.forEach(button => {
+                // Check current state
+                const computedStyle = window.getComputedStyle(faqBody);
+                const isVisible = computedStyle.display !== 'none' && 
+                                 computedStyle.visibility !== 'hidden' && 
+                                 computedStyle.height !== '0px' &&
+                                 computedStyle.opacity !== '0';
+                
+                console.log('📊 Current state:', { 
+                    isVisible, 
+                    display: computedStyle.display, 
+                    visibility: computedStyle.visibility
+                });
+                
+                // Toggle visibility
+                if (isVisible) {
+                    // Hide
+                    faqBody.style.display = 'none';
+                    faqBody.style.visibility = 'hidden';
+                    addButton.textContent = 'Add';
+                    console.log('✅ Accordion hidden');
+                } else {
+                    // Show
+                    faqBody.style.display = 'block';
+                    faqBody.style.visibility = 'visible';
+                    addButton.textContent = 'Hide';
+                    console.log('✅ Accordion shown');
+                }
+                
+                // Also trigger faq-title click (the working method)
+                if (faqTitle) {
+                    console.log('✅ Triggering faq-title click as well...');
+                    setTimeout(() => {
+                        faqTitle.click();
+                    }, 50);
+                }
+            }, true); // Capture phase
+            
+            // Make all Add buttons look clickable
+            allAddButtons.forEach(button => {
+                if (button && button.style) {
                     button.style.cursor = 'pointer';
                     button.style.userSelect = 'none';
                     button.style.pointerEvents = 'auto';
-                    button.style.position = 'relative';
-                    button.style.zIndex = '10';
-                });
-                
-                console.log(`✅ Initialized event delegation for accordion Add buttons (found ${addButtons.length} buttons)`);
-            }, 1000); // Wait 1 second for Webflow to fully initialize
+                    button.style.zIndex = '999';
+                }
+            });
+            
+            console.log(`✅ Set up event delegation for accordion Add buttons`);
         }
         
         /**
