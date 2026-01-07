@@ -2180,22 +2180,31 @@
                     addButton.style.userSelect = 'none';
                     addButton.style.pointerEvents = 'auto';
                     
-                    // THE KEY: Don't stop propagation! Let the click bubble up to faq-title
-                    // Just prevent default behavior but let it bubble
-                    addButton.addEventListener('click', function(e) {
-                        console.log('🖱️ Add button clicked - allowing bubble to faq-title');
-                        // DON'T call stopPropagation() - let it bubble up!
-                        // The faq-title click handler will catch it
-                    }, false); // Bubbling phase (not capture)
-                    
-                    // Also try direct click trigger as backup
+                    // Use mousedown (fires before click, harder to block)
                     addButton.addEventListener('mousedown', function(e) {
-                        // On mousedown, trigger faq-title click immediately
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
                         console.log('🖱️ Add button mousedown - triggering faq-title click');
-                        setTimeout(() => {
-                            faqTitle.click();
-                        }, 10);
-                    }, true);
+                        
+                        // Immediately trigger faq-title click
+                        faqTitle.click();
+                        
+                        return false;
+                    }, true); // Capture phase - fires FIRST
+                    
+                    // Also try click as backup
+                    addButton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log('🖱️ Add button click - triggering faq-title click');
+                        
+                        // Trigger faq-title click
+                        faqTitle.click();
+                        
+                        return false;
+                    }, true); // Capture phase
                 });
                 
                 console.log(`✅ Initialized Add buttons for ${faqItems.length} accordion sections`);
