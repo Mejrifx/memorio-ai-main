@@ -38,7 +38,7 @@
       #signOutBtn {
         position: absolute !important;
         right: 10px !important;
-        top: 15px !important;
+        top: 10px !important;
         transform: none !important;
         width: 40px !important;
         height: 40px !important;
@@ -48,6 +48,7 @@
         display: flex !important;
         align-items: center;
         justify-content: center;
+        z-index: 10;
       }
       
       /* Show icon only on mobile */
@@ -65,12 +66,16 @@
       
       .nav {
         position: relative !important;
-        padding: 10px 20px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        min-height: auto !important;
       }
       
       .logo-wrapper {
-        margin: 0 auto;
-        text-align: center;
+        margin: 0 auto !important;
+        text-align: center !important;
+        padding: 10px 0 !important;
+        display: block !important;
       }
     }
     
