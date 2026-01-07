@@ -2379,10 +2379,38 @@
                 }
             });
             
+            // Save immediately when clicking navigation buttons (NEXT/BACK)
+            const navButtons = document.querySelectorAll('.next, .back, .submit-button');
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    console.log('📝 Navigation button clicked - saving draft immediately');
+                    clearTimeout(autosaveTimeout);
+                    saveFormDraft(); // Save immediately, don't wait
+                });
+            });
+            
+            // Save before page unload (closing tab, refreshing, etc.)
+            window.addEventListener('beforeunload', () => {
+                // Use synchronous save attempt (navigator.sendBeacon for reliable save on page close)
+                const formData = {};
+                const inputs = document.querySelectorAll('#wf-form-memorio_obituary_form input, #wf-form-memorio_obituary_form textarea, #wf-form-memorio_obituary_form select');
+                inputs.forEach(input => {
+                    if (input.name && input.value) {
+                        formData[input.name] = input.value;
+                    }
+                });
+                
+                if (currentCase && Object.keys(formData).length > 0) {
+                    console.log('💾 Saving draft before page unload');
+                    // Try to save synchronously
+                    saveFormDraft();
+                }
+            });
+            
             // Load existing draft on page load
             loadFormDraft();
             
-            console.log('✅ Autosave initialized');
+            console.log('✅ Autosave initialized with navigation and unload hooks');
         }
         
         /**
@@ -2399,18 +2427,29 @@
                 const formData = {};
                 const formInputs = document.querySelectorAll('#wf-form-memorio_obituary_form input, #wf-form-memorio_obituary_form textarea, #wf-form-memorio_obituary_form select');
                 
+                console.log(`📝 Collecting form data from ${formInputs.length} inputs...`);
+                
                 formInputs.forEach(input => {
                     if (input.name && input.value) {
                         formData[input.name] = input.value;
+                        console.log(`  ✓ ${input.name}: "${input.value.substring(0, 50)}${input.value.length > 50 ? '...' : ''}"`);
                     }
                 });
+                
+                console.log(`📦 Total fields to save: ${Object.keys(formData).length}`);
                 
                 // Also save photo selection state
                 if (selectedPhotos && selectedPhotos.length > 0) {
                     formData._photo_count = selectedPhotos.length;
                 }
                 
+                if (Object.keys(formData).length === 0) {
+                    console.log('⚠️ No data to save, skipping autosave');
+                    return;
+                }
+                
                 // Save to forms table as draft
+                console.log('💾 Saving to database...');
                 const { error } = await supabaseClient
                     .from('forms')
                     .upsert({
@@ -2425,7 +2464,7 @@
                 if (error) {
                     console.error('❌ Autosave failed:', error);
                 } else {
-                    console.log('💾 Form draft autosaved');
+                    console.log(`✅ Form draft autosaved successfully (${Object.keys(formData).length} fields)`);
                     // Show subtle success indicator
                     showAutosaveIndicator();
                 }
@@ -2439,33 +2478,58 @@
          */
         async function loadFormDraft() {
             if (!currentCase) {
+                console.log('⚠️ No case loaded, skipping draft load');
                 return;
             }
             
             try {
+                console.log('📥 Loading draft for case:', currentCase.id);
+                
                 const { data, error } = await supabaseClient
                     .from('forms')
                     .select('draft_json, submitted_at')
                     .eq('case_id', currentCase.id)
                     .single();
                 
-                if (error || !data || !data.draft_json || data.submitted_at) {
-                    // No draft or already submitted
+                if (error) {
+                    console.log('ℹ️ No existing draft found (this is normal for new forms)');
+                    return;
+                }
+                
+                if (!data || !data.draft_json) {
+                    console.log('ℹ️ No draft data available');
+                    return;
+                }
+                
+                if (data.submitted_at) {
+                    console.log('ℹ️ Form already submitted, not loading draft');
                     return;
                 }
                 
                 // Restore form values
                 const draftData = data.draft_json;
+                const fieldCount = Object.keys(draftData).filter(k => !k.startsWith('_')).length;
+                console.log(`📦 Found draft with ${fieldCount} fields, restoring...`);
+                
+                let restoredCount = 0;
                 Object.keys(draftData).forEach(key => {
                     if (key.startsWith('_')) return; // Skip meta fields
                     
                     const input = document.querySelector(`[name="${key}"]`);
-                    if (input && !input.value) { // Only restore if field is empty
-                        input.value = draftData[key];
+                    if (input) {
+                        if (!input.value) {
+                            input.value = draftData[key];
+                            restoredCount++;
+                            console.log(`  ✓ Restored ${key}: "${draftData[key].substring(0, 50)}${draftData[key].length > 50 ? '...' : ''}"`);
+                        } else {
+                            console.log(`  ⊘ Skipped ${key} (field already has value)`);
+                        }
+                    } else {
+                        console.log(`  ⚠️ Field not found: ${key}`);
                     }
                 });
                 
-                console.log('✅ Form draft loaded');
+                console.log(`✅ Form draft loaded successfully (${restoredCount}/${fieldCount} fields restored)`);
             } catch (error) {
                 console.error('❌ Failed to load draft:', error);
             }
