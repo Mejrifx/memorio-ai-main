@@ -2122,6 +2122,9 @@
             // Initialize autosave
             initializeAutosave();
             
+            // Initialize accordion "Add" buttons
+            initAccordionAddButtons();
+            
             // Update review screen
             updateReviewScreen();
             
@@ -2129,6 +2132,50 @@
             initCustomFormNavigation();
             
             console.log('✅ Family portal enhancements initialized');
+        }
+        
+        /**
+         * Initialize accordion "Add" buttons functionality
+         */
+        function initAccordionAddButtons() {
+            // Find all "Add" buttons in accordion sections
+            const addButtons = document.querySelectorAll('.faq-item .accordion._1, .faq-item .accordion._2, .faq-item .accordion._3, .faq-item .accordion._4, .faq-item .accordion._5, .faq-item .accordion._6');
+            
+            addButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Find the parent faq-item
+                    const faqItem = this.closest('.faq-item');
+                    if (!faqItem) return;
+                    
+                    // Find the faq-body within this item
+                    const faqBody = faqItem.querySelector('.faq-body');
+                    if (!faqBody) return;
+                    
+                    // Toggle visibility
+                    const isVisible = faqBody.style.display !== 'none' && window.getComputedStyle(faqBody).display !== 'none';
+                    
+                    if (isVisible) {
+                        // Hide
+                        faqBody.style.display = 'none';
+                        this.textContent = 'Add';
+                    } else {
+                        // Show
+                        faqBody.style.display = 'block';
+                        this.textContent = 'Hide';
+                    }
+                    
+                    console.log('✅ Accordion toggled:', faqItem.querySelector('.text-block-3')?.textContent || 'Unknown');
+                });
+                
+                // Make button look clickable
+                button.style.cursor = 'pointer';
+                button.style.userSelect = 'none';
+            });
+            
+            console.log(`✅ Initialized ${addButtons.length} accordion "Add" buttons`);
         }
         
         /**
@@ -2518,8 +2565,7 @@
                     console.error('❌ Autosave failed:', error);
                 } else {
                     console.log(`✅ Form draft autosaved successfully (${Object.keys(formData).length} fields)`);
-                    // Show subtle success indicator
-                    showAutosaveIndicator();
+                    // Removed: showAutosaveIndicator(); - user requested to remove "SAVED" notification
                 }
             } catch (error) {
                 console.error('❌ Autosave error:', error);
