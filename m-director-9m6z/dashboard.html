@@ -590,6 +590,50 @@
     }
     
     /* ============================================================================
+       SLA BADGES
+       ============================================================================ */
+    .sla-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+      white-space: nowrap;
+    }
+    
+    .sla-badge.green {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #66bb6a;
+    }
+    
+    .sla-badge.orange {
+      background-color: #fff3e0;
+      color: #e65100;
+      border: 1px solid #ff9800;
+    }
+    
+    .sla-badge.red {
+      background-color: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef5350;
+    }
+    
+    .sla-badge.black {
+      background-color: #212121;
+      color: #ffffff;
+      border: 1px solid #000000;
+      font-weight: 700;
+    }
+    
+    .sla-badge.waiting {
+      background-color: #f5f5f5;
+      color: #757575;
+      border: 1px solid #e0e0e0;
+    }
+    
+    /* ============================================================================
        MODAL - MEMORIO THEMED
        ============================================================================ */
     .modal-overlay {
@@ -2117,6 +2161,51 @@
       }
     }
     
+    // Helper function to generate SLA badge HTML
+    function getSLABadge(caseData) {
+      // If case is delivered or closed, show completion badge
+      if (caseData.status === 'delivered' || caseData.status === 'closed') {
+        return '<span class="sla-badge green">✓ Delivered</span>';
+      }
+      
+      // If no submission yet (waiting on family), show waiting badge
+      if (!caseData.first_submission_at || caseData.status === 'waiting_on_family') {
+        return '<span class="sla-badge waiting">⏳ Waiting on Family</span>';
+      }
+      
+      // Calculate hours elapsed since submission
+      const submissionTime = new Date(caseData.first_submission_at);
+      const now = new Date();
+      const hoursElapsed = (now - submissionTime) / (1000 * 60 * 60);
+      
+      // Determine badge based on thresholds
+      let badgeClass, badgeText, badgeIcon;
+      
+      if (hoursElapsed < 24) {
+        // Green: < 24 hours
+        badgeClass = 'green';
+        badgeIcon = '🟢';
+        badgeText = `${Math.floor(hoursElapsed)}h`;
+      } else if (hoursElapsed < 36) {
+        // Orange: 24-36 hours
+        badgeClass = 'orange';
+        badgeIcon = '🟠';
+        badgeText = `${Math.floor(hoursElapsed)}h`;
+      } else if (hoursElapsed < 48) {
+        // Red: 36-48 hours
+        badgeClass = 'red';
+        badgeIcon = '🔴';
+        badgeText = `${Math.floor(hoursElapsed)}h`;
+      } else {
+        // Black: 48+ hours (BREACH)
+        badgeClass = 'black';
+        badgeIcon = '⚫';
+        badgeText = `${Math.floor(hoursElapsed)}h BREACH`;
+      }
+      
+      return `<span class="sla-badge ${badgeClass}">${badgeIcon} ${badgeText}</span>`;
+    }
+    
     // Render cases to the list
     function renderCases(cases) {
       const casesList = document.getElementById('cases-list');
@@ -2128,9 +2217,11 @@
       
       casesList.innerHTML = cases.map(c => {
         const stage = getCaseStage(c.status);
+        const slaBadge = getSLABadge(c);
         return `
           <div class="case-card" onclick="openCaseModal('${c.id}')">
             <div class="case-name">${c.deceased_name}</div>
+            ${slaBadge}
             <div style="
               background-color: ${stage.color}15;
               border: 1.5px solid ${stage.color};
