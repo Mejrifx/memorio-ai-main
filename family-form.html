@@ -2141,22 +2141,31 @@
         
         /**
          * Initialize accordion "Add" buttons functionality
-         * Simply make Add button trigger the same click as the section (faq-title)
+         * Make Add button clicks bubble up to faq-title (the working click handler)
          */
         function initAccordionAddButtons() {
             console.log('🔧 Initializing accordion Add buttons...');
             
             // Wait for form to be visible
             setTimeout(() => {
-                // Find all Add buttons by looking for elements with text "Add" inside faq-items
+                // Find all Add buttons
                 const faqItems = document.querySelectorAll('.faq-item');
                 console.log(`🔍 Found ${faqItems.length} faq-items`);
                 
                 faqItems.forEach((faqItem, index) => {
-                    // Find the Add button in this faq-item (look for element with "Add" text)
-                    const allElements = faqItem.querySelectorAll('*');
-                    const addButton = Array.from(allElements).find(el => {
-                        return el.textContent?.trim() === 'Add' || el.textContent?.trim() === 'Hide';
+                    // Find the Add button - look for element with "Add" text that's inside faq-title
+                    const faqTitle = faqItem.querySelector('.faq-title');
+                    if (!faqTitle) return;
+                    
+                    // Find Add button inside faq-title
+                    const allInTitle = faqTitle.querySelectorAll('*');
+                    const addButton = Array.from(allInTitle).find(el => {
+                        const text = el.textContent?.trim();
+                        return (text === 'Add' || text === 'Hide') && 
+                               (el.classList.contains('accordion') || el.classList.contains('_1') || 
+                                el.classList.contains('_2') || el.classList.contains('_3') ||
+                                el.classList.contains('_4') || el.classList.contains('_5') || 
+                                el.classList.contains('_6'));
                     });
                     
                     if (!addButton) {
@@ -2164,37 +2173,29 @@
                         return;
                     }
                     
-                    console.log(`✅ Found Add button in faq-item ${index + 1}:`, addButton);
+                    console.log(`✅ Found Add button in faq-item ${index + 1}`);
                     
                     // Make it look clickable
                     addButton.style.cursor = 'pointer';
                     addButton.style.userSelect = 'none';
                     addButton.style.pointerEvents = 'auto';
                     
-                    // Find the faq-title (the section that works when clicked)
-                    const faqTitle = faqItem.querySelector('.faq-title');
-                    if (!faqTitle) {
-                        console.warn(`⚠️ No faq-title found in faq-item ${index + 1}`);
-                        return;
-                    }
+                    // THE KEY: Don't stop propagation! Let the click bubble up to faq-title
+                    // Just prevent default behavior but let it bubble
+                    addButton.addEventListener('click', function(e) {
+                        console.log('🖱️ Add button clicked - allowing bubble to faq-title');
+                        // DON'T call stopPropagation() - let it bubble up!
+                        // The faq-title click handler will catch it
+                    }, false); // Bubbling phase (not capture)
                     
-                    // Remove any existing click handlers and add new one
-                    const newButton = addButton.cloneNode(true);
-                    addButton.parentNode.replaceChild(newButton, addButton);
-                    
-                    // When Add button is clicked, just trigger the faq-title click (the working method)
-                    newButton.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        
-                        console.log('🖱️ Add button clicked - triggering faq-title click');
-                        
-                        // Simply click the faq-title (which we know works)
-                        faqTitle.click();
-                        
-                        return false;
-                    }, true); // Capture phase to fire first
+                    // Also try direct click trigger as backup
+                    addButton.addEventListener('mousedown', function(e) {
+                        // On mousedown, trigger faq-title click immediately
+                        console.log('🖱️ Add button mousedown - triggering faq-title click');
+                        setTimeout(() => {
+                            faqTitle.click();
+                        }, 10);
+                    }, true);
                 });
                 
                 console.log(`✅ Initialized Add buttons for ${faqItems.length} accordion sections`);
