@@ -2182,25 +2182,23 @@
                     // Store reference to faq-title for the handler
                     addButton._faqTitle = faqTitle;
                     
-                    // Handler that triggers faq-title click (preserves Webflow animation)
+                    // Handler that triggers faq-title click
                     const handleAddClick = function(e) {
                         console.log('🖱️ Add button handler fired!');
                         
-                        // Don't prevent default or stop propagation - let Webflow handle it
-                        // Just trigger the faq-title click which has the animation
+                        // Stop the event from doing anything else
+                        e.stopPropagation();
+                        
+                        // Trigger faq-title click (this will trigger the Webflow animation)
                         if (this._faqTitle) {
-                            console.log('✅ Triggering faq-title click (with animation)');
-                            
-                            // Use a small delay to ensure Webflow's animation system is ready
-                            setTimeout(() => {
-                                // Trigger click on faq-title (this preserves Webflow's animation)
-                                this._faqTitle.click();
-                            }, 10);
+                            console.log('✅ Triggering faq-title click');
+                            // Trigger immediately - Webflow's click handler will handle the animation
+                            this._faqTitle.click();
                         }
                     };
                     
-                    // Attach handler - use bubbling phase (not capture) to preserve Webflow interactions
-                    addButton.addEventListener('click', handleAddClick, false);
+                    // Use capture phase to fire first, but don't prevent default
+                    addButton.addEventListener('click', handleAddClick, true);
                     
                     console.log(`✅ Set up handlers for Add button ${index + 1}`);
                 });
