@@ -17,6 +17,8 @@
 -- SOLUTION:
 -- =========
 -- Add first_submission_at and sla_hours_elapsed to the view
+-- NOTE: Must add at END of SELECT list to avoid PostgreSQL error about
+--       changing column order (cannot reorder existing columns with CREATE OR REPLACE)
 
 CREATE OR REPLACE VIEW admin_cases_view
 WITH (security_invoker = false, security_barrier = true)
@@ -30,8 +32,6 @@ SELECT
   cases.status, 
   cases.sla_start_at, 
   cases.sla_state,
-  cases.first_submission_at,        -- ADDED: When family submitted form
-  cases.sla_hours_elapsed,          -- ADDED: Hours since submission
   cases.metadata as case_metadata, 
   cases.created_at, 
   cases.updated_at,
@@ -45,7 +45,9 @@ SELECT
   family_user.status as family_status,
   creator_user.email as creator_email, 
   creator_user.metadata as creator_metadata, 
-  creator_user.role as creator_role
+  creator_user.role as creator_role,
+  cases.first_submission_at,        -- ADDED: When family submitted form (at end to avoid column reordering)
+  cases.sla_hours_elapsed           -- ADDED: Hours since submission (at end to avoid column reordering)
 FROM cases
 LEFT JOIN organizations orgs ON orgs.id = cases.org_id
 LEFT JOIN users family_user ON family_user.id = cases.assigned_family_user_id
