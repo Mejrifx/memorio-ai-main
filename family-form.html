@@ -2182,23 +2182,20 @@
                     // Store reference to faq-title for the handler
                     addButton._faqTitle = faqTitle;
                     
-                    // Handler that triggers faq-title click
+                    // Handler that triggers faq-title click (this was the working version)
                     const handleAddClick = function(e) {
                         console.log('🖱️ Add button handler fired!');
-                        
-                        // Stop the event from doing anything else
-                        e.stopPropagation();
-                        
-                        // Trigger faq-title click (this will trigger the Webflow animation)
                         if (this._faqTitle) {
                             console.log('✅ Triggering faq-title click');
-                            // Trigger immediately - Webflow's click handler will handle the animation
                             this._faqTitle.click();
                         }
                     };
                     
-                    // Use capture phase to fire first, but don't prevent default
+                    // Use the working approach: direct onclick + event listeners
+                    addButton.onclick = handleAddClick;
+                    addButton.onmousedown = handleAddClick;
                     addButton.addEventListener('click', handleAddClick, true);
+                    addButton.addEventListener('mousedown', handleAddClick, true);
                     
                     console.log(`✅ Set up handlers for Add button ${index + 1}`);
                 });
