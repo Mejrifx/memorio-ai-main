@@ -2182,33 +2182,12 @@
                     // Store reference to faq-title for the handler
                     addButton._faqTitle = faqTitle;
                     
-                    // Handler that triggers faq-title click with proper animation
+                    // Handler that triggers faq-title click (this was the working version)
                     const handleAddClick = function(e) {
                         console.log('🖱️ Add button handler fired!');
                         if (this._faqTitle) {
-                            console.log('✅ Triggering faq-title click with animation');
-                            
-                            // Create a realistic MouseEvent that Webflow will recognize
-                            // This should trigger the Webflow interaction and animation
-                            const mouseEvent = new MouseEvent('click', {
-                                view: window,
-                                bubbles: true,
-                                cancelable: true,
-                                buttons: 1,
-                                detail: 1,
-                                clientX: this._faqTitle.getBoundingClientRect().left + 10,
-                                clientY: this._faqTitle.getBoundingClientRect().top + 10,
-                                screenX: window.screenX + this._faqTitle.getBoundingClientRect().left + 10,
-                                screenY: window.screenY + this._faqTitle.getBoundingClientRect().top + 10
-                            });
-                            
-                            // Dispatch the event to faq-title
-                            this._faqTitle.dispatchEvent(mouseEvent);
-                            
-                            // Also try direct click as backup
-                            setTimeout(() => {
-                                this._faqTitle.click();
-                            }, 5);
+                            console.log('✅ Triggering faq-title click');
+                            this._faqTitle.click();
                         }
                     };
                     
