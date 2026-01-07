@@ -2178,31 +2178,29 @@
                     // Make it look clickable
                     addButton.style.cursor = 'pointer';
                     addButton.style.userSelect = 'none';
-                    addButton.style.pointerEvents = 'auto';
                     
-                    // SIMPLEST APPROACH: Add onclick attribute directly
-                    // This fires before any other handlers can block it
-                    addButton.setAttribute('onclick', `
-                        (function() {
-                            var faqItem = this.closest('.faq-item');
-                            var faqTitle = faqItem ? faqItem.querySelector('.faq-title') : null;
-                            if (faqTitle) {
-                                console.log('🖱️ Add button onclick - triggering faq-title click');
-                                faqTitle.click();
-                            }
-                            return false;
-                        }).call(this);
-                    `);
+                    // Store reference to faq-title for the handler
+                    addButton._faqTitle = faqTitle;
                     
-                    // Also add event listener as backup
-                    addButton.addEventListener('click', function(e) {
-                        console.log('🖱️ Add button event listener - triggering faq-title click');
-                        const faqItem = this.closest('.faq-item');
-                        const faqTitle = faqItem ? faqItem.querySelector('.faq-title') : null;
-                        if (faqTitle) {
-                            faqTitle.click();
+                    // Remove the Add button from blocking clicks - make it trigger faq-title
+                    // Use a simple, direct approach
+                    const handleAddClick = function() {
+                        console.log('🖱️ Add button handler fired!');
+                        if (this._faqTitle) {
+                            console.log('✅ Triggering faq-title click');
+                            this._faqTitle.click();
                         }
-                    }, true);
+                    };
+                    
+                    // Attach handler directly to the button
+                    addButton.onclick = handleAddClick;
+                    addButton.onmousedown = handleAddClick;
+                    
+                    // Also try addEventListener
+                    addButton.addEventListener('click', handleAddClick, true);
+                    addButton.addEventListener('mousedown', handleAddClick, true);
+                    
+                    console.log(`✅ Set up handlers for Add button ${index + 1}`);
                 });
                 
                 console.log(`✅ Initialized Add buttons for ${faqItems.length} accordion sections`);
