@@ -2139,119 +2139,116 @@
         
         /**
          * Initialize accordion "Add" buttons functionality
-         * The Add button should trigger the same action as clicking the faq-title
+         * Use event delegation for more reliable click handling
          */
         function initAccordionAddButtons() {
             // Wait a bit for Webflow interactions to initialize
             setTimeout(() => {
-                // Find all "Add" buttons - try multiple selector patterns
-                let addButtons = document.querySelectorAll('.faq-item .accordion._1, .faq-item .accordion._2, .faq-item .accordion._3, .faq-item .accordion._4, .faq-item .accordion._5, .faq-item .accordion._6');
-                
-                // If not found, try alternative selector (with space instead of dot)
-                if (addButtons.length === 0) {
-                    addButtons = document.querySelectorAll('.faq-item [class*="accordion"][class*="_1"], .faq-item [class*="accordion"][class*="_2"], .faq-item [class*="accordion"][class*="_3"], .faq-item [class*="accordion"][class*="_4"], .faq-item [class*="accordion"][class*="_5"], .faq-item [class*="accordion"][class*="_6"]');
+                // Find the accordion container
+                const accordionContainer = document.querySelector('.faq-container.form-accordion');
+                if (!accordionContainer) {
+                    console.warn('⚠️ Could not find accordion container');
+                    return;
                 }
                 
-                // If still not found, try finding by text content
-                if (addButtons.length === 0) {
-                    const allAccordionButtons = document.querySelectorAll('.faq-item .accordion');
-                    addButtons = Array.from(allAccordionButtons).filter(btn => btn.textContent.trim() === 'Add');
-                }
+                console.log('✅ Found accordion container, setting up event delegation');
                 
-                console.log(`🔍 Found ${addButtons.length} Add buttons`);
-                
-                addButtons.forEach((button, index) => {
-                    console.log(`🔧 Setting up Add button ${index + 1}:`, button);
+                // Use event delegation - listen for clicks on the container
+                accordionContainer.addEventListener('click', function(e) {
+                    // Check if the clicked element is an Add button
+                    const clickedElement = e.target;
                     
-                    // Make button look clickable
-                    button.style.cursor = 'pointer';
-                    button.style.userSelect = 'none';
-                    button.style.pointerEvents = 'auto';
-                    button.style.position = 'relative';
-                    button.style.zIndex = '10';
+                    // Check if it's an Add button (has class accordion and text is "Add" or "Hide")
+                    const isAddButton = clickedElement.classList.contains('accordion') && 
+                                       (clickedElement.classList.contains('_1') || 
+                                        clickedElement.classList.contains('_2') || 
+                                        clickedElement.classList.contains('_3') || 
+                                        clickedElement.classList.contains('_4') || 
+                                        clickedElement.classList.contains('_5') || 
+                                        clickedElement.classList.contains('_6'));
                     
-                    // Remove any existing click handlers
-                    const newButton = button.cloneNode(true);
-                    button.parentNode.replaceChild(newButton, button);
+                    if (!isAddButton) {
+                        return; // Not an Add button, ignore
+                    }
                     
-                    // Add click handler that triggers the faq-title click
-                    newButton.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        
-                        console.log('🖱️ Add button clicked!', this);
-                        
-                        // Find the parent faq-item
-                        const faqItem = this.closest('.faq-item');
-                        if (!faqItem) {
-                            console.warn('⚠️ Could not find faq-item');
-                            return false;
-                        }
-                        
-                        // Find the faq-title (the section header that was working before)
-                        const faqTitle = faqItem.querySelector('.faq-title');
-                        if (!faqTitle) {
-                            console.warn('⚠️ Could not find faq-title');
-                            return false;
-                        }
-                        
-                        // Find the faq-body
-                        const faqBody = faqItem.querySelector('.faq-body');
-                        if (!faqBody) {
-                            console.warn('⚠️ Could not find faq-body');
-                            return false;
-                        }
-                        
-                        // Check current state
-                        const computedStyle = window.getComputedStyle(faqBody);
-                        const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.height !== '0px';
-                        
-                        console.log('📊 Current state:', { isVisible, display: computedStyle.display, visibility: computedStyle.visibility, height: computedStyle.height });
-                        
-                        // Toggle visibility directly
-                        if (isVisible) {
-                            // Hide
-                            faqBody.style.display = 'none';
-                            faqBody.style.visibility = 'hidden';
-                            faqBody.style.height = '0';
-                            faqBody.style.overflow = 'hidden';
-                            this.textContent = 'Add';
-                            console.log('✅ Accordion hidden');
-                        } else {
-                            // Show
-                            faqBody.style.display = 'block';
-                            faqBody.style.visibility = 'visible';
-                            faqBody.style.height = 'auto';
-                            faqBody.style.overflow = 'visible';
-                            this.textContent = 'Hide';
-                            console.log('✅ Accordion shown');
-                        }
-                        
-                        // Also try triggering faq-title click as backup
-                        console.log('✅ Also triggering faq-title click as backup...');
+                    console.log('🖱️ Add button clicked via delegation!', clickedElement);
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    
+                    // Find the parent faq-item
+                    const faqItem = clickedElement.closest('.faq-item');
+                    if (!faqItem) {
+                        console.warn('⚠️ Could not find faq-item');
+                        return;
+                    }
+                    
+                    // Find the faq-body
+                    const faqBody = faqItem.querySelector('.faq-body');
+                    if (!faqBody) {
+                        console.warn('⚠️ Could not find faq-body');
+                        return;
+                    }
+                    
+                    // Check current state
+                    const computedStyle = window.getComputedStyle(faqBody);
+                    const isVisible = computedStyle.display !== 'none' && 
+                                     computedStyle.visibility !== 'hidden' && 
+                                     computedStyle.height !== '0px' &&
+                                     computedStyle.opacity !== '0';
+                    
+                    console.log('📊 Current state:', { 
+                        isVisible, 
+                        display: computedStyle.display, 
+                        visibility: computedStyle.visibility, 
+                        height: computedStyle.height,
+                        opacity: computedStyle.opacity
+                    });
+                    
+                    // Toggle visibility directly
+                    if (isVisible) {
+                        // Hide
+                        faqBody.style.display = 'none';
+                        faqBody.style.visibility = 'hidden';
+                        faqBody.style.height = '0';
+                        faqBody.style.overflow = 'hidden';
+                        faqBody.style.opacity = '0';
+                        clickedElement.textContent = 'Add';
+                        console.log('✅ Accordion hidden');
+                    } else {
+                        // Show
+                        faqBody.style.display = 'block';
+                        faqBody.style.visibility = 'visible';
+                        faqBody.style.height = 'auto';
+                        faqBody.style.overflow = 'visible';
+                        faqBody.style.opacity = '1';
+                        clickedElement.textContent = 'Hide';
+                        console.log('✅ Accordion shown');
+                    }
+                    
+                    // Also try triggering faq-title click as backup
+                    const faqTitle = faqItem.querySelector('.faq-title');
+                    if (faqTitle) {
                         try {
                             faqTitle.click();
                         } catch (err) {
                             console.warn('⚠️ faq-title.click() failed:', err);
                         }
-                        
-                        // Update button text based on state after a brief delay
-                        setTimeout(() => {
-                            const faqBody = faqItem.querySelector('.faq-body');
-                            if (faqBody) {
-                                const computedStyle = window.getComputedStyle(faqBody);
-                                const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
-                                this.textContent = isVisible ? 'Hide' : 'Add';
-                                console.log('📊 Updated button text to:', this.textContent);
-                            }
-                        }, 200);
-                        
-                        return false;
-                    }, true); // Use capture phase to fire before other handlers
+                    }
+                }, true); // Use capture phase
+                
+                // Also make all Add buttons look clickable
+                const addButtons = accordionContainer.querySelectorAll('.accordion._1, .accordion._2, .accordion._3, .accordion._4, .accordion._5, .accordion._6');
+                addButtons.forEach(button => {
+                    button.style.cursor = 'pointer';
+                    button.style.userSelect = 'none';
+                    button.style.pointerEvents = 'auto';
+                    button.style.position = 'relative';
+                    button.style.zIndex = '10';
                 });
                 
-                console.log(`✅ Initialized ${addButtons.length} accordion "Add" buttons`);
+                console.log(`✅ Initialized event delegation for accordion Add buttons (found ${addButtons.length} buttons)`);
             }, 1000); // Wait 1 second for Webflow to fully initialize
         }
         
