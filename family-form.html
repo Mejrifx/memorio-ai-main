@@ -2178,33 +2178,44 @@
                     // Make it look clickable
                     addButton.style.cursor = 'pointer';
                     addButton.style.userSelect = 'none';
-                    addButton.style.pointerEvents = 'auto';
                     
-                    // Use mousedown (fires before click, harder to block)
-                    addButton.addEventListener('mousedown', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        console.log('🖱️ Add button mousedown - triggering faq-title click');
-                        
-                        // Immediately trigger faq-title click
-                        faqTitle.click();
-                        
-                        return false;
-                    }, true); // Capture phase - fires FIRST
+                    // CRITICAL: Make clicks pass through to faq-title
+                    // Set pointer-events to none on Add button, but make faq-title handle it
+                    // OR: Make Add button trigger faq-title click on ANY interaction
                     
-                    // Also try click as backup
-                    addButton.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        console.log('🖱️ Add button click - triggering faq-title click');
-                        
-                        // Trigger faq-title click
-                        faqTitle.click();
-                        
-                        return false;
-                    }, true); // Capture phase
+                    // Try multiple events to catch it
+                    ['mousedown', 'mouseup', 'click', 'touchstart'].forEach(eventType => {
+                        addButton.addEventListener(eventType, function(e) {
+                            console.log(`🖱️ Add button ${eventType} - triggering faq-title click`);
+                            
+                            e.preventDefault();
+                            e.stopPropagation();
+                            e.stopImmediatePropagation();
+                            
+                            // Force trigger faq-title click multiple ways
+                            if (faqTitle) {
+                                // Method 1: Direct click
+                                faqTitle.click();
+                                
+                                // Method 2: Dispatch event
+                                const clickEvent = new MouseEvent('click', {
+                                    bubbles: true,
+                                    cancelable: true,
+                                    view: window
+                                });
+                                faqTitle.dispatchEvent(clickEvent);
+                                
+                                // Method 3: Trigger mousedown/click on faq-title
+                                faqTitle.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                                setTimeout(() => {
+                                    faqTitle.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+                                    faqTitle.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                                }, 10);
+                            }
+                            
+                            return false;
+                        }, true); // Capture phase
+                    });
                 });
                 
                 console.log(`✅ Initialized Add buttons for ${faqItems.length} accordion sections`);
