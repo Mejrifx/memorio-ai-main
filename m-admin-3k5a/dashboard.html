@@ -4763,20 +4763,34 @@
         if (directorsError) throw directorsError;
         
         // Load case analytics from the view
+        console.log('📊 Loading analytics for org:', orgId);
         const { data: analytics, error: analyticsError } = await supabaseClient
           .from('case_analytics')
           .select('*')
           .eq('org_id', orgId)
           .single();
         
+        console.log('📊 Analytics query result:', { analytics, analyticsError });
+        
         // Handle case where no analytics exist yet (new org with no cases)
-        const analyticsData = analyticsError ? {
-          active_cases: 0,
-          cases_last_30_days: 0,
-          on_time_cases: 0,
-          breach_cases: 0,
-          sla_percentage: 100
-        } : analytics;
+        let analyticsData;
+        if (analyticsError) {
+          console.warn('⚠️ Analytics error (using defaults):', analyticsError);
+          // Check if it's "no rows" error (PGRST116) - org has no cases yet
+          if (analyticsError.code === 'PGRST116') {
+            console.log('ℹ️ No cases found for this organization yet');
+          }
+          analyticsData = {
+            active_cases: 0,
+            cases_last_30_days: 0,
+            on_time_cases: 0,
+            breach_cases: 0,
+            sla_percentage: 100
+          };
+        } else {
+          console.log('✅ Analytics loaded successfully:', analytics);
+          analyticsData = analytics;
+        }
         
         // Populate modal with organization data
         document.getElementById('modal-org-name').textContent = org.name;
