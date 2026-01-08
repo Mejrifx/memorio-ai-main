@@ -117,11 +117,6 @@
       border-color: #436481;
     }
     
-    .case-card.urgent {
-      border-color: #ff6b6b;
-      background-color: #ffe5e5;
-    }
-    
     .case-name {
       color: #32343a;
       font-size: 20px;
@@ -156,36 +151,11 @@
       gap: 5px;
     }
     
-    .urgency-badge {
+    /* Position SLA badge in top-right when in card */
+    .sla-badge-top-right {
       position: absolute;
       top: 10px;
       right: 10px;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-    
-    .urgency-new {
-      background-color: #e3f2fd;
-      color: #1976d2;
-    }
-    
-    .urgency-normal {
-      background-color: #fff9c4;
-      color: #f57f17;
-    }
-    
-    .urgency-urgent {
-      background-color: #ffebee;
-      color: #c62828;
-      animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
     }
     
     .case-status {
@@ -1032,15 +1002,17 @@
     }
     
     // Helper function to generate SLA badge HTML
-    function getSLABadge(caseData) {
+    function getSLABadge(caseData, positionTopRight = false) {
+      const positionClass = positionTopRight ? ' sla-badge-top-right' : '';
+      
       // If case is delivered or closed, show completion badge
       if (caseData.status === 'delivered' || caseData.status === 'closed') {
-        return '<span class="sla-badge green">✓ Delivered</span>';
+        return `<span class="sla-badge green${positionClass}">✓ Delivered</span>`;
       }
       
       // If no submission yet (waiting on family), show waiting badge
       if (!caseData.first_submission_at || caseData.status === 'waiting_on_family') {
-        return '<span class="sla-badge waiting">⏳ Waiting on Family</span>';
+        return `<span class="sla-badge waiting${positionClass}">⏳ Waiting</span>`;
       }
       
       // Calculate hours elapsed since submission
@@ -1069,7 +1041,7 @@
         badgeText = `${Math.floor(hoursElapsed)}h BREACH`;
       }
       
-      return `<span class="sla-badge ${badgeClass}">${badgeText}</span>`;
+      return `<span class="sla-badge ${badgeClass}${positionClass}">${badgeText}</span>`;
     }
     
     // Load assigned cases
@@ -1176,25 +1148,6 @@
         // Display cases with enhanced information
         casesList.innerHTML = assignedCases.map(c => {
           const assignedDate = new Date(c.assigned_at);
-          const hoursAgo = Math.floor((Date.now() - assignedDate.getTime()) / (1000 * 60 * 60));
-          const daysAgo = Math.floor(hoursAgo / 24);
-          
-          // Determine urgency
-          let urgencyClass = '';
-          let urgencyText = '';
-          let urgencyBadgeClass = 'urgency-new';
-          
-          if (hoursAgo < 24) {
-            urgencyText = `${hoursAgo}h ago`;
-            urgencyBadgeClass = 'urgency-new';
-          } else if (hoursAgo < 72) {
-            urgencyText = `${daysAgo}d ago`;
-            urgencyBadgeClass = 'urgency-normal';
-          } else {
-            urgencyText = `${daysAgo}d ago`;
-            urgencyBadgeClass = 'urgency-urgent';
-            urgencyClass = 'urgent';
-          }
           
           // Determine display status
           let displayStatus = 'Assigned';
@@ -1223,15 +1176,15 @@
             ? `<span class="version-badge">v${c.latest_submission.revision_number}</span>` 
             : '';
           
-          const slaBadge = getSLABadge(c);
+          // Get SLA badge positioned in top-right corner
+          const slaBadge = getSLABadge(c, true);
           
           return `
-            <div class="case-card ${urgencyClass}" onclick="openCaseModal('${c.id}')">
-              <div class="urgency-badge ${urgencyBadgeClass}">${urgencyText}</div>
+            <div class="case-card" onclick="openCaseModal('${c.id}')">
+              ${slaBadge}
               <div class="case-name">${c.deceased_name} ${versionBadge}</div>
               <div class="case-id">ID: ${c.id.substring(0, 8)}...</div>
               <div class="case-org">🏠 ${c.organizations?.name || 'Unknown'}</div>
-              ${slaBadge}
               <div class="case-meta">
                 <div class="case-meta-item">
                   <span>📷</span>
