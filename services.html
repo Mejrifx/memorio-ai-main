@@ -33,11 +33,32 @@
       box-sizing: border-box;
     }
     
+    html {
+      background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #fffbf7 8%,
+        #fff3e9 15%,
+        #f4e8de 25%,
+        #fff3e9 35%,
+        #fffbf7 45%,
+        #ffffff 55%,
+        #fffbf7 65%,
+        #fff3e9 75%,
+        #f4e8de 85%,
+        #fff3e9 95%,
+        #fffbf7 100%
+      );
+      background-attachment: fixed;
+      min-height: 100%;
+    }
+    
     body {
       font-family: 'Dosis Variablefont Wght', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
       color: #32343a;
       line-height: 1.6;
       overflow-x: hidden;
+      background: transparent;
     }
     
     /* ============================================================================
@@ -207,7 +228,7 @@
        ============================================================================ */
     .hero {
       padding: 180px 24px 100px;
-      background: linear-gradient(180deg, #ffffff 0%, #fffbf7 70%, #fff3e9 100%);
+      background: transparent;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -249,20 +270,6 @@
       position: relative;
     }
     
-    /* First section after hero - transition from cream to white */
-    .section:first-of-type {
-      background: linear-gradient(180deg, #fff3e9 0%, #fffbf7 30%, #ffffff 100%);
-    }
-    
-    /* Second section - white to cream */
-    .section:nth-of-type(2) {
-      background: linear-gradient(180deg, #ffffff 0%, #fffbf7 70%, #fff3e9 100%);
-    }
-    
-    /* Third section - cream wave */
-    .section:nth-of-type(3) {
-      background: linear-gradient(180deg, #fff3e9 0%, #f4e8de 40%, #f4e8de 60%, #fff3e9 100%);
-    }
     
     .section-container {
       max-width: 1200px;
@@ -490,7 +497,7 @@
        ============================================================================ */
     .cta-section {
       padding: 100px 24px;
-      background: linear-gradient(180deg, #fff3e9 0%, #fffbf7 30%, #ffffff 100%);
+      background: transparent;
     }
     
     .cta-card {
@@ -589,7 +596,7 @@
        FOOTER
        ============================================================================ */
     .footer {
-      background: linear-gradient(180deg, #ffffff 0%, #fffbf7 30%, #fff3e9 100%);
+      background: transparent;
       color: #32343a;
       padding: 60px 24px 30px;
     }
