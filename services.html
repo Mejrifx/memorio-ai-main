@@ -359,14 +359,6 @@
       fill: white;
     }
     
-    .feature-card .feature-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #32343a;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    
     .feature-card .feature-description {
       font-size: 16px;
       color: #32343a;
@@ -562,6 +554,17 @@
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+    
+    /* Override for feature cards - must come after general .feature-title rule */
+    .feature-card .feature-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #32343a;
+      margin-bottom: 16px;
+      text-align: center;
+      display: block;
+      width: 100%;
     }
     
     .feature-title svg {
