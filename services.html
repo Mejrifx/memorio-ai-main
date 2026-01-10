@@ -228,7 +228,7 @@
     .hero {
       padding: 120px 24px 100px;
       background-image: url('images/memorio-services-background.png');
-      background-size: contain;
+      background-size: 100% auto;
       background-position: center top;
       background-repeat: no-repeat;
       text-align: center;
@@ -238,17 +238,6 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
-    }
-    
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.3);
-      z-index: 1;
     }
     
     .hero-content {
@@ -845,7 +834,7 @@
       .hero {
         padding: 100px 24px 60px;
         min-height: 100vh;
-        background-size: contain;
+        background-size: 100% auto;
       }
       
       .hero-content {
