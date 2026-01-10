@@ -1703,8 +1703,10 @@
       document.getElementById('modal-family-password').classList.add('blurred');
       
       try {
+        // Use admin_cases_view instead of cases table
+        // This view includes family user info and respects RLS policies
         const { data: caseData, error: caseError } = await supabaseClient
-          .from('cases')
+          .from('admin_cases_view')
           .select('*')
           .eq('id', caseId)
           .single();
@@ -1713,20 +1715,10 @@
         
         currentCaseDetails = caseData;
         
-        let familyData = null;
-        let familyPassword = null;
-        if (caseData.assigned_family_user_id) {
-          const { data: familyUser, error: familyError } = await supabaseClient
-            .from('users')
-            .select('email, metadata')
-            .eq('id', caseData.assigned_family_user_id)
-            .single();
-          
-          if (!familyError) {
-            familyData = familyUser;
-            familyPassword = familyUser.metadata?.temp_password || null;
-          }
-        }
+        // Family data is already included in admin_cases_view
+        const familyEmail = caseData.family_email;
+        const familyMetadata = caseData.family_metadata;
+        const familyPassword = familyMetadata?.temp_password || null;
         
         const { data: formData, error: formError } = await supabaseClient
           .from('forms')
@@ -1742,10 +1734,10 @@
         document.getElementById('modal-case-created').textContent = new Date(caseData.created_at).toLocaleDateString();
         document.getElementById('modal-case-updated').textContent = new Date(caseData.updated_at).toLocaleDateString();
         
-        if (familyData) {
-          document.getElementById('modal-family-name').textContent = familyData.metadata?.name || 'Family Member';
-          document.getElementById('modal-family-email').textContent = familyData.email;
-          document.getElementById('modal-family-login-email').textContent = familyData.email;
+        if (familyEmail) {
+          document.getElementById('modal-family-name').textContent = familyMetadata?.name || 'Family Member';
+          document.getElementById('modal-family-email').textContent = familyEmail;
+          document.getElementById('modal-family-login-email').textContent = familyEmail;
         } else {
           document.getElementById('modal-family-name').textContent = 'Not assigned';
           document.getElementById('modal-family-email').textContent = 'Not assigned';
@@ -1763,7 +1755,7 @@
         if (familyPassword) {
           document.getElementById('modal-family-password').textContent = familyPassword;
         } else {
-          document.getElementById('modal-family-password').textContent = 'Password not available';
+          document.getElementById('modal-family-password').textContent = 'Not available';
         }
         
         // Fetch obituary content if it exists
@@ -2144,8 +2136,10 @@
       casesList.innerHTML = '<p style="color: #32343a; opacity: 0.6;">Loading cases...</p>';
       
       try {
+        // Use admin_cases_view instead of cases table
+        // This view includes all necessary data and respects RLS policies
         const { data: cases, error } = await supabaseClient
-          .from('cases')
+          .from('admin_cases_view')
           .select('*')
           .order('created_at', { ascending: false });
         
