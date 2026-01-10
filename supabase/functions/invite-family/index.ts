@@ -142,6 +142,7 @@ serve(async (req) => {
           name, 
           phone, 
           case_id,
+          temp_password: tempPassword,  // Store temp password for director to retrieve
           requires_password_change: true  // Flag for first-time password change
         }
       });
