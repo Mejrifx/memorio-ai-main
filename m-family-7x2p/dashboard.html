@@ -787,13 +787,6 @@
               </svg>
               Download Video
             </button>
-            <button class="btn-secondary" onclick="shareMemorial()" style="padding: 14px 32px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-                <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
-              </svg>
-              Share
-            </button>
           </div>
         </div>
       </div>
@@ -961,12 +954,6 @@
           if (!userError && userData?.metadata?.name) {
             userName = userData.metadata.name;
             console.log('✅ User name loaded:', userName);
-            
-            // Update the dashboard title with personalized greeting
-            const titleElement = document.getElementById('dashboard-title');
-            if (titleElement) {
-              titleElement.textContent = `Thank you ${userName}. We'll take it from here.`;
-            }
           } else {
             console.warn('⚠️ Could not load user name from database:', userError);
             // Fallback: try to get name from user_metadata (JWT)
@@ -974,10 +961,6 @@
             if (fallbackName) {
               userName = fallbackName;
               console.log('✅ User name loaded from JWT:', userName);
-              const titleElement = document.getElementById('dashboard-title');
-              if (titleElement) {
-                titleElement.textContent = `Thank you ${userName}. We'll take it from here.`;
-              }
             }
           }
         } catch (e) {
@@ -1133,6 +1116,12 @@
         
         // Load completed memorial if status is delivered
         await loadCompletedMemorial(currentCase);
+        
+        // Update dashboard title based on status
+        updateDashboardTitle(currentCase.status);
+        
+        // Show/hide sections based on delivery status
+        toggleDeliveredView(currentCase.status === 'delivered');
         
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('caseContainer').style.display = 'block';
@@ -1450,6 +1439,44 @@
       }
     }
     
+    // Update dashboard title based on status
+    function updateDashboardTitle(status) {
+      const titleElement = document.getElementById('dashboard-title');
+      if (!titleElement) return;
+      
+      if (status === 'delivered' && userName) {
+        titleElement.textContent = `Your tribute is ready, ${userName}`;
+      } else if (userName) {
+        titleElement.textContent = `Thank you ${userName}. We'll take it from here.`;
+      } else {
+        titleElement.textContent = 'My Case';
+      }
+    }
+    
+    // Toggle between normal dashboard and delivered view
+    function toggleDeliveredView(isDelivered) {
+      // Elements to hide when delivered
+      const caseCard = document.querySelector('.case-card');
+      const dashboardGrid = document.querySelector('.dashboard-grid');
+      const notificationsSection = document.querySelectorAll('.dashboard-section')[2]; // 3rd dashboard-section is notifications
+      
+      if (isDelivered) {
+        // Hide case overview, obituary/photos grid, and notifications
+        if (caseCard) caseCard.style.display = 'none';
+        if (dashboardGrid) dashboardGrid.style.display = 'none';
+        if (notificationsSection) notificationsSection.style.display = 'none';
+        
+        console.log('✅ Delivered view enabled - showing only memorial and timeline');
+      } else {
+        // Show everything (normal dashboard view)
+        if (caseCard) caseCard.style.display = 'block';
+        if (dashboardGrid) dashboardGrid.style.display = 'grid';
+        if (notificationsSection) notificationsSection.style.display = 'block';
+        
+        console.log('✅ Normal dashboard view enabled');
+      }
+    }
+    
     // Asset functions
     function viewAsset(asset) {
       // Open asset in new tab
@@ -1742,28 +1769,6 @@
       } catch (error) {
         console.error('Error downloading video:', error);
         showToast('Error downloading video', true);
-      }
-    }
-    
-    // Share memorial
-    function shareMemorial() {
-      if (navigator.share && window.memorialVideoUrl) {
-        navigator.share({
-          title: `Memorial Tribute - ${window.memorialVideoName.replace(/_/g, ' ')}`,
-          text: 'View our memorial tribute video',
-          url: window.location.href
-        }).then(() => {
-          showToast('✓ Share successful!');
-        }).catch(error => {
-          console.log('Share cancelled or failed:', error);
-        });
-      } else {
-        // Fallback: Copy link to clipboard
-        navigator.clipboard.writeText(window.location.href).then(() => {
-          showToast('✓ Link copied to clipboard!');
-        }).catch(() => {
-          showToast('Unable to share. Please copy the page URL manually.', true);
-        });
       }
     }
     
