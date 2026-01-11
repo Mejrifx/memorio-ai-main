@@ -2147,6 +2147,18 @@
                 if (tributeQuoteField && tributeQuoteField.value) {
                     console.log('✅ tribute_quote explicitly added to payload:', tributeQuoteField.value.substring(0, 50));
                 }
+                
+                // 🔧 EXPLICIT FIX: Ensure music_selection is always captured
+                const musicSelectionField = document.getElementById('music_selection');
+                if (musicSelectionField && musicSelectionField.value && !payload.music_selection) {
+                    console.warn('⚠️ music_selection was missing from FormData, adding explicitly');
+                    payload.music_selection = musicSelectionField.value;
+                }
+                if (musicSelectionField && musicSelectionField.value) {
+                    console.log('✅ music_selection explicitly added to payload:', musicSelectionField.value);
+                } else {
+                    console.log('⚠️ music_selection field is empty - user may not have selected music');
+                }
                 console.log('Form payload:', payload);
                 console.log('Date fields check:');
                 console.log('- date_of_birth:', payload.date_of_birth);
@@ -2162,6 +2174,12 @@
                 console.log('- tribute_quote field exists:', !!document.getElementById('tribute_quote'));
                 console.log('- tribute_quote field value:', document.getElementById('tribute_quote')?.value);
                 console.log('- tribute_quote field name:', document.getElementById('tribute_quote')?.name);
+                
+                console.log('🎵 MUSIC SELECTION CHECK:');
+                console.log('- music_selection in payload:', payload.music_selection);
+                console.log('- music_selection field exists:', !!document.getElementById('music_selection'));
+                console.log('- music_selection field value:', document.getElementById('music_selection')?.value);
+                console.log('- music_selection field name:', document.getElementById('music_selection')?.name);
                 
                 try {
                     console.log('Fetching from:', ENDPOINT);
