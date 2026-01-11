@@ -700,6 +700,44 @@
       border-color: #6ca7d3;
     }
     
+    /* ============================================================================
+       BUTTON STYLES
+       ============================================================================ */
+    .btn-secondary {
+      background-color: #f4e8de;
+      color: #32343a;
+      border: 2px solid #436481;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #e0d5cc;
+    }
+    
+    .btn-danger {
+      background-color: #d32f2f;
+      color: #ffffff;
+      border: 2px solid #d32f2f;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+    }
+    
+    .btn-danger:hover {
+      background-color: #c62828;
+      border-color: #c62828;
+    }
+    
     .modal-section {
       margin-bottom: 24px;
     }
@@ -1315,6 +1353,24 @@
     </div>
   </div>
 
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header" style="border-bottom: 2px solid #436481;">
+        <h2 class="modal-title" id="confirm-modal-title">Confirm Action</h2>
+      </div>
+      
+      <div class="modal-section">
+        <p id="confirm-modal-message" style="color: #32343a; font-size: 16px; line-height: 1.6; margin: 0; white-space: pre-line;"></p>
+      </div>
+      
+      <div style="display: flex; gap: 12px; justify-content: flex-end; padding: 20px; border-top: 2px solid #e0e0e0;">
+        <button class="btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+        <button id="confirm-modal-action-btn" class="btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
@@ -1658,6 +1714,42 @@
       }, 3000);
     }
     
+    // Confirmation modal
+    function showConfirmModal(title, message, onConfirm) {
+      const modal = document.getElementById('confirm-modal');
+      const modalTitle = document.getElementById('confirm-modal-title');
+      const modalMessage = document.getElementById('confirm-modal-message');
+      const actionBtn = document.getElementById('confirm-modal-action-btn');
+      
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      modal.style.display = 'flex';
+      
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+      
+      // Set up the confirm action
+      actionBtn.onclick = () => {
+        closeConfirmModal();
+        onConfirm();
+      };
+    }
+    
+    function closeConfirmModal() {
+      const modal = document.getElementById('confirm-modal');
+      modal.style.display = 'none';
+      
+      // Re-enable body scroll
+      document.body.style.overflow = '';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('confirm-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'confirm-modal') {
+        closeConfirmModal();
+      }
+    });
+    
     // Copy to clipboard
     function copyToClipboard(elementId) {
       const element = document.getElementById(elementId);
@@ -1823,10 +1915,15 @@
     
     // Delete case function (also deletes associated family user)
     async function deleteCase(caseId, caseName) {
-      if (!confirm(`Are you sure you want to delete the case for "${caseName}"?\n\nThis will also permanently delete the associated family member's account.\n\nThis action cannot be undone.`)) {
-        return;
-      }
-      
+      showConfirmModal(
+        'Delete Case',
+        `Are you sure you want to delete the case for "${caseName}"?\n\nThis will also permanently delete the associated family member's account.\n\nThis action cannot be undone.`,
+        () => performDeleteCase(caseId, caseName)
+      );
+    }
+    
+    // Perform the actual case deletion
+    async function performDeleteCase(caseId, caseName) {
       try {
         // First, get the case to find the assigned family user
         const { data: caseData, error: caseError } = await supabaseClient
@@ -2070,7 +2167,7 @@
         return {
           label: 'In Progress',
           color: '#2196f3', // Blue
-          emoji: '🎬'
+          emoji: ''
         };
       }
       
@@ -2102,7 +2199,7 @@
     
     function getVideoStatusBadge(status) {
       const statusConfig = {
-        'in_production': { text: '🎬 Editor Working', color: '#9c27b0' },
+        'in_production': { text: 'Editor Working', color: '#9c27b0' },
         'awaiting_review': { text: '⏳ Pending QC', color: '#ff9800' },
         'revision_requested': { text: '🔄 Revision Needed', color: '#f44336' },
         'delivered': { text: '✅ Delivered', color: '#4caf50' }
