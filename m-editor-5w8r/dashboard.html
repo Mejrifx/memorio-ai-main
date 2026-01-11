@@ -1307,6 +1307,7 @@
         console.log('🔍 EDITOR DEBUG - Full caseData.forms:', caseData.forms);
         console.log('🔍 EDITOR DEBUG - Extracted formData:', formData);
         console.log('🔍 EDITOR DEBUG - tribute_quote value:', formData.tribute_quote);
+        console.log('🔍 EDITOR DEBUG - music_selection value:', formData.music_selection);
         console.log('🔍 EDITOR DEBUG - All quote fields:', {
           tribute_quote: formData.tribute_quote,
           loved_ones_quote: formData.loved_ones_quote,
@@ -1372,6 +1373,7 @@
         }
         
         // Display case metadata
+        const musicSelection = formData.music_selection || 'Not specified';
         const metadataHtml = `
           <div class="modal-detail-item">
             <div class="modal-detail-label">Case ID:</div>
@@ -1388,6 +1390,10 @@
           <div class="modal-detail-item">
             <div class="modal-detail-label">Photo Count:</div>
             <div class="modal-detail-value">${photos.length} photo${photos.length !== 1 ? 's' : ''}</div>
+          </div>
+          <div class="modal-detail-item">
+            <div class="modal-detail-label">Music Selection:</div>
+            <div class="modal-detail-value" style="font-weight: 600; color: #436481;">♪ ${musicSelection}</div>
           </div>
           ${latestSubmission ? `
           <div class="modal-detail-item">
