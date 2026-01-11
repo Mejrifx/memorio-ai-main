@@ -1240,6 +1240,15 @@
         
         if (caseError) throw caseError;
         
+        // 🔍 DEBUG: Log raw case data to see what was queried
+        console.log('🔍 EDITOR DEBUG - Raw caseData from query:', caseData);
+        console.log('🔍 EDITOR DEBUG - caseData.forms array:', caseData.forms);
+        if (caseData.forms && caseData.forms.length > 0) {
+          console.log('🔍 EDITOR DEBUG - First form submitted_json:', caseData.forms[0].submitted_json);
+        } else {
+          console.warn('⚠️ EDITOR DEBUG - No forms data found for this case!');
+        }
+        
         // Get assignment details
         const { data: assignment } = await supabaseClient
           .from('editor_assignments')
@@ -1269,6 +1278,17 @@
         
         // Extract form data
         const formData = caseData.forms?.[0]?.submitted_json || {};
+        
+        // 🔍 DEBUG: Log form data to diagnose tribute_quote issue
+        console.log('🔍 EDITOR DEBUG - Full caseData.forms:', caseData.forms);
+        console.log('🔍 EDITOR DEBUG - submitted_json:', formData);
+        console.log('🔍 EDITOR DEBUG - tribute_quote value:', formData.tribute_quote);
+        console.log('🔍 EDITOR DEBUG - All quote fields:', {
+          tribute_quote: formData.tribute_quote,
+          loved_ones_quote: formData.loved_ones_quote,
+          favorite_memory: formData.favorite_memory,
+          loved_ones_description: formData.loved_ones_description
+        });
         
         // DISPLAY QUOTE/MEMORY PROMINENTLY (Top Priority for Editors)
         const quoteSection = document.getElementById('quote-section');
