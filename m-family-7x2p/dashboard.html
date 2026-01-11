@@ -965,7 +965,7 @@
             // Update the dashboard title with personalized greeting
             const titleElement = document.getElementById('dashboard-title');
             if (titleElement) {
-              titleElement.textContent = `Hey ${userName}, Let's begin.`;
+              titleElement.textContent = `Thank you ${userName}. We'll take it from here.`;
             }
           } else {
             console.warn('⚠️ Could not load user name from database:', userError);
@@ -976,7 +976,7 @@
               console.log('✅ User name loaded from JWT:', userName);
               const titleElement = document.getElementById('dashboard-title');
               if (titleElement) {
-                titleElement.textContent = `Hey ${userName}, Let's begin.`;
+                titleElement.textContent = `Thank you ${userName}. We'll take it from here.`;
               }
             }
           }
