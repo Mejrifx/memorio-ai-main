@@ -1179,6 +1179,17 @@
           // Get SLA badge positioned in top-right corner
           const slaBadge = getSLABadge(c, true);
           
+          // Get music selection from form data
+          const formData = c.forms?.[0]?.submitted_json || {};
+          const musicSelection = formData.music_selection || '';
+          const musicIcon = musicSelection === 'Piano' ? '🎹' : musicSelection === 'Guitar' ? '🎸' : '🎵';
+          const musicDisplay = musicSelection 
+            ? `<div class="case-meta-item">
+                 <span>${musicIcon}</span>
+                 <span>${musicSelection}</span>
+               </div>`
+            : '';
+          
           return `
             <div class="case-card" onclick="openCaseModal('${c.id}')">
               ${slaBadge}
@@ -1194,6 +1205,7 @@
                   <span>📅</span>
                   <span>${assignedDate.toLocaleDateString()}</span>
                 </div>
+                ${musicDisplay}
               </div>
               <div class="case-status ${statusClass}">${displayStatus}</div>
             </div>
