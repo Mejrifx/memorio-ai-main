@@ -664,8 +664,8 @@
         </div>
       </div>
       
-      <div style="background-color: #fff3e9; border: 2px solid #436481; border-radius: 12px; padding: 32px; text-align: center;">
-        <p style="color: rgba(50, 52, 58, 0.6); font-size: 16px;">Review history coming soon...</p>
+      <div id="reviewHistoryList" class="submissions-list">
+        <!-- Review history will be loaded here -->
       </div>
     </section>
   </div>
@@ -859,6 +859,101 @@
       }
     }
     
+    // Load review history for current QC user
+    async function loadReviewHistory() {
+      try {
+        // Get all submissions reviewed by this QC user
+        const { data: reviews, error } = await supabaseClient
+          .from('video_submissions')
+          .select(`
+            *,
+            cases!inner(
+              id,
+              deceased_name,
+              org_id,
+              organizations(id, name)
+            ),
+            users!video_submissions_editor_user_id_fkey(email, metadata)
+          `)
+          .eq('qc_reviewer_id', currentUser.id)
+          .in('qc_status', ['approved', 'revision_requested'])
+          .order('qc_reviewed_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        const reviewHistory = reviews || [];
+        displayReviewHistory(reviewHistory);
+        updateReviewHistoryStats(reviewHistory);
+        
+      } catch (error) {
+        console.error('Error loading review history:', error);
+        showToast('Error loading review history', true);
+      }
+    }
+    
+    // Display review history
+    function displayReviewHistory(reviews) {
+      const listContainer = document.getElementById('reviewHistoryList');
+      
+      if (reviews.length === 0) {
+        listContainer.innerHTML = `
+          <div style="background-color: #fff3e9; border: 2px solid #436481; border-radius: 12px; padding: 32px; text-align: center;">
+            <p style="color: rgba(50, 52, 58, 0.6); font-size: 16px;">No reviews yet. Start reviewing videos to build your history!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      listContainer.innerHTML = reviews.map(review => {
+        const reviewDate = new Date(review.qc_reviewed_at);
+        const statusColor = review.qc_status === 'approved' ? '#4caf50' : '#ff9800';
+        const statusIcon = review.qc_status === 'approved' ? '✓' : '⟳';
+        const statusText = review.qc_status === 'approved' ? 'Approved' : 'Revision Requested';
+        
+        return `
+          <div class="submission-card" style="cursor: default; opacity: 0.95;">
+            <div class="submission-header">
+              <div class="submission-case-name">${review.cases.deceased_name}</div>
+              <div class="submission-status" style="background-color: ${statusColor};">
+                ${statusIcon} ${statusText}
+              </div>
+            </div>
+            
+            <div class="submission-details">
+              <div class="submission-detail">
+                <strong>Funeral Home:</strong> ${review.cases.organizations?.name || 'Unknown'}
+              </div>
+              <div class="submission-detail">
+                <strong>Editor:</strong> ${review.users?.metadata?.name || review.users?.email || 'Unknown'}
+              </div>
+              <div class="submission-detail">
+                <strong>Reviewed:</strong> ${reviewDate.toLocaleDateString()} at ${reviewDate.toLocaleTimeString()}
+              </div>
+              <div class="submission-detail">
+                <strong>Version:</strong> v${review.revision_number}
+              </div>
+              ${review.qc_notes ? `
+              <div class="submission-detail" style="margin-top: 12px; padding: 12px; background-color: rgba(67, 100, 129, 0.05); border-radius: 8px;">
+                <strong style="display: block; margin-bottom: 6px;">Your Notes:</strong>
+                <div style="color: rgba(50, 52, 58, 0.8); line-height: 1.6;">${review.qc_notes}</div>
+              </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Update review history stats
+    function updateReviewHistoryStats(reviews) {
+      const totalReviewed = reviews.length;
+      const approved = reviews.filter(r => r.qc_status === 'approved').length;
+      const approvalRate = totalReviewed > 0 ? Math.round((approved / totalReviewed) * 100) : 0;
+      
+      document.getElementById('stat-total-reviewed').textContent = totalReviewed;
+      document.getElementById('stat-approval-rate').textContent = `${approvalRate}%`;
+    }
+    
     // Display submissions in list
     function displaySubmissions() {
       const listContainer = document.getElementById('submissionsList');
@@ -991,6 +1086,13 @@
     // Handle Approve
     async function handleApprove() {
       if (!currentSubmission) return;
+      
+      const notes = document.getElementById('qcNotes').value;
+      
+      if (!notes || notes.trim() === '') {
+        showToast('Please provide notes or feedback before approving.', true);
+        return;
+      }
       
       showConfirmModal(
         'Approve & Deliver Video',
@@ -1156,6 +1258,11 @@
         'review-history': 'Review History'
       };
       document.getElementById('topbar-title').textContent = titles[tabId];
+      
+      // Load review history when switching to that tab
+      if (tabId === 'review-history') {
+        loadReviewHistory();
+      }
     }
     
     // Utility functions
