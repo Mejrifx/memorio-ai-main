@@ -2183,22 +2183,22 @@
                     addButton._faqTitle = faqTitle;
                     
                     // Remove the Add button from blocking clicks - make it trigger faq-title
-                    // Use a simple, direct approach
-                    const handleAddClick = function() {
+                    // Use a single event handler to avoid rapid open/close bug
+                    const handleAddClick = function(e) {
                         console.log('🖱️ Add button handler fired!');
+                        
+                        // Prevent default behavior and stop propagation
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
                         if (this._faqTitle) {
                             console.log('✅ Triggering faq-title click');
                             this._faqTitle.click();
                         }
                     };
                     
-                    // Attach handler directly to the button
-                    addButton.onclick = handleAddClick;
-                    addButton.onmousedown = handleAddClick;
-                    
-                    // Also try addEventListener
+                    // Use only ONE event listener to prevent multiple triggers
                     addButton.addEventListener('click', handleAddClick, true);
-                    addButton.addEventListener('mousedown', handleAddClick, true);
                     
                     console.log(`✅ Set up handlers for Add button ${index + 1}`);
                 });
