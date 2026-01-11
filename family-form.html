@@ -2132,6 +2132,16 @@
                 mountUIIntoSuccess();
                 
                 const payload = Object.fromEntries(new FormData(form).entries());
+                
+                // 🔧 EXPLICIT FIX: Ensure tribute_quote is always captured
+                const tributeQuoteField = document.getElementById('tribute_quote');
+                if (tributeQuoteField && tributeQuoteField.value && !payload.tribute_quote) {
+                    console.warn('⚠️ tribute_quote was missing from FormData, adding explicitly');
+                    payload.tribute_quote = tributeQuoteField.value;
+                }
+                if (tributeQuoteField && tributeQuoteField.value) {
+                    console.log('✅ tribute_quote explicitly added to payload:', tributeQuoteField.value.substring(0, 50));
+                }
                 console.log('Form payload:', payload);
                 console.log('Date fields check:');
                 console.log('- date_of_birth:', payload.date_of_birth);
@@ -2142,6 +2152,11 @@
                 console.log('- month_of_passing:', payload.month_of_passing);
                 console.log('- day_of_passing:', payload.day_of_passing);
                 console.log('- year_of_passing:', payload.year_of_passing);
+                console.log('🔍 TRIBUTE QUOTE CHECK:');
+                console.log('- tribute_quote in payload:', payload.tribute_quote);
+                console.log('- tribute_quote field exists:', !!document.getElementById('tribute_quote'));
+                console.log('- tribute_quote field value:', document.getElementById('tribute_quote')?.value);
+                console.log('- tribute_quote field name:', document.getElementById('tribute_quote')?.name);
                 
                 try {
                     console.log('Fetching from:', ENDPOINT);
@@ -2577,8 +2592,8 @@
                     }, AUTOSAVE_DELAY);
                 });
                 
-                // Also autosave on input for text fields
-                if (input.type === 'text' || input.type === 'textarea') {
+                // Also autosave on input for text fields and textareas
+                if (input.tagName === 'TEXTAREA' || input.type === 'text' || input.type === 'email') {
                     input.addEventListener('input', () => {
                         clearTimeout(autosaveTimeout);
                         autosaveTimeout = setTimeout(() => {
@@ -2646,6 +2661,13 @@
                 });
                 
                 console.log(`📦 Total fields to save: ${Object.keys(formData).length}`);
+                
+                // 🔧 EXPLICIT FIX: Ensure tribute_quote is always captured
+                const tributeQuoteField = document.getElementById('tribute_quote');
+                if (tributeQuoteField && tributeQuoteField.value && !formData.tribute_quote) {
+                    console.warn('⚠️ tribute_quote was missing from form collection, adding explicitly');
+                    formData.tribute_quote = tributeQuoteField.value;
+                }
                 
                 // Also save photo selection state
                 if (selectedPhotos && selectedPhotos.length > 0) {
