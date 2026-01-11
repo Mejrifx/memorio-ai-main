@@ -5124,6 +5124,8 @@
       // Show editor name from metadata, fallback to email
       const editorAssignment = caseData.editor_assignments?.[0];
       const editorName = editorAssignment?.editor_metadata?.name || editorAssignment?.editor_email || 'Unassigned';
+      // Show family member name from metadata, fallback to email
+      const familyName = caseData.family_metadata?.name || caseData.family_email || 'Unassigned';
       const createdDate = new Date(caseData.created_at).toLocaleDateString();
       
       // Calculate SLA badge based on actual case data
@@ -5138,8 +5140,12 @@
           <div class="case-card-org">${orgName}</div>
           <div class="case-card-meta">
             <div class="case-card-meta-row">
+              <span class="meta-icon">👨‍👩‍👧‍👦</span>
+              <span>Family: ${familyName}</span>
+            </div>
+            <div class="case-card-meta-row">
               <span class="meta-icon">👤</span>
-              <span>${editorName}</span>
+              <span>Editor: ${editorName}</span>
             </div>
             <div class="case-card-meta-row">
               <span class="meta-icon">📅</span>
