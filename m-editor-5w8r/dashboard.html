@@ -1179,8 +1179,14 @@
           // Get SLA badge positioned in top-right corner
           const slaBadge = getSLABadge(c, true);
           
-          // Get music selection from form data
-          const formData = c.forms?.[0]?.submitted_json || {};
+          // Get music selection from form data - handle both array and object formats
+          let formData = {};
+          if (Array.isArray(c.forms) && c.forms.length > 0) {
+            formData = c.forms[0]?.submitted_json || {};
+          } else if (c.forms && typeof c.forms === 'object') {
+            formData = c.forms.submitted_json || {};
+          }
+          
           const musicSelection = formData.music_selection || '';
           const musicDisplay = musicSelection 
             ? `<div class="case-meta-item">
@@ -1242,9 +1248,17 @@
         
         // 🔍 DEBUG: Log raw case data to see what was queried
         console.log('🔍 EDITOR DEBUG - Raw caseData from query:', caseData);
-        console.log('🔍 EDITOR DEBUG - caseData.forms array:', caseData.forms);
-        if (caseData.forms && caseData.forms.length > 0) {
-          console.log('🔍 EDITOR DEBUG - First form submitted_json:', caseData.forms[0].submitted_json);
+        console.log('🔍 EDITOR DEBUG - caseData.forms:', caseData.forms);
+        console.log('🔍 EDITOR DEBUG - Is forms an array?', Array.isArray(caseData.forms));
+        
+        // Supabase can return forms as either an object or array depending on the relationship
+        let formsData = caseData.forms;
+        if (Array.isArray(formsData) && formsData.length > 0) {
+          console.log('🔍 EDITOR DEBUG - Forms is array, using first element');
+          console.log('🔍 EDITOR DEBUG - First form submitted_json:', formsData[0].submitted_json);
+        } else if (formsData && typeof formsData === 'object' && !Array.isArray(formsData)) {
+          console.log('🔍 EDITOR DEBUG - Forms is object (not array)');
+          console.log('🔍 EDITOR DEBUG - Forms object submitted_json:', formsData.submitted_json);
         } else {
           console.warn('⚠️ EDITOR DEBUG - No forms data found for this case!');
         }
@@ -1276,12 +1290,19 @@
         // Populate modal header
         document.getElementById('modal-case-name').textContent = caseData.deceased_name;
         
-        // Extract form data
-        const formData = caseData.forms?.[0]?.submitted_json || {};
+        // Extract form data - handle both array and object formats from Supabase
+        let formData = {};
+        if (Array.isArray(caseData.forms) && caseData.forms.length > 0) {
+          // Forms returned as array
+          formData = caseData.forms[0]?.submitted_json || {};
+        } else if (caseData.forms && typeof caseData.forms === 'object') {
+          // Forms returned as single object (typical for one-to-many with single result)
+          formData = caseData.forms.submitted_json || {};
+        }
         
         // 🔍 DEBUG: Log form data to diagnose tribute_quote issue
         console.log('🔍 EDITOR DEBUG - Full caseData.forms:', caseData.forms);
-        console.log('🔍 EDITOR DEBUG - submitted_json:', formData);
+        console.log('🔍 EDITOR DEBUG - Extracted formData:', formData);
         console.log('🔍 EDITOR DEBUG - tribute_quote value:', formData.tribute_quote);
         console.log('🔍 EDITOR DEBUG - All quote fields:', {
           tribute_quote: formData.tribute_quote,
