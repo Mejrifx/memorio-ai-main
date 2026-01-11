@@ -462,28 +462,47 @@
                 </div>
                 
                 <label for="music_selection" class="field-label">What music would you like for the tribute video?</label>
-                <select 
-                  id="music_selection" 
-                  name="music_selection" 
-                  data-name="music_selection"
-                  style="
-                    width: 100%;
-                    padding: 12px;
-                    border: 2px solid #436481;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-                    background-color: #ffffff;
-                    box-sizing: border-box;
-                    margin-bottom: 20px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;"
-                  onfocus="this.style.borderColor='#1e3a52'; this.style.boxShadow='0 0 0 3px rgba(67, 100, 129, 0.1)'"
-                  onblur="this.style.borderColor='#436481'; this.style.boxShadow='none'">
-                  <option value="">Select music preference</option>
-                  <option value="Piano">Piano</option>
-                  <option value="Guitar">Guitar</option>
-                </select>
+                <input type="hidden" id="music_selection" name="music_selection" data-name="music_selection" value="">
+                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                  <button 
+                    type="button" 
+                    id="music-piano-btn"
+                    onclick="selectMusic('Piano')"
+                    style="
+                      flex: 1;
+                      padding: 14px 24px;
+                      background-color: #ffffff;
+                      color: #436481;
+                      border: 2px solid #436481;
+                      border-radius: 10px;
+                      font-size: 16px;
+                      font-weight: 600;
+                      cursor: pointer;
+                      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 8px rgba(67, 100, 129, 0.1);">
+                    Piano
+                  </button>
+                  <button 
+                    type="button" 
+                    id="music-guitar-btn"
+                    onclick="selectMusic('Guitar')"
+                    style="
+                      flex: 1;
+                      padding: 14px 24px;
+                      background-color: #ffffff;
+                      color: #436481;
+                      border: 2px solid #436481;
+                      border-radius: 10px;
+                      font-size: 16px;
+                      font-weight: 600;
+                      cursor: pointer;
+                      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+                      transition: all 0.3s ease;
+                      box-shadow: 0 2px 8px rgba(67, 100, 129, 0.1);">
+                    Guitar
+                  </button>
+                </div>
                 <label for="tribute_quote" class="field-label quote">Is there a favorite quote, verse, or saying you&#x27;d like us to include in the tribute video?</label>
                 <textarea placeholder="Something they always said or something that reminds you of them and captures their spirit." maxlength="5000" id="tribute_quote" name="tribute_quote" data-name="tribute_quote" class="textarea tribute w-input"></textarea>
                 <div class="text-block-2">*Required Fields</div>
@@ -1406,6 +1425,35 @@
                     reader.readAsDataURL(file);
                 });
             });
+        }
+        
+        /**
+         * Handle music selection with button toggle
+         */
+        function selectMusic(choice) {
+            const hiddenInput = document.getElementById('music_selection');
+            const pianoBtn = document.getElementById('music-piano-btn');
+            const guitarBtn = document.getElementById('music-guitar-btn');
+            
+            // Update hidden input value
+            hiddenInput.value = choice;
+            
+            // Reset both buttons to default state
+            pianoBtn.style.backgroundColor = '#ffffff';
+            pianoBtn.style.color = '#436481';
+            guitarBtn.style.backgroundColor = '#ffffff';
+            guitarBtn.style.color = '#436481';
+            
+            // Highlight selected button
+            if (choice === 'Piano') {
+                pianoBtn.style.backgroundColor = '#436481';
+                pianoBtn.style.color = '#ffffff';
+            } else if (choice === 'Guitar') {
+                guitarBtn.style.backgroundColor = '#436481';
+                guitarBtn.style.color = '#ffffff';
+            }
+            
+            console.log(`🎵 Music selection: ${choice}`);
         }
         
         /**
