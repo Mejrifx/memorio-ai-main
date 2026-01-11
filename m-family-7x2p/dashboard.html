@@ -451,10 +451,12 @@
     .memorial-video-player {
       width: 100%;
       max-width: 800px;
+      max-height: 450px;
       margin: 0 auto;
       border-radius: 12px;
       border: 2px solid #436481;
       background-color: black;
+      object-fit: contain;
     }
     
     .memorial-obituary-section {
@@ -503,6 +505,28 @@
       background-color: #218838;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-download-obituary {
+      padding: 14px 32px;
+      background-color: #436481;
+      color: white;
+      border: none;
+      border-radius: 60px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-download-obituary:hover {
+      background-color: #1e3a52;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.3);
     }
     
     .memorial-badge {
@@ -787,6 +811,16 @@
               </svg>
               Download Video
             </button>
+            <button class="btn-download-obituary" onclick="downloadObituaryPDF()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10,9 9,9 8,9"/>
+              </svg>
+              Download Obituary PDF
+            </button>
           </div>
         </div>
       </div>
@@ -837,6 +871,9 @@
 
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   
   <script>
     const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
@@ -1771,6 +1808,114 @@
         showToast('Error downloading video', true);
       }
     }
+    
+    // Download obituary as PDF
+    async function downloadObituaryPDF() {
+      try {
+        const obituaryContent = document.getElementById('memorialObituaryContent');
+        
+        if (!obituaryContent || !obituaryContent.textContent.trim()) {
+          showToast('No obituary content available', true);
+          return;
+        }
+        
+        showToast('Generating PDF...');
+        
+        // Get the jsPDF library
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Set document properties
+        const deceasedName = currentCase?.deceased_name || 'Memorial';
+        doc.setProperties({
+          title: `${deceasedName} - Obituary`,
+          subject: 'Memorial Obituary',
+          author: 'Memorio',
+          keywords: 'obituary, memorial, tribute',
+          creator: 'Memorio'
+        });
+        
+        // Add Memorio branding header
+        doc.setFontSize(10);
+        doc.setTextColor(67, 100, 129); // Memorio blue
+        doc.text('Memorio', 105, 15, { align: 'center' });
+        
+        // Add deceased name as title
+        doc.setFontSize(20);
+        doc.setTextColor(50, 52, 58); // Dark text
+        doc.text(deceasedName, 105, 30, { align: 'center' });
+        
+        // Add a decorative line
+        doc.setDrawColor(67, 100, 129);
+        doc.setLineWidth(0.5);
+        doc.line(20, 35, 190, 35);
+        
+        // Add obituary content
+        doc.setFontSize(12);
+        doc.setTextColor(50, 52, 58);
+        
+        // Get plain text from the obituary content
+        const obituaryText = obituaryContent.textContent.trim();
+        
+        // Split text into lines that fit the page width
+        const pageWidth = 170; // 210mm page - 20mm margins on each side
+        const lineHeight = 7;
+        const startY = 45;
+        const maxY = 280; // Leave margin at bottom
+        
+        const lines = doc.splitTextToSize(obituaryText, pageWidth);
+        
+        let currentY = startY;
+        let currentPage = 1;
+        
+        lines.forEach(line => {
+          // Check if we need a new page
+          if (currentY > maxY) {
+            doc.addPage();
+            currentPage++;
+            currentY = 20; // Reset Y position for new page
+          }
+          
+          doc.text(line, 20, currentY);
+          currentY += lineHeight;
+        });
+        
+        // Add footer with page numbers and Memorio branding
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i);
+          doc.setFontSize(9);
+          doc.setTextColor(150, 150, 150);
+          doc.text(
+            `Page ${i} of ${totalPages}`,
+            105,
+            290,
+            { align: 'center' }
+          );
+          doc.text(
+            'Created with care by Memorio',
+            105,
+            295,
+            { align: 'center' }
+          );
+        }
+        
+        // Generate filename
+        const fileName = `${deceasedName.replace(/\s+/g, '_')}_Obituary.pdf`;
+        
+        // Save the PDF
+        doc.save(fileName);
+        
+        showToast('✓ Obituary PDF downloaded!');
+        
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        showToast('Error generating PDF', true);
+      }
+    }
+    
+    // Make PDF download function global
+    window.downloadObituaryPDF = downloadObituaryPDF;
     
     // Initialize
     (async function init() {
