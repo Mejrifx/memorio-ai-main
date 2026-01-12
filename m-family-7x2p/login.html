@@ -209,6 +209,71 @@
       }
     });
     
+    // ============================================================================
+    // RATE LIMITING SYSTEM
+    // ============================================================================
+    // Prevents brute force attacks by limiting failed login attempts
+    
+    function checkRateLimit(email) {
+      const storageKey = `login_attempts_${email}`;
+      const attemptData = localStorage.getItem(storageKey);
+      
+      if (!attemptData) return { allowed: true };
+      
+      const { count, lastAttempt, lockedUntil } = JSON.parse(attemptData);
+      const now = Date.now();
+      
+      // Check if currently locked out
+      if (lockedUntil && now < lockedUntil) {
+        const remainingMinutes = Math.ceil((lockedUntil - now) / 60000);
+        return {
+          allowed: false,
+          message: `Too many failed attempts. Please try again in ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''}.`
+        };
+      }
+      
+      // Reset if last attempt was more than 1 hour ago
+      if (now - lastAttempt > 3600000) {
+        localStorage.removeItem(storageKey);
+        return { allowed: true };
+      }
+      
+      return { allowed: true };
+    }
+    
+    function recordFailedAttempt(email) {
+      const storageKey = `login_attempts_${email}`;
+      const attemptData = localStorage.getItem(storageKey);
+      const now = Date.now();
+      
+      let count = 1;
+      if (attemptData) {
+        const parsed = JSON.parse(attemptData);
+        count = parsed.count + 1;
+      }
+      
+      // Progressive lockout periods
+      let lockedUntil = null;
+      if (count >= 10) {
+        lockedUntil = now + 30 * 60000; // 30 minutes
+      } else if (count >= 5) {
+        lockedUntil = now + 5 * 60000; // 5 minutes
+      } else if (count >= 3) {
+        lockedUntil = now + 1 * 60000; // 1 minute
+      }
+      
+      localStorage.setItem(storageKey, JSON.stringify({
+        count,
+        lastAttempt: now,
+        lockedUntil
+      }));
+    }
+    
+    function clearRateLimit(email) {
+      const storageKey = `login_attempts_${email}`;
+      localStorage.removeItem(storageKey);
+    }
+    
     // Handle login form submission
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -223,6 +288,14 @@
       errorMessage.style.display = 'none';
       successMessage.style.display = 'none';
       
+      // Check rate limiting
+      const rateCheck = checkRateLimit(email);
+      if (!rateCheck.allowed) {
+        errorMessage.textContent = '🔒 ' + rateCheck.message;
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
       // Disable button and show loading
       loginBtn.disabled = true;
       loginBtn.textContent = 'Signing in...';
@@ -235,6 +308,9 @@
         });
         
         if (error) throw error;
+        
+        // Success! Clear rate limit
+        clearRateLimit(email);
         
         // Check if user is a family member
         const role = data.user.app_metadata?.role;
@@ -254,6 +330,10 @@
         
       } catch (error) {
         console.error('Login error:', error);
+        
+        // Record failed attempt for rate limiting
+        recordFailedAttempt(email);
+        
         errorMessage.textContent = error.message || 'Failed to sign in. Please check your credentials.';
         errorMessage.style.display = 'block';
         

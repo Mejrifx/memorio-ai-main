@@ -649,10 +649,22 @@
         grid-template-columns: 1fr;
       }
     }
+    
+    /* Security: Hide content until auth verified (prevents page flash) */
+    body.auth-pending {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    body.auth-verified {
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.2s ease-in;
+    }
   </style>
 </head>
 
-<body class="body">
+<body class="body auth-pending">
   <!-- Nav -->
   <div class="nav">
     <div class="logo-wrapper">
@@ -949,6 +961,9 @@
         document.getElementById('editor-name').textContent = editorName;
         
         isAuthenticated = true;
+        // Show content now that auth is verified
+        document.body.classList.remove('auth-pending');
+        document.body.classList.add('auth-verified');
         return true;
         
       } catch (error) {

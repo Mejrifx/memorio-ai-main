@@ -907,13 +907,25 @@
       opacity: 0.6;
       pointer-events: none;
     }
+    
+    /* Security: Hide content until auth verified (prevents page flash) */
+    body.auth-pending {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    body.auth-verified {
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.2s ease-in;
+    }
   </style>
   
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
-<body>
+<body class="auth-pending">
   <!-- ============================================================================
        SIDEBAR
        ============================================================================ -->
@@ -1499,6 +1511,9 @@
         }
         
         isAuthenticated = true;
+        // Show content now that auth is verified
+        document.body.classList.remove('auth-pending');
+        document.body.classList.add('auth-verified');
         console.log('✅ Director authentication successful');
         console.log('Director Org ID:', userData.org_id);
         console.log('=== END AUTH CHECK ===\n');

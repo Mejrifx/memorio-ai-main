@@ -672,9 +672,21 @@
     .toast.error {
       background-color: #dc3545;
     }
+    
+    /* Security: Hide content until auth verified (prevents page flash) */
+    body.auth-pending {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    body.auth-verified {
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.2s ease-in;
+    }
   </style>
 </head>
-<body class="body">
+<body class="body auth-pending">
   <div class="nav">
     <div class="logo-wrapper">
       <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
@@ -1061,6 +1073,9 @@
         }
         
         isAuthenticated = true;
+        // Show content now that auth is verified
+        document.body.classList.remove('auth-pending');
+        document.body.classList.add('auth-verified');
         console.log('✅ Family authentication successful');
         console.log('=== END AUTH CHECK ===\n');
         return true;

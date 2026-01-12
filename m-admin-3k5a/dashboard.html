@@ -2609,13 +2609,25 @@
         padding: 16px 20px;
       }
     }
+    
+    /* Security: Hide content until auth verified (prevents page flash) */
+    body.auth-pending {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    body.auth-verified {
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.2s ease-in;
+    }
   </style>
   
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
-<body class="body">
+<body class="body auth-pending">
   
   <!-- ============================================================================
        SIDEBAR NAVIGATION
@@ -3645,6 +3657,9 @@
         }
         
         isAuthenticated = true;
+        // Show content now that auth is verified
+        document.body.classList.remove('auth-pending');
+        document.body.classList.add('auth-verified');
         console.log('✅ Admin authentication successful');
         console.log('=== END AUTH CHECK ===\n');
         return true;
