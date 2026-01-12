@@ -364,9 +364,11 @@
     .video-player {
       width: 100%;
       max-width: 800px;
+      max-height: 450px;
       border-radius: 8px;
       border: 2px solid #436481;
       background-color: black;
+      object-fit: contain;
     }
     
     .editor-notes {
@@ -1195,13 +1197,7 @@
     async function handleApprove() {
       if (!currentSubmission) return;
       
-      const notes = document.getElementById('qcNotes').value;
-      
-      if (!notes || notes.trim() === '') {
-        showToast('Please provide notes or feedback before approving.', true);
-        return;
-      }
-      
+      // Notes are optional for approval (but required for revision)
       showConfirmModal(
         'Approve & Deliver Video',
         'Are you sure you want to approve this video and deliver it to the family?\n\nThis action will:\n• Mark the video as approved\n• Update the case status to "delivered"\n• Notify the family',
