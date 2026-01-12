@@ -565,9 +565,21 @@
         height: 300px;
       }
     }
+    
+    /* Security: Hide content until auth verified (prevents page flash) */
+    body.auth-pending {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    body.auth-verified {
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.2s ease-in;
+    }
   </style>
 </head>
-<body>
+<body class="auth-pending">
   <!-- Sidebar Navigation -->
   <div class="sidebar">
     <div class="sidebar-logo">
@@ -786,6 +798,9 @@
         document.getElementById('userName').textContent = userName;
         
         isAuthenticated = true;
+        // Show content now that auth is verified
+        document.body.classList.remove('auth-pending');
+        document.body.classList.add('auth-verified');
         console.log('✅ QC authentication successful');
         console.log('QC Org ID:', currentOrgId);
         console.log('=== END AUTH CHECK ===\n');

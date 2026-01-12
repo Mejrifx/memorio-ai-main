@@ -12,7 +12,108 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# Redirects - ensure all routes go to index.html (for SPA behavior)
+# ============================================================================
+# CLEAN URL REDIRECTS
+# ============================================================================
+# These provide clean, professional URLs while keeping obscured paths secure
+# Users see: /family/login instead of /m-family-7x2p/login.html
+
+# Family Portal
+[[redirects]]
+  from = "/family/login"
+  to = "/m-family-7x2p/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/family/dashboard"
+  to = "/m-family-7x2p/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/family"
+  to = "/m-family-7x2p/login.html"
+  status = 200
+
+# Director Portal
+[[redirects]]
+  from = "/director/login"
+  to = "/m-director-9m6z/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/director/dashboard"
+  to = "/m-director-9m6z/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/director"
+  to = "/m-director-9m6z/login.html"
+  status = 200
+
+# Editor Portal
+[[redirects]]
+  from = "/editor/login"
+  to = "/m-editor-5w8r/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/editor/dashboard"
+  to = "/m-editor-5w8r/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/editor"
+  to = "/m-editor-5w8r/login.html"
+  status = 200
+
+# QC Portal
+[[redirects]]
+  from = "/qc/login"
+  to = "/m-qc-4h7k/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/qc/dashboard"
+  to = "/m-qc-4h7k/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/qc"
+  to = "/m-qc-4h7k/login.html"
+  status = 200
+
+# Admin Portal
+[[redirects]]
+  from = "/admin/login"
+  to = "/m-admin-3k5a/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/dashboard"
+  to = "/m-admin-3k5a/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/cases"
+  to = "/m-admin-3k5a/cases.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/case-detail"
+  to = "/m-admin-3k5a/case-detail.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/accounts"
+  to = "/m-admin-3k5a/manage-accounts.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/m-admin-3k5a/login.html"
+  status = 200
+
+# Catch-all redirect (must be LAST)
 [[redirects]]
   from = "/*"
   to = "/index.html"
