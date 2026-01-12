@@ -2183,6 +2183,29 @@
       align-items: flex-start;
     }
     
+    /* Simple Modal (for Reassign Editor) */
+    .simple-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 20000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .simple-modal-content {
+      background-color: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      width: 100%;
+    }
+    
     .case-detail-content {
       background-color: var(--bg-secondary);
       border: 3px solid var(--border-primary);
@@ -6119,14 +6142,159 @@
     }
     
     // Support Actions from Modal
+    let currentEditorAssignment = null;
+    
     async function openReassignEditorFromModal() {
-      // TODO: Implement editor reassignment modal
-      alert('Editor reassignment feature coming soon! (Currently being migrated from case-detail.html)');
+      try {
+        if (!currentCaseDetailId) {
+          alert('No case selected');
+          return;
+        }
+        
+        // Get current case data with editor assignments
+        const { data: caseData, error: caseError } = await supabaseClient
+          .from('admin_cases_view')
+          .select('*')
+          .eq('id', currentCaseDetailId)
+          .single();
+        
+        if (caseError) throw caseError;
+        
+        // Find active editor assignment (where unassigned_at IS NULL)
+        const { data: assignments, error: assignError } = await supabaseClient
+          .from('editor_assignments')
+          .select('*, editor:users!editor_user_id(id, email, metadata)')
+          .eq('case_id', currentCaseDetailId)
+          .is('unassigned_at', null)
+          .order('assigned_at', { ascending: false })
+          .limit(1);
+        
+        if (assignError) throw assignError;
+        
+        currentEditorAssignment = assignments && assignments.length > 0 ? assignments[0] : null;
+        
+        // Display current editor
+        const currentEditorDiv = document.getElementById('current-editor-name');
+        if (currentEditorAssignment && currentEditorAssignment.editor) {
+          const editorName = currentEditorAssignment.editor.metadata?.name || currentEditorAssignment.editor.email;
+          currentEditorDiv.textContent = editorName;
+        } else {
+          currentEditorDiv.textContent = 'No editor currently assigned';
+        }
+        
+        // Load all active editors
+        const { data: editors, error: editorsError } = await supabaseClient
+          .from('admin_users_view')
+          .select('id, email, metadata')
+          .eq('role', 'editor')
+          .eq('status', 'active')
+          .order('email');
+        
+        if (editorsError) throw editorsError;
+        
+        // Filter out current editor and populate dropdown
+        const select = document.getElementById('new-editor-select');
+        select.innerHTML = '<option value="">-- Select Editor --</option>';
+        
+        editors.forEach(editor => {
+          // Skip current editor
+          if (currentEditorAssignment && editor.id === currentEditorAssignment.editor_user_id) {
+            return;
+          }
+          
+          const editorName = editor.metadata?.name || editor.email;
+          const option = document.createElement('option');
+          option.value = editor.id;
+          option.textContent = editorName;
+          select.appendChild(option);
+        });
+        
+        // Show modal
+        document.getElementById('reassign-editor-modal').style.display = 'flex';
+        
+      } catch (error) {
+        console.error('Error opening reassign editor modal:', error);
+        alert('Error loading editors: ' + error.message);
+      }
     }
     
-    async function openReassignQCFromModal() {
-      // TODO: Implement QC reassignment modal
-      alert('QC reassignment feature coming soon! (Currently being migrated from case-detail.html)');
+    function closeReassignEditorModal() {
+      document.getElementById('reassign-editor-modal').style.display = 'none';
+      document.getElementById('new-editor-select').value = '';
+      currentEditorAssignment = null;
+    }
+    
+    async function confirmReassignEditor() {
+      try {
+        const newEditorId = document.getElementById('new-editor-select').value;
+        
+        if (!newEditorId) {
+          alert('Please select an editor');
+          return;
+        }
+        
+        const session = await getValidSession();
+        if (!session) {
+          alert('Session expired. Please log in again.');
+          return;
+        }
+        
+        // Get new editor name for audit log
+        const { data: newEditor } = await supabaseClient
+          .from('admin_users_view')
+          .select('email, metadata')
+          .eq('id', newEditorId)
+          .single();
+        
+        // 1. Unassign current editor (if exists)
+        if (currentEditorAssignment) {
+          const { error: unassignError } = await supabaseClient
+            .from('editor_assignments')
+            .update({ unassigned_at: new Date().toISOString() })
+            .eq('id', currentEditorAssignment.id);
+          
+          if (unassignError) throw unassignError;
+        }
+        
+        // 2. Assign new editor
+        const { error: assignError } = await supabaseClient
+          .from('editor_assignments')
+          .insert({
+            case_id: currentCaseDetailId,
+            editor_user_id: newEditorId,
+            assigned_by: session.user.id
+          });
+        
+        if (assignError) throw assignError;
+        
+        // 3. Log to audit trail
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: session.user.id,
+            actor_role: 'admin',
+            action_type: 'editor_reassigned',
+            target_type: 'case',
+            target_id: currentCaseDetailId,
+            payload: { 
+              old_editor: currentEditorAssignment?.editor_user_id || null,
+              old_editor_email: currentEditorAssignment?.editor?.email || null,
+              new_editor: newEditorId,
+              new_editor_email: newEditor?.email || null
+            }
+          });
+        
+        // Close modal and show success
+        closeReassignEditorModal();
+        alert('✓ Editor reassigned successfully!');
+        
+        // Reload case detail modal
+        await loadCaseDetailData(currentCaseDetailId);
+        
+      } catch (error) {
+        console.error('Error reassigning editor:', error);
+        alert('Error reassigning editor: ' + error.message);
+      }
     }
     
     async function pushToRevisionFromModal() {
@@ -6190,7 +6358,8 @@
     window.closeCaseDetailModal = closeCaseDetailModal;
     window.switchModalTab = switchModalTab;
     window.openReassignEditorFromModal = openReassignEditorFromModal;
-    window.openReassignQCFromModal = openReassignQCFromModal;
+    window.closeReassignEditorModal = closeReassignEditorModal;
+    window.confirmReassignEditor = confirmReassignEditor;
     window.pushToRevisionFromModal = pushToRevisionFromModal;
     window.showCaseIdInfo = showCaseIdInfo;
     
@@ -6301,10 +6470,6 @@
               <span>✏️</span>
               <span>Reassign Editor</span>
             </button>
-            <button class="support-action-btn" onclick="openReassignQCFromModal()">
-              <span>🔍</span>
-              <span>Reassign QC</span>
-            </button>
             <button class="support-action-btn danger" onclick="pushToRevisionFromModal()">
               <span>🔄</span>
               <span>Push to Revision</span>
@@ -6315,6 +6480,36 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Reassign Editor Modal -->
+  <div id="reassign-editor-modal" class="simple-modal" style="display: none;">
+    <div class="simple-modal-content" style="max-width: 500px;">
+      <h2 style="margin-bottom: 20px; color: #32343a;">Reassign Editor</h2>
+      
+      <div style="margin-bottom: 20px; padding: 12px; background-color: #e3f2fd; border-left: 4px solid #2196f3; border-radius: 4px;">
+        <strong style="color: #1976d2;">Currently Assigned:</strong>
+        <div id="current-editor-name" style="margin-top: 5px; color: #32343a;"></div>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #32343a;">
+          Select New Editor:
+        </label>
+        <select id="new-editor-select" style="width: 100%; padding: 10px; border: 2px solid #436481; border-radius: 8px; font-size: 14px;">
+          <option value="">-- Select Editor --</option>
+        </select>
+      </div>
+      
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button onclick="closeReassignEditorModal()" style="padding: 10px 20px; background-color: #ccc; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+          Cancel
+        </button>
+        <button onclick="confirmReassignEditor()" style="padding: 10px 20px; background-color: #436481; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+          Reassign Editor
+        </button>
       </div>
     </div>
   </div>
