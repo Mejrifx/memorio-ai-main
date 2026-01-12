@@ -6296,7 +6296,7 @@
         
         // Close modal and show success
         closeReassignEditorModal();
-        showToast('✓ Editor reassigned successfully!');
+        showSuccessModal('✅ Editor Reassigned Successfully!\n\nThe case has been reassigned to the new editor. The change is now reflected in the case details and audit trail.');
         
         // Reload all cases data to get updated assignments
         await loadAllCases();
