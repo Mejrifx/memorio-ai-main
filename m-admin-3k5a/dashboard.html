@@ -6147,7 +6147,7 @@
     async function openReassignEditorFromModal() {
       try {
         if (!currentCaseDetailId) {
-          alert('No case selected');
+          showToast('No case selected', true);
           return;
         }
         
@@ -6211,7 +6211,7 @@
         
       } catch (error) {
         console.error('Error opening reassign editor modal:', error);
-        alert('Error loading editors: ' + error.message);
+        showToast('Error loading editors: ' + error.message, true);
       }
     }
     
@@ -6226,13 +6226,13 @@
         const newEditorId = document.getElementById('new-editor-select').value;
         
         if (!newEditorId) {
-          alert('Please select an editor');
+          showToast('Please select an editor', true);
           return;
         }
         
         const session = await getValidSession();
         if (!session) {
-          alert('Session expired. Please log in again.');
+          showToast('Session expired. Please log in again.', true);
           return;
         }
         
@@ -6250,7 +6250,10 @@
             .update({ unassigned_at: new Date().toISOString() })
             .eq('id', currentEditorAssignment.id);
           
-          if (unassignError) throw unassignError;
+          if (unassignError) {
+            console.error('Error unassigning editor:', unassignError);
+            throw unassignError;
+          }
         }
         
         // 2. Assign new editor
@@ -6262,10 +6265,13 @@
             assigned_by: session.user.id
           });
         
-        if (assignError) throw assignError;
+        if (assignError) {
+          console.error('Error assigning new editor:', assignError);
+          throw assignError;
+        }
         
         // 3. Log to audit trail
-        await supabaseClient
+        const { error: auditError } = await supabaseClient
           .from('events')
           .insert({
             actor_user_id: session.user.id,
@@ -6281,9 +6287,16 @@
             }
           });
         
+        if (auditError) {
+          console.error('⚠️ Error logging to audit trail:', auditError);
+          // Don't throw - reassignment was successful, just audit log failed
+        } else {
+          console.log('✅ Audit trail updated successfully');
+        }
+        
         // Close modal and show success
         closeReassignEditorModal();
-        alert('✓ Editor reassigned successfully!');
+        showToast('✓ Editor reassigned successfully!');
         
         // Reload all cases data to get updated assignments
         await loadAllCases();
@@ -6295,9 +6308,12 @@
           populateModalHeader(updatedCaseData);
         }
         
+        // Reload audit trail to show the reassignment event
+        await loadModalAudit(currentCaseDetailId);
+        
       } catch (error) {
         console.error('Error reassigning editor:', error);
-        alert('Error reassigning editor: ' + error.message);
+        showToast('Error reassigning editor: ' + error.message, true);
       }
     }
     
