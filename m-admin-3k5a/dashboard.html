@@ -6151,32 +6151,29 @@
           return;
         }
         
-        // Get current case data with editor assignments
-        const { data: caseData, error: caseError } = await supabaseClient
-          .from('admin_cases_view')
-          .select('*')
-          .eq('id', currentCaseDetailId)
-          .single();
-        
-        if (caseError) throw caseError;
-        
-        // Find active editor assignment (where unassigned_at IS NULL)
+        // Find active editor assignment using view (bypasses RLS issues)
         const { data: assignments, error: assignError } = await supabaseClient
-          .from('editor_assignments')
-          .select('*, editor:users!editor_user_id(id, email, metadata)')
+          .from('admin_editor_assignments_view')
+          .select('*')
           .eq('case_id', currentCaseDetailId)
           .is('unassigned_at', null)
           .order('assigned_at', { ascending: false })
           .limit(1);
         
-        if (assignError) throw assignError;
+        if (assignError) {
+          console.error('Error loading editor assignment:', assignError);
+          throw assignError;
+        }
         
         currentEditorAssignment = assignments && assignments.length > 0 ? assignments[0] : null;
         
+        console.log('Current editor assignment:', currentEditorAssignment);
+        
         // Display current editor
         const currentEditorDiv = document.getElementById('current-editor-name');
-        if (currentEditorAssignment && currentEditorAssignment.editor) {
-          const editorName = currentEditorAssignment.editor.metadata?.name || currentEditorAssignment.editor.email;
+        if (currentEditorAssignment) {
+          // Use data from admin_editor_assignments_view which includes editor_email and editor_metadata
+          const editorName = currentEditorAssignment.editor_metadata?.name || currentEditorAssignment.editor_email || 'Unknown Editor';
           currentEditorDiv.textContent = editorName;
         } else {
           currentEditorDiv.textContent = 'No editor currently assigned';
@@ -6278,7 +6275,7 @@
             target_id: currentCaseDetailId,
             payload: { 
               old_editor: currentEditorAssignment?.editor_user_id || null,
-              old_editor_email: currentEditorAssignment?.editor?.email || null,
+              old_editor_email: currentEditorAssignment?.editor_email || null,
               new_editor: newEditorId,
               new_editor_email: newEditor?.email || null
             }
@@ -6288,8 +6285,15 @@
         closeReassignEditorModal();
         alert('✓ Editor reassigned successfully!');
         
-        // Reload case detail modal
-        await loadCaseDetailData(currentCaseDetailId);
+        // Reload all cases data to get updated assignments
+        await loadAllCases();
+        
+        // Refresh the case detail modal header with updated data
+        const updatedCaseData = allCasesData.find(c => c.id === currentCaseDetailId);
+        if (updatedCaseData) {
+          currentModalCaseData = updatedCaseData;
+          populateModalHeader(updatedCaseData);
+        }
         
       } catch (error) {
         console.error('Error reassigning editor:', error);
