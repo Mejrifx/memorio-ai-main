@@ -6044,7 +6044,9 @@
           ? `<strong>Editor Assigned:</strong> ${editorEmail}` 
           : '<strong>Editor Assigned</strong> to case',
         
-        'editor_reassigned': '<strong>Editor Reassigned</strong> to different editor',
+        'editor_reassigned': payload?.new_editor_email 
+          ? `<strong>Editor Reassigned</strong><br><small style="color: var(--text-tertiary);">From: ${payload.old_editor_email || 'Unassigned'} → To: ${payload.new_editor_email}</small>`
+          : '<strong>Editor Reassigned</strong> to different editor',
         'editor_unassigned': '<strong>Editor Unassigned</strong> from case',
         
         'video_submitted': editorEmail 
