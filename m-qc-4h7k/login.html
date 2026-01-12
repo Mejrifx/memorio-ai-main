@@ -299,52 +299,36 @@
       loginBtn.textContent = 'Signing in...';
       
       try {
-        // Attempt login
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-          email: email,
-          password: password
+        // Call server-side rate-limited login Edge Function
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/rate-limited-login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+            expectedRole: 'qc'
+          })
         });
         
-        if (error) throw error;
+        const result = await response.json();
         
-        // Success! Clear rate limit
-        clearRateLimit(email);
-        
-        // Check if user is a QC user
-        const role = data.user.app_metadata?.role;
-        
-        if (role !== 'qc') {
-          throw new Error('Access denied: This portal is only for QC users.');
+        // Handle rate limiting (429)
+        if (response.status === 429) {
+          throw new Error(result.message || 'Too many failed login attempts. Please try again later.');
         }
         
-        // Fetch user data from database to check status
-        const { data: userData, error: userError } = await supabaseClient
-          .from('users')
-          .select('role, status, metadata')
-          .eq('id', data.user.id)
-          .single();
-        
-        if (userError) {
-          console.warn('Could not fetch user data:', userError);
+        // Handle authentication errors
+        if (!response.ok) {
+          throw new Error(result.message || 'Failed to sign in. Please check your credentials.');
         }
         
-        // Update user status to 'active' on first successful login
-        if (userData && userData.status === 'invited') {
-          await supabaseClient
-            .from('users')
-            .update({ 
-              status: 'active',
-              last_login_at: new Date().toISOString()
-            })
-            .eq('id', data.user.id);
-        } else if (userData) {
-          // Just update last login time for already active users
-          await supabaseClient
-            .from('users')
-            .update({ 
-              last_login_at: new Date().toISOString()
-            })
-            .eq('id', data.user.id);
+        // Success! Session is automatically set by Supabase
+        // Store session manually if needed
+        if (result.session) {
+          await supabaseClient.auth.setSession(result.session);
         }
         
         // Success - redirect to dashboard
@@ -357,9 +341,6 @@
         
       } catch (error) {
         console.error('Login error:', error);
-        
-        // Record failed attempt for rate limiting
-        recordFailedAttempt(email);
         
         errorMessage.textContent = error.message || 'Failed to sign in. Please check your credentials.';
         errorMessage.style.display = 'block';
