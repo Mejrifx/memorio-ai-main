@@ -205,7 +205,7 @@
       if (session && session.user.app_metadata?.role === 'family') {
         // Already logged in, redirect to intake form
         // index.html will handle routing to dashboard if form is already submitted
-        window.location.href = '../index.html';
+        window.location.href = '/index.html';
       }
     });
     
@@ -339,7 +339,7 @@
         successMessage.style.display = 'block';
         
         setTimeout(() => {
-          window.location.href = '../index.html';
+          window.location.href = '/index.html';
         }, 1000);
         
       } catch (error) {

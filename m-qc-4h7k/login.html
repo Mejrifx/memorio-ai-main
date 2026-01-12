@@ -203,7 +203,7 @@
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
       if (session && session.user.app_metadata?.role === 'qc') {
         // Already logged in, redirect to dashboard
-        window.location.href = 'dashboard.html';
+        window.location.href = '/qc/dashboard';
       }
     });
     
@@ -336,7 +336,7 @@
         successMessage.style.display = 'block';
         
         setTimeout(() => {
-          window.location.href = 'dashboard.html';
+          window.location.href = '/qc/dashboard';
         }, 1000);
         
       } catch (error) {
