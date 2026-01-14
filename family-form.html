@@ -1115,11 +1115,11 @@
                 await supabaseClient.auth.signOut();
                 
                 // Redirect to main Memorio site
-                window.location.href = 'index.html';
+                window.location.href = '/';
             } catch (error) {
                 console.error('❌ Sign out error:', error);
                 // Still redirect even if error
-                window.location.href = 'index.html';
+                window.location.href = '/';
             }
         }
         

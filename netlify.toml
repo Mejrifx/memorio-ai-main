@@ -25,6 +25,11 @@
   status = 200
 
 [[redirects]]
+  from = "/family/form"
+  to = "/family-form.html"
+  status = 200
+
+[[redirects]]
   from = "/family/dashboard"
   to = "/m-family-7x2p/dashboard.html"
   status = 200
