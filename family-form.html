@@ -1263,7 +1263,7 @@
                         // Form is already completed and not in edit mode, redirect immediately without showing form
                         if (canRedirect()) {
                             setRedirectLock();
-                            window.location.href = '/m-family-7x2p/dashboard.html';
+                            window.location.href = '/family/dashboard';
                         } else {
                             console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
                             alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
@@ -1720,7 +1720,7 @@
                             <div id="obituaryContent" class="obituary-content"></div>
                             <div class="edit-hint">You can always make changes in the dashboard</div>
                             <div class="action-buttons">
-                                <a href="/m-family-7x2p/dashboard.html" class="btn" style="background: #436481; text-decoration: none;">Access Dashboard</a>
+                                <a href="/family/dashboard" class="btn" style="background: #436481; text-decoration: none;">Access Dashboard</a>
                             </div>
                         </div>
                     </div>`;
@@ -1889,7 +1889,7 @@
                 if (actionButtons && !document.getElementById('dashboardBtn')) {
                     const dashboardBtn = document.createElement('a');
                     dashboardBtn.id = 'dashboardBtn';
-                    dashboardBtn.href = '/m-family-7x2p/dashboard.html';
+                    dashboardBtn.href = '/family/dashboard';
                     dashboardBtn.className = 'btn';
                     dashboardBtn.textContent = 'Access Dashboard';
                     dashboardBtn.style.marginLeft = '15px';
@@ -2628,7 +2628,7 @@
             
             const dashboardIcon = document.createElement('a');
             dashboardIcon.id = 'persistent-dashboard-icon';
-            dashboardIcon.href = '/m-family-7x2p/dashboard.html';
+            dashboardIcon.href = '/family/dashboard';
             dashboardIcon.innerHTML = `
                 <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9998; background-color: #436481; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; transition: all 0.3s ease; text-decoration: none;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

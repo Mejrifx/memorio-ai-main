@@ -5,12 +5,12 @@
   <title>My Case - Memorio Family Portal</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <!-- Preload Dosis font -->
-  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
-  <link href="../css/normalize.css" rel="stylesheet" type="text/css">
-  <link href="../css/webflow.css" rel="stylesheet" type="text/css">
-  <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
-  <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
-  <link href="../images/webclip.png" rel="apple-touch-icon">
+  <link rel="preload" href="/fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link href="/css/normalize.css" rel="stylesheet" type="text/css">
+  <link href="/css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="/css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/x-icon">
+  <link href="/images/webclip.png" rel="apple-touch-icon">
   
   <style>
     .dashboard-container {
@@ -689,14 +689,14 @@
 <body class="body auth-pending">
   <div class="nav">
     <div class="logo-wrapper">
-      <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
+      <img src="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
            loading="lazy" 
            width="166" 
            sizes="166px" 
            alt="The Memorio Logo" 
-           srcset="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, 
-                   ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, 
-                   ../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w">
+           srcset="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, 
+                   /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, 
+                   /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w">
     </div>
   </div>
 
@@ -1226,7 +1226,7 @@
       
       if (caseData.status === 'waiting_on_family' || caseData.status === 'created') {
         actionButtons = `
-          <a href="../index.html" class="btn-primary">Complete Obituary Form</a>
+          <a href="/family/form" class="btn-primary">Complete Obituary Form</a>
         `;
       } else if (caseData.status === 'submitted') {
         actionButtons = `
