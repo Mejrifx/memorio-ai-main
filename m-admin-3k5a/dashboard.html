@@ -3610,7 +3610,7 @@
         
         if (!session) {
           console.error('No session found - redirecting to login');
-          window.location.href = 'login.html';
+          window.location.href = '/admin/login';
           return false;
         }
         
@@ -3633,7 +3633,7 @@
         if (error || !userData || userData.role !== 'admin') {
           console.error('❌ Not an admin or user not found');
           await supabaseClient.auth.signOut();
-          window.location.href = 'login.html';
+          window.location.href = '/admin/login';
           return false;
         }
         
@@ -3666,7 +3666,7 @@
         
       } catch (error) {
         console.error('❌ Auth check failed:', error);
-        window.location.href = 'login.html';
+        window.location.href = '/admin/login';
         return false;
       }
     }
@@ -3716,7 +3716,7 @@
     // Logout handler
     async function handleLogout() {
       await supabaseClient.auth.signOut();
-      window.location.href = 'login.html';
+      window.location.href = '/admin/login';
     }
     
     // Make functions global

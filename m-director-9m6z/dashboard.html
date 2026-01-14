@@ -1449,7 +1449,7 @@
         
         if (!session) {
           console.error('No session found - redirecting to login');
-          window.location.href = 'login.html';
+          window.location.href = '/director/login';
           return false;
         }
         
@@ -1472,7 +1472,7 @@
         if (error || !userData || userData.role !== 'director') {
           console.error('❌ Not a director or user not found');
           await supabaseClient.auth.signOut();
-          window.location.href = 'login.html';
+          window.location.href = '/director/login';
           return false;
         }
         
@@ -1521,7 +1521,7 @@
         
       } catch (error) {
         console.error('❌ Auth check failed:', error);
-        window.location.href = 'login.html';
+        window.location.href = '/director/login';
         return false;
       }
     }
@@ -1586,7 +1586,7 @@
     // Logout handler
     document.getElementById('logout-btn').addEventListener('click', async () => {
       await supabaseClient.auth.signOut();
-      window.location.href = 'login.html';
+      window.location.href = '/director/login';
     });
     
     // Section switching

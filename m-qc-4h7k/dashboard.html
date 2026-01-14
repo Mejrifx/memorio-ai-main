@@ -770,7 +770,7 @@
         
         if (!session) {
           console.error('No session found - redirecting to login');
-          window.location.href = 'login.html';
+          window.location.href = '/qc/login';
           return false;
         }
         
@@ -787,7 +787,7 @@
           console.error('❌ Not a QC user');
           alert('Access denied: This portal is only for QC users.');
           await supabaseClient.auth.signOut();
-          window.location.href = 'login.html';
+          window.location.href = '/qc/login';
           return false;
         }
         
@@ -808,7 +808,7 @@
         
       } catch (error) {
         console.error('❌ Auth check failed:', error);
-        window.location.href = 'login.html';
+        window.location.href = '/qc/login';
         return false;
       }
     }
@@ -1471,7 +1471,7 @@
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await supabaseClient.auth.signOut();
-      window.location.href = 'login.html';
+      window.location.href = '/qc/login';
     });
     
     // Initialize

@@ -921,7 +921,7 @@
         
         if (!session) {
           console.error('No session found - redirecting to login');
-          window.location.href = 'login.html';
+          window.location.href = '/editor/login';
           return false;
         }
         
@@ -943,7 +943,7 @@
         if (userError || !userData || userData.role !== 'editor') {
           console.error('❌ Not an editor or user not found');
           await supabaseClient.auth.signOut();
-          window.location.href = 'login.html';
+          window.location.href = '/editor/login';
           return false;
         }
         
@@ -968,7 +968,7 @@
         
       } catch (error) {
         console.error('❌ Auth check failed:', error);
-        window.location.href = 'login.html';
+        window.location.href = '/editor/login';
         return false;
       }
     }
@@ -1805,7 +1805,7 @@
     // Handle logout
     async function handleLogout() {
       await supabaseClient.auth.signOut();
-      window.location.href = 'login.html';
+      window.location.href = '/editor/login';
     }
     
     // Confirmation Modal Functions
