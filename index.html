@@ -1525,7 +1525,17 @@
           <li><a href="#how-it-works">How It Works</a></li>
           <li><a href="#benefits">Benefits</a></li>
           <li><a href="#faq">FAQ</a></li>
-          <li><a href="#" id="footerLoginBtn">Family Login</a></li>
+        </ul>
+                    </div>
+      
+      <div class="footer-section">
+        <h3>Login</h3>
+        <ul class="footer-links">
+          <li><a href="/family/login">Family Portal</a></li>
+          <li><a href="/director/login">Director Portal</a></li>
+          <li><a href="/editor/login">Editor Portal</a></li>
+          <li><a href="/qc/login">QC Portal</a></li>
+          <li><a href="/admin/login">Admin Portal</a></li>
         </ul>
                     </div>
       
@@ -1655,13 +1665,11 @@
       const loginBtn = document.getElementById('loginBtn');
       const heroLoginBtn = document.getElementById('heroLoginBtn');
       const ctaLoginBtn = document.getElementById('ctaLoginBtn');
-      const footerLoginBtn = document.getElementById('footerLoginBtn');
       
       console.log('🔍 Login buttons found:', {
         loginBtn: !!loginBtn,
         heroLoginBtn: !!heroLoginBtn,
-        ctaLoginBtn: !!ctaLoginBtn,
-        footerLoginBtn: !!footerLoginBtn
+        ctaLoginBtn: !!ctaLoginBtn
       });
       
       function redirectToFamilyForm() {
@@ -1684,13 +1692,6 @@
       if (ctaLoginBtn) {
         ctaLoginBtn.addEventListener('click', (e) => {
           console.log('🖱️ CTA login button clicked');
-          redirectToFamilyForm();
-        });
-      }
-      if (footerLoginBtn) {
-        footerLoginBtn.addEventListener('click', (e) => {
-          console.log('🖱️ Footer login link clicked');
-          e.preventDefault();
           redirectToFamilyForm();
         });
       }
