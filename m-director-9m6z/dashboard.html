@@ -1479,6 +1479,12 @@
         // Check if user needs to change password (first login)
         if (userData.metadata?.requires_password_change === true) {
           console.log('⚠️ First login detected - forcing password change');
+          
+          // CRITICAL FIX: Make page visible BEFORE showing password modal
+          // Otherwise the modal appears but the page stays hidden (blank screen)
+          document.body.classList.remove('auth-pending');
+          document.body.classList.add('auth-verified');
+          
           showPasswordChangeModal();
           return false; // Block dashboard access
         }
@@ -1675,11 +1681,19 @@
         const session = await getValidSession();
         if (!session) throw new Error('Session expired');
         
+        // CRITICAL FIX: Fetch existing metadata from database first
+        // Don't use user_metadata from JWT - they're different!
+        const { data: existingUser } = await supabaseClient
+          .from('users')
+          .select('metadata')
+          .eq('id', session.user.id)
+          .single();
+        
         const { error: metadataError } = await supabaseClient
           .from('users')
           .update({
             metadata: {
-              ...currentSession.user.user_metadata,
+              ...(existingUser?.metadata || {}),  // Preserve existing metadata
               requires_password_change: false,
               password_changed_at: new Date().toISOString()
             }
