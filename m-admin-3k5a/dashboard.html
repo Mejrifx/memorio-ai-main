@@ -5189,6 +5189,12 @@
               <span class="meta-icon">📅</span>
               <span>Created ${createdDate}</span>
             </div>
+            ${caseData.metadata?.service_date ? `
+            <div class="case-card-meta-row">
+              <span class="meta-icon">⛪</span>
+              <span>Service ${new Date(caseData.metadata.service_date).toLocaleDateString()}</span>
+            </div>
+            ` : ''}
           </div>
         </div>
       `;
@@ -5617,6 +5623,15 @@
       document.getElementById('case-modal-id').textContent = caseData.id;
       document.getElementById('case-modal-status-full').textContent = formatStatus(caseData.status);
       document.getElementById('case-modal-created').textContent = new Date(caseData.created_at).toLocaleString();
+      
+      // Display service date from metadata
+      const serviceDate = caseData.metadata?.service_date;
+      if (serviceDate) {
+        document.getElementById('case-modal-service-date').textContent = new Date(serviceDate).toLocaleDateString();
+      } else {
+        document.getElementById('case-modal-service-date').textContent = 'Not specified';
+      }
+      
       document.getElementById('case-modal-updated').textContent = new Date(caseData.updated_at).toLocaleString();
       document.getElementById('case-modal-org-id').textContent = caseData.org_id || '-';
     }
@@ -6488,6 +6503,10 @@
                 <div class="case-detail-item">
                   <span class="case-detail-label">Created</span>
                   <span class="case-detail-value" id="case-modal-created">-</span>
+                </div>
+                <div class="case-detail-item">
+                  <span class="case-detail-label">Service Date</span>
+                  <span class="case-detail-value" id="case-modal-service-date">-</span>
                 </div>
                 <div class="case-detail-item">
                   <span class="case-detail-label">Last Updated</span>
