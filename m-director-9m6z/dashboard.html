@@ -1280,6 +1280,10 @@
             <div class="modal-info-value" id="modal-case-created">-</div>
           </div>
           <div class="modal-info-item">
+            <div class="modal-info-label">Service Date</div>
+            <div class="modal-info-value" id="modal-case-service-date">-</div>
+          </div>
+          <div class="modal-info-item">
             <div class="modal-info-label">Last Updated</div>
             <div class="modal-info-value" id="modal-case-updated">-</div>
           </div>
@@ -1853,6 +1857,15 @@
         document.getElementById('modal-case-id').textContent = caseData.id;
         document.getElementById('modal-case-status').textContent = `${stage.emoji} ${stage.label}`;
         document.getElementById('modal-case-created').textContent = new Date(caseData.created_at).toLocaleDateString();
+        
+        // Display service date from metadata
+        const serviceDate = caseData.metadata?.service_date;
+        if (serviceDate) {
+          document.getElementById('modal-case-service-date').textContent = new Date(serviceDate).toLocaleDateString();
+        } else {
+          document.getElementById('modal-case-service-date').textContent = 'Not specified';
+        }
+        
         document.getElementById('modal-case-updated').textContent = new Date(caseData.updated_at).toLocaleDateString();
         
         if (familyEmail) {
@@ -2353,6 +2366,7 @@
             </div>
             ${getVideoStatusBadge(c.status)}
             <p class="case-meta">Created: ${new Date(c.created_at).toLocaleDateString()}</p>
+            ${c.metadata?.service_date ? `<p class="case-meta" style="margin-top: 4px;">Service: ${new Date(c.metadata.service_date).toLocaleDateString()}</p>` : ''}
             <div class="credential-box" style="margin-top: 12px;">
               <div class="credential-label">Case ID</div>
               <div class="credential-value" id="case-id-${c.id}" style="font-size: 11px; word-break: break-all;">${c.id}</div>
