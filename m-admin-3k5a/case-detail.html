@@ -1659,10 +1659,34 @@
           html += '<h3 class="form-data-title">Uploaded Photos</h3>';
           html += '<div class="assets-grid">';
           assets.forEach(asset => {
-            const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/case-assets/${asset.file_key}`;
+            // Determine the correct image URL based on the source
+            let imageUrl;
+            
+            if (asset.metadata?.source === 'uploadcare') {
+              // Uploadcare photo from initial form submission
+              const fileId = asset.metadata?.uploadcare_file_id || asset.file_key;
+              
+              // Ensure we have a proper Uploadcare URL
+              if (!asset.file_key.includes('ucarecdn.com')) {
+                imageUrl = `https://ucarecdn.com/${fileId}/`;
+              } else {
+                imageUrl = asset.file_key.replace(/\/$/, '') + '/';
+              }
+              
+              console.log('📸 Admin viewing Uploadcare photo:', fileId, '→', imageUrl);
+            } else if (asset.file_key.startsWith('http://') || asset.file_key.startsWith('https://')) {
+              // file_key already contains a full URL (Supabase Storage or other)
+              imageUrl = asset.file_key;
+              console.log('📸 Admin viewing full URL photo:', imageUrl);
+            } else {
+              // file_key is a relative path - construct Supabase Storage URL
+              imageUrl = `${SUPABASE_URL}/storage/v1/object/public/case-assets/${asset.file_key}`;
+              console.log('📸 Admin viewing relative path photo:', asset.file_key, '→', imageUrl);
+            }
+            
             html += `
               <div class="asset-item" onclick="window.open('${imageUrl}', '_blank')">
-                <img src="${imageUrl}" alt="Asset" loading="lazy">
+                <img src="${imageUrl}" alt="Asset" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'padding: 20px; text-align: center;\\'>❌ Error loading image</div>'">
               </div>
             `;
           });
