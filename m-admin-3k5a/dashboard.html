@@ -3571,6 +3571,7 @@
     // Global auth state
     let isAuthenticated = false;
     let currentSession = null;
+    let currentUser = null;
     
     // Set up automatic token refresh and session monitoring
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
@@ -3657,6 +3658,7 @@
         }
         
         isAuthenticated = true;
+        currentUser = session.user; // Store current user globally
         // Show content now that auth is verified
         document.body.classList.remove('auth-pending');
         document.body.classList.add('auth-verified');
@@ -6374,35 +6376,83 @@
     }
     
     async function pushToRevisionFromModal() {
-      if (!confirm('Push this case to revision? The editor will be notified.')) {
+      // Prompt for revision notes from admin
+      const revisionNotes = prompt('Enter revision notes for the editor (required):');
+      
+      if (!revisionNotes || revisionNotes.trim() === '') {
+        alert('Revision notes are required.');
+        return;
+      }
+      
+      if (!confirm('Push this video to revision? The editor will be notified.')) {
         return;
       }
       
       try {
-        const { error } = await supabaseClient
+        // Step 1: Find the latest video submission for this case
+        const { data: latestSubmission, error: submissionError } = await supabaseClient
+          .from('video_submissions')
+          .select('*')
+          .eq('case_id', currentCaseDetailId)
+          .order('submitted_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (submissionError || !latestSubmission) {
+          throw new Error('No video submission found for this case. Cannot push to revision.');
+        }
+        
+        // Check if submission is already in revision or approved
+        if (latestSubmission.qc_status === 'revision_requested') {
+          throw new Error('This video is already marked for revision.');
+        }
+        if (latestSubmission.qc_status === 'approved') {
+          throw new Error('This video has already been approved and delivered to family.');
+        }
+        
+        // Step 2: Update the video submission to revision_requested
+        const { error: updateSubmissionError } = await supabaseClient
+          .from('video_submissions')
+          .update({
+            qc_status: 'revision_requested',
+            qc_reviewer_id: currentUser.id,
+            qc_notes: `[Admin Override] ${revisionNotes}`,
+            qc_reviewed_at: new Date().toISOString()
+          })
+          .eq('id', latestSubmission.id);
+        
+        if (updateSubmissionError) throw updateSubmissionError;
+        
+        // Step 3: Update the case status to revision_requested
+        const { error: updateCaseError } = await supabaseClient
           .from('cases')
           .update({ status: 'revision_requested' })
           .eq('id', currentCaseDetailId);
         
-        if (error) throw error;
+        if (updateCaseError) throw updateCaseError;
         
-        // Log to audit
+        // Step 4: Log to audit trail
         await supabaseClient
           .from('events')
           .insert({
             actor_user_id: currentUser.id,
             actor_role: 'admin',
-            action_type: 'pushed_to_revision',
-            target_type: 'case',
-            target_id: currentCaseDetailId,
-            payload: { reason: 'Admin support action' }
+            action_type: 'video_pushed_to_revision',
+            target_type: 'video_submission',
+            target_id: latestSubmission.id,
+            payload: { 
+              case_id: currentCaseDetailId,
+              reason: revisionNotes,
+              admin_override: true
+            }
           });
         
-        alert('Case pushed to revision successfully!');
+        // Show success modal instead of alert
+        showSuccessModal('Video pushed to revision successfully! The editor has been notified.');
         closeCaseDetailModal();
         
-        // Reload cases
-        await loadCases();
+        // Reload cases to reflect updated status
+        await loadAllCases();
         
       } catch (error) {
         console.error('Error pushing to revision:', error);
