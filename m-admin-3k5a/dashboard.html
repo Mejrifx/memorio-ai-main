@@ -5189,10 +5189,10 @@
               <span class="meta-icon">📅</span>
               <span>Created ${createdDate}</span>
             </div>
-            ${caseData.metadata?.service_date ? `
+            ${caseData.case_metadata?.service_date ? `
             <div class="case-card-meta-row">
               <span class="meta-icon">⛪</span>
-              <span>Service ${new Date(caseData.metadata.service_date).toLocaleDateString()}</span>
+              <span>Service ${new Date(caseData.case_metadata.service_date).toLocaleDateString()}</span>
             </div>
             ` : ''}
           </div>
@@ -5625,7 +5625,7 @@
       document.getElementById('case-modal-created').textContent = new Date(caseData.created_at).toLocaleString();
       
       // Display service date from metadata
-      const serviceDate = caseData.metadata?.service_date;
+      const serviceDate = caseData.case_metadata?.service_date;
       if (serviceDate) {
         document.getElementById('case-modal-service-date').textContent = new Date(serviceDate).toLocaleDateString();
       } else {
