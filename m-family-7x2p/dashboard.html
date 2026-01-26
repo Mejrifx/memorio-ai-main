@@ -364,6 +364,66 @@
       font-size: 14px;
     }
     
+    /* Upload Timer Banner */
+    #upload-timer-banner {
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      color: white;
+      box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+    }
+    
+    #upload-timer-banner.expired {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+    }
+    
+    .timer-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .timer-countdown {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+      text-align: center;
+      margin: 8px 0;
+    }
+    
+    .timer-message {
+      font-size: 13px;
+      opacity: 0.95;
+      text-align: center;
+    }
+    
+    /* Locked Upload State */
+    .upload-area.locked {
+      background-color: #f0f0f0;
+      border-color: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .upload-area.locked:hover {
+      background-color: #f0f0f0;
+      border-color: #ccc;
+    }
+    
+    .upload-area.locked .upload-icon {
+      color: #999;
+    }
+    
+    .upload-area.locked .upload-text {
+      color: #999;
+    }
+    
     .file-input {
       display: none;
     }
@@ -766,13 +826,19 @@
             <span class="icon icon-photos"></span>
             Photos
           </h3>
+          
+          <!-- Upload Timer Banner -->
+          <div id="upload-timer-banner" style="display: none;">
+            <!-- Timer will be populated here -->
+          </div>
+          
           <div id="assetsSection">
             <div class="assets-grid" id="assetsGrid">
-              <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+              <div class="upload-area" id="upload-area" onclick="handleUploadClick()">
                 <div class="upload-icon">
                   <span class="icon icon-upload"></span>
                 </div>
-                <div class="upload-text">Click to upload photos</div>
+                <div class="upload-text" id="upload-text">Click to upload photos</div>
               </div>
             </div>
             <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
@@ -912,6 +978,8 @@
     let currentForm = null;
     let currentAssets = [];
     let userName = null;
+    let uploadTimerInterval = null;
+    let uploadWindowExpired = false;
     
     // Redirect lock to prevent infinite loops
     const REDIRECT_LOCK_KEY = 'memorio-family-redirect-lock';
@@ -931,6 +999,147 @@
     
     function setRedirectLock() {
       sessionStorage.setItem(REDIRECT_LOCK_KEY, Date.now().toString());
+    }
+    
+    // ============================================================================
+    // UPLOAD TIMER FUNCTIONS (12-hour window)
+    // ============================================================================
+    
+    /**
+     * Calculate time remaining in the 12-hour upload window
+     * @param {string} submittedAt - ISO timestamp from forms.submitted_at
+     * @returns {object} { expired: boolean, hours: number, minutes: number, seconds: number, totalMs: number }
+     */
+    function calculateUploadTimeRemaining(submittedAt) {
+      if (!submittedAt) {
+        return { expired: false, hours: 12, minutes: 0, seconds: 0, totalMs: 12 * 60 * 60 * 1000 };
+      }
+      
+      const submittedTime = new Date(submittedAt).getTime();
+      const now = Date.now();
+      const twelveHoursMs = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+      const elapsedMs = now - submittedTime;
+      const remainingMs = twelveHoursMs - elapsedMs;
+      
+      if (remainingMs <= 0) {
+        return { expired: true, hours: 0, minutes: 0, seconds: 0, totalMs: 0 };
+      }
+      
+      const hours = Math.floor(remainingMs / (60 * 60 * 1000));
+      const minutes = Math.floor((remainingMs % (60 * 60 * 1000)) / (60 * 1000));
+      const seconds = Math.floor((remainingMs % (60 * 1000)) / 1000);
+      
+      return { expired: false, hours, minutes, seconds, totalMs: remainingMs };
+    }
+    
+    /**
+     * Initialize and start the upload timer countdown
+     */
+    function initializeUploadTimer() {
+      // Clear any existing interval
+      if (uploadTimerInterval) {
+        clearInterval(uploadTimerInterval);
+      }
+      
+      // Check if form has been submitted
+      if (!currentForm || !currentForm.submitted_at) {
+        // No form submitted yet - hide timer, allow uploads
+        document.getElementById('upload-timer-banner').style.display = 'none';
+        uploadWindowExpired = false;
+        unlockUploadArea();
+        return;
+      }
+      
+      // Update timer immediately
+      updateUploadTimerDisplay();
+      
+      // Update timer every second
+      uploadTimerInterval = setInterval(updateUploadTimerDisplay, 1000);
+    }
+    
+    /**
+     * Update the timer display (called every second)
+     */
+    function updateUploadTimerDisplay() {
+      const timerBanner = document.getElementById('upload-timer-banner');
+      const timeRemaining = calculateUploadTimeRemaining(currentForm?.submitted_at);
+      
+      if (timeRemaining.expired) {
+        // Window expired - lock uploads
+        uploadWindowExpired = true;
+        lockUploadArea();
+        
+        timerBanner.className = 'expired';
+        timerBanner.innerHTML = `
+          <div class="timer-title">
+            🔒 Upload Window Closed
+          </div>
+          <div class="timer-message">
+            The 12-hour upload window has ended. You can still view all your uploaded photos below.
+          </div>
+        `;
+        timerBanner.style.display = 'block';
+        
+        // Stop the timer
+        if (uploadTimerInterval) {
+          clearInterval(uploadTimerInterval);
+          uploadTimerInterval = null;
+        }
+      } else {
+        // Window still open - show countdown
+        uploadWindowExpired = false;
+        unlockUploadArea();
+        
+        const { hours, minutes, seconds } = timeRemaining;
+        const timeString = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+        
+        timerBanner.className = '';
+        timerBanner.innerHTML = `
+          <div class="timer-title">
+            ⏱️ Upload Window Active
+          </div>
+          <div class="timer-countdown">${timeString}</div>
+          <div class="timer-message">
+            Time remaining to upload additional photos. After this window closes, our editors will begin creating your memorial video.
+          </div>
+        `;
+        timerBanner.style.display = 'block';
+      }
+    }
+    
+    /**
+     * Lock the upload area (disable uploads)
+     */
+    function lockUploadArea() {
+      const uploadArea = document.getElementById('upload-area');
+      const uploadText = document.getElementById('upload-text');
+      
+      uploadArea.classList.add('locked');
+      uploadText.textContent = '🔒 Upload window closed';
+    }
+    
+    /**
+     * Unlock the upload area (enable uploads)
+     */
+    function unlockUploadArea() {
+      const uploadArea = document.getElementById('upload-area');
+      const uploadText = document.getElementById('upload-text');
+      
+      uploadArea.classList.remove('locked');
+      uploadText.textContent = 'Click to upload photos';
+    }
+    
+    /**
+     * Handle upload area click (check if locked)
+     */
+    function handleUploadClick() {
+      if (uploadWindowExpired) {
+        alert('The 12-hour upload window has closed. You can no longer add photos to this case.');
+        return;
+      }
+      
+      // Trigger file input
+      document.getElementById('fileInput').click();
     }
     
     // Set up automatic token refresh and session monitoring
@@ -1163,6 +1372,10 @@
         displayCaseOverview(cases);
         displayObituary();
         displayAssets();
+        
+        // Initialize upload timer (12-hour window)
+        initializeUploadTimer();
+        
         displayTimeline(cases);
         displayNotifications();
         
@@ -1562,6 +1775,13 @@
     document.getElementById('fileInput').addEventListener('change', async (event) => {
       const files = event.target.files;
       if (files.length === 0) return;
+      
+      // Check if upload window has expired
+      if (uploadWindowExpired) {
+        alert('The 12-hour upload window has closed. You can no longer add photos to this case.');
+        event.target.value = '';
+        return;
+      }
       
       // Filter to only images
       const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
@@ -2032,6 +2252,13 @@
         closeObituaryEditor();
       }
     };
+    
+    // Cleanup timer on page unload
+    window.addEventListener('beforeunload', () => {
+      if (uploadTimerInterval) {
+        clearInterval(uploadTimerInterval);
+      }
+    });
     
   </script>
   

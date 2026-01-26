@@ -305,6 +305,43 @@
       margin: 0 0 15px 0;
     }
     
+    /* Photo Access Timer Banner (12-hour window) */
+    #photo-timer-banner {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px;
+      color: white;
+      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+      text-align: center;
+    }
+    
+    .photo-timer-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .photo-timer-countdown {
+      font-size: 36px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 3px;
+      margin: 12px 0;
+    }
+    
+    .photo-timer-message {
+      font-size: 14px;
+      opacity: 0.95;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
     .modal-detail-item {
       margin-bottom: 15px;
     }
@@ -747,14 +784,19 @@
         </div>
       </div>
       
-      <div class="modal-section">
+      <!-- Photo Access Timer Banner (12-hour window) -->
+      <div id="photo-timer-banner" style="display: none;">
+        <!-- Timer will be populated here -->
+      </div>
+      
+      <div class="modal-section" id="photos-section">
         <h3 class="modal-section-title">📷 Uploaded Photos</h3>
         <div id="photos-content" class="photo-gallery">
           <!-- Photos will be loaded here -->
         </div>
       </div>
       
-      <div class="modal-section">
+      <div class="modal-section" id="download-section-wrapper">
         <h3 class="modal-section-title">Download Photos for Video Creation</h3>
         <p style="color: #666; margin-bottom: 20px;">
           Download the family's uploaded photos to create a memorial tribute slideshow video.
@@ -870,6 +912,135 @@
     let currentUser = null;
     let currentCase = null;
     let assignedCases = [];
+    let photoTimerInterval = null;
+    let photosAccessLocked = false;
+    
+    // ============================================================================
+    // PHOTO ACCESS TIMER FUNCTIONS (12-hour window)
+    // ============================================================================
+    
+    /**
+     * Calculate time remaining in the 12-hour upload window
+     * @param {string} submittedAt - ISO timestamp from forms.submitted_at
+     * @returns {object} { expired: boolean, hours: number, minutes: number, seconds: number, totalMs: number }
+     */
+    function calculatePhotoAccessTimeRemaining(submittedAt) {
+      if (!submittedAt) {
+        return { expired: false, hours: 12, minutes: 0, seconds: 0, totalMs: 12 * 60 * 60 * 1000 };
+      }
+      
+      const submittedTime = new Date(submittedAt).getTime();
+      const now = Date.now();
+      const twelveHoursMs = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+      const elapsedMs = now - submittedTime;
+      const remainingMs = twelveHoursMs - elapsedMs;
+      
+      if (remainingMs <= 0) {
+        return { expired: true, hours: 0, minutes: 0, seconds: 0, totalMs: 0 };
+      }
+      
+      const hours = Math.floor(remainingMs / (60 * 60 * 1000));
+      const minutes = Math.floor((remainingMs % (60 * 60 * 1000)) / (60 * 1000));
+      const seconds = Math.floor((remainingMs % (60 * 1000)) / 1000);
+      
+      return { expired: false, hours, minutes, seconds, totalMs: remainingMs };
+    }
+    
+    /**
+     * Initialize and start the photo access timer countdown
+     * Called when opening a case modal
+     * @param {string} submittedAt - ISO timestamp from forms.submitted_at
+     */
+    function initializePhotoAccessTimer(submittedAt) {
+      // Clear any existing interval
+      if (photoTimerInterval) {
+        clearInterval(photoTimerInterval);
+      }
+      
+      // Check if form has been submitted
+      if (!submittedAt) {
+        // No form submitted yet - show waiting message
+        showPhotoWaitingMessage();
+        return;
+      }
+      
+      // Update timer immediately
+      updatePhotoTimerDisplay(submittedAt);
+      
+      // Update timer every second
+      photoTimerInterval = setInterval(() => updatePhotoTimerDisplay(submittedAt), 1000);
+    }
+    
+    /**
+     * Show message when family hasn't submitted form yet
+     */
+    function showPhotoWaitingMessage() {
+      const timerBanner = document.getElementById('photo-timer-banner');
+      const photosSection = document.getElementById('photos-section');
+      const downloadSection = document.getElementById('download-section-wrapper');
+      
+      timerBanner.innerHTML = `
+        <div class="photo-timer-title">
+          ⏳ Waiting for Family Submission
+        </div>
+        <div class="photo-timer-message">
+          The family has not yet completed their intake form. Photos will be available once the form is submitted and the 12-hour upload window expires.
+        </div>
+      `;
+      timerBanner.style.display = 'block';
+      
+      // Hide photos and download sections
+      photosSection.style.display = 'none';
+      downloadSection.style.display = 'none';
+      photosAccessLocked = true;
+    }
+    
+    /**
+     * Update the timer display (called every second)
+     * @param {string} submittedAt - ISO timestamp from forms.submitted_at
+     */
+    function updatePhotoTimerDisplay(submittedAt) {
+      const timerBanner = document.getElementById('photo-timer-banner');
+      const photosSection = document.getElementById('photos-section');
+      const downloadSection = document.getElementById('download-section-wrapper');
+      const timeRemaining = calculatePhotoAccessTimeRemaining(submittedAt);
+      
+      if (timeRemaining.expired) {
+        // Window expired - photos are now accessible
+        photosAccessLocked = false;
+        timerBanner.style.display = 'none';
+        photosSection.style.display = 'block';
+        downloadSection.style.display = 'block';
+        
+        // Stop the timer
+        if (photoTimerInterval) {
+          clearInterval(photoTimerInterval);
+          photoTimerInterval = null;
+        }
+      } else {
+        // Window still active - family still uploading
+        photosAccessLocked = true;
+        
+        const { hours, minutes, seconds } = timeRemaining;
+        const timeString = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+        
+        timerBanner.innerHTML = `
+          <div class="photo-timer-title">
+            🔒 Photos Locked - Family Still Uploading
+          </div>
+          <div class="photo-timer-countdown">${timeString}</div>
+          <div class="photo-timer-message">
+            The family has a 12-hour window to upload additional photos after submitting their form.<br>
+            Photos will be available for download once this window expires to ensure you have all the photos before starting your work.
+          </div>
+        `;
+        timerBanner.style.display = 'block';
+        
+        // Hide photos and download sections
+        photosSection.style.display = 'none';
+        downloadSection.style.display = 'none';
+      }
+    }
     
     // Set up automatic token refresh and session monitoring
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
@@ -1256,7 +1427,7 @@
           .select(`
             *,
             organizations (name),
-            forms (submitted_json),
+            forms (submitted_json, submitted_at),
             assets (id, file_key, mime_type, metadata)
           `)
           .eq('id', caseId)
@@ -1310,12 +1481,15 @@
         
         // Extract form data - handle both array and object formats from Supabase
         let formData = {};
+        let formSubmittedAt = null;
         if (Array.isArray(caseData.forms) && caseData.forms.length > 0) {
           // Forms returned as array
           formData = caseData.forms[0]?.submitted_json || {};
+          formSubmittedAt = caseData.forms[0]?.submitted_at;
         } else if (caseData.forms && typeof caseData.forms === 'object') {
           // Forms returned as single object (typical for one-to-many with single result)
           formData = caseData.forms.submitted_json || {};
+          formSubmittedAt = caseData.forms.submitted_at;
         }
         
         // 🔍 DEBUG: Log form data to diagnose tribute_quote issue
@@ -1360,6 +1534,9 @@
         } else {
           revisionNotice.style.display = 'none';
         }
+        
+        // INITIALIZE PHOTO ACCESS TIMER (12-hour window check)
+        initializePhotoAccessTimer(formSubmittedAt);
         
         // DISPLAY PHOTOS WITH INDIVIDUAL DOWNLOAD BUTTONS
         const photosContent = document.getElementById('photos-content');
@@ -1446,7 +1623,14 @@
       // Re-enable body scroll when modal is closed
       document.body.style.overflow = '';
       
+      // Clear photo access timer
+      if (photoTimerInterval) {
+        clearInterval(photoTimerInterval);
+        photoTimerInterval = null;
+      }
+      
       currentCase = null;
+      photosAccessLocked = false;
     }
     
     // View individual photo in new tab
@@ -1457,6 +1641,12 @@
     
     // Download individual photo
     async function downloadPhoto(photoUrl, photoNumber) {
+      // Check if photos are still locked (12-hour window not expired)
+      if (photosAccessLocked) {
+        showToast('Photos are locked - family still uploading. Please wait for the upload window to expire.', true);
+        return;
+      }
+      
       try {
         const response = await fetch(photoUrl);
         const blob = await response.blob();
@@ -1477,6 +1667,12 @@
     
     // Download all photos for video creation as ZIP file
     async function downloadAllPhotos() {
+      // Check if photos are still locked (12-hour window not expired)
+      if (photosAccessLocked) {
+        showToast('Photos are locked - family still uploading. Please wait for the upload window to expire.', true);
+        return;
+      }
+      
       if (!currentCase || !currentCase.assets || currentCase.assets.length === 0) {
         showToast('No photos available to download', true);
         return;
