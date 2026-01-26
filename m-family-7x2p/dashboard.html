@@ -1935,7 +1935,7 @@
     // Handle logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await supabaseClient.auth.signOut();
-      window.location.href = 'login.html';
+      window.location.href = '/';
     });
     
     // Load completed memorial (if case is delivered)
