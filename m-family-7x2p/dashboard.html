@@ -2595,7 +2595,7 @@
           .update({
             family_revision_notes: revisionNotes,
             revision_source: 'family',
-            qc_status: 'pending' // Reset to pending so it doesn't show as approved
+            qc_status: 'revision_requested' // Keep in editor's queue, NOT QC's queue
           })
           .eq('id', latestSubmission.id);
         
