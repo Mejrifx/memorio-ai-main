@@ -1586,9 +1586,9 @@
           if (caseError) {
             console.error('❌ Error loading case:', caseError);
             if (canRedirect()) {
-              console.log('No case found, redirecting to intake form...');
+              console.log('No case found, redirecting to home...');
               setRedirectLock();
-              window.location.href = '../index.html';
+              window.location.href = '/';
             } else {
               console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
               alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
@@ -1609,10 +1609,10 @@
             // Form is submitted, allow access to dashboard
             sessionStorage.removeItem(REDIRECT_LOCK_KEY); // Clear lock on success
           } else {
-            console.log('⚠️ Form not submitted yet, redirecting to intake form...');
+            console.log('⚠️ Form not submitted yet, redirecting to home...');
             if (canRedirect()) {
               setRedirectLock();
-              window.location.href = '../index.html';
+              window.location.href = '/';
             } else {
               console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
               alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
@@ -1622,8 +1622,8 @@
           
         } catch (e) {
           console.error('❌ Error checking form submission:', e);
-          // On error, redirect to intake form to be safe
-          window.location.href = '../index.html';
+          // On error, redirect to home to be safe
+          window.location.href = '/';
           return false;
         }
         
