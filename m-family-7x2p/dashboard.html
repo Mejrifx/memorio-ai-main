@@ -1218,6 +1218,36 @@
         </div>
       </div>
       
+      <!-- Revision Confirmation Modal -->
+      <div id="revisionConfirmModal" class="revision-modal-overlay" style="display: none;">
+        <div class="revision-modal-content" style="max-width: 500px;">
+          <div class="revision-modal-header">
+            <h2 class="revision-modal-title">Confirm Revision Request</h2>
+          </div>
+          
+          <div class="revision-modal-body">
+            <div class="revision-warning">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <div>
+                <strong>This is your only revision request</strong>
+                <p style="margin-top: 8px;">Are you sure you want to submit this revision request? Once submitted, you won't be able to request another revision.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="revision-modal-footer">
+            <button class="btn-cancel" onclick="closeRevisionConfirmModal()">Cancel</button>
+            <button class="btn-submit-revision" onclick="confirmRevisionSubmission()">
+              Yes, Submit Revision Request
+            </button>
+          </div>
+        </div>
+      </div>
+      
       <!-- Timeline Section -->
       <div class="dashboard-section">
         <h3 class="section-title">
@@ -2267,18 +2297,22 @@
       }
       
       try {
-        // Get approved video submission
+        // Get video submission
+        // If family requested revision, get the video with qc_status='revision_requested'
+        // Otherwise get the approved video
+        const queryStatus = isRevisionInProgress ? 'revision_requested' : 'approved';
+        
         const { data: videoSubmission, error: videoError } = await supabaseClient
           .from('video_submissions')
           .select('*')
           .eq('case_id', caseData.id)
-          .eq('qc_status', 'approved')
-          .order('qc_reviewed_at', { ascending: false })
+          .eq('qc_status', queryStatus)
+          .order('submitted_at', { ascending: false })
           .limit(1)
           .single();
         
         if (videoError || !videoSubmission) {
-          console.warn('No approved video found:', videoError);
+          console.warn(`No ${queryStatus} video found:`, videoError);
           document.getElementById('completedMemorialSection').style.display = 'none';
           return;
         }
@@ -2342,7 +2376,7 @@
             // Revision available - show enabled button
             revisionBtn.style.display = 'inline-flex';
             revisionBtn.disabled = false;
-            document.getElementById('requestRevisionBtnText').textContent = 'Request Revision (1/1)';
+            document.getElementById('requestRevisionBtnText').textContent = 'Request Revision (0/1)';
           }
         }
         
@@ -2549,7 +2583,7 @@
     });
     
     /**
-     * Submit the revision request
+     * Submit the revision request (step 1: validate and show confirmation)
      */
     async function submitRevisionRequest() {
       const revisionNotes = document.getElementById('revisionNotes').value.trim();
@@ -2565,10 +2599,25 @@
         return;
       }
       
-      // Confirmation
-      if (!confirm('Are you sure you want to submit this revision request? This is your only revision opportunity.')) {
-        return;
-      }
+      // Show confirmation modal instead of browser confirm
+      document.getElementById('revisionConfirmModal').style.display = 'flex';
+    }
+    
+    /**
+     * Close revision confirmation modal
+     */
+    function closeRevisionConfirmModal() {
+      document.getElementById('revisionConfirmModal').style.display = 'none';
+    }
+    
+    /**
+     * Actually submit the revision after confirmation
+     */
+    async function confirmRevisionSubmission() {
+      const revisionNotes = document.getElementById('revisionNotes').value.trim();
+      
+      // Close confirmation modal
+      closeRevisionConfirmModal();
       
       try {
         // Disable submit button to prevent double-clicking
@@ -2652,6 +2701,8 @@
     window.openRevisionRequestModal = openRevisionRequestModal;
     window.closeRevisionRequestModal = closeRevisionRequestModal;
     window.submitRevisionRequest = submitRevisionRequest;
+    window.closeRevisionConfirmModal = closeRevisionConfirmModal;
+    window.confirmRevisionSubmission = confirmRevisionSubmission;
     
     // Make PDF download function global
     window.downloadObituaryPDF = downloadObituaryPDF;
