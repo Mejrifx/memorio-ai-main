@@ -2293,8 +2293,8 @@
       
       if (!isDelivered && !isRevisionInProgress) {
         document.getElementById('completedMemorialSection').style.display = 'none';
-        document.getElementById('revisionInProgressBanner').style.display = 'none';
-        document.getElementById('requestRevisionBtn').style.display = 'none';
+        const revisionBtn = document.getElementById('requestRevisionBtn');
+        if (revisionBtn) revisionBtn.style.display = 'none';
         return;
       }
       
