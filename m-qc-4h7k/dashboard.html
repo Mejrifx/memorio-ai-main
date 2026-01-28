@@ -1165,12 +1165,29 @@
         .eq('case_id', currentSubmission.case_id)
         .single();
       
+      // Check if this is a revision from a family request
+      // Family notes are on the PREVIOUS submission, not the new one
+      let familyRevisionNotes = null;
+      if (currentSubmission.revision_number > 1) {
+        const { data: previousSubmissions } = await supabaseClient
+          .from('video_submissions')
+          .select('family_revision_notes, revision_source')
+          .eq('case_id', currentSubmission.case_id)
+          .eq('revision_source', 'family')
+          .order('submitted_at', { ascending: false })
+          .limit(1);
+        
+        if (previousSubmissions && previousSubmissions.length > 0) {
+          familyRevisionNotes = previousSubmissions[0].family_revision_notes;
+        }
+      }
+      
       // Display review interface
-      displayReviewInterface(currentSubmission, obituary);
+      displayReviewInterface(currentSubmission, obituary, familyRevisionNotes);
     }
     
     // Display review interface
-    function displayReviewInterface(submission, obituary) {
+    function displayReviewInterface(submission, obituary, familyRevisionNotes = null) {
       const content = document.getElementById('reviewContent');
       const editorName = submission.users?.metadata?.name || submission.users?.email || 'Editor';
       
@@ -1204,13 +1221,13 @@
           </div>
         ` : ''}
         
-        ${submission.family_revision_notes && submission.revision_source === 'family' ? `
+        ${familyRevisionNotes ? `
           <div class="family-revision-notes">
             <div class="family-revision-header">
               <strong style="color: #2e7d32;">👨‍👩‍👧 Family Revision Request</strong>
               <span class="family-revision-badge">From Family</span>
             </div>
-            <p style="margin-top: 12px; color: #333; line-height: 1.6;">${submission.family_revision_notes}</p>
+            <p style="margin-top: 12px; color: #333; line-height: 1.6;">${familyRevisionNotes}</p>
             <p style="margin-top: 8px; font-size: 13px; color: #666; font-style: italic;">
               ⚠️ Please verify that the editor has addressed all the family's requested changes before approving.
             </p>
