@@ -937,6 +937,23 @@
     let photosAccessLocked = false;
     
     // ============================================================================
+    // HELPER FUNCTIONS
+    // ============================================================================
+    
+    // Construct proper image URL for both Uploadcare and Supabase Storage
+    function getAssetUrl(fileKey) {
+      if (!fileKey) return '';
+      
+      // If it's already a full URL (Uploadcare or external), return as-is
+      if (fileKey.startsWith('http://') || fileKey.startsWith('https://')) {
+        return fileKey;
+      }
+      
+      // Otherwise, it's a Supabase Storage path - construct the full URL
+      return `${SUPABASE_URL}/storage/v1/object/public/case-assets/${fileKey}`;
+    }
+    
+    // ============================================================================
     // PHOTO ACCESS TIMER FUNCTIONS (12-hour window)
     // ============================================================================
     
@@ -1584,14 +1601,17 @@
         const photos = caseData.assets?.filter(a => a.mime_type?.startsWith('image/')) || [];
         
         if (photos.length > 0) {
-          photosContent.innerHTML = photos.map((asset, index) => `
-            <div class="photo-item" onclick="viewPhoto('${asset.file_key}', ${index + 1})">
-              <img src="${asset.file_key}" alt="Photo ${index + 1}" loading="lazy">
-              <button class="photo-download-btn" onclick="event.stopPropagation(); downloadPhoto('${asset.file_key}', ${index + 1})">
-                ⬇
-              </button>
-            </div>
-          `).join('');
+          photosContent.innerHTML = photos.map((asset, index) => {
+            const assetUrl = getAssetUrl(asset.file_key);
+            return `
+              <div class="photo-item" onclick="viewPhoto('${assetUrl}', ${index + 1})">
+                <img src="${assetUrl}" alt="Photo ${index + 1}" loading="lazy">
+                <button class="photo-download-btn" onclick="event.stopPropagation(); downloadPhoto('${assetUrl}', ${index + 1})">
+                  ⬇
+                </button>
+              </div>
+            `;
+          }).join('');
         } else {
           photosContent.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No photos uploaded yet.</p>';
         }
@@ -1740,8 +1760,9 @@
           const photo = photos[i];
           
           try {
-            // Fetch the image as blob
-            const response = await fetch(photo.file_key);
+            // Fetch the image as blob using proper URL
+            const photoUrl = getAssetUrl(photo.file_key);
+            const response = await fetch(photoUrl);
             if (!response.ok) {
               console.warn(`Failed to fetch photo ${i + 1}:`, response.statusText);
               continue;
