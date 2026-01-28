@@ -443,6 +443,12 @@
       margin: 15px 0;
     }
     
+    /* Family Revision Notice (distinct styling) */
+    .revision-notice.family-revision {
+      background-color: #e8f5e9;
+      border: 2px solid #4caf50;
+    }
+    
     .revision-notice-title {
       color: #e65100;
       font-weight: 700;
@@ -453,11 +459,26 @@
       gap: 8px;
     }
     
+    .revision-notice.family-revision .revision-notice-title {
+      color: #2e7d32;
+    }
+    
     .revision-notice-text {
       color: #333;
       font-size: 14px;
       line-height: 1.6;
       white-space: pre-wrap;
+    }
+    
+    .revision-source-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background-color: #4caf50;
+      color: white;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-left: 8px;
     }
     
     .video-upload-section {
@@ -1522,16 +1543,36 @@
         
         // DISPLAY REVISION NOTICE IF APPLICABLE
         const revisionNotice = document.getElementById('revision-notice');
-        if (latestSubmission && latestSubmission.qc_status === 'revision_requested') {
+        const caseStatus = caseData.status;
+        
+        // Check for family revision request
+        if (caseStatus === 'family_revision_requested' && latestSubmission?.family_revision_notes) {
+          // Family requested revision
+          revisionNotice.className = 'revision-notice family-revision';
           revisionNotice.innerHTML = `
             <div class="revision-notice-title">
-              ⚠️ REVISION REQUESTED
+              👨‍👩‍👧 FAMILY REVISION REQUEST
+              <span class="revision-source-badge">From Family</span>
+              <span class="version-badge">v${latestSubmission.revision_number + 1} needed</span>
+            </div>
+            <div class="revision-notice-text">${latestSubmission.family_revision_notes}</div>
+          `;
+          revisionNotice.style.display = 'block';
+        } 
+        // Check for QC revision request
+        else if (caseStatus === 'revision_requested' && latestSubmission && latestSubmission.qc_status === 'revision_requested') {
+          // QC requested revision
+          revisionNotice.className = 'revision-notice';
+          revisionNotice.innerHTML = `
+            <div class="revision-notice-title">
+              ⚠️ QC REVISION REQUESTED
               <span class="version-badge">v${latestSubmission.revision_number + 1} needed</span>
             </div>
             <div class="revision-notice-text">${latestSubmission.qc_notes || 'Please make revisions and resubmit.'}</div>
           `;
           revisionNotice.style.display = 'block';
-        } else {
+        } 
+        else {
           revisionNotice.style.display = 'none';
         }
         

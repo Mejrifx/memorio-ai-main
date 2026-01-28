@@ -379,6 +379,31 @@
       margin-bottom: 24px;
     }
     
+    /* Family Revision Notes (distinct from editor notes) */
+    .family-revision-notes {
+      background-color: #e8f5e9;
+      border: 2px solid #4caf50;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .family-revision-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .family-revision-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background-color: #4caf50;
+      color: white;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
     .obituary-section {
       margin-bottom: 24px;
     }
@@ -1176,6 +1201,19 @@
           <div class="editor-notes">
             <strong style="color: #32343a;">Editor's Notes:</strong>
             <p style="margin-top: 8px; color: #32343a;">${submission.editor_notes}</p>
+          </div>
+        ` : ''}
+        
+        ${submission.family_revision_notes && submission.revision_source === 'family' ? `
+          <div class="family-revision-notes">
+            <div class="family-revision-header">
+              <strong style="color: #2e7d32;">👨‍👩‍👧 Family Revision Request</strong>
+              <span class="family-revision-badge">From Family</span>
+            </div>
+            <p style="margin-top: 12px; color: #333; line-height: 1.6;">${submission.family_revision_notes}</p>
+            <p style="margin-top: 8px; font-size: 13px; color: #666; font-style: italic;">
+              ⚠️ Please verify that the editor has addressed all the family's requested changes before approving.
+            </p>
           </div>
         ` : ''}
         
