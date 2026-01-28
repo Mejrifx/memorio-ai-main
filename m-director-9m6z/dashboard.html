@@ -1361,6 +1361,74 @@
         </div>
       </div>
       
+      <!-- Photos & Assets Section -->
+      <div class="modal-section" id="photos-section" style="display: none;">
+        <h3 class="modal-section-title">📸 Photos & Assets</h3>
+        
+        <!-- Upload Timer Banner -->
+        <div id="director-upload-timer-banner" style="display: none; margin-bottom: 16px;">
+          <!-- Timer will be populated here -->
+        </div>
+        
+        <!-- Upload Area -->
+        <div id="director-upload-area" style="margin-bottom: 20px;">
+          <div style="
+            border: 2px dashed #436481;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            background-color: #f4e8de;
+          ">
+            <input type="file" id="director-photo-input" accept="image/*" multiple style="display: none;">
+            <button class="btn-primary" onclick="document.getElementById('director-photo-input').click()" id="director-upload-btn">
+              <span style="font-size: 20px; margin-right: 8px;">📁</span>
+              Upload Photos
+            </button>
+            <p style="margin-top: 12px; color: #666; font-size: 14px;">
+              Click to select photos (JPEG, PNG, GIF)
+            </p>
+          </div>
+        </div>
+        
+        <!-- Photos Grid -->
+        <div id="director-photos-grid" style="
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          gap: 12px;
+          max-height: 400px;
+          overflow-y: auto;
+        ">
+          <!-- Photos will be populated here -->
+        </div>
+        
+        <div id="director-no-photos" style="text-align: center; padding: 20px; color: #666;">
+          No photos uploaded yet
+        </div>
+      </div>
+      
+      <!-- Downloads Section (Only shown when delivered) -->
+      <div class="modal-section" id="downloads-section" style="display: none;">
+        <h3 class="modal-section-title">📥 Downloads</h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <button class="btn-primary" onclick="directorDownloadVideo()" style="width: 100%;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Download Memorial Video
+          </button>
+          <button class="btn-primary" onclick="directorDownloadObituaryPDF()" style="width: 100%;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10,9 9,9 8,9"/>
+            </svg>
+            Download Obituary PDF
+          </button>
+        </div>
+      </div>
+      
       <div style="margin-top: 24px; display: flex; gap: 12px;">
         <button class="btn-secondary" onclick="deleteCase(currentCaseDetails.id, currentCaseDetails.deceased_name)">
           Delete Case
@@ -1414,6 +1482,9 @@
     let currentCaseDetails = null;
     let credentialsRevealed = false;
     let allCases = []; // Store all cases for filtering
+    let directorUploadTimerInterval = null;
+    let directorPhotosAccessLocked = false;
+    let currentCaseAssets = [];
     
     // Set up automatic token refresh and session monitoring
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
@@ -1917,6 +1988,24 @@
           obituarySection.style.display = 'none';
         }
         
+        // Load assets and setup photo upload section
+        if (formData && formData.submitted_at) {
+          // Form is submitted, show photos section and initialize timer
+          await loadDirectorAssets(caseId);
+          initializeDirectorUploadTimer(formData.submitted_at);
+          document.getElementById('photos-section').style.display = 'block';
+        } else {
+          // Form not submitted, hide photos section
+          document.getElementById('photos-section').style.display = 'none';
+        }
+        
+        // Show downloads section if case is delivered
+        if (caseData.status === 'delivered') {
+          document.getElementById('downloads-section').style.display = 'block';
+        } else {
+          document.getElementById('downloads-section').style.display = 'none';
+        }
+        
       } catch (error) {
         console.error('Error loading case details:', error);
         showToast('Error loading case details', true);
@@ -1928,7 +2017,323 @@
       document.getElementById('case-details-modal').style.display = 'none';
       currentCaseDetails = null;
       credentialsRevealed = false;
+      
+      // Clear upload timer
+      if (directorUploadTimerInterval) {
+        clearInterval(directorUploadTimerInterval);
+        directorUploadTimerInterval = null;
+      }
     }
+    
+    // Load assets (photos) for director
+    async function loadDirectorAssets(caseId) {
+      try {
+        const { data: assets, error } = await supabaseClient
+          .from('assets')
+          .select('*')
+          .eq('case_id', caseId)
+          .order('uploaded_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        currentCaseAssets = assets || [];
+        displayDirectorPhotos();
+        
+      } catch (error) {
+        console.error('Error loading assets:', error);
+        showToast('Error loading photos', true);
+      }
+    }
+    
+    // Display photos in grid
+    function displayDirectorPhotos() {
+      const photosGrid = document.getElementById('director-photos-grid');
+      const noPhotos = document.getElementById('director-no-photos');
+      
+      if (currentCaseAssets.length === 0) {
+        photosGrid.style.display = 'none';
+        noPhotos.style.display = 'block';
+        return;
+      }
+      
+      photosGrid.style.display = 'grid';
+      noPhotos.style.display = 'none';
+      photosGrid.innerHTML = '';
+      
+      currentCaseAssets.forEach(asset => {
+        const photoDiv = document.createElement('div');
+        photoDiv.style.cssText = `
+          position: relative;
+          aspect-ratio: 1;
+          border-radius: 8px;
+          overflow: hidden;
+          border: 2px solid #436481;
+          background-color: #f4e8de;
+        `;
+        
+        const img = document.createElement('img');
+        // Handle both Supabase Storage and Uploadcare URLs
+        if (asset.file_key && asset.file_key.startsWith('http')) {
+          img.src = asset.file_key;
+        } else {
+          img.src = `${SUPABASE_URL}/storage/v1/object/public/case-assets/${asset.file_key}`;
+        }
+        img.alt = 'Photo';
+        img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+        img.onerror = () => {
+          img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23666">📷</text></svg>';
+        };
+        
+        photoDiv.appendChild(img);
+        photosGrid.appendChild(photoDiv);
+      });
+    }
+    
+    // Initialize 12-hour upload timer
+    function initializeDirectorUploadTimer(submittedAt) {
+      const UPLOAD_WINDOW_HOURS = 12;
+      const timerBanner = document.getElementById('director-upload-timer-banner');
+      const uploadBtn = document.getElementById('director-upload-btn');
+      
+      if (!submittedAt) {
+        timerBanner.style.display = 'none';
+        return;
+      }
+      
+      function updateTimer() {
+        const now = new Date();
+        const submittedDate = new Date(submittedAt);
+        const windowEndTime = new Date(submittedDate.getTime() + (UPLOAD_WINDOW_HOURS * 60 * 60 * 1000));
+        const timeRemaining = windowEndTime - now;
+        
+        if (timeRemaining <= 0) {
+          // Window expired
+          directorPhotosAccessLocked = true;
+          timerBanner.innerHTML = `
+            <div style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 16px; border-radius: 8px; text-align: center;">
+              <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">⏰ Upload Window Closed</div>
+              <div style="font-size: 14px;">The 12-hour upload window has expired</div>
+            </div>
+          `;
+          timerBanner.style.display = 'block';
+          uploadBtn.disabled = true;
+          uploadBtn.style.opacity = '0.5';
+          uploadBtn.style.cursor = 'not-allowed';
+          
+          if (directorUploadTimerInterval) {
+            clearInterval(directorUploadTimerInterval);
+            directorUploadTimerInterval = null;
+          }
+        } else {
+          // Window active
+          directorPhotosAccessLocked = false;
+          const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+          const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+          
+          timerBanner.innerHTML = `
+            <div style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; padding: 16px; border-radius: 8px; text-align: center;">
+              <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">⏰ Upload Window Active</div>
+              <div style="font-size: 24px; font-weight: 700; font-family: 'Courier New', monospace; margin: 8px 0;">
+                ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}
+              </div>
+              <div style="font-size: 14px;">Time remaining to upload additional photos</div>
+            </div>
+          `;
+          timerBanner.style.display = 'block';
+          uploadBtn.disabled = false;
+          uploadBtn.style.opacity = '1';
+          uploadBtn.style.cursor = 'pointer';
+        }
+      }
+      
+      updateTimer();
+      directorUploadTimerInterval = setInterval(updateTimer, 1000);
+    }
+    
+    // Handle photo upload
+    document.getElementById('director-photo-input')?.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      
+      if (directorPhotosAccessLocked) {
+        showToast('Upload window has expired', true);
+        return;
+      }
+      
+      if (files.length === 0) return;
+      
+      if (!currentCaseDetails) {
+        showToast('No case selected', true);
+        return;
+      }
+      
+      showToast(`Uploading ${files.length} photo(s)...`);
+      
+      try {
+        const session = await getValidSession();
+        
+        for (const file of files) {
+          // Upload to Supabase Storage
+          const fileName = `${currentCaseDetails.id}/${Date.now()}-${file.name}`;
+          const { data: uploadData, error: uploadError } = await supabaseClient.storage
+            .from('case-assets')
+            .upload(fileName, file);
+          
+          if (uploadError) throw uploadError;
+          
+          // Save asset record to database
+          const { error: dbError } = await supabaseClient
+            .from('assets')
+            .insert({
+              case_id: currentCaseDetails.id,
+              uploader_user_id: session.user.id,
+              file_key: fileName,
+              mime_type: file.type,
+              size_bytes: file.size,
+              metadata: { uploaded_by: 'director' }
+            });
+          
+          if (dbError) throw dbError;
+        }
+        
+        showToast(`Successfully uploaded ${files.length} photo(s)!`);
+        
+        // Reload assets
+        await loadDirectorAssets(currentCaseDetails.id);
+        
+        // Clear file input
+        e.target.value = '';
+        
+      } catch (error) {
+        console.error('Error uploading photos:', error);
+        showToast('Error uploading photos', true);
+      }
+    });
+    
+    // Download video
+    async function directorDownloadVideo() {
+      if (!currentCaseDetails) {
+        showToast('No case selected', true);
+        return;
+      }
+      
+      try {
+        showToast('Preparing download...');
+        
+        // Get the final approved video
+        const { data: videoSubmission, error } = await supabaseClient
+          .from('video_submissions')
+          .select('*')
+          .eq('case_id', currentCaseDetails.id)
+          .eq('qc_status', 'approved')
+          .order('submitted_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (error || !videoSubmission) {
+          showToast('No approved video found', true);
+          return;
+        }
+        
+        // Fetch video as blob
+        const response = await fetch(videoSubmission.video_url);
+        if (!response.ok) throw new Error('Failed to fetch video');
+        
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        
+        // Trigger download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentCaseDetails.deceased_name.replace(/\s+/g, '_')}_Memorial_Tribute.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('Video downloaded successfully!');
+        
+      } catch (error) {
+        console.error('Error downloading video:', error);
+        showToast('Error downloading video', true);
+      }
+    }
+    
+    // Download obituary as PDF
+    async function directorDownloadObituaryPDF() {
+      if (!currentCaseDetails) {
+        showToast('No case selected', true);
+        return;
+      }
+      
+      try {
+        showToast('Preparing PDF...');
+        
+        // Get obituary content
+        const { data: obituary, error } = await supabaseClient
+          .from('obituary_content')
+          .select('*')
+          .eq('case_id', currentCaseDetails.id)
+          .single();
+        
+        if (error || !obituary) {
+          showToast('No obituary found', true);
+          return;
+        }
+        
+        // Create a printable HTML page
+        const printWindow = window.open('', '_blank');
+        const content = obituary.content_html || obituary.content_plain || '';
+        
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>${currentCaseDetails.deceased_name} - Obituary</title>
+            <style>
+              body {
+                font-family: 'Times New Roman', serif;
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 20px;
+                line-height: 1.8;
+                color: #333;
+              }
+              h1 {
+                text-align: center;
+                margin-bottom: 30px;
+                color: #436481;
+              }
+              @media print {
+                body { margin: 0; padding: 20px; }
+              }
+            </style>
+          </head>
+          <body>
+            <h1>${currentCaseDetails.deceased_name}</h1>
+            ${content}
+          </body>
+          </html>
+        `);
+        
+        printWindow.document.close();
+        
+        // Wait for content to load then trigger print
+        setTimeout(() => {
+          printWindow.print();
+        }, 500);
+        
+        showToast('PDF print dialog opened!');
+        
+      } catch (error) {
+        console.error('Error downloading obituary:', error);
+        showToast('Error downloading obituary', true);
+      }
+    }
+    
+    // Make functions globally accessible
+    window.directorDownloadVideo = directorDownloadVideo;
+    window.directorDownloadObituaryPDF = directorDownloadObituaryPDF;
     
     function revealCredentials() {
       const revealBtn = document.getElementById('reveal-credentials-btn');
