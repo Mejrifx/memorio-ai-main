@@ -1731,8 +1731,8 @@
         // Update dashboard title based on status
         updateDashboardTitle(currentCase.status);
         
-        // Show/hide sections based on delivery status
-        toggleDeliveredView(currentCase.status === 'delivered');
+        // Show/hide sections based on delivery status or revision in progress
+        toggleDeliveredView(currentCase.status === 'delivered' || currentCase.status === 'family_revision_requested');
         
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('caseContainer').style.display = 'block';
@@ -2066,18 +2066,19 @@
     
     // Toggle between normal dashboard and delivered view
     function toggleDeliveredView(isDelivered) {
-      // Elements to hide when delivered
+      // Elements to hide when video is delivered or revision in progress
       const caseCard = document.querySelector('.case-card');
       const dashboardGrid = document.querySelector('.dashboard-grid');
       const notificationsSection = document.querySelectorAll('.dashboard-section')[2]; // 3rd dashboard-section is notifications
       
       if (isDelivered) {
         // Hide case overview, obituary/photos grid, and notifications
+        // Show only the completed memorial section (video + obituary + downloads)
         if (caseCard) caseCard.style.display = 'none';
         if (dashboardGrid) dashboardGrid.style.display = 'none';
         if (notificationsSection) notificationsSection.style.display = 'none';
         
-        console.log('✅ Delivered view enabled - showing only memorial and timeline');
+        console.log('✅ Memorial view enabled - showing only video, obituary, and downloads');
       } else {
         // Show everything (normal dashboard view)
         if (caseCard) caseCard.style.display = 'block';
