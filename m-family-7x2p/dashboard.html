@@ -544,6 +544,10 @@
       transition: opacity 0.3s ease;
     }
     
+    .memorial-video-overlay.revision-complete {
+      background-color: rgba(40, 167, 69, 0.9); /* Green for completed revision */
+    }
+    
     .memorial-video-overlay.hidden {
       opacity: 0;
       pointer-events: none;
@@ -2360,10 +2364,13 @@
         const familyRevisionUsed = caseData.metadata?.family_revision_used || false;
         const revisionBtn = document.getElementById('requestRevisionBtn');
         const videoOverlay = document.getElementById('videoRevisionOverlay');
+        const overlayText = document.querySelector('.memorial-video-overlay-text');
         
         // Set up video overlay behavior for revision in progress
         if (isRevisionInProgress) {
-          // Show overlay initially (video is paused)
+          // Revision in progress - show blue overlay
+          overlayText.innerHTML = 'Revision in Progress<br>Our editor is working on the changes';
+          videoOverlay.classList.remove('revision-complete');
           videoOverlay.classList.remove('hidden');
           
           // Add event listeners to control overlay visibility
@@ -2381,16 +2388,34 @@
           
           revisionBtn.style.display = 'none';
         } else if (isDelivered) {
-          // Video delivered - hide overlay, check if revision available
-          videoOverlay.classList.add('hidden');
+          // Video delivered - check if this is a completed revision or initial delivery
           
           if (familyRevisionUsed) {
-            // Revision already used - show disabled button
+            // Revision completed - show green overlay
+            overlayText.textContent = 'Your revision is complete';
+            videoOverlay.classList.add('revision-complete');
+            videoOverlay.classList.remove('hidden');
+            
+            // Add event listeners to control overlay visibility
+            videoElement.addEventListener('play', function() {
+              videoOverlay.classList.add('hidden');
+            });
+            
+            videoElement.addEventListener('pause', function() {
+              videoOverlay.classList.remove('hidden');
+            });
+            
+            videoElement.addEventListener('ended', function() {
+              videoOverlay.classList.remove('hidden');
+            });
+            
+            // Show disabled button (revision used)
             revisionBtn.style.display = 'inline-flex';
             revisionBtn.disabled = true;
             document.getElementById('requestRevisionBtnText').textContent = 'Revision used (1/1)';
           } else {
-            // Revision available - show enabled button
+            // Initial delivery - no overlay, show revision button
+            videoOverlay.classList.add('hidden');
             revisionBtn.style.display = 'inline-flex';
             revisionBtn.disabled = false;
             document.getElementById('requestRevisionBtnText').textContent = 'Request Revision (0/1)';
