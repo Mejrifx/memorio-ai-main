@@ -1406,6 +1406,26 @@
         </div>
       </div>
       
+      <!-- Delivered Banner (Only shown when case is delivered) -->
+      <div id="delivered-banner" style="display: none; margin-bottom: 24px;">
+        <div style="
+          background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+          border-radius: 12px;
+          padding: 24px;
+          text-align: center;
+          color: white;
+          box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        ">
+          <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+          <h3 style="font-size: 22px; font-weight: 700; margin: 0 0 8px 0;">
+            Memorial Complete
+          </h3>
+          <p style="font-size: 16px; margin: 0; opacity: 0.95;">
+            The obituary and video have been delivered to the family
+          </p>
+        </div>
+      </div>
+      
       <!-- Downloads Section (Only shown when delivered) -->
       <div class="modal-section" id="downloads-section" style="display: none;">
         <h3 class="modal-section-title">📥 Downloads</h3>
@@ -1988,22 +2008,24 @@
           obituarySection.style.display = 'none';
         }
         
-        // Load assets and setup photo upload section
-        if (formData && formData.submitted_at) {
-          // Form is submitted, show photos section and initialize timer
+        // Handle sections based on case status
+        if (caseData.status === 'delivered') {
+          // Case is delivered - show banner and downloads, hide photos
+          document.getElementById('delivered-banner').style.display = 'block';
+          document.getElementById('downloads-section').style.display = 'block';
+          document.getElementById('photos-section').style.display = 'none';
+        } else if (formData && formData.submitted_at) {
+          // Form is submitted but not delivered - show photos section and initialize timer
+          document.getElementById('delivered-banner').style.display = 'none';
+          document.getElementById('downloads-section').style.display = 'none';
+          document.getElementById('photos-section').style.display = 'block';
           await loadDirectorAssets(caseId);
           initializeDirectorUploadTimer(formData.submitted_at);
-          document.getElementById('photos-section').style.display = 'block';
         } else {
-          // Form not submitted, hide photos section
-          document.getElementById('photos-section').style.display = 'none';
-        }
-        
-        // Show downloads section if case is delivered
-        if (caseData.status === 'delivered') {
-          document.getElementById('downloads-section').style.display = 'block';
-        } else {
+          // Form not submitted - hide all sections
+          document.getElementById('delivered-banner').style.display = 'none';
           document.getElementById('downloads-section').style.display = 'none';
+          document.getElementById('photos-section').style.display = 'none';
         }
         
       } catch (error) {
