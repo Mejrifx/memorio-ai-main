@@ -51,7 +51,11 @@ serve(async (req) => {
       date_of_birth,
       date_of_death,
       city_of_birth,
+      state_of_birth,
+      country_of_birth,
       city_of_death,
+      state_of_death,
+      country_of_death,
       service_date,
       service_location, 
       metadata 
@@ -64,7 +68,11 @@ serve(async (req) => {
       date_of_birth,
       date_of_death,
       city_of_birth,
+      state_of_birth,
+      country_of_birth,
       city_of_death,
+      state_of_death,
+      country_of_death,
       service_date
     };
 
@@ -96,7 +104,11 @@ serve(async (req) => {
           date_of_birth,
           date_of_death,
           city_of_birth,
+          state_of_birth,
+          country_of_birth,
           city_of_death,
+          state_of_death,
+          country_of_death,
           service_date,
           service_location,
           // Additional metadata
@@ -146,7 +158,11 @@ serve(async (req) => {
           date_of_birth,
           date_of_death,
           city_of_birth,
+          state_of_birth,
+          country_of_birth,
           city_of_death,
+          state_of_death,
+          country_of_death,
           service_date,
           service_location
         }

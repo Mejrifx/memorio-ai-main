@@ -1058,24 +1058,66 @@
             </div>
           </div>
           
-          <!-- City of Birth & City of Death -->
-          <div class="form-row">
+          <!-- Birth Location -->
+          <div class="form-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: 16px;">
             <div class="form-group">
               <label for="deceased-birth-city" class="form-label">City of Birth*</label>
               <input 
                 class="form-input" 
                 type="text" 
                 id="deceased-birth-city" 
-                placeholder="New York, NY" 
+                placeholder="New York" 
                 required>
             </div>
             <div class="form-group">
-              <label for="deceased-death-city" class="form-label">City of Death*</label>
+              <label for="deceased-birth-state" class="form-label">State/Province/Region of Birth*</label>
+              <input 
+                class="form-input" 
+                type="text" 
+                id="deceased-birth-state" 
+                placeholder="New York" 
+                required>
+            </div>
+            <div class="form-group">
+              <label for="deceased-birth-country" class="form-label">Country of Birth*</label>
+              <input 
+                class="form-input" 
+                type="text" 
+                id="deceased-birth-country" 
+                value="United States" 
+                placeholder="United States" 
+                required>
+            </div>
+          </div>
+          
+          <!-- Death Location -->
+          <div class="form-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: 16px;">
+            <div class="form-group">
+              <label for="deceased-death-city" class="form-label">City of Passing*</label>
               <input 
                 class="form-input" 
                 type="text" 
                 id="deceased-death-city" 
-                placeholder="Los Angeles, CA" 
+                placeholder="Los Angeles" 
+                required>
+            </div>
+            <div class="form-group">
+              <label for="deceased-death-state" class="form-label">State/Province/Region of Passing*</label>
+              <input 
+                class="form-input" 
+                type="text" 
+                id="deceased-death-state" 
+                placeholder="California" 
+                required>
+            </div>
+            <div class="form-group">
+              <label for="deceased-death-country" class="form-label">Country of Passing*</label>
+              <input 
+                class="form-input" 
+                type="text" 
+                id="deceased-death-country" 
+                value="United States" 
+                placeholder="United States" 
                 required>
             </div>
           </div>
@@ -2454,6 +2496,53 @@
       }
     }
     
+    // State/Country validation helper
+    function validateLocationPair(state, country, fieldType) {
+      const usStates = ['alabama', 'alaska', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut', 'delaware', 
+        'florida', 'georgia', 'hawaii', 'idaho', 'illinois', 'indiana', 'iowa', 'kansas', 'kentucky', 'louisiana', 
+        'maine', 'maryland', 'massachusetts', 'michigan', 'minnesota', 'mississippi', 'missouri', 'montana', 'nebraska', 
+        'nevada', 'new hampshire', 'new jersey', 'new mexico', 'new york', 'north carolina', 'north dakota', 'ohio', 
+        'oklahoma', 'oregon', 'pennsylvania', 'rhode island', 'south carolina', 'south dakota', 'tennessee', 'texas', 
+        'utah', 'vermont', 'virginia', 'washington', 'west virginia', 'wisconsin', 'wyoming', 'district of columbia', 
+        'dc', 'washington dc', 'washington d.c.'];
+      
+      const canadianProvinces = ['alberta', 'british columbia', 'manitoba', 'new brunswick', 'newfoundland and labrador', 
+        'northwest territories', 'nova scotia', 'nunavut', 'ontario', 'prince edward island', 'quebec', 'saskatchewan', 
+        'yukon', 'ab', 'bc', 'mb', 'nb', 'nl', 'nt', 'ns', 'nu', 'on', 'pe', 'qc', 'sk', 'yt'];
+      
+      const stateLower = state.toLowerCase().trim();
+      const countryLower = country.toLowerCase().trim();
+      
+      // Check for US state with non-US country
+      if (usStates.includes(stateLower) && 
+          !['united states', 'usa', 'us', 'u.s.', 'u.s.a.', 'america'].includes(countryLower)) {
+        return {
+          valid: false,
+          message: `"${state}" is a US state but country is set to "${country}". Did you mean "United States"?`
+        };
+      }
+      
+      // Check for Canadian province with non-Canadian country
+      if (canadianProvinces.includes(stateLower) && 
+          !['canada', 'ca'].includes(countryLower)) {
+        return {
+          valid: false,
+          message: `"${state}" is a Canadian province but country is set to "${country}". Did you mean "Canada"?`
+        };
+      }
+      
+      // Check for US/USA country with non-US state (warning only for common cases)
+      if (['united states', 'usa', 'us', 'u.s.', 'u.s.a.', 'america'].includes(countryLower) && 
+          canadianProvinces.includes(stateLower)) {
+        return {
+          valid: false,
+          message: `Country is "United States" but "${state}" is a Canadian province. Did you mean "Canada"?`
+        };
+      }
+      
+      return { valid: true };
+    }
+    
     // Create Case form handler
     document.getElementById('create-case-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -2465,9 +2554,37 @@
         date_of_birth: document.getElementById('deceased-dob').value,
         date_of_death: document.getElementById('deceased-dod').value,
         city_of_birth: document.getElementById('deceased-birth-city').value,
+        state_of_birth: document.getElementById('deceased-birth-state').value,
+        country_of_birth: document.getElementById('deceased-birth-country').value,
         city_of_death: document.getElementById('deceased-death-city').value,
+        state_of_death: document.getElementById('deceased-death-state').value,
+        country_of_death: document.getElementById('deceased-death-country').value,
         service_date: document.getElementById('deceased-service-date').value
       };
+      
+      // Validate birth location
+      const birthValidation = validateLocationPair(
+        caseData.state_of_birth, 
+        caseData.country_of_birth, 
+        'birth'
+      );
+      
+      if (!birthValidation.valid) {
+        showToast(birthValidation.message, true);
+        return;
+      }
+      
+      // Validate death location
+      const deathValidation = validateLocationPair(
+        caseData.state_of_death, 
+        caseData.country_of_death, 
+        'passing'
+      );
+      
+      if (!deathValidation.valid) {
+        showToast(deathValidation.message, true);
+        return;
+      }
       
       const createBtn = document.getElementById('create-case-btn');
       const successBox = document.getElementById('case-success-box');
@@ -2511,6 +2628,10 @@
         document.getElementById('created-case-id').textContent = result.data.case_id;
         successBox.style.display = 'block';
         document.getElementById('create-case-form').reset();
+        
+        // Reset country fields to default
+        document.getElementById('deceased-birth-country').value = 'United States';
+        document.getElementById('deceased-death-country').value = 'United States';
         
         // Reload cases to show the new case
         await loadCases();
