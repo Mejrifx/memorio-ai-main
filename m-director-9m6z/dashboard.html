@@ -818,8 +818,98 @@
     }
     
     /* ============================================================================
-       CASES GRID - MEMORIO THEMED
+       CASES LIST VIEW - MODERN DESIGN
        ============================================================================ */
+    .cases-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    
+    .case-row {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+    
+    .case-row:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    
+    .case-row-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    
+    .case-row-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text);
+      margin: 0;
+    }
+    
+    .case-row-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+    
+    .case-row-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    
+    .case-row-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    
+    .case-row-date {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      min-width: 100px;
+      text-align: right;
+    }
+    
+    .case-empty-state {
+      text-align: center;
+      padding: var(--space-16) var(--space-8);
+    }
+    
+    .case-empty-state-icon {
+      font-size: 48px;
+      margin-bottom: var(--space-4);
+      opacity: 0.3;
+    }
+    
+    .case-empty-state-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text);
+      margin: 0 0 var(--space-2) 0;
+    }
+    
+    .case-empty-state-description {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+    
+    /* Legacy grid styles (keeping for backwards compat) */
     .cases-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -1280,242 +1370,266 @@
     
     <!-- CREATE CASE SECTION -->
     <div id="create-case-section" class="content-section active">
-      <div class="action-card">
-        <h2 class="card-title">Create New Case</h2>
-        <p class="card-description">Start a new memorial tribute case by providing the decedent's core information. This ensures we can create a complete obituary even if the family doesn't complete their portion.</p>
-        
-        <form id="create-case-form">
-          <!-- Full Name -->
+      <div class="page-header">
+        <h1 class="page-title">Create New Case</h1>
+        <p class="page-description">Start a new memorial tribute case by providing the decedent's core information.</p>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Decedent Information</h3>
+          <p class="card-description">All fields are required to ensure complete obituary generation</p>
+        </div>
+        <div class="card-content">
+          <form id="create-case-form">
+            <!-- Full Name -->
+            <div class="form-row-single">
+              <div class="form-group">
+                <label for="deceased-name" class="label">Full Name of Loved One</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="deceased-name" 
+                  placeholder="John Michael Doe" 
+                  required>
+              </div>
+            </div>
+            
+            <!-- Gender -->
+            <div class="form-row-single">
+              <div class="form-group">
+                <label for="deceased-gender" class="label">Gender</label>
+                <select class="select" id="deceased-gender" required>
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Date of Birth & Date of Death -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="deceased-dob" class="label">Date of Birth</label>
+                <input 
+                  class="input" 
+                  type="date" 
+                  id="deceased-dob" 
+                  required>
+              </div>
+              <div class="form-group">
+                <label for="deceased-dod" class="label">Date of Passing</label>
+                <input 
+                  class="input" 
+                  type="date" 
+                  id="deceased-dod" 
+                  required>
+              </div>
+            </div>
+            
+            <!-- Birth Location -->
+            <div class="form-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: var(--space-4);">
+              <div class="form-group">
+                <label for="deceased-birth-city" class="label">City of Birth</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="deceased-birth-city" 
+                  placeholder="New York" 
+                  required>
+              </div>
+              <div class="form-group">
+                <label for="deceased-birth-state" class="label">State of Birth</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="deceased-birth-state" 
+                  placeholder="New York" 
+                  required>
+              </div>
+              <div class="form-group">
+                <label for="deceased-birth-country" class="label">Country of Birth</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="deceased-birth-country" 
+                  value="United States" 
+                  placeholder="United States" 
+                  required>
+              </div>
+            </div>
+            
+            <!-- Death Location -->
+            <div class="form-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: var(--space-4);">
+              <div class="form-group">
+                <label for="deceased-death-city" class="label">City of Passing</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="deceased-death-city" 
+                  placeholder="Los Angeles" 
+                  required>
+              </div>
+              <div class="form-group">
+                <label for="deceased-death-state" class="label">State of Passing</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="deceased-death-state" 
+                  placeholder="California" 
+                  required>
+              </div>
+              <div class="form-group">
+                <label for="deceased-death-country" class="label">Country of Passing</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="deceased-death-country" 
+                  value="United States" 
+                  placeholder="United States" 
+                  required>
+              </div>
+            </div>
+            
+            <!-- Service Date -->
           <div class="form-row-single">
             <div class="form-group">
-              <label for="deceased-name" class="form-label">Full Name (Loved One)*</label>
+              <label for="deceased-service-date" class="label">Service Date</label>
               <input 
-                class="form-input" 
-                type="text" 
-                id="deceased-name" 
-                placeholder="John Michael Doe" 
-                required>
-            </div>
-          </div>
-          
-          <!-- Gender -->
-          <div class="form-row-single">
-            <div class="form-group">
-              <label for="deceased-gender" class="form-label">Gender*</label>
-              <select class="form-input" id="deceased-gender" required>
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-                <option value="prefer_not_to_say">Prefer not to say</option>
-              </select>
-            </div>
-          </div>
-          
-          <!-- Date of Birth & Date of Death -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="deceased-dob" class="form-label">Date of Birth*</label>
-              <input 
-                class="form-input" 
-                type="date" 
-                id="deceased-dob" 
-                required>
-            </div>
-            <div class="form-group">
-              <label for="deceased-dod" class="form-label">Date of Death*</label>
-              <input 
-                class="form-input" 
-                type="date" 
-                id="deceased-dod" 
-                required>
-            </div>
-          </div>
-          
-          <!-- Birth Location -->
-          <div class="form-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: 16px;">
-            <div class="form-group">
-              <label for="deceased-birth-city" class="form-label">City of Birth*</label>
-              <input 
-                class="form-input" 
-                type="text" 
-                id="deceased-birth-city" 
-                placeholder="New York" 
-                required>
-            </div>
-            <div class="form-group">
-              <label for="deceased-birth-state" class="form-label">State of Birth*</label>
-              <input 
-                class="form-input" 
-                type="text" 
-                id="deceased-birth-state" 
-                placeholder="New York" 
-                required>
-            </div>
-            <div class="form-group">
-              <label for="deceased-birth-country" class="form-label">Country of Birth*</label>
-              <input 
-                class="form-input" 
-                type="text" 
-                id="deceased-birth-country" 
-                value="United States" 
-                placeholder="United States" 
-                required>
-            </div>
-          </div>
-          
-          <!-- Death Location -->
-          <div class="form-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: 16px;">
-            <div class="form-group">
-              <label for="deceased-death-city" class="form-label">City of Passing*</label>
-              <input 
-                class="form-input" 
-                type="text" 
-                id="deceased-death-city" 
-                placeholder="Los Angeles" 
-                required>
-            </div>
-            <div class="form-group">
-              <label for="deceased-death-state" class="form-label">State of Passing*</label>
-              <input 
-                class="form-input" 
-                type="text" 
-                id="deceased-death-state" 
-                placeholder="California" 
-                required>
-            </div>
-            <div class="form-group">
-              <label for="deceased-death-country" class="form-label">Country of Passing*</label>
-              <input 
-                class="form-input" 
-                type="text" 
-                id="deceased-death-country" 
-                value="United States" 
-                placeholder="United States" 
-                required>
-            </div>
-          </div>
-          
-          <!-- Service Date -->
-          <div class="form-row-single">
-            <div class="form-group">
-              <label for="deceased-service-date" class="form-label">Service Date*</label>
-              <input 
-                class="form-input" 
+                class="input" 
                 type="date" 
                 id="deceased-service-date" 
                 required>
             </div>
           </div>
-          
-          <button type="submit" class="btn-primary" id="create-case-btn">
-            CREATE CASE
-          </button>
         </form>
-        
-        <div id="case-success-box" class="success-box">
-          <h3><span class="success-icon"></span>Case Created Successfully!</h3>
-          <p>Case ID has been generated. You can now invite the family to complete the tribute form.</p>
-          
-          <div class="credential-box">
-            <div class="credential-label">Case ID</div>
-            <div class="credential-value" id="created-case-id"></div>
-            <button class="copy-btn" onclick="copyToClipboard('created-case-id')">Copy</button>
-          </div>
-        </div>
-        
-        <div id="case-error-box" class="error-box"></div>
       </div>
+      
+      <div class="card-footer">
+        <button type="submit" form="create-case-form" class="btn btn-primary btn-lg" id="create-case-btn">
+          Create Case
+        </button>
+      </div>
+    </div>
+      
+      <!-- Success Message -->
+      <div id="case-success-box" class="success-box">
+        <h3><span class="success-icon"></span>Case Created Successfully!</h3>
+        <p>Case ID has been generated. You can now invite the family to complete the tribute form.</p>
+        
+        <div class="credential-box">
+          <div class="credential-label">Case ID</div>
+          <div class="credential-value" id="created-case-id"></div>
+          <button class="copy-btn" onclick="copyToClipboard('created-case-id')">Copy</button>
+        </div>
+      </div>
+      
+      <!-- Error Message -->
+      <div id="case-error-box" class="error-box"></div>
     </div>
 
     <!-- INVITE FAMILY SECTION -->
     <div id="invite-family-section" class="content-section">
-      <div class="action-card">
-        <h2 class="card-title">Invite Family Member</h2>
-        <p class="card-description">Send a secure invitation to a family member to complete the tribute form for their case.</p>
-        
-        <form id="invite-family-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="family-email" class="form-label">Email Address*</label>
-              <input 
-                class="form-input" 
-                type="email" 
-                id="family-email" 
-                placeholder="family@example.com" 
-                required>
+      <div class="page-header">
+        <h1 class="page-title">Invite Family Member</h1>
+        <p class="page-description">Send a secure invitation to a family member to complete the tribute form for their case.</p>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Family Member Details</h3>
+          <p class="card-description">Provide contact information and associate with a case ID</p>
+        </div>
+        <div class="card-content">
+          <form id="invite-family-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="family-email" class="label">Email Address</label>
+                <input 
+                  class="input" 
+                  type="email" 
+                  id="family-email" 
+                  placeholder="family@example.com" 
+                  required>
+              </div>
+              
+              <div class="form-group">
+                <label for="family-name" class="label">Full Name</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="family-name" 
+                  placeholder="Jane Doe" 
+                  required>
+              </div>
             </div>
             
-            <div class="form-group">
-              <label for="family-name" class="form-label">Full Name*</label>
-              <input 
-                class="form-input" 
-                type="text" 
-                id="family-name" 
-                placeholder="Jane Doe" 
-                required>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="family-phone" class="label">Phone Number (Optional)</label>
+                <input 
+                  class="input" 
+                  type="tel" 
+                  id="family-phone" 
+                  placeholder="+1-555-0123">
+              </div>
+              
+              <div class="form-group">
+                <label for="case-id" class="label">Case ID</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="case-id" 
+                  placeholder="Paste Case ID here" 
+                  required>
+              </div>
             </div>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="family-phone" class="form-label">Phone Number</label>
-              <input 
-                class="form-input" 
-                type="tel" 
-                id="family-phone" 
-                placeholder="+1-555-0123">
-            </div>
-            
-            <div class="form-group">
-              <label for="case-id" class="form-label">Case ID*</label>
-              <input 
-                class="form-input" 
-                type="text" 
-                id="case-id" 
-                placeholder="Paste Case ID here" 
-                required>
-            </div>
-          </div>
-          
-          <button type="submit" class="btn-primary" id="invite-family-btn">
-            SEND INVITATION
-          </button>
-        </form>
-        
-        <div id="family-success-box" class="success-box">
-          <h3><span class="success-icon"></span>Family Member Invited Successfully!</h3>
-          <p>Share these credentials with the family member. They will need them to access the tribute form.</p>
-          
-          <div class="credential-box">
-            <div class="credential-label">Email Address</div>
-            <div class="credential-value" id="invited-email"></div>
-            <button class="copy-btn" onclick="copyToClipboard('invited-email')">Copy</button>
-          </div>
-          
-          <div class="credential-box">
-            <div class="credential-label">Password</div>
-            <div class="credential-value" id="family-password"></div>
-            <button class="copy-btn" onclick="copyToClipboard('family-password')">Copy</button>
-          </div>
+          </form>
         </div>
         
-        <div id="family-error-box" class="error-box"></div>
+        <div class="card-footer">
+          <button type="submit" form="invite-family-form" class="btn btn-primary btn-lg" id="invite-family-btn">
+            Send Invitation
+          </button>
+        </div>
       </div>
+      
+      <!-- Success Message -->
+      <div id="family-success-box" class="success-box">
+        <h3><span class="success-icon"></span>Family Member Invited Successfully!</h3>
+        <p>Share these credentials with the family member. They will need them to access the tribute form.</p>
+        
+        <div class="credential-box">
+          <div class="credential-label">Email Address</div>
+          <div class="credential-value" id="invited-email"></div>
+          <button class="copy-btn" onclick="copyToClipboard('invited-email')">Copy</button>
+        </div>
+        
+        <div class="credential-box">
+          <div class="credential-label">Temporary Password</div>
+          <div class="credential-value" id="family-password"></div>
+          <button class="copy-btn" onclick="copyToClipboard('family-password')">Copy</button>
+        </div>
+      </div>
+      
+      <!-- Error Message -->
+      <div id="family-error-box" class="error-box"></div>
     </div>
 
     <!-- MY CASES SECTION -->
     <div id="my-cases-section" class="content-section">
-      <div class="action-card">
-        <h2 class="card-title">My Cases</h2>
-        <p class="card-description">View and manage all memorial tribute cases for your organization.</p>
-        
-        <div id="cases-list" class="cases-grid">
-          <!-- Cases will be loaded here dynamically -->
-        </div>
-        
-        <div id="cases-error-box" class="error-box"></div>
+      <div class="page-header">
+        <h1 class="page-title">My Cases</h1>
+        <p class="page-description">View and manage all memorial tribute cases for your organization.</p>
       </div>
+      
+      <div id="cases-list" class="cases-list">
+        <!-- Cases will be loaded here dynamically -->
+      </div>
+      
+      <div id="cases-error-box" class="error-box"></div>
     </div>
   </div>
 
@@ -3112,12 +3226,12 @@
     function getSLABadge(caseData) {
       // If case is delivered or closed, show completion badge
       if (caseData.status === 'delivered' || caseData.status === 'closed') {
-        return '<span class="sla-badge green">✓ Delivered</span>';
+        return '<span class="badge badge-success"><span class="badge-dot" style="background-color: #15803d;"></span>Delivered</span>';
       }
       
       // If no submission yet (waiting on family), show waiting badge
       if (!caseData.first_submission_at || caseData.status === 'waiting_on_family') {
-        return '<span class="sla-badge waiting">⏳ Waiting on Family</span>';
+        return '<span class="badge badge-info"><span class="badge-dot" style="background-color: #1d4ed8;"></span>Waiting</span>';
       }
       
       // Calculate hours elapsed since submission
@@ -3126,27 +3240,31 @@
       const hoursElapsed = (now - submissionTime) / (1000 * 60 * 60);
       
       // Determine badge based on thresholds
-      let badgeClass, badgeText;
+      let badgeVariant, badgeText, dotColor;
       
       if (hoursElapsed < 24) {
-        // Green: < 24 hours
-        badgeClass = 'green';
+        // Success: < 24 hours
+        badgeVariant = 'success';
         badgeText = `${Math.floor(hoursElapsed)}h`;
+        dotColor = '#15803d';
       } else if (hoursElapsed < 36) {
-        // Orange: 24-36 hours
-        badgeClass = 'orange';
+        // Warning: 24-36 hours
+        badgeVariant = 'warning';
         badgeText = `${Math.floor(hoursElapsed)}h`;
+        dotColor = '#c2410c';
       } else if (hoursElapsed < 48) {
-        // Red: 36-48 hours
-        badgeClass = 'red';
+        // Danger: 36-48 hours
+        badgeVariant = 'danger';
         badgeText = `${Math.floor(hoursElapsed)}h`;
+        dotColor = '#dc2626';
       } else {
-        // Black: 48+ hours (BREACH)
-        badgeClass = 'black';
-        badgeText = `${Math.floor(hoursElapsed)}h BREACH`;
+        // Danger: 48+ hours (BREACH)
+        badgeVariant = 'danger';
+        badgeText = `${Math.floor(hoursElapsed)}h • BREACH`;
+        dotColor = '#dc2626';
       }
       
-      return `<span class="sla-badge ${badgeClass}">${badgeText}</span>`;
+      return `<span class="badge badge-${badgeVariant}"><span class="badge-dot" style="background-color: ${dotColor};"></span>${badgeText}</span>`;
     }
     
     // Render cases to the list
@@ -3154,37 +3272,47 @@
       const casesList = document.getElementById('cases-list');
       
       if (!cases || cases.length === 0) {
-        casesList.innerHTML = '<p style="color: #32343a; opacity: 0.6;">No cases found. Create your first case to get started!</p>';
+        casesList.innerHTML = `
+          <div class="case-empty-state">
+            <div class="case-empty-state-icon">📋</div>
+            <h3 class="case-empty-state-title">No cases found</h3>
+            <p class="case-empty-state-description">Create your first case to get started!</p>
+          </div>
+        `;
         return;
       }
       
       casesList.innerHTML = cases.map(c => {
         const stage = getCaseStage(c.status);
         const slaBadge = getSLABadge(c);
+        const serviceDate = c.case_metadata?.service_date 
+          ? new Date(c.case_metadata.service_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          : null;
+        
         return `
-          <div class="case-card" onclick="openCaseModal('${c.id}')">
-            <div class="case-name">${c.deceased_name}</div>
-            ${slaBadge}
-            <div style="
-              background-color: ${stage.color}15;
-              border: 1.5px solid ${stage.color};
-              color: ${stage.color};
-              padding: 8px 14px;
-              border-radius: 20px;
-              font-size: 13px;
-              font-weight: 600;
-              margin-top: 8px;
-              display: inline-block;
-            ">
-              ${stage.emoji} ${stage.label}
+          <div class="case-row" onclick="openCaseModal('${c.id}')">
+            <div class="case-row-left">
+              <h4 class="case-row-name">${c.deceased_name}</h4>
+              <div class="case-row-meta">
+                <div class="case-row-meta-item">
+                  ${stage.emoji} <span>${stage.label}</span>
+                </div>
+                ${serviceDate ? `
+                  <div class="case-row-meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zm2 4h5v5H7v-5z"/>
+                    </svg>
+                    <span>Service: ${serviceDate}</span>
+                  </div>
+                ` : ''}
+              </div>
             </div>
-            ${getVideoStatusBadge(c.status)}
-            <p class="case-meta">Created: ${new Date(c.created_at).toLocaleDateString()}</p>
-            ${c.case_metadata?.service_date ? `<p class="case-meta" style="margin-top: 4px;">Service: ${new Date(c.case_metadata.service_date).toLocaleDateString()}</p>` : ''}
-            <div class="credential-box" style="margin-top: 12px;">
-              <div class="credential-label">Case ID</div>
-              <div class="credential-value" id="case-id-${c.id}" style="font-size: 11px; word-break: break-all;">${c.id}</div>
-              <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('case-id-${c.id}')">Copy</button>
+            <div class="case-row-right">
+              ${slaBadge}
+              <div class="case-row-date">${new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" opacity="0.3">
+                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+              </svg>
             </div>
           </div>
         `;
