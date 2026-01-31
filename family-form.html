@@ -2574,6 +2574,24 @@
                 }
             }
             
+            // Populate STATE OF BIRTH
+            if (currentCase.metadata?.state_of_birth) {
+                const stateField = document.getElementById('state_of_birth');
+                if (stateField) {
+                    stateField.value = currentCase.metadata.state_of_birth;
+                    console.log('✅ Pre-populated state_of_birth:', currentCase.metadata.state_of_birth);
+                }
+            }
+            
+            // Populate COUNTRY OF BIRTH
+            if (currentCase.metadata?.country_of_birth) {
+                const countryField = document.getElementById('country_of_birth');
+                if (countryField) {
+                    countryField.value = currentCase.metadata.country_of_birth;
+                    console.log('✅ Pre-populated country_of_birth:', currentCase.metadata.country_of_birth);
+                }
+            }
+            
             // Populate DATE OF DEATH fields (same pattern as DOB)
             if (currentCase.metadata?.date_of_death) {
                 const dodParts = currentCase.metadata.date_of_death.split('-'); // YYYY-MM-DD format
@@ -2603,6 +2621,24 @@
                 }
             }
             
+            // Populate STATE OF DEATH
+            if (currentCase.metadata?.state_of_death) {
+                const stateField = document.getElementById('state_of_passing');
+                if (stateField) {
+                    stateField.value = currentCase.metadata.state_of_death;
+                    console.log('✅ Pre-populated state_of_passing:', currentCase.metadata.state_of_death);
+                }
+            }
+            
+            // Populate COUNTRY OF DEATH
+            if (currentCase.metadata?.country_of_death) {
+                const countryField = document.getElementById('country_of_passing');
+                if (countryField) {
+                    countryField.value = currentCase.metadata.country_of_death;
+                    console.log('✅ Pre-populated country_of_passing:', currentCase.metadata.country_of_death);
+                }
+            }
+            
             // Log summary for debugging
             console.log('📋 All director-provided data populated:', {
                 name: fullName,
@@ -2611,7 +2647,11 @@
                 dob: currentCase.metadata?.date_of_birth,
                 dod: currentCase.metadata?.date_of_death,
                 city_of_birth: currentCase.metadata?.city_of_birth,
-                city_of_death: currentCase.metadata?.city_of_death
+                state_of_birth: currentCase.metadata?.state_of_birth,
+                country_of_birth: currentCase.metadata?.country_of_birth,
+                city_of_death: currentCase.metadata?.city_of_death,
+                state_of_death: currentCase.metadata?.state_of_death,
+                country_of_death: currentCase.metadata?.country_of_death
             });
             
             console.log('✅ Deceased name populated:', deceasedName);
