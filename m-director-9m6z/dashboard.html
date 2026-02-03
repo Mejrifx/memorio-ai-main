@@ -3334,26 +3334,27 @@
       
       // Determine badge based on thresholds
       let badgeVariant, badgeText, dotColor;
+      const hours = Math.floor(hoursElapsed);
       
       if (hoursElapsed < 24) {
         // Success: < 24 hours
         badgeVariant = 'success';
-        badgeText = `${Math.floor(hoursElapsed)}h`;
+        badgeText = `${hours} Hour(s)`;
         dotColor = '#15803d';
       } else if (hoursElapsed < 36) {
         // Warning: 24-36 hours
         badgeVariant = 'warning';
-        badgeText = `${Math.floor(hoursElapsed)}h`;
+        badgeText = `${hours} Hour(s)`;
         dotColor = '#c2410c';
       } else if (hoursElapsed < 48) {
         // Danger: 36-48 hours
         badgeVariant = 'danger';
-        badgeText = `${Math.floor(hoursElapsed)}h`;
+        badgeText = `${hours} Hour(s)`;
         dotColor = '#dc2626';
       } else {
         // Danger: 48+ hours (BREACH)
         badgeVariant = 'danger';
-        badgeText = `${Math.floor(hoursElapsed)}h • BREACH`;
+        badgeText = `${hours} Hour(s) • BREACH`;
         dotColor = '#dc2626';
       }
       
