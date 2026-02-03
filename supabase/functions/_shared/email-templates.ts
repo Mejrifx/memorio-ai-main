@@ -169,7 +169,7 @@ export const familyInviteTemplate = (name: string, deceasedName: string, magicLi
         <p style="font-size: 24px; color: #436481; font-weight: 700; margin: 10px 0;">${deceasedName}</p>
       </div>
       
-      <p>Take your time—each question helps us gently piece together a heartfelt memory. There's no rush, and you can always go back.</p>
+      <p>Take your time—each question helps us gently piece together a heartfelt memory. There's no rush.</p>
       
       <p style="color: #6ca7d3; font-weight: bold;">🔒 This link is secure and only accessible to you. It will expire in 24 hours.</p>
       
