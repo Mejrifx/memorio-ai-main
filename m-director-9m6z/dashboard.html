@@ -1047,8 +1047,8 @@
       background-color: var(--color-surface);
       border: 1px solid var(--color-border-light);
       border-radius: var(--radius-xl);
-      max-width: 900px;
-      width: 90%;
+      max-width: 1200px;
+      width: 92%;
       max-height: 90vh;
       overflow: hidden;
       box-shadow: var(--shadow-xl);
@@ -1103,9 +1103,30 @@
     }
     
     .modal-body {
-      padding: var(--space-6);
+      padding: var(--space-8);
       overflow-y: auto;
+      overflow-x: hidden;
       flex: 1;
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+    
+    /* Custom scrollbar for modal */
+    .modal-body::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .modal-body::-webkit-scrollbar-track {
+      background: var(--color-surface-hover);
+      border-radius: var(--radius-sm);
+    }
+    
+    .modal-body::-webkit-scrollbar-thumb {
+      background: var(--color-primary);
+      border-radius: var(--radius-sm);
+    }
+    
+    .modal-body::-webkit-scrollbar-thumb:hover {
+      background: var(--color-primary-dark);
     }
     
     .modal-footer {
@@ -1693,7 +1714,8 @@
         <button class="modal-close" onclick="closeCaseModal()">&times;</button>
       </div>
       
-      <div class="modal-section">
+      <div class="modal-body">
+        <div class="modal-section">
         <h3 class="modal-section-title">Case Information</h3>
         <div class="modal-info-grid">
           <div class="modal-info-item">
@@ -1878,9 +1900,11 @@
           </button>
         </div>
       </div>
+      </div>
       
-      <div style="margin-top: 24px; display: flex; gap: 12px;">
-        <button class="btn-secondary" onclick="deleteCase(currentCaseDetails.id, currentCaseDetails.deceased_name)">
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeCaseModal()">Close</button>
+        <button class="btn btn-danger" onclick="deleteCase(currentCaseDetails.id, currentCaseDetails.deceased_name)">
           Delete Case
         </button>
       </div>
