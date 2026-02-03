@@ -3202,7 +3202,7 @@
       if (['created', 'waiting_on_family', 'intake_in_progress'].includes(status)) {
         return {
           label: 'Waiting on Family',
-          color: '#ff9800', // Orange
+          color: '#6b7280', // Grey
           icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>'
         };
       }
@@ -3324,7 +3324,7 @@
       
       // If no submission yet (waiting on family), show waiting badge
       if (!caseData.first_submission_at || caseData.status === 'waiting_on_family') {
-        return '<span class="badge badge-info"><span class="badge-dot" style="background-color: #1d4ed8;"></span>Waiting</span>';
+        return '<span class="badge" style="background-color: rgba(107, 114, 128, 0.1); color: #6b7280; border: 1px solid rgba(107, 114, 128, 0.2);"><span class="badge-dot" style="background-color: #6b7280;"></span>Waiting</span>';
       }
       
       // Calculate hours elapsed since submission
@@ -3396,7 +3396,7 @@
             <div class="case-row-left">
               <h4 class="case-row-name">${c.deceased_name}</h4>
               <div class="case-row-meta">
-                <div class="case-row-meta-item">
+                <div class="case-row-meta-item" style="color: ${stage.color};">
                   ${stage.icon} <span>${stage.label}</span>
                 </div>
                 ${serviceDate ? `
