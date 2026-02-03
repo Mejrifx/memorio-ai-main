@@ -2984,12 +2984,12 @@
       const createBtn = document.getElementById('create-case-btn');
       const successBox = document.getElementById('case-success-box');
       const errorBox = document.getElementById('case-error-box');
-      const section = e.target.closest('.action-card');
+      const section = e.target.closest('.card');
       
       successBox.style.display = 'none';
       errorBox.style.display = 'none';
       
-      section.classList.add('loading');
+      if (section) section.classList.add('loading');
       createBtn.disabled = true;
       createBtn.textContent = 'CREATING CASE...';
       
@@ -3054,12 +3054,12 @@
       const inviteBtn = document.getElementById('invite-family-btn');
       const successBox = document.getElementById('family-success-box');
       const errorBox = document.getElementById('family-error-box');
-      const section = e.target.closest('.action-card');
+      const section = e.target.closest('.card');
       
       successBox.style.display = 'none';
       errorBox.style.display = 'none';
       
-      section.classList.add('loading');
+      if (section) section.classList.add('loading');
       inviteBtn.disabled = true;
       inviteBtn.textContent = 'SENDING INVITATION...';
       
