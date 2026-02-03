@@ -893,9 +893,19 @@
     }
     
     .case-empty-state-icon {
-      font-size: 48px;
+      width: 48px;
+      height: 48px;
       margin-bottom: var(--space-4);
       opacity: 0.3;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .case-empty-state-icon svg {
+      width: 100%;
+      height: 100%;
     }
     
     .case-empty-state-title {
@@ -1793,7 +1803,16 @@
       
       <!-- Obituary Draft Section (Only shown when draft exists) -->
       <div class="modal-section" id="obituary-section" style="display: none;">
-        <h3 class="modal-section-title">📝 Obituary Draft</h3>
+        <h3 class="modal-section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10,9 9,9 8,9"></polyline>
+          </svg>
+          Obituary Draft
+        </h3>
         <div style="
           background-color: #f4e8de;
           border: 1.5px solid #436481;
@@ -1817,7 +1836,14 @@
       
       <!-- Photos & Assets Section -->
       <div class="modal-section" id="photos-section" style="display: none;">
-        <h3 class="modal-section-title">📸 Photos & Assets</h3>
+        <h3 class="modal-section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21,15 16,10 5,21"></polyline>
+          </svg>
+          Photos & Assets
+        </h3>
         
         <!-- Upload Timer Banner -->
         <div id="director-upload-timer-banner" style="display: none; margin-bottom: 16px;">
@@ -1835,7 +1861,9 @@
           ">
             <input type="file" id="director-photo-input" accept="image/*" multiple style="display: none;">
             <button class="btn-primary" onclick="document.getElementById('director-photo-input').click()" id="director-upload-btn">
-              <span style="font-size: 20px; margin-right: 8px;">📁</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
               Upload Photos
             </button>
             <p style="margin-top: 12px; color: #666; font-size: 14px;">
@@ -1881,7 +1909,14 @@
       
       <!-- Downloads Section (Only shown when delivered) -->
       <div class="modal-section" id="downloads-section" style="display: none;">
-        <h3 class="modal-section-title">📥 Downloads</h3>
+        <h3 class="modal-section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7,10 12,15 17,10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Downloads
+        </h3>
         <div style="display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start;">
           <button class="btn btn-primary" onclick="directorDownloadVideo()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3168,7 +3203,7 @@
         return {
           label: 'Waiting on Family',
           color: '#ff9800', // Orange
-          emoji: '⏳'
+          icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>'
         };
       }
       
@@ -3177,7 +3212,7 @@
         return {
           label: 'In Progress',
           color: '#2196f3', // Blue
-          emoji: ''
+          icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline></svg>'
         };
       }
       
@@ -3186,7 +3221,7 @@
         return {
           label: 'Awaiting Review',
           color: '#9c27b0', // Purple
-          emoji: '🔍'
+          icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
         };
       }
       
@@ -3195,7 +3230,7 @@
         return {
           label: 'Complete',
           color: '#4caf50', // Green
-          emoji: '✅'
+          icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="20,6 9,17 4,12"></polyline></svg>'
         };
       }
       
@@ -3203,16 +3238,32 @@
       return {
         label: status.replace(/_/g, ' '),
         color: '#9e9e9e', // Grey
-        emoji: '📝'
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
       };
     }
     
     function getVideoStatusBadge(status) {
       const statusConfig = {
-        'in_production': { text: 'Editor Working', color: '#9c27b0' },
-        'awaiting_review': { text: '⏳ Pending QC', color: '#ff9800' },
-        'revision_requested': { text: '🔄 Revision Needed', color: '#f44336' },
-        'delivered': { text: '✅ Delivered', color: '#4caf50' }
+        'in_production': { 
+          text: 'Editor Working', 
+          color: '#9c27b0',
+          icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline></svg>'
+        },
+        'awaiting_review': { 
+          text: 'Pending QC', 
+          color: '#ff9800',
+          icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>'
+        },
+        'revision_requested': { 
+          text: 'Revision Needed', 
+          color: '#f44336',
+          icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="23,4 23,10 17,10"></polyline><polyline points="1,20 1,14 7,14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>'
+        },
+        'delivered': { 
+          text: 'Delivered', 
+          color: '#4caf50',
+          icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="20,6 9,17 4,12"></polyline></svg>'
+        }
       };
       
       const config = statusConfig[status];
@@ -3228,9 +3279,11 @@
           font-size: 12px;
           font-weight: 600;
           margin-top: 8px;
-          display: inline-block;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
         ">
-          ${config.text}
+          ${config.icon || ''}${config.text}
         </div>
       `;
     }
@@ -3314,7 +3367,15 @@
       if (!cases || cases.length === 0) {
         casesList.innerHTML = `
           <div class="case-empty-state">
-            <div class="case-empty-state-icon">📋</div>
+            <div class="case-empty-state-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14,2 14,8 20,8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10,9 9,9 8,9"></polyline>
+              </svg>
+            </div>
             <h3 class="case-empty-state-title">No cases found</h3>
             <p class="case-empty-state-description">Create your first case to get started!</p>
           </div>
@@ -3335,7 +3396,7 @@
               <h4 class="case-row-name">${c.deceased_name}</h4>
               <div class="case-row-meta">
                 <div class="case-row-meta-item">
-                  ${stage.emoji} <span>${stage.label}</span>
+                  ${stage.icon} <span>${stage.label}</span>
                 </div>
                 ${serviceDate ? `
                   <div class="case-row-meta-item">
