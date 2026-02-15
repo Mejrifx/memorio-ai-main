@@ -39,15 +39,18 @@ const i18n = {
       // Director Portal
       'director.dashboard': 'Director Dashboard',
       'director.createCase': 'Create New Case',
+      'director.createCaseDesc': 'Start a new memorial tribute case by providing the loved one\'s information.',
       'director.inviteFamily': 'Invite Family',
       'director.myCases': 'My Cases',
       'director.caseDetails': 'Case Details',
-      'director.deceasedName': 'Deceased Name',
+      'director.lovedOneName': 'Full Name of Loved One',
       'director.gender': 'Gender',
+      'director.gender.select': 'Select Gender',
       'director.gender.male': 'Male',
       'director.gender.female': 'Female',
       'director.gender.other': 'Other',
       'director.gender.specify': 'Please Specify Gender/Pronouns',
+      'director.gender.specifyHelper': 'This will be used in the memorial tribute',
       'director.dateOfBirth': 'Date of Birth',
       'director.dateOfPassing': 'Date of Passing',
       'director.cityOfBirth': 'City of Birth',
@@ -56,13 +59,17 @@ const i18n = {
       'director.cityOfDeath': 'City of Passing',
       'director.stateOfDeath': 'State/Province of Passing',
       'director.countryOfDeath': 'Country of Passing',
-      'director.createCaseBtn': 'Create Case',
+      'director.createCaseBtn': 'CREATE CASE',
       'director.changePassword': 'Change Your Password',
       'director.changePasswordDesc': 'For security reasons, you must change your temporary password before accessing the dashboard.',
       'director.newPassword': 'New Password',
       'director.confirmPassword': 'Confirm New Password',
       'director.passwordMinLength': 'Must be at least 8 characters',
       'director.changePasswordBtn': 'CHANGE PASSWORD',
+      'director.noCases': 'No cases found',
+      'director.noCasesDesc': 'Create your first case to get started!',
+      'director.caseCreated': 'Case Created',
+      'director.familyInvitationSent': 'Family Invitation Sent',
       
       // Family Portal
       'family.dashboard': 'Family Dashboard',
@@ -174,15 +181,18 @@ const i18n = {
       // Director Portal
       'director.dashboard': 'Panel del Director',
       'director.createCase': 'Crear Nuevo Caso',
+      'director.createCaseDesc': 'Comience un nuevo caso de tributo conmemorativo proporcionando la información del ser querido.',
       'director.inviteFamily': 'Invitar Familia',
       'director.myCases': 'Mis Casos',
       'director.caseDetails': 'Detalles del Caso',
-      'director.deceasedName': 'Nombre del Difunto',
+      'director.lovedOneName': 'Nombre Completo del Ser Querido',
       'director.gender': 'Género',
+      'director.gender.select': 'Seleccionar Género',
       'director.gender.male': 'Masculino',
       'director.gender.female': 'Femenino',
       'director.gender.other': 'Otro',
       'director.gender.specify': 'Por Favor Especifique Género/Pronombres',
+      'director.gender.specifyHelper': 'Esto se utilizará en el tributo conmemorativo',
       'director.dateOfBirth': 'Fecha de Nacimiento',
       'director.dateOfPassing': 'Fecha de Fallecimiento',
       'director.cityOfBirth': 'Ciudad de Nacimiento',
@@ -191,13 +201,17 @@ const i18n = {
       'director.cityOfDeath': 'Ciudad de Fallecimiento',
       'director.stateOfDeath': 'Estado/Provincia de Fallecimiento',
       'director.countryOfDeath': 'País de Fallecimiento',
-      'director.createCaseBtn': 'Crear Caso',
+      'director.createCaseBtn': 'CREAR CASO',
       'director.changePassword': 'Cambie Su Contraseña',
       'director.changePasswordDesc': 'Por razones de seguridad, debe cambiar su contraseña temporal antes de acceder al panel.',
       'director.newPassword': 'Nueva Contraseña',
       'director.confirmPassword': 'Confirmar Nueva Contraseña',
       'director.passwordMinLength': 'Debe tener al menos 8 caracteres',
       'director.changePasswordBtn': 'CAMBIAR CONTRASEÑA',
+      'director.noCases': 'No se encontraron casos',
+      'director.noCasesDesc': '¡Cree su primer caso para comenzar!',
+      'director.caseCreated': 'Caso Creado',
+      'director.familyInvitationSent': 'Invitación Familiar Enviada',
       
       // Family Portal
       'family.dashboard': 'Panel Familiar',
@@ -348,12 +362,27 @@ const i18n = {
       const key = element.dataset.i18n;
       const translation = this.t(key);
       
-      // Check if we should translate placeholder or text content
-      if (element.hasAttribute('placeholder')) {
-        element.placeholder = translation;
+      // Handle different element types
+      if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+        // For input/textarea, update placeholder
+        if (element.hasAttribute('placeholder')) {
+          element.placeholder = translation;
+        }
+      } else if (element.tagName === 'OPTION') {
+        // For option elements, update the text
+        element.textContent = translation;
       } else {
+        // For all other elements, update text content
         element.textContent = translation;
       }
+    });
+    
+    // Also translate select dropdowns that have options with data-i18n
+    document.querySelectorAll('select').forEach(select => {
+      select.querySelectorAll('option[data-i18n]').forEach(option => {
+        const key = option.dataset.i18n;
+        option.textContent = this.t(key);
+      });
     });
   },
   

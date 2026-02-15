@@ -1408,9 +1408,9 @@
       </a>
       
       <nav class="topbar-nav">
-        <button class="topbar-nav-item active" onclick="switchSection('create-case')">Create Case</button>
-        <button class="topbar-nav-item" onclick="switchSection('invite-family')">Invite Family</button>
-        <button class="topbar-nav-item" onclick="switchSection('my-cases')">My Cases</button>
+        <button class="topbar-nav-item active" onclick="switchSection('create-case')" data-i18n="director.createCase">Create Case</button>
+        <button class="topbar-nav-item" onclick="switchSection('invite-family')" data-i18n="director.inviteFamily">Invite Family</button>
+        <button class="topbar-nav-item" onclick="switchSection('my-cases')" data-i18n="director.myCases">My Cases</button>
       </nav>
     </div>
     
@@ -1448,7 +1448,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
             </svg>
-            <span>Logout</span>
+            <span data-i18n="common.logout">Logout</span>
           </button>
         </div>
       </div>
@@ -1463,8 +1463,8 @@
     <!-- CREATE CASE SECTION -->
     <div id="create-case-section" class="content-section active">
       <div class="page-header">
-        <h1 class="page-title">Create New Case</h1>
-        <p class="page-description">Start a new memorial tribute case by providing the loved one's information.</p>
+        <h1 class="page-title" data-i18n="director.createCase">Create New Case</h1>
+        <p class="page-description" data-i18n="director.createCaseDesc">Start a new memorial tribute case by providing the loved one's information.</p>
       </div>
       
       <div class="card">
@@ -1492,7 +1492,7 @@
               <div class="form-group">
                 <label for="deceased-gender" class="label" data-i18n="director.gender">Gender</label>
                 <select class="select" id="deceased-gender" required>
-                  <option value="">Select Gender</option>
+                  <option value="" data-i18n="director.gender.select">Select Gender</option>
                   <option value="male" data-i18n="director.gender.male">Male</option>
                   <option value="female" data-i18n="director.gender.female">Female</option>
                   <option value="other" data-i18n="director.gender.other">Other</option>
@@ -1509,7 +1509,7 @@
                   type="text" 
                   id="deceased-gender-custom" 
                   placeholder="e.g., Non-binary, They/Them, etc.">
-                <small style="color: rgba(50, 52, 58, 0.6); font-size: 12px; display: block; margin-top: 4px;">
+                <small style="color: rgba(50, 52, 58, 0.6); font-size: 12px; display: block; margin-top: 4px;" data-i18n="director.gender.specifyHelper">
                   This will be used in the memorial tribute
                 </small>
               </div>
@@ -1518,7 +1518,7 @@
             <!-- Date of Birth & Date of Death -->
             <div class="form-row">
               <div class="form-group">
-                <label for="deceased-dob" class="label">Date of Birth</label>
+                <label for="deceased-dob" class="label" data-i18n="director.dateOfBirth">Date of Birth</label>
                 <input 
                   class="input" 
                   type="date" 
@@ -1526,7 +1526,7 @@
                   required>
               </div>
               <div class="form-group">
-                <label for="deceased-dod" class="label">Date of Passing</label>
+                <label for="deceased-dod" class="label" data-i18n="director.dateOfPassing">Date of Passing</label>
                 <input 
                   class="input" 
                   type="date" 
@@ -1538,7 +1538,7 @@
             <!-- Birth Location -->
             <div class="form-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: var(--space-4);">
               <div class="form-group">
-                <label for="deceased-birth-city" class="label">City of Birth</label>
+                <label for="deceased-birth-city" class="label" data-i18n="director.cityOfBirth">City of Birth</label>
                 <input 
                   class="input" 
                   type="text" 
@@ -1547,7 +1547,7 @@
                   required>
               </div>
               <div class="form-group">
-                <label for="deceased-birth-state" class="label">State of Birth</label>
+                <label for="deceased-birth-state" class="label" data-i18n="director.stateOfBirth">State of Birth</label>
                 <input 
                   class="input" 
                   type="text" 
@@ -1556,7 +1556,7 @@
                   required>
               </div>
               <div class="form-group">
-                <label for="deceased-birth-country" class="label">Country of Birth</label>
+                <label for="deceased-birth-country" class="label" data-i18n="director.countryOfBirth">Country of Birth</label>
                 <input 
                   class="input" 
                   type="text" 
@@ -1570,7 +1570,7 @@
             <!-- Death Location -->
             <div class="form-row" style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr; gap: var(--space-4);">
               <div class="form-group">
-                <label for="deceased-death-city" class="label">City of Passing</label>
+                <label for="deceased-death-city" class="label" data-i18n="director.cityOfDeath">City of Passing</label>
                 <input 
                   class="input" 
                   type="text" 
@@ -1579,7 +1579,7 @@
                   required>
               </div>
               <div class="form-group">
-                <label for="deceased-death-state" class="label">State of Passing</label>
+                <label for="deceased-death-state" class="label" data-i18n="director.stateOfDeath">State of Passing</label>
                 <input 
                   class="input" 
                   type="text" 
@@ -1588,7 +1588,7 @@
                   required>
               </div>
               <div class="form-group">
-                <label for="deceased-death-country" class="label">Country of Passing</label>
+                <label for="deceased-death-country" class="label" data-i18n="director.countryOfDeath">Country of Passing</label>
                 <input 
                   class="input" 
                   type="text" 
@@ -1614,8 +1614,8 @@
       </div>
       
       <div class="card-footer">
-        <button type="submit" form="create-case-form" class="btn btn-primary btn-lg" id="create-case-btn">
-          Create Case
+        <button type="submit" form="create-case-form" class="btn btn-primary btn-lg" id="create-case-btn" data-i18n="director.createCaseBtn">
+          CREATE CASE
         </button>
       </div>
     </div>
