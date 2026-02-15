@@ -10,6 +10,9 @@
   <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
   <link rel="apple-touch-icon" href="images/webclip.png">
   
+  <!-- i18n (Internationalization) Support -->
+  <script src="js/i18n.js"></script>
+  
   <!-- Preload Dosis font -->
   <link rel="preload" href="fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
   
@@ -1219,6 +1222,44 @@
     html {
       scroll-behavior: smooth;
     }
+    
+    /* ============================================================================
+       LANGUAGE TOGGLE - Compact for Marketing Site
+       ============================================================================ */
+    .language-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(67, 100, 129, 0.2);
+      border-radius: 9999px;
+      padding: 4px;
+    }
+    
+    .language-toggle-btn {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #32343a;
+      background: transparent;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: 'Dosis Variablefont Wght', sans-serif;
+    }
+    
+    .language-toggle-btn:hover {
+      background-color: rgba(67, 100, 129, 0.1);
+    }
+    
+    .language-toggle-btn.active {
+      background-color: #436481;
+      color: white;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -1244,6 +1285,12 @@
           <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
           <li><a href="#faq" class="nav-link">FAQ</a></li>
           <li><a href="services.html" class="nav-link">Services</a></li>
+          <li>
+            <div class="language-toggle">
+              <button class="language-toggle-btn active" data-lang-btn="en" title="English">EN</button>
+              <button class="language-toggle-btn" data-lang-btn="es" title="Español">ES</button>
+            </div>
+          </li>
           <li><button class="btn-login" id="loginBtn">Family Login</button></li>
         </ul>
       </nav>
