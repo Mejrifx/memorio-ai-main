@@ -1622,13 +1622,13 @@
       
       <!-- Success Message -->
       <div id="case-success-box" class="success-box">
-        <h3><span class="success-icon"></span>Case Created Successfully!</h3>
-        <p>Case ID has been generated. You can now invite the family to complete the tribute form.</p>
+        <h3><span class="success-icon"></span><span data-i18n="director.caseCreatedSuccess">Case Created Successfully!</span></h3>
+        <p data-i18n="director.caseCreatedDesc">Case ID has been generated. You can now invite the family to complete the tribute form.</p>
         
         <div class="credential-box">
-          <div class="credential-label">Case ID</div>
+          <div class="credential-label" data-i18n="director.caseID">Case ID</div>
           <div class="credential-value" id="created-case-id"></div>
-          <button class="copy-btn" onclick="copyToClipboard('created-case-id')">Copy</button>
+          <button class="copy-btn" onclick="copyToClipboard('created-case-id')" data-i18n="director.copyBtn">Copy</button>
         </div>
       </div>
       
@@ -1639,20 +1639,20 @@
     <!-- INVITE FAMILY SECTION -->
     <div id="invite-family-section" class="content-section">
       <div class="page-header">
-        <h1 class="page-title">Invite Family Member</h1>
-        <p class="page-description">Send a secure invitation to a family member to complete the tribute form for their case.</p>
+        <h1 class="page-title" data-i18n="director.inviteFamilyTitle">Invite Family Member</h1>
+        <p class="page-description" data-i18n="director.inviteFamilyDesc">Send a secure invitation to a family member to complete the tribute form for their case.</p>
       </div>
       
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Family Member Details</h3>
-          <p class="card-description">Provide contact information and associate with a case ID</p>
+          <h3 class="card-title" data-i18n="director.familyMemberDetails">Family Member Details</h3>
+          <p class="card-description" data-i18n="director.familyMemberDetailsDesc">Provide contact information and associate with a case ID</p>
         </div>
         <div class="card-content">
           <form id="invite-family-form">
             <div class="form-row">
               <div class="form-group">
-                <label for="family-email" class="label">Email Address</label>
+                <label for="family-email" class="label" data-i18n="director.emailAddress">Email Address</label>
                 <input 
                   class="input" 
                   type="email" 
@@ -1662,7 +1662,7 @@
               </div>
               
               <div class="form-group">
-                <label for="family-name" class="label">Full Name</label>
+                <label for="family-name" class="label" data-i18n="director.fullName">Full Name</label>
                 <input 
                   class="input" 
                   type="text" 
@@ -1674,7 +1674,7 @@
             
             <div class="form-row">
               <div class="form-group">
-                <label for="family-phone" class="label">Phone Number (Optional)</label>
+                <label for="family-phone" class="label" data-i18n="director.phoneNumber">Phone Number (Optional)</label>
                 <input 
                   class="input" 
                   type="tel" 
@@ -1683,7 +1683,7 @@
               </div>
               
               <div class="form-group">
-                <label for="case-id" class="label">Case ID</label>
+                <label for="case-id" class="label" data-i18n="director.caseID">Case ID</label>
                 <input 
                   class="input" 
                   type="text" 
@@ -1696,7 +1696,7 @@
         </div>
         
         <div class="card-footer">
-          <button type="submit" form="invite-family-form" class="btn btn-primary btn-lg" id="invite-family-btn">
+          <button type="submit" form="invite-family-form" class="btn btn-primary btn-lg" id="invite-family-btn" data-i18n="director.sendInvitation">
             Send Invitation
           </button>
         </div>
@@ -1727,8 +1727,8 @@
     <!-- MY CASES SECTION -->
     <div id="my-cases-section" class="content-section">
       <div class="page-header">
-        <h1 class="page-title">My Cases</h1>
-        <p class="page-description">View and manage all memorial tribute cases for your organization.</p>
+        <h1 class="page-title" data-i18n="director.myCases">My Cases</h1>
+        <p class="page-description" data-i18n="director.myCasesDesc">View and manage all memorial tribute cases for your organization.</p>
       </div>
       
       <div id="cases-list" class="cases-list">
@@ -3487,10 +3487,11 @@
                 <polyline points="10,9 9,9 8,9"></polyline>
               </svg>
             </div>
-            <h3 class="case-empty-state-title">No cases found</h3>
-            <p class="case-empty-state-description">Create your first case to get started!</p>
+            <h3 class="case-empty-state-title" data-i18n="director.noCases">No cases found</h3>
+            <p class="case-empty-state-description" data-i18n="director.noCasesDesc">Create your first case to get started!</p>
           </div>
         `;
+        i18n.applyTranslations();
         return;
       }
       
