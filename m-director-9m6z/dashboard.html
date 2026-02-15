@@ -1453,6 +1453,21 @@
               </div>
             </div>
             
+            <!-- Custom Gender Input (shown when "Other" is selected) -->
+            <div class="form-row-single" id="custom-gender-container" style="display: none;">
+              <div class="form-group">
+                <label for="deceased-gender-custom" class="label">Please Specify Gender/Pronouns</label>
+                <input 
+                  class="input" 
+                  type="text" 
+                  id="deceased-gender-custom" 
+                  placeholder="e.g., Non-binary, They/Them, etc.">
+                <small style="color: rgba(50, 52, 58, 0.6); font-size: 12px; display: block; margin-top: 4px;">
+                  This will be used in the memorial tribute
+                </small>
+              </div>
+            </div>
+            
             <!-- Date of Birth & Date of Death -->
             <div class="form-row">
               <div class="form-group">
@@ -1719,7 +1734,14 @@
           
           <div id="password-error" class="error-box" style="display: none; margin-bottom: 16px;"></div>
           
-          <button type="submit" class="btn-primary" id="change-password-btn" style="width: 100%;">
+          <button type="submit" class="btn-primary" id="change-password-btn" style="
+            width: 100%;
+            border-radius: 9999px;
+            padding: 14px 28px;
+            margin-top: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+          ">
             CHANGE PASSWORD
           </button>
         </form>
@@ -3011,14 +3033,42 @@
       return { valid: true };
     }
     
+    // Handle gender dropdown change to show/hide custom input
+    document.getElementById('deceased-gender').addEventListener('change', function() {
+      const customContainer = document.getElementById('custom-gender-container');
+      const customInput = document.getElementById('deceased-gender-custom');
+      
+      if (this.value === 'other') {
+        customContainer.style.display = 'block';
+        customInput.setAttribute('required', 'required');
+      } else {
+        customContainer.style.display = 'none';
+        customInput.removeAttribute('required');
+        customInput.value = ''; // Clear the value when hidden
+      }
+    });
+    
     // Create Case form handler
     document.getElementById('create-case-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      // Handle custom gender value
+      let genderValue = document.getElementById('deceased-gender').value;
+      if (genderValue === 'other') {
+        const customGender = document.getElementById('deceased-gender-custom').value.trim();
+        if (!customGender) {
+          const errorBox = document.getElementById('create-case-error-box');
+          errorBox.textContent = 'Please specify gender/pronouns when "Other" is selected.';
+          errorBox.style.display = 'block';
+          return;
+        }
+        genderValue = customGender; // Use the custom value
+      }
+      
       // Capture all required loved one's information
       const caseData = {
         deceased_name: document.getElementById('deceased-name').value,
-        gender: document.getElementById('deceased-gender').value,
+        gender: genderValue,
         date_of_birth: document.getElementById('deceased-dob').value,
         date_of_death: document.getElementById('deceased-dod').value,
         city_of_birth: document.getElementById('deceased-birth-city').value,
