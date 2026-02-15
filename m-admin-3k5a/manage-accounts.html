@@ -768,7 +768,7 @@
     async function loadAccounts() {
       try {
         const { data: accounts, error } = await supabaseClient
-          .from('admin_users_view')  // Use view to bypass RLS
+          .from('users')
           .select(`
             *,
             organizations (name)
