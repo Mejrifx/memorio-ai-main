@@ -1210,7 +1210,7 @@
             ></textarea>
             <div class="revision-char-count">
               <span id="revisionCharCount">0</span> / 1000 characters
-              <span class="revision-minimum">(minimum 50 characters)</span>
+              <span class="revision-minimum">(minimum 25 characters)</span>
             </div>
           </div>
           
@@ -2618,8 +2618,9 @@
           const length = textarea.value.length;
           charCount.textContent = length;
           
-          // Enable button only if 50-1000 characters
-          submitBtn.disabled = length < 50 || length > 1000;
+          // Enable button only if 25-1000 characters
+          const minLength = 25;
+          submitBtn.disabled = length < minLength || length > 1000;
         });
       }
     });
@@ -2631,8 +2632,8 @@
       const revisionNotes = document.getElementById('revisionNotes').value.trim();
       
       // Validation
-      if (revisionNotes.length < 50) {
-        alert('Please provide at least 50 characters describing the changes you need.');
+      if (revisionNotes.length < 25) {
+        alert('Please provide at least 25 characters describing the changes you need.');
         return;
       }
       
