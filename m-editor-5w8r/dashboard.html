@@ -842,6 +842,44 @@
         <p>You'll see cases here when directors assign them to you.</p>
       </div>
     </div>
+    
+    <!-- Edit History Section -->
+    <div style="margin-top: 60px;">
+      <h2 class="section-title">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+          <path d="M3 3v18h18" />
+          <path d="M18 17V9" />
+          <path d="M13 17V5" />
+          <path d="M8 17v-3" />
+        </svg>
+        Edit History
+      </h2>
+      <div style="background-color: #f4e8de; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+          <div style="text-align: center;">
+            <div style="font-size: 36px; font-weight: 700; color: #436481;" id="total-completed-count">0</div>
+            <div style="color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Total Completed</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 36px; font-weight: 700; color: #28a745;" id="approved-count">0</div>
+            <div style="color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Approved</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 36px; font-weight: 700; color: #ffc107;" id="revision-count">0</div>
+            <div style="color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Revisions Requested</div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="completed-cases-list" class="case-list">
+        <!-- Completed cases will be loaded here -->
+      </div>
+      <div id="history-empty-state" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">📊</div>
+        <p>No completed cases yet.</p>
+        <p>Your editing history will appear here once you submit videos.</p>
+      </div>
+    </div>
   </div>
 
   <!-- Case Details Modal -->
@@ -1317,6 +1355,8 @@
         // Only load data after successful authentication
         console.log('🚀 Loading assigned cases...');
         await loadAssignedCases();
+        console.log('🚀 Loading edit history...');
+        await loadEditHistory();
         console.log('✅ App initialization complete');
         
         // Start auto-refresh for new assignments
@@ -1547,6 +1587,125 @@
         errorBox.style.display = 'block';
         casesList.innerHTML = '';
         emptyState.style.display = 'none';
+      }
+    }
+    
+    // Load edit history - Show completed videos submitted by this editor
+    async function loadEditHistory() {
+      const completedList = document.getElementById('completed-cases-list');
+      const historyEmptyState = document.getElementById('history-empty-state');
+      const totalCompletedCount = document.getElementById('total-completed-count');
+      const approvedCountEl = document.getElementById('approved-count');
+      const revisionCountEl = document.getElementById('revision-count');
+      
+      try {
+        // Get all video submissions by this editor with case details
+        const { data: submissions, error } = await supabaseClient
+          .from('video_submissions')
+          .select(`
+            *,
+            cases (
+              id,
+              deceased_name,
+              status,
+              organizations (name)
+            )
+          `)
+          .eq('editor_user_id', currentUser.id)
+          .order('submitted_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        console.log('📊 Edit history loaded:', submissions);
+        
+        // Calculate stats
+        const totalCompleted = submissions ? submissions.length : 0;
+        const approved = submissions ? submissions.filter(s => s.qc_status === 'approved').length : 0;
+        const revisionRequested = submissions ? submissions.filter(s => s.qc_status === 'revision_requested').length : 0;
+        
+        // Update stats display
+        totalCompletedCount.textContent = totalCompleted;
+        approvedCountEl.textContent = approved;
+        revisionCountEl.textContent = revisionRequested;
+        
+        if (!submissions || submissions.length === 0) {
+          completedList.innerHTML = '';
+          historyEmptyState.style.display = 'block';
+          return;
+        }
+        
+        historyEmptyState.style.display = 'none';
+        
+        // Group submissions by case to avoid duplicates (show only latest per case)
+        const caseMap = new Map();
+        submissions.forEach(sub => {
+          if (!caseMap.has(sub.case_id) || sub.revision_number > caseMap.get(sub.case_id).revision_number) {
+            caseMap.set(sub.case_id, sub);
+          }
+        });
+        
+        // Display completed cases
+        completedList.innerHTML = Array.from(caseMap.values()).map(sub => {
+          const submittedDate = new Date(sub.submitted_at).toLocaleDateString();
+          const caseName = sub.cases?.deceased_name || 'Unknown';
+          const orgName = sub.cases?.organizations?.name || 'Unknown Org';
+          
+          let statusBadge = '';
+          let statusClass = '';
+          
+          switch (sub.qc_status) {
+            case 'pending':
+              statusBadge = '⏳ Pending Review';
+              statusClass = 'status-pending';
+              break;
+            case 'in_review':
+              statusBadge = '👁️ In Review';
+              statusClass = 'status-in-review';
+              break;
+            case 'approved':
+              statusBadge = '✓ Approved';
+              statusClass = 'status-approved';
+              break;
+            case 'revision_requested':
+              statusBadge = '🔄 Revision Requested';
+              statusClass = 'status-revision';
+              break;
+            case 'rejected':
+              statusBadge = '✗ Rejected';
+              statusClass = 'status-rejected';
+              break;
+            default:
+              statusBadge = sub.qc_status;
+              statusClass = 'status-unknown';
+          }
+          
+          const versionBadge = sub.revision_number > 1 
+            ? `<span style="background: #436481; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">v${sub.revision_number}</span>`
+            : '';
+          
+          return `
+            <div class="case-card" style="cursor: default;">
+              <div class="case-name">${caseName} ${versionBadge}</div>
+              <div class="case-id">ID: ${sub.case_id.substring(0, 8)}...</div>
+              <div class="case-org">🏠 ${orgName}</div>
+              <div class="case-meta">
+                <div class="case-meta-item">
+                  <span>📅</span>
+                  <span>Submitted ${submittedDate}</span>
+                </div>
+                <div class="case-meta-item">
+                  <span>📦</span>
+                  <span>${(sub.file_size_bytes / (1024 * 1024)).toFixed(1)} MB</span>
+                </div>
+              </div>
+              <div class="case-status ${statusClass}">${statusBadge}</div>
+            </div>
+          `;
+        }).join('');
+        
+      } catch (error) {
+        console.error('Error loading edit history:', error);
+        completedList.innerHTML = `<p style="color: #e74c3c;">Error loading edit history: ${error.message}</p>`;
       }
     }
     
@@ -2236,6 +2395,7 @@
       
       try {
         await loadAssignedCases();
+        await loadEditHistory();
         showToast('✓ Workload refreshed successfully!');
       } catch (error) {
         console.error('Error refreshing workload:', error);
