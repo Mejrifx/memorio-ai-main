@@ -1108,14 +1108,30 @@
       const timerBanner = document.getElementById('photo-timer-banner');
       const photosSection = document.getElementById('photos-section');
       const downloadSection = document.getElementById('download-section-wrapper');
+      const uploadFormSection = document.getElementById('upload-form-section');
+      const videoFileInput = document.getElementById('video-file-input');
+      const editorNotesInput = document.getElementById('editor-notes-input');
+      const submitBtn = document.getElementById('submit-video-btn');
       const timeRemaining = calculatePhotoAccessTimeRemaining(submittedAt);
       
       if (timeRemaining.expired) {
-        // Window expired - photos are now accessible
+        // Window expired - photos are now accessible and video uploads enabled
         photosAccessLocked = false;
         timerBanner.style.display = 'none';
         photosSection.style.display = 'block';
         downloadSection.style.display = 'block';
+        
+        // Enable video upload form
+        if (uploadFormSection) {
+          uploadFormSection.style.opacity = '1';
+          uploadFormSection.style.pointerEvents = 'auto';
+        }
+        if (videoFileInput) videoFileInput.disabled = false;
+        if (editorNotesInput) editorNotesInput.disabled = false;
+        if (submitBtn && !submitBtn.textContent.includes('Submitted')) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '🚀 Submit to Quality Control';
+        }
         
         // Stop the timer
         if (photoTimerInterval) {
@@ -1123,7 +1139,7 @@
           photoTimerInterval = null;
         }
       } else {
-        // Window still active - family still uploading
+        // Window still active - family still uploading, disable video uploads
         photosAccessLocked = true;
         
         const { hours, minutes, seconds } = timeRemaining;
@@ -1136,7 +1152,8 @@
           <div class="photo-timer-countdown">${timeString}</div>
           <div class="photo-timer-message">
             The family has a 12-hour window to upload additional photos after submitting their form.<br>
-            Photos will be available for download once this window expires to ensure you have all the photos before starting your work.
+            Photos will be available for download once this window expires to ensure you have all the photos before starting your work.<br>
+            <strong>Video uploads are also disabled during this period.</strong>
           </div>
         `;
         timerBanner.style.display = 'block';
@@ -1144,6 +1161,18 @@
         // Hide photos and download sections
         photosSection.style.display = 'none';
         downloadSection.style.display = 'none';
+        
+        // Disable video upload form
+        if (uploadFormSection) {
+          uploadFormSection.style.opacity = '0.5';
+          uploadFormSection.style.pointerEvents = 'none';
+        }
+        if (videoFileInput) videoFileInput.disabled = true;
+        if (editorNotesInput) editorNotesInput.disabled = true;
+        if (submitBtn && !submitBtn.textContent.includes('Submitted')) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = '🔒 Locked - Family Upload Window Active';
+        }
       }
     }
     
@@ -2004,6 +2033,12 @@
     // Submit video to QC
     async function submitVideoToQC() {
       if (!currentCase) return;
+      
+      // Check if photos are still locked (12-hour window not expired)
+      if (photosAccessLocked) {
+        showToast('Cannot upload video during the 12-hour family upload window. Please wait for the window to expire before submitting your video.', true);
+        return;
+      }
       
       const fileInput = document.getElementById('video-file-input');
       const notesInput = document.getElementById('editor-notes-input');
