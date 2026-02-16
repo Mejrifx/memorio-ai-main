@@ -1881,9 +1881,9 @@
         </div>
       </div>
       
-      <!-- Obituary Draft Section (Only shown when draft exists) -->
+      <!-- Obituary Section (Only shown when draft exists) -->
       <div class="modal-section" id="obituary-section" style="display: none;">
-        <h3 class="modal-section-title">
+        <h3 class="modal-section-title" id="obituary-section-title">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14,2 14,8 20,8"></polyline>
@@ -2574,6 +2574,7 @@
         const obituarySection = document.getElementById('obituary-section');
         const obituaryContent = document.getElementById('obituary-content');
         const obituaryUpdated = document.getElementById('obituary-updated');
+        const obituarySectionTitle = document.getElementById('obituary-section-title');
         
         if (!obituaryError && obituaryData && obituaryData.content_html) {
           // Show obituary section
@@ -2581,6 +2582,17 @@
           obituarySection.style.display = 'block';
           obituaryContent.innerHTML = obituaryData.content_html;
           obituaryUpdated.textContent = new Date(obituaryData.updated_at).toLocaleString();
+          
+          // Update title based on case status
+          if (caseData.status === 'delivered') {
+            // Change title to "Completed Obituary" when delivered
+            const titleIcon = obituarySectionTitle.querySelector('svg').outerHTML;
+            obituarySectionTitle.innerHTML = titleIcon + ' Completed Obituary';
+          } else {
+            // Keep as "Obituary Draft" for other statuses
+            const titleIcon = obituarySectionTitle.querySelector('svg').outerHTML;
+            obituarySectionTitle.innerHTML = titleIcon + ' Obituary Draft';
+          }
         } else {
           // Hide obituary section if no content
           console.log('❌ Hiding obituary section:', obituaryError?.message || 'No content');

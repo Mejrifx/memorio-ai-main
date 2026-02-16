@@ -57,6 +57,36 @@
       color: #f2eadd;
     }
     
+    .refresh-btn {
+      color: #436481;
+      background-color: transparent;
+      border: 1.35px solid #436481;
+      border-radius: 60px;
+      padding: 11px 18px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 12px;
+    }
+    
+    .refresh-btn:hover {
+      background-color: #436481;
+      color: #f2eadd;
+    }
+    
+    .refresh-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
     .stats-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -108,13 +138,19 @@
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
-      border: 2px solid transparent;
+      border: 1.5px solid rgba(67, 100, 129, 0.2);
     }
     
     .case-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       border-color: #436481;
+    }
+    
+    .case-card:focus-within {
+      outline: none;
+      border-color: #436481;
+      box-shadow: 0 0 0 3px rgba(67, 100, 129, 0.1);
     }
     
     .case-name {
@@ -703,6 +739,17 @@
         gap: 20px;
       }
       
+      .header-actions {
+        width: 100%;
+        flex-direction: column;
+      }
+      
+      .refresh-btn,
+      .logout-btn {
+        width: 100%;
+        margin-right: 0;
+      }
+      
       .case-list {
         grid-template-columns: 1fr;
       }
@@ -712,6 +759,16 @@
     body.auth-pending {
       opacity: 0;
       pointer-events: none;
+    }
+    
+    /* Spinning animation for refresh button */
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
     }
     
     body.auth-verified {
@@ -741,7 +798,17 @@
         <h1 class="dashboard-title">Video Editor Portal</h1>
         <p class="user-info">Welcome, <span id="editor-name">Editor</span> - Create memorial tribute videos</p>
       </div>
-      <button class="logout-btn" onclick="handleLogout()">LOGOUT</button>
+      <div class="header-actions">
+        <button class="refresh-btn" id="refresh-workload-btn" onclick="handleRefreshWorkload()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          CHECK WORKLOAD
+        </button>
+        <button class="logout-btn" onclick="handleLogout()">LOGOUT</button>
+      </div>
     </div>
 
     <!-- Stats -->
@@ -1222,6 +1289,10 @@
         console.log('🚀 Loading assigned cases...');
         await loadAssignedCases();
         console.log('✅ App initialization complete');
+        
+        // Start auto-refresh for new assignments
+        startAutoRefresh();
+        console.log('✅ Auto-refresh enabled (every 2 minutes)');
       }
     }
     
@@ -1819,6 +1890,9 @@
     // Load video submission status
     async function loadSubmissionStatus(caseId) {
       try {
+        const statusDisplay = document.getElementById('submission-status-display');
+        const submitBtn = document.getElementById('submit-video-btn');
+        
         const { data: submission, error } = await supabaseClient
           .from('video_submissions')
           .select('*')
@@ -1833,6 +1907,16 @@
         
         if (submission) {
           displaySubmissionStatus(submission);
+        } else {
+          // No submission yet - reset button to allow new submission
+          statusDisplay.style.display = 'none';
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '🚀 Submit to Quality Control';
+            submitBtn.style.backgroundColor = '#28a745';
+            submitBtn.style.borderColor = '#28a745';
+            submitBtn.style.cursor = 'pointer';
+          }
         }
         
       } catch (error) {
@@ -1844,23 +1928,28 @@
     function displaySubmissionStatus(submission) {
       const statusDisplay = document.getElementById('submission-status-display');
       const uploadForm = document.getElementById('upload-form-section');
+      const submitBtn = document.getElementById('submit-video-btn');
       
       let statusColor = '#ffc107';
       let statusText = 'Pending Review';
       let showForm = false;
+      let disableSubmit = false;
       
       switch (submission.qc_status) {
         case 'pending':
           statusColor = '#ffc107';
           statusText = 'Pending QC Review';
+          disableSubmit = true;
           break;
         case 'in_review':
           statusColor = '#17a2b8';
           statusText = 'Currently Being Reviewed';
+          disableSubmit = true;
           break;
         case 'approved':
           statusColor = '#28a745';
           statusText = '✓ Approved & Delivered';
+          disableSubmit = true;
           break;
         case 'revision_requested':
           statusColor = '#dc3545';
@@ -1870,6 +1959,7 @@
         case 'rejected':
           statusColor = '#dc3545';
           statusText = 'Rejected - Contact Admin';
+          disableSubmit = true;
           break;
       }
       
@@ -1895,6 +1985,15 @@
         </div>
       `;
       statusDisplay.style.display = 'block';
+      
+      // Disable submit button if video is already submitted and not awaiting revision
+      if (disableSubmit && submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '✓ Submitted for Review';
+        submitBtn.style.backgroundColor = '#6c757d';
+        submitBtn.style.borderColor = '#6c757d';
+        submitBtn.style.cursor = 'not-allowed';
+      }
       
       // Show or hide upload form
       if (showForm || submission.qc_status === 'pending' || submission.qc_status === 'in_review') {
@@ -1929,10 +2028,10 @@
         return;
       }
       
-      // Validate file size (max 500MB)
-      const maxSize = 500 * 1024 * 1024;
+      // Validate file size (max 1.5GB)
+      const maxSize = 1.5 * 1024 * 1024 * 1024; // 1.5GB in bytes
       if (videoFile.size > maxSize) {
-        showToast('Video file is too large. Maximum size is 500MB', true);
+        showToast('Video file is too large. Maximum size is 1.5GB', true);
         return;
       }
       
@@ -2040,13 +2139,30 @@
         if (fileInput) fileInput.value = '';
         if (notesInput) notesInput.value = '';
         
+        // Update button state immediately to prevent double submission
+        submitBtn.textContent = '✓ Submitted for Review';
+        submitBtn.style.backgroundColor = '#6c757d';
+        submitBtn.style.borderColor = '#6c757d';
+        submitBtn.style.cursor = 'not-allowed';
+        // Keep button disabled - do NOT re-enable
+        
         setTimeout(async () => {
           progressDiv.style.display = 'none';
-          submitBtn.disabled = false;
-          submitBtn.textContent = '🚀 Submit to Quality Control';
           
           // Reload cases list to show updated submission status
           await loadAssignedCases();
+          
+          // Show submission status in modal
+          const { data: newSubmissions } = await supabaseClient
+            .from('video_submissions')
+            .select('*')
+            .eq('case_id', currentCase.id)
+            .order('created_at', { ascending: false })
+            .limit(1);
+          
+          if (newSubmissions && newSubmissions.length > 0) {
+            displaySubmissionStatus(newSubmissions[0]);
+          }
         }, 2000);
         
       } catch (error) {
@@ -2062,8 +2178,67 @@
     
     // Handle logout
     async function handleLogout() {
+      stopAutoRefresh(); // Stop auto-refresh before logging out
       await supabaseClient.auth.signOut();
       window.location.href = '/editor/login';
+    }
+    
+    // Handle manual workload refresh
+    async function handleRefreshWorkload() {
+      const refreshBtn = document.getElementById('refresh-workload-btn');
+      if (refreshBtn.disabled) return;
+      
+      refreshBtn.disabled = true;
+      const originalText = refreshBtn.innerHTML;
+      refreshBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px; animation: spin 1s linear infinite;">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+        REFRESHING...
+      `;
+      
+      try {
+        await loadAssignedCases();
+        showToast('✓ Workload refreshed successfully!');
+      } catch (error) {
+        console.error('Error refreshing workload:', error);
+        showToast('Error refreshing workload', true);
+      } finally {
+        setTimeout(() => {
+          refreshBtn.innerHTML = originalText;
+          refreshBtn.disabled = false;
+        }, 1000);
+      }
+    }
+    
+    // Auto-refresh workload every 2 minutes
+    let autoRefreshInterval = null;
+    
+    function startAutoRefresh() {
+      // Clear any existing interval
+      if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+      }
+      
+      // Refresh every 2 minutes (120000ms)
+      autoRefreshInterval = setInterval(async () => {
+        console.log('Auto-refreshing workload...');
+        try {
+          await loadAssignedCases();
+          console.log('✓ Workload auto-refreshed');
+        } catch (error) {
+          console.error('Error during auto-refresh:', error);
+        }
+      }, 120000); // 2 minutes
+    }
+    
+    function stopAutoRefresh() {
+      if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+      }
     }
     
     // Confirmation Modal Functions
