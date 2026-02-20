@@ -11,10 +11,42 @@
   <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
   <link href="../images/webclip.png" rel="apple-touch-icon">
   
+  <!-- i18n System -->
+  <script src="../js/i18n.js"></script>
+  
   <style>
     /* ============================================================================
        MEMORIO QC DASHBOARD - BRAND-CONSISTENT DESIGN
        ============================================================================ */
+    
+    /* Language Toggle Styling */
+    .language-toggle {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .language-button {
+      background: transparent;
+      border: 2px solid #436481;
+      color: #436481;
+      padding: 6px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    
+    .language-button:hover {
+      background: rgba(67, 100, 129, 0.1);
+    }
+    
+    .language-button.active {
+      background: #436481;
+      color: white;
+    }
     
     * {
       margin: 0;
@@ -638,7 +670,11 @@
           <span id="userName">QC User</span> ▾
         </button>
         <div class="topbar-profile-dropdown">
-          <a class="topbar-dropdown-item" id="logoutBtn">Logout</a>
+          <div class="language-toggle" style="padding: 8px;">
+            <button class="language-button active" data-lang-btn="en">EN</button>
+            <button class="language-button" data-lang-btn="es">ES</button>
+          </div>
+          <a class="topbar-dropdown-item" id="logoutBtn" data-i18n="common.logout">Logout</a>
         </div>
       </div>
     </div>
