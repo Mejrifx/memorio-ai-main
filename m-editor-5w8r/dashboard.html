@@ -837,7 +837,14 @@
         <!-- Cases will be loaded here -->
       </div>
       <div id="empty-state" class="empty-state" style="display: none;">
-        <div class="empty-state-icon">📝</div>
+        <div class="empty-state-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+        </div>
         <p>No cases assigned yet.</p>
         <p>You'll see cases here when directors assign them to you.</p>
       </div>
@@ -875,7 +882,14 @@
         <!-- Completed cases will be loaded here -->
       </div>
       <div id="history-empty-state" class="empty-state" style="display: none;">
-        <div class="empty-state-icon">📊</div>
+        <div class="empty-state-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 3v18h18" />
+            <path d="M18 17V9" />
+            <path d="M13 17V5" />
+            <path d="M8 17v-3" />
+          </svg>
+        </div>
         <p>No completed cases yet.</p>
         <p>Your editing history will appear here once you submit videos.</p>
       </div>
@@ -897,14 +911,24 @@
       
       <!-- Quote/Memory from Family (Primary Content for Editors) -->
       <div class="modal-section">
-        <h3 class="modal-section-title">💬 Family's Message / Short Memory</h3>
+        <h3 class="modal-section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          Family's Message / Short Memory
+        </h3>
         <div id="quote-section" class="quote-section">
           <!-- Quote will be loaded here -->
         </div>
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title">📋 Case Metadata</h3>
+        <h3 class="modal-section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          Case Metadata
+        </h3>
         <div id="case-metadata-content">
           <!--  Assignment date, photo count, version will be loaded here -->
         </div>
@@ -916,7 +940,14 @@
       </div>
       
       <div class="modal-section" id="photos-section">
-        <h3 class="modal-section-title">📷 Uploaded Photos</h3>
+        <h3 class="modal-section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Uploaded Photos
+        </h3>
         <div id="photos-content" class="photo-gallery">
           <!-- Photos will be loaded here -->
         </div>
@@ -939,7 +970,14 @@
       
       <!-- Video Upload Section -->
       <div class="modal-section" id="video-upload-section">
-        <h3 class="modal-section-title">📤 Submit Completed Video</h3>
+        <h3 class="modal-section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          Submit Completed Video
+        </h3>
         
         <!-- Current Submission Status -->
         <div id="submission-status-display" style="display: none; margin-bottom: 20px;"></div>
@@ -979,7 +1017,12 @@
             class="btn-primary" 
             onclick="submitVideoToQC()"
             style="width: 100%; background-color: #28a745; border-color: #28a745;">
-            🚀 Submit to Quality Control
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Submit to Quality Control
           </button>
         </div>
       </div>
@@ -1123,9 +1166,13 @@
       const downloadSection = document.getElementById('download-section-wrapper');
       
       timerBanner.innerHTML = `
-        <div class="photo-timer-title">
-          ⏳ Waiting for Family Submission
-        </div>
+          <div class="photo-timer-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Waiting for Family Submission
+          </div>
         <div class="photo-timer-message">
           The family has not yet completed their intake form. Photos will be available once the form is submitted and the 12-hour upload window expires.
         </div>
@@ -1168,7 +1215,7 @@
         if (editorNotesInput) editorNotesInput.disabled = false;
         if (submitBtn && !submitBtn.textContent.includes('Submitted')) {
           submitBtn.disabled = false;
-          submitBtn.textContent = '🚀 Submit to Quality Control';
+          submitBtn.textContent = 'Submit to Quality Control';
         }
         
         // Stop the timer
@@ -1185,7 +1232,11 @@
         
         timerBanner.innerHTML = `
           <div class="photo-timer-title">
-            🔒 Photos Locked - Family Still Uploading
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Photos Locked - Family Still Uploading
           </div>
           <div class="photo-timer-countdown">${timeString}</div>
           <div class="photo-timer-message">
@@ -1209,7 +1260,7 @@
         if (editorNotesInput) editorNotesInput.disabled = true;
         if (submitBtn && !submitBtn.textContent.includes('Submitted')) {
           submitBtn.disabled = true;
-          submitBtn.textContent = '🔒 Locked - Family Upload Window Active';
+          submitBtn.textContent = 'Locked - Family Upload Window Active';
         }
       }
     }
@@ -1371,12 +1422,23 @@
       
       // If case is delivered or closed, show completion badge
       if (caseData.status === 'delivered' || caseData.status === 'closed') {
-        return `<span class="sla-badge green${positionClass}">✓ Delivered</span>`;
+        return `<span class="sla-badge green${positionClass}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display: inline-block; vertical-align: middle; margin-right: 3px;">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Delivered
+        </span>`;
       }
       
       // If no submission yet (waiting on family), show waiting badge
       if (!caseData.first_submission_at || caseData.status === 'waiting_on_family') {
-        return `<span class="sla-badge waiting${positionClass}">⏳ Waiting</span>`;
+        return `<span class="sla-badge waiting${positionClass}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 3px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          Waiting
+        </span>`;
       }
       
       // Calculate hours elapsed since submission
@@ -1519,10 +1581,10 @@
           
           if (c.latest_submission) {
             if (c.latest_submission.qc_status === 'revision_requested') {
-              displayStatus = '⚠️ Revision Needed';
+              displayStatus = 'Revision Needed';
               statusClass = 'status-revision';
             } else if (c.latest_submission.qc_status === 'approved') {
-              displayStatus = '✓ Completed';
+              displayStatus = 'Completed';
               statusClass = 'status-completed';
             } else if (c.latest_submission.qc_status === 'in_review' || c.latest_submission.qc_status === 'pending') {
               displayStatus = 'In QC Review';
@@ -1554,7 +1616,11 @@
           const musicSelection = formData.music_selection || '';
           const musicDisplay = musicSelection 
             ? `<div class="case-meta-item">
-                 <span>♪</span>
+                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle;">
+                   <path d="M9 18V5l12-2v13"></path>
+                   <circle cx="6" cy="18" r="3"></circle>
+                   <circle cx="18" cy="16" r="3"></circle>
+                 </svg>
                  <span>${musicSelection}</span>
                </div>`
             : '';
@@ -1564,14 +1630,29 @@
               ${slaBadge}
               <div class="case-name">${c.deceased_name} ${versionBadge}</div>
               <div class="case-id">ID: ${c.id.substring(0, 8)}...</div>
-              <div class="case-org">🏠 ${c.organizations?.name || 'Unknown'}</div>
+              <div class="case-org">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                ${c.organizations?.name || 'Unknown'}
+              </div>
               <div class="case-meta">
                 <div class="case-meta-item">
-                  <span>📷</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
                   <span>${c.photo_count} photo${c.photo_count !== 1 ? 's' : ''}</span>
                 </div>
                 <div class="case-meta-item">
-                  <span>📅</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle;">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
                   <span>${assignedDate.toLocaleDateString()}</span>
                 </div>
                 ${musicDisplay}
@@ -1655,23 +1736,23 @@
           
           switch (sub.qc_status) {
             case 'pending':
-              statusBadge = '⏳ Pending Review';
+              statusBadge = 'Pending Review';
               statusClass = 'status-pending';
               break;
             case 'in_review':
-              statusBadge = '👁️ In Review';
+              statusBadge = 'In Review';
               statusClass = 'status-in-review';
               break;
             case 'approved':
-              statusBadge = '✓ Approved';
+              statusBadge = 'Approved';
               statusClass = 'status-approved';
               break;
             case 'revision_requested':
-              statusBadge = '🔄 Revision Requested';
+              statusBadge = 'Revision Requested';
               statusClass = 'status-revision';
               break;
             case 'rejected':
-              statusBadge = '✗ Rejected';
+              statusBadge = 'Rejected';
               statusClass = 'status-rejected';
               break;
             default:
@@ -1687,14 +1768,27 @@
             <div class="case-card" style="cursor: default;">
               <div class="case-name">${caseName} ${versionBadge}</div>
               <div class="case-id">ID: ${sub.case_id.substring(0, 8)}...</div>
-              <div class="case-org">🏠 ${orgName}</div>
+              <div class="case-org">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                ${orgName}
+              </div>
               <div class="case-meta">
                 <div class="case-meta-item">
-                  <span>📅</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle;">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
                   <span>Submitted ${submittedDate}</span>
                 </div>
                 <div class="case-meta-item">
-                  <span>📦</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle;">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                  </svg>
                   <span>${(sub.file_size_bytes / (1024 * 1024)).toFixed(1)} MB</span>
                 </div>
               </div>
@@ -1827,7 +1921,13 @@
           revisionNotice.className = 'revision-notice family-revision';
           revisionNotice.innerHTML = `
             <div class="revision-notice-title">
-              👨‍👩‍👧 FAMILY REVISION REQUEST
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              FAMILY REVISION REQUEST
               <span class="revision-source-badge">From Family</span>
               <span class="version-badge">v${latestSubmission.revision_number + 1} needed</span>
             </div>
@@ -1841,7 +1941,12 @@
           revisionNotice.className = 'revision-notice';
           revisionNotice.innerHTML = `
             <div class="revision-notice-title">
-              ⚠️ QC REVISION REQUESTED
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              QC REVISION REQUESTED
               <span class="version-badge">v${latestSubmission.revision_number + 1} needed</span>
             </div>
             <div class="revision-notice-text">${latestSubmission.qc_notes || 'Please make revisions and resubmit.'}</div>
@@ -2100,7 +2205,7 @@
           statusDisplay.style.display = 'none';
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = '🚀 Submit to Quality Control';
+            submitBtn.textContent = 'Submit to Quality Control';
             submitBtn.style.backgroundColor = '#28a745';
             submitBtn.style.borderColor = '#28a745';
             submitBtn.style.cursor = 'pointer';
@@ -2366,7 +2471,7 @@
         // Re-enable button
         progressDiv.style.display = 'none';
         submitBtn.disabled = false;
-        submitBtn.textContent = '🚀 Submit to Quality Control';
+        submitBtn.textContent = 'Submit to Quality Control';
       }
     }
     
