@@ -4856,11 +4856,7 @@
         // Handle case where no analytics exist yet (new org with no cases)
         let analyticsData;
         if (analyticsError) {
-          console.warn('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg> Analytics error (using defaults):', analyticsError);
+          console.warn('⚠️ Analytics error (using defaults):', analyticsError);
           // Check if it's "no rows" error (PGRST116) - org has no cases yet
           if (analyticsError.code === 'PGRST116') {
             console.log('ℹ️ No cases found for this organization yet');
@@ -6459,11 +6455,7 @@
           });
         
         if (auditError) {
-          console.error('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg> Error logging to audit trail:', auditError);
+          console.error('❌ Error logging to audit trail:', auditError);
           // Don't throw - reassignment was successful, just audit log failed
         } else {
           console.log('✅ Audit trail updated successfully');
