@@ -35,6 +35,13 @@ const i18n = {
       'common.upload': 'Upload',
       'common.error': 'Error',
       'common.success': 'Success',
+      'common.emailAddress': 'Email Address',
+      'common.password': 'Password',
+      'common.enterEmail': 'Enter your email',
+      'common.enterPassword': 'Enter your password',
+      'common.rateLimitExceeded': 'Too many failed attempts. Please try again in {minutes} minute(s).',
+      'common.loginFailed': 'Failed to sign in. Please check your credentials.',
+      'common.unexpectedError': 'An unexpected error occurred. Please try again.',
       
       // Main Website
       'website.nav.features': 'Features',
@@ -146,6 +153,28 @@ const i18n = {
       'family.revisionComplete': 'Your revision is complete',
       'family.downloadVideo': 'Download Video',
       'family.downloadObituary': 'Download Obituary',
+      'family.loginTitle': 'Family Portal',
+      'family.loginSubtitle': 'Sign in to complete your obituary form',
+      'family.signIn': 'Sign In',
+      'family.signingIn': 'Signing in...',
+      'family.noCredentials': 'Don\'t have login credentials?',
+      'family.contactDirector': 'Contact your funeral director for access.',
+      'family.loginSuccess': 'Login successful! Redirecting...',
+      
+      // Family Form
+      'form.title': 'Memorial Tribute Form',
+      'form.subtitle': 'Help us create a meaningful tribute',
+      'form.basicInfo': 'Basic Information',
+      'form.lifeStory': 'Life Story',
+      'form.familyMembers': 'Family Members',
+      'form.photoUpload': 'Photo Upload',
+      'form.musicPreferences': 'Music Preferences',
+      'form.additionalNotes': 'Additional Notes',
+      'form.nextStep': 'Next Step',
+      'form.previousStep': 'Previous Step',
+      'form.submitForm': 'Submit Form',
+      'form.saving': 'Saving...',
+      'form.saved': 'Saved',
       
       // Editor Portal
       'editor.dashboard': 'Editor Dashboard',
@@ -159,6 +188,22 @@ const i18n = {
       'editor.editHistory': 'Edit History',
       'editor.completedCases': 'Completed Cases',
       'editor.videosEdited': 'Videos Edited',
+      'editor.loginTitle': 'Video Editor Portal',
+      'editor.loginSubtitle': 'Sign in to create memorial tribute videos',
+      'editor.signIn': 'Sign In',
+      'editor.signingIn': 'Signing in...',
+      'editor.noCredentials': 'Don\'t have login credentials?',
+      'editor.contactAdmin': 'Contact your admin for access.',
+      'editor.loginSuccess': 'Login successful! Redirecting...',
+      'editor.totalCompleted': 'Total Completed',
+      'editor.approved': 'Approved',
+      'editor.revisionsRequested': 'Revisions Requested',
+      'editor.noCasesYet': 'No completed cases yet.',
+      'editor.submittedVideos': 'Your submitted videos will appear here.',
+      'editor.uploadLocked': 'Locked - Family Upload Window Active',
+      'editor.uploadLockedMsg': 'Video uploads are disabled during the family photo upload window (12 hours after form submission).',
+      'editor.submittedForReview': 'Submitted for Review',
+      'editor.workloadRefreshed': 'Workload refreshed!',
       
       // QC Portal
       'qc.dashboard': 'QC Dashboard',
@@ -168,6 +213,13 @@ const i18n = {
       'qc.approved': 'Approved',
       'qc.rejected': 'Rejected',
       'qc.passRate': 'Pass Rate',
+      'qc.loginTitle': 'Quality Control Portal',
+      'qc.loginSubtitle': 'Sign in to review memorial tributes',
+      'qc.signIn': 'Sign In',
+      'qc.signingIn': 'Signing in...',
+      'qc.noCredentials': 'Don\'t have login credentials?',
+      'qc.contactAdmin': 'Contact your admin for access.',
+      'qc.loginSuccess': 'Login successful! Redirecting...',
       
       // Admin Portal
       'admin.dashboard': 'Admin Dashboard',
@@ -236,6 +288,13 @@ const i18n = {
       'common.upload': 'Subir',
       'common.error': 'Error',
       'common.success': 'Éxito',
+      'common.emailAddress': 'Dirección de Correo Electrónico',
+      'common.password': 'Contraseña',
+      'common.enterEmail': 'Ingrese su correo electrónico',
+      'common.enterPassword': 'Ingrese su contraseña',
+      'common.rateLimitExceeded': 'Demasiados intentos fallidos. Por favor, inténtelo de nuevo en {minutes} minuto(s).',
+      'common.loginFailed': 'Error al iniciar sesión. Por favor, verifique sus credenciales.',
+      'common.unexpectedError': 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.',
       
       // Main Website
       'website.nav.features': 'Características',
@@ -347,6 +406,28 @@ const i18n = {
       'family.revisionComplete': 'Su revisión está completa',
       'family.downloadVideo': 'Descargar Video',
       'family.downloadObituary': 'Descargar Obituario',
+      'family.loginTitle': 'Portal Familiar',
+      'family.loginSubtitle': 'Inicie sesión para completar su formulario de obituario',
+      'family.signIn': 'Iniciar Sesión',
+      'family.signingIn': 'Iniciando sesión...',
+      'family.noCredentials': '¿No tiene credenciales de inicio de sesión?',
+      'family.contactDirector': 'Póngase en contacto con su director de funeraria para obtener acceso.',
+      'family.loginSuccess': '¡Inicio de sesión exitoso! Redirigiendo...',
+      
+      // Family Form
+      'form.title': 'Formulario de Tributo Conmemorativo',
+      'form.subtitle': 'Ayúdenos a crear un tributo significativo',
+      'form.basicInfo': 'Información Básica',
+      'form.lifeStory': 'Historia de Vida',
+      'form.familyMembers': 'Miembros de la Familia',
+      'form.photoUpload': 'Subir Fotos',
+      'form.musicPreferences': 'Preferencias Musicales',
+      'form.additionalNotes': 'Notas Adicionales',
+      'form.nextStep': 'Siguiente Paso',
+      'form.previousStep': 'Paso Anterior',
+      'form.submitForm': 'Enviar Formulario',
+      'form.saving': 'Guardando...',
+      'form.saved': 'Guardado',
       
       // Editor Portal
       'editor.dashboard': 'Panel del Editor',
@@ -360,6 +441,22 @@ const i18n = {
       'editor.editHistory': 'Historial de Ediciones',
       'editor.completedCases': 'Casos Completados',
       'editor.videosEdited': 'Videos Editados',
+      'editor.loginTitle': 'Portal del Editor de Video',
+      'editor.loginSubtitle': 'Inicie sesión para crear videos de tributo conmemorativo',
+      'editor.signIn': 'Iniciar Sesión',
+      'editor.signingIn': 'Iniciando sesión...',
+      'editor.noCredentials': '¿No tiene credenciales de inicio de sesión?',
+      'editor.contactAdmin': 'Póngase en contacto con su administrador para obtener acceso.',
+      'editor.loginSuccess': '¡Inicio de sesión exitoso! Redirigiendo...',
+      'editor.totalCompleted': 'Total Completado',
+      'editor.approved': 'Aprobado',
+      'editor.revisionsRequested': 'Revisiones Solicitadas',
+      'editor.noCasesYet': 'Aún no hay casos completados.',
+      'editor.submittedVideos': 'Sus videos enviados aparecerán aquí.',
+      'editor.uploadLocked': 'Bloqueado - Ventana de Carga Familiar Activa',
+      'editor.uploadLockedMsg': 'Las cargas de video están deshabilitadas durante la ventana de carga de fotos familiares (12 horas después del envío del formulario).',
+      'editor.submittedForReview': 'Enviado para Revisión',
+      'editor.workloadRefreshed': '¡Carga de trabajo actualizada!',
       
       // QC Portal
       'qc.dashboard': 'Panel de QC',
@@ -369,6 +466,13 @@ const i18n = {
       'qc.approved': 'Aprobado',
       'qc.rejected': 'Rechazado',
       'qc.passRate': 'Tasa de Aprobación',
+      'qc.loginTitle': 'Portal de Control de Calidad',
+      'qc.loginSubtitle': 'Inicie sesión para revisar tributos conmemorativos',
+      'qc.signIn': 'Iniciar Sesión',
+      'qc.signingIn': 'Iniciando sesión...',
+      'qc.noCredentials': '¿No tiene credenciales de inicio de sesión?',
+      'qc.contactAdmin': 'Póngase en contacto con su administrador para obtener acceso.',
+      'qc.loginSuccess': '¡Inicio de sesión exitoso! Redirigiendo...',
       
       // Admin Portal
       'admin.dashboard': 'Panel de Administración',
@@ -476,13 +580,14 @@ const i18n = {
    * Translate all elements with data-i18n attribute
    */
   translatePage() {
+    // Translate text content
     document.querySelectorAll('[data-i18n]').forEach(element => {
       const key = element.dataset.i18n;
       const translation = this.t(key);
       
       // Handle different element types
       if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-        // For input/textarea, update placeholder
+        // For input/textarea, update placeholder if it has one
         if (element.hasAttribute('placeholder')) {
           element.placeholder = translation;
         }
@@ -493,6 +598,13 @@ const i18n = {
         // For all other elements, update text content
         element.textContent = translation;
       }
+    });
+    
+    // Translate placeholders specifically marked with data-i18n-placeholder
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+      const key = element.dataset.i18nPlaceholder;
+      const translation = this.t(key);
+      element.placeholder = translation;
     });
     
     // Also translate select dropdowns that have options with data-i18n
