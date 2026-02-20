@@ -12,7 +12,46 @@
   <link href="../images/favicon.png" rel="shortcut icon" type="image/x-icon">
   <link href="../images/webclip.png" rel="apple-touch-icon">
   
+  <!-- i18n System -->
+  <script src="../js/i18n.js"></script>
+  
   <style>
+    /* Language Toggle Styling */
+    .language-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px 12px;
+      border-radius: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .language-button {
+      background: transparent;
+      border: 2px solid #436481;
+      color: #436481;
+      padding: 6px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    
+    .language-button:hover {
+      background: rgba(67, 100, 129, 0.1);
+    }
+    
+    .language-button.active {
+      background: #436481;
+      color: white;
+    }
+    
     .login-container {
       min-height: 100vh;
       display: flex;
@@ -128,6 +167,12 @@
   </style>
 </head>
 <body class="body">
+  <!-- Language Toggle -->
+  <div class="language-toggle">
+    <button class="language-button active" data-lang-btn="en">EN</button>
+    <button class="language-button" data-lang-btn="es">ES</button>
+  </div>
+  
   <div class="nav">
     <div class="logo-wrapper">
       <img src="../images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" 
@@ -143,39 +188,41 @@
 
   <div class="login-container">
     <div class="login-box">
-      <h1 class="login-title">Family Portal</h1>
-      <p class="login-subtitle">Sign in to complete your obituary form</p>
+      <h1 class="login-title" data-i18n="family.loginTitle">Family Portal</h1>
+      <p class="login-subtitle" data-i18n="family.loginSubtitle">Sign in to complete your obituary form</p>
       
       <div id="errorMessage" class="error-message"></div>
       <div id="successMessage" class="success-message"></div>
       
       <form id="loginForm">
         <div class="form-group">
-          <label class="form-label" for="email">Email Address</label>
+          <label class="form-label" for="email" data-i18n="common.emailAddress">Email Address</label>
           <input type="email" 
                  id="email" 
                  class="form-input" 
+                 data-i18n-placeholder="common.enterEmail"
                  placeholder="Enter your email"
                  required>
         </div>
         
         <div class="form-group">
-          <label class="form-label" for="password">Password</label>
+          <label class="form-label" for="password" data-i18n="common.password">Password</label>
           <input type="password" 
                  id="password" 
                  class="form-input" 
+                 data-i18n-placeholder="common.enterPassword"
                  placeholder="Enter your password"
                  required>
         </div>
         
-        <button type="submit" class="btn-login" id="loginBtn">
+        <button type="submit" class="btn-login" id="loginBtn" data-i18n="family.signIn">
           Sign In
         </button>
       </form>
       
       <p class="help-text">
-        Don't have login credentials?<br>
-        Contact your funeral director for access.
+        <span data-i18n="family.noCredentials">Don't have login credentials?</span><br>
+        <span data-i18n="family.contactDirector">Contact your funeral director for access.</span>
       </p>
     </div>
   </div>
@@ -297,7 +344,7 @@
       
       // Disable button and show loading
       loginBtn.disabled = true;
-      loginBtn.textContent = 'Signing in...';
+      loginBtn.textContent = i18n.t('family.signingIn');
       
       try {
         // Call server-side rate-limited login Edge Function
@@ -333,7 +380,7 @@
         }
         
         // Success - redirect to family form
-        successMessage.textContent = '✓ Login successful! Redirecting...';
+        successMessage.textContent = i18n.t('family.loginSuccess');
         successMessage.style.display = 'block';
         
         setTimeout(() => {
@@ -343,12 +390,12 @@
       } catch (error) {
         console.error('Login error:', error);
         
-        errorMessage.textContent = error.message || 'Failed to sign in. Please check your credentials.';
+        errorMessage.textContent = error.message || i18n.t('common.loginFailed');
         errorMessage.style.display = 'block';
         
         // Re-enable button
         loginBtn.disabled = false;
-        loginBtn.textContent = 'Sign In';
+        loginBtn.textContent = i18n.t('family.signIn');
       }
     });
   </script>
