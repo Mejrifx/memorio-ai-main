@@ -1063,7 +1063,7 @@
       </div>
     </div>
     
-    <div id="loadingState" class="loading">
+    <div id="loadingState" class="loading" data-i18n="family.loadingCase">
       Loading your case...
     </div>
     
@@ -1077,17 +1077,17 @@
         
         <div class="case-info">
           <div class="info-item">
-            <div class="info-label">Case ID</div>
-            <div class="info-value" id="caseId">Loading...</div>
-            <button class="copy-btn" onclick="copyToClipboard('caseId')" style="margin-top: 5px; font-size: 12px;">Copy</button>
+            <div class="info-label" data-i18n="family.caseID">Case ID</div>
+            <div class="info-value" id="caseId" data-i18n="family.loading">Loading...</div>
+            <button class="copy-btn" onclick="copyToClipboard('caseId')" style="margin-top: 5px; font-size: 12px;" data-i18n="common.copy">Copy</button>
           </div>
           <div class="info-item">
-            <div class="info-label">Created</div>
-            <div class="info-value" id="caseCreated">Loading...</div>
+            <div class="info-label" data-i18n="family.created">Created</div>
+            <div class="info-value" id="caseCreated" data-i18n="family.loading">Loading...</div>
           </div>
           <div class="info-item">
-            <div class="info-label">Last Updated</div>
-            <div class="info-value" id="caseUpdated">Loading...</div>
+            <div class="info-label" data-i18n="family.lastUpdated">Last Updated</div>
+            <div class="info-value" id="caseUpdated" data-i18n="family.loading">Loading...</div>
           </div>
         </div>
         
@@ -1102,7 +1102,7 @@
         <div class="dashboard-section">
           <h3 class="section-title">
             <span class="icon icon-obituary"></span>
-            Obituary
+            <span data-i18n="family.obituarySection">Obituary</span>
           </h3>
           <div id="obituarySection">
             <div class="obituary-preview">
