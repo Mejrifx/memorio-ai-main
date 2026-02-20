@@ -3653,11 +3653,7 @@
         console.log('JWT Role from app_metadata:', jwtRole);
         
         if (!jwtRole || jwtRole !== 'admin') {
-          console.warn('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg> WARNING: app_metadata role missing or incorrect in JWT!');
+          console.warn('⚠️ WARNING: app_metadata role missing or incorrect in JWT!');
           console.warn('Expected: admin, Got:', jwtRole);
           console.warn('Refreshing session to update JWT...');
           
@@ -4018,11 +4014,7 @@
           .eq('id', caseId);
         
         if (statusError) {
-          console.warn('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg> Failed to update case status:', statusError);
+          console.warn('⚠️ Failed to update case status:', statusError);
           // Don't throw - assignment was successful, just log the warning
         } else {
           console.log('✅ Case status updated to in_production');
@@ -5018,11 +5010,7 @@
           .is('unassigned_at', null);
         
         if (assignmentsError) {
-          console.warn('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg> Error loading editor assignments:', assignmentsError);
+          console.warn('⚠️ Error loading editor assignments:', assignmentsError);
         }
         
         // Get video submissions with QC reviewer info from view (bypasses RLS)
@@ -5032,11 +5020,7 @@
           .order('created_at', { ascending: false });
         
         if (submissionsError) {
-          console.warn('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg> Error loading video submissions:', submissionsError);
+          console.warn('⚠️ Error loading video submissions:', submissionsError);
         }
         
         // Combine data
