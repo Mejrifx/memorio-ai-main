@@ -5222,11 +5222,11 @@
     
     async function loadManageAccounts() {
       try {
-        console.log('👥 Loading manage accounts...');
+        console.log('👥 Loading manage accounts with analytics...');
         
-        // Query the view which now includes temp_password
+        // Query the combined analytics view which includes user info + analytics
         const { data: accounts, error } = await supabaseClient
-          .from('admin_users_view')
+          .from('user_analytics_combined')
           .select('*')
           .in('role', ['editor', 'qc'])
           .order('created_at', { ascending: false });
@@ -5236,15 +5236,11 @@
           throw error;
         }
         
-        console.log(`✅ Loaded ${accounts?.length || 0} accounts`);
+        console.log(`✅ Loaded ${accounts?.length || 0} accounts with analytics`);
         console.log('📊 Sample account data:', accounts?.[0]);
         
         allAccountsData = accounts || [];
         filteredAccountsData = allAccountsData;
-        
-        // Log how many have temp passwords
-        const withPasswords = allAccountsData.filter(a => a.temp_password).length;
-        console.log(`🔑 ${withPasswords}/${allAccountsData.length} accounts have temp_password`);
         
         // Update stats
         updateAccountsStats();
@@ -5317,7 +5313,7 @@
     }
     
     function createAccountCard(account) {
-      const name = account.metadata?.name || 'No name';
+      const name = account.name || 'No name';
       
       const orgName = account.org_name || 'Global Access'; // Editors & QC have global access
       const createdDate = new Date(account.created_at).toLocaleDateString('en-US', { 
@@ -5338,8 +5334,87 @@
           })
         : 'Never';
       
+      // Build analytics section based on role
+      let analyticsSection = '';
+      
+      if (account.role === 'editor') {
+        const totalVideos = account.editor_total_videos || 0;
+        const approved = account.editor_approved || 0;
+        const revisions = account.editor_revisions || 0;
+        const pending = account.editor_pending || 0;
+        
+        analyticsSection = `
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-primary);">
+            <div style="font-weight: 600; font-size: 13px; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18" />
+                <path d="M18 17V9" />
+                <path d="M13 17V5" />
+                <path d="M8 17v-3" />
+              </svg>
+              Editor Statistics
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+              <div style="background: rgba(67, 100, 129, 0.1); padding: 8px; border-radius: 6px;">
+                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Total Edited</div>
+                <div style="font-size: 20px; font-weight: 700; color: #436481;">${totalVideos}</div>
+              </div>
+              <div style="background: rgba(40, 167, 69, 0.1); padding: 8px; border-radius: 6px;">
+                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Approved</div>
+                <div style="font-size: 20px; font-weight: 700; color: #28a745;">${approved}</div>
+              </div>
+              <div style="background: rgba(255, 193, 7, 0.1); padding: 8px; border-radius: 6px;">
+                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Revisions</div>
+                <div style="font-size: 20px; font-weight: 700; color: #ffc107;">${revisions}</div>
+              </div>
+              <div style="background: rgba(108, 117, 125, 0.1); padding: 8px; border-radius: 6px;">
+                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Pending</div>
+                <div style="font-size: 20px; font-weight: 700; color: #6c757d;">${pending}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (account.role === 'qc') {
+        const passed = account.qc_passed || 0;
+        const rejected = account.qc_rejected || 0;
+        const totalReviewed = account.qc_total_reviewed || 0;
+        const passRate = account.qc_pass_rate || 0;
+        
+        // Determine pass rate color
+        let passRateColor = '#28a745'; // Green for high pass rate
+        if (passRate < 70) passRateColor = '#dc3545'; // Red for low pass rate
+        else if (passRate < 85) passRateColor = '#ffc107'; // Yellow for medium pass rate
+        
+        analyticsSection = `
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-primary);">
+            <div style="font-weight: 600; font-size: 13px; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              QC Statistics
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 8px;">
+              <div style="background: rgba(40, 167, 69, 0.1); padding: 8px; border-radius: 6px;">
+                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Passed</div>
+                <div style="font-size: 20px; font-weight: 700; color: #28a745;">${passed}</div>
+              </div>
+              <div style="background: rgba(220, 53, 69, 0.1); padding: 8px; border-radius: 6px;">
+                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Rejected</div>
+                <div style="font-size: 20px; font-weight: 700; color: #dc3545;">${rejected}</div>
+              </div>
+            </div>
+            <div style="background: rgba(67, 100, 129, 0.05); padding: 12px; border-radius: 6px; text-align: center;">
+              <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Pass Rate</div>
+              <div style="font-size: 28px; font-weight: 700; color: ${passRateColor};">${passRate}%</div>
+              <div style="color: #666; font-size: 11px; margin-top: 2px;">${totalReviewed} total reviewed</div>
+            </div>
+          </div>
+        `;
+      }
+      
       return `
-        <div class="account-card" style="cursor: pointer;" onclick="openAccountDetailsModal('${account.id}')">
+        <div class="account-card" style="cursor: pointer;" onclick="openAccountDetailsModal('${account.user_id}')">
           <div class="account-card-header">
             <div>
               <div class="account-name">${name}</div>
@@ -5367,11 +5442,13 @@
             </div>
           </div>
           
+          ${analyticsSection}
+          
           <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-primary);">
             <button 
               class="btn-danger" 
               style="width: 100%; padding: 10px; font-size: 14px;"
-              onclick="event.stopPropagation(); openDeleteAccountModal('${account.id}', '${account.email.replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}', '${account.role}')">
+              onclick="event.stopPropagation(); openDeleteAccountModal('${account.user_id}', '${account.email.replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}', '${account.role}')">
               🗑️ Delete Account
             </button>
           </div>
