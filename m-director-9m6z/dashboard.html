@@ -3204,6 +3204,7 @@
         console.log('✅ Case created successfully:', result.data.case_id);
         document.getElementById('created-case-id').textContent = result.data.case_id;
         successBox.style.display = 'block';
+        setTimeout(() => successBox.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
         document.getElementById('create-case-form').reset();
         
         // Reset country fields to default
@@ -3304,6 +3305,7 @@
         }
         
         successBox.style.display = 'block';
+        setTimeout(() => successBox.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
         document.getElementById('invite-family-form').reset();
         
       } catch (error) {
