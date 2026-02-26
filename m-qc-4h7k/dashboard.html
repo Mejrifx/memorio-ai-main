@@ -918,6 +918,7 @@
               deceased_name,
               org_id,
               status,
+              first_submission_at,
               organizations(id, name)
             ),
             users!video_submissions_editor_user_id_fkey(email, metadata)
@@ -1223,33 +1224,14 @@
     }
     
     // Display review interface
-    async function displayReviewInterface(submission, obituary, familyRevisionNotes = null) {
+    // Display review interface
+    function displayReviewInterface(submission, obituary, familyRevisionNotes = null) {
       const content = document.getElementById('reviewContent');
       const editorName = submission.users?.metadata?.name || submission.users?.email || 'Editor';
       
-      // Check cooldown status
-      let cooldownInfo = null;
-      try {
-        const { data: shouldApplyCooldown } = await supabaseClient
-          .rpc('should_apply_cooldown', { p_case_id: submission.case_id });
-        
-        if (shouldApplyCooldown) {
-          const { data: expirationTime } = await supabaseClient
-            .rpc('calculate_cooldown_expiration', { p_case_id: submission.case_id });
-          
-          if (expirationTime) {
-            const expDate = new Date(expirationTime);
-            const hoursUntil = Math.round((expDate - new Date()) / 1000 / 3600);
-            cooldownInfo = {
-              active: true,
-              expiresAt: expDate,
-              hoursUntil: hoursUntil
-            };
-          }
-        }
-      } catch (error) {
-        console.error('Error checking cooldown:', error);
-      }
+      // Pure JS cooldown check using already-fetched first_submission_at
+      const cooldownInfo = checkCooldown(submission);
+      
       
       content.innerHTML = `
         <div class="review-content-header">
@@ -1359,93 +1341,84 @@
       `;
     }
     
-    // Handle Approve - Check cooldown status first
-    async function handleApprove(overrideCooldown = false) {
+    // Pure JS cooldown check — no RPC needed, uses first_submission_at from already-fetched case data
+    function checkCooldown(submission) {
+      const firstSubmissionAt = submission.cases?.first_submission_at;
+      if (!firstSubmissionAt) return { active: false };
+      const submittedMs = new Date(firstSubmissionAt).getTime();
+      const hoursElapsed = (Date.now() - submittedMs) / 3600000;
+      if (hoursElapsed >= 40) return { active: false };
+      const expiresAt = new Date(submittedMs + 40 * 3600000);
+      const hoursUntil = Math.round((expiresAt - Date.now()) / 3600000);
+      return { active: true, expiresAt, hoursUntil };
+    }
+    
+    // Handle Approve - synchronous cooldown check, no RPC calls
+    function handleApprove(overrideCooldown = false) {
       if (!currentSubmission) return;
       
-      try {
-        // Check if cooldown should apply
-        const { data: cooldownCheck, error: cooldownError } = await supabaseClient
-          .rpc('should_apply_cooldown', { p_case_id: currentSubmission.case_id });
-        
-        if (cooldownError) throw cooldownError;
-        
-        const shouldApplyCooldown = cooldownCheck && !overrideCooldown;
-        
-        // Get cooldown expiration time if applicable
-        let cooldownMessage = '';
-        if (shouldApplyCooldown) {
-          const { data: expirationTime } = await supabaseClient
-            .rpc('calculate_cooldown_expiration', { p_case_id: currentSubmission.case_id });
-          
-          if (expirationTime) {
-            const expDate = new Date(expirationTime);
-            const hoursUntil = Math.round((expDate - new Date()) / 1000 / 3600);
-            cooldownMessage = `\n\n⏱️ COOLDOWN ACTIVE: Video will be delivered to family in approximately ${hoursUntil} hours (at ${expDate.toLocaleString()}).\n\nThe family still has time to edit the obituary before receiving the video.`;
-          }
-        }
-        
-        // Show appropriate confirmation modal
-        if (overrideCooldown && shouldApplyCooldown) {
-          // Override confirmation with strong warning
-          showConfirmModal(
-            '⚠️ Override Cooldown & Deliver Immediately',
-            '🚨 WARNING: You are about to bypass the 40-hour cooldown period.\n\nThe family may still be editing the obituary. Are you absolutely sure you want to deliver the video immediately?\n\nThis action will:\n• Mark the video as approved\n• Deliver the video to the family RIGHT NOW\n• Skip the cooldown timer',
-            () => performApprove(true)
-          );
-        } else {
-          // Standard approval
-          showConfirmModal(
-            shouldApplyCooldown ? '✓ Approve Video (Delivery Scheduled)' : '✓ Approve & Deliver Video',
-            shouldApplyCooldown 
-              ? `Are you sure you want to approve this video?${cooldownMessage}\n\nThis action will:\n• Mark the video as approved\n• Schedule delivery when cooldown expires\n• Family will receive the video automatically`
-              : 'Are you sure you want to approve this video and deliver it to the family?\n\nThis action will:\n• Mark the video as approved\n• Deliver to family immediately (40+ hours have passed)\n• Notify the family',
-            () => performApprove(false)
-          );
-        }
-        
-      } catch (error) {
-        console.error('Error checking cooldown status:', error);
-        showToast('Error checking cooldown status', true);
+      const cooldown = checkCooldown(currentSubmission);
+      const shouldApplyCooldown = cooldown.active && !overrideCooldown;
+      
+      if (overrideCooldown && cooldown.active) {
+        showConfirmModal(
+          '⚠️ Override Cooldown & Deliver Immediately',
+          '🚨 WARNING: You are about to bypass the 40-hour cooldown period.\n\nThe family may still be editing the obituary. Are you absolutely sure you want to deliver the video immediately?\n\nThis action will:\n• Mark the video as approved\n• Deliver the video to the family RIGHT NOW\n• Skip the cooldown timer',
+          () => performApprove(true)
+        );
+      } else {
+        const cooldownMessage = shouldApplyCooldown
+          ? `\n\n⏱️ COOLDOWN ACTIVE: Video will be delivered to family in approximately ${cooldown.hoursUntil} hours (at ${cooldown.expiresAt.toLocaleString()}).\n\nThe family still has time to edit the obituary.`
+          : '';
+        showConfirmModal(
+          shouldApplyCooldown ? '✓ Approve Video (Delivery Scheduled)' : '✓ Approve & Deliver Video',
+          shouldApplyCooldown
+            ? `Are you sure you want to approve this video?${cooldownMessage}\n\nThis action will:\n• Mark the video as approved\n• Schedule delivery when cooldown expires\n• Family will receive the video automatically`
+            : 'Are you sure you want to approve this video and deliver it to the family?\n\nThis action will:\n• Mark the video as approved\n• Deliver to family immediately (40+ hours have passed)\n• Notify the family',
+          () => performApprove(false)
+        );
       }
     }
     
-    // Perform the actual approval using the new cooldown function
+    // Perform the actual approval — direct DB updates, no RPC dependency
     async function performApprove(overrideCooldown = false) {
       const notes = document.getElementById('qcNotes').value;
+      const cooldown = checkCooldown(currentSubmission);
+      const shouldApplyCooldown = cooldown.active && !overrideCooldown;
       
       try {
-        // Call the approve_video_with_cooldown function
-        const { data, error } = await supabaseClient
-          .rpc('approve_video_with_cooldown', {
-            p_submission_id: currentSubmission.id,
-            p_qc_user_id: currentUser.id,
-            p_qc_notes: notes || null,
-            p_override_cooldown: overrideCooldown
-          });
+        const { error: subError } = await supabaseClient
+          .from('video_submissions')
+          .update({
+            qc_status: 'approved',
+            qc_reviewer_id: currentUser.id,
+            qc_notes: notes || null,
+            qc_reviewed_at: new Date().toISOString(),
+            cooldown_expires_at: shouldApplyCooldown ? cooldown.expiresAt.toISOString() : null,
+            cooldown_overridden: overrideCooldown
+          })
+          .eq('id', currentSubmission.id);
         
-        if (error) throw error;
+        if (subError) throw subError;
         
-        const result = data[0];
+        // Keep case as awaiting_review during cooldown; deliver immediately otherwise
+        const { error: caseError } = await supabaseClient
+          .from('cases')
+          .update({ status: shouldApplyCooldown ? 'awaiting_review' : 'delivered' })
+          .eq('id', currentSubmission.case_id);
         
-        if (result.success) {
-          // Show appropriate success message
-          let successMessage = '✓ Video approved!';
-          if (result.cooldown_applied) {
-            const expDate = new Date(result.cooldown_expires_at);
-            successMessage = `✓ Video approved! Will be delivered to family at ${expDate.toLocaleString()}`;
-          } else if (result.immediate_delivery) {
-            successMessage = overrideCooldown 
-              ? '✓ Video approved and delivered immediately (cooldown overridden)'
-              : '✓ Video approved and delivered to family!';
-          }
-          
-          showToast(successMessage, false);
+        if (caseError) throw caseError;
+        
+        let successMessage;
+        if (shouldApplyCooldown) {
+          successMessage = `✓ Video approved! Will be delivered to family at ${cooldown.expiresAt.toLocaleString()}`;
+        } else if (overrideCooldown) {
+          successMessage = '✓ Video approved and delivered immediately (cooldown overridden)';
         } else {
-          throw new Error(result.message || 'Approval failed');
+          successMessage = '✓ Video approved and delivered to family!';
         }
+        showToast(successMessage, false);
         
-        // Clear selection and reload
         currentSubmission = null;
         document.getElementById('reviewContent').innerHTML = `
           <div class="empty-state">
