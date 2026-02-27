@@ -5012,7 +5012,7 @@
         // Get video submissions with QC reviewer info from view (bypasses RLS)
         const { data: submissions, error: submissionsError } = await supabaseClient
           .from('admin_video_submissions_view')
-          .select('case_id, qc_status, qc_reviewer_id, qc_reviewer_email, qc_reviewer_metadata')
+          .select('case_id, qc_status, qc_reviewer_id, qc_reviewer_email, qc_reviewer_metadata, cooldown_expires_at')
           .order('created_at', { ascending: false });
         
         if (submissionsError) {
@@ -5036,6 +5036,7 @@
           
           return {
             ...c,
+            cooldown_expires_at: latestSubmission?.cooldown_expires_at || null,
             organizations: c.org_name ? { name: c.org_name } : null,
             editor_assignments: caseAssignments,
             video_submissions: latestSubmission ? [{
@@ -5098,6 +5099,34 @@
       renderKanbanBoard();
     }
     
+    // Map of case_id -> cooldown_expires_at for admin kanban cooldown timers
+    let adminCooldownMap = {};
+    let adminCooldownTimerInterval = null;
+    
+    function startAdminCooldownTimers() {
+      if (adminCooldownTimerInterval) clearInterval(adminCooldownTimerInterval);
+      if (Object.keys(adminCooldownMap).length === 0) return;
+      
+      adminCooldownTimerInterval = setInterval(() => {
+        Object.entries(adminCooldownMap).forEach(([caseId, expiresAt]) => {
+          const el = document.getElementById(`admin-cooldown-timer-${caseId}`);
+          if (!el) return;
+          
+          const msLeft = new Date(expiresAt) - Date.now();
+          if (msLeft <= 0) {
+            clearInterval(adminCooldownTimerInterval);
+            loadAllCases();
+            return;
+          }
+          
+          const h = Math.floor(msLeft / 3600000);
+          const m = Math.floor((msLeft % 3600000) / 60000);
+          const s = Math.floor((msLeft % 60000) / 1000);
+          el.textContent = `${h}h ${m}m ${s}s`;
+        });
+      }, 1000);
+    }
+    
     function renderKanbanBoard() {
       const columns = {
         waiting: ['waiting_on_family', 'intake_in_progress'],
@@ -5105,6 +5134,14 @@
         review: ['awaiting_review', 'revision_requested'],
         complete: ['delivered', 'closed']
       };
+      
+      // Build cooldown map for cases in review column
+      adminCooldownMap = {};
+      filteredCasesData.forEach(c => {
+        if (c.cooldown_expires_at && c.status === 'awaiting_review') {
+          adminCooldownMap[c.id] = c.cooldown_expires_at;
+        }
+      });
       
       // Count cases per column
       const counts = {
@@ -5131,6 +5168,8 @@
           columnEl.innerHTML = cases.map(c => createCaseCard(c)).join('');
         }
       });
+      
+      startAdminCooldownTimers();
     }
     
     // Helper function to generate SLA badge HTML
@@ -5186,11 +5225,34 @@
       // Calculate SLA badge based on actual case data
       let slaBadge = getSLABadge(caseData);
       
+      // Cooldown timer badge (shown to left of SLA badge)
+      const hasCooldown = adminCooldownMap[caseData.id];
+      const cooldownBadge = hasCooldown ? `
+        <span style="
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: #fef3c7;
+          border: 1.5px solid #f59e0b;
+          color: #b45309;
+          border-radius: 12px;
+          padding: 3px 10px;
+          font-size: 11px;
+          font-weight: 700;
+          white-space: nowrap;
+        ">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>
+          <span id="admin-cooldown-timer-${caseData.id}">...</span>
+        </span>` : '';
+      
       return `
         <div class="case-card" onclick="openCaseDetailModal('${caseData.id}')">
           <div class="case-card-header">
             <div class="case-card-name">${caseData.deceased_name}</div>
-            ${slaBadge}
+            <div style="display:flex; align-items:center; gap:6px;">
+              ${cooldownBadge}
+              ${slaBadge}
+            </div>
           </div>
           <div class="case-card-org">${orgName}</div>
           <div class="case-card-meta">
