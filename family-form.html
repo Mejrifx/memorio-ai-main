@@ -2565,13 +2565,12 @@
                 }
             }
             
-            // Populate CITY OF BIRTH
-            if (currentCase.metadata?.city_of_birth) {
-                const cityField = document.getElementById('city_of_birth');
-                if (cityField) {
-                    cityField.value = currentCase.metadata.city_of_birth;
-                    console.log('✅ Pre-populated city_of_birth:', currentCase.metadata.city_of_birth);
-                }
+            // Populate CITY OF BIRTH (always set; fallback to N/A)
+            const cityOfBirthField = document.getElementById('city_of_birth');
+            if (cityOfBirthField) {
+                const cityOfBirthValue = currentCase.metadata?.city_of_birth || 'N/A';
+                cityOfBirthField.value = cityOfBirthValue;
+                console.log('✅ Pre-populated city_of_birth:', cityOfBirthValue);
             }
             
             // Populate STATE OF BIRTH (always set so n8n receives the field; use N/A if blank)
@@ -2582,13 +2581,12 @@
                 console.log('✅ Pre-populated state_of_birth:', stateOfBirthValue);
             }
             
-            // Populate COUNTRY OF BIRTH
-            if (currentCase.metadata?.country_of_birth) {
-                const countryField = document.getElementById('country_of_birth');
-                if (countryField) {
-                    countryField.value = currentCase.metadata.country_of_birth;
-                    console.log('✅ Pre-populated country_of_birth:', currentCase.metadata.country_of_birth);
-                }
+            // Populate COUNTRY OF BIRTH (always set; fallback to N/A so n8n never gets blank)
+            const countryOfBirthField = document.getElementById('country_of_birth');
+            if (countryOfBirthField) {
+                const countryOfBirthValue = currentCase.metadata?.country_of_birth || 'N/A';
+                countryOfBirthField.value = countryOfBirthValue;
+                console.log('✅ Pre-populated country_of_birth:', countryOfBirthValue);
             }
             
             // Populate DATE OF DEATH fields (same pattern as DOB)
@@ -2611,13 +2609,12 @@
                 }
             }
             
-            // Populate CITY OF DEATH
-            if (currentCase.metadata?.city_of_death) {
-                const cityField = document.getElementById('city_of_passing');
-                if (cityField) {
-                    cityField.value = currentCase.metadata.city_of_death;
-                    console.log('✅ Pre-populated city_of_passing:', currentCase.metadata.city_of_death);
-                }
+            // Populate CITY OF DEATH (always set; fallback to N/A)
+            const cityOfPassingField = document.getElementById('city_of_passing');
+            if (cityOfPassingField) {
+                const cityOfPassingValue = currentCase.metadata?.city_of_death || 'N/A';
+                cityOfPassingField.value = cityOfPassingValue;
+                console.log('✅ Pre-populated city_of_passing:', cityOfPassingValue);
             }
             
             // Populate STATE OF DEATH (always set so n8n receives the field; use N/A if blank)
@@ -2628,13 +2625,12 @@
                 console.log('✅ Pre-populated state_of_passing:', stateOfPassingValue);
             }
             
-            // Populate COUNTRY OF DEATH
-            if (currentCase.metadata?.country_of_death) {
-                const countryField = document.getElementById('country_of_passing');
-                if (countryField) {
-                    countryField.value = currentCase.metadata.country_of_death;
-                    console.log('✅ Pre-populated country_of_passing:', currentCase.metadata.country_of_death);
-                }
+            // Populate COUNTRY OF DEATH (always set; fallback to N/A)
+            const countryOfPassingField = document.getElementById('country_of_passing');
+            if (countryOfPassingField) {
+                const countryOfPassingValue = currentCase.metadata?.country_of_death || 'N/A';
+                countryOfPassingField.value = countryOfPassingValue;
+                console.log('✅ Pre-populated country_of_passing:', countryOfPassingValue);
             }
             
             // Log summary for debugging
