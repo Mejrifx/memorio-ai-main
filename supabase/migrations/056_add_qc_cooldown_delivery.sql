@@ -27,7 +27,7 @@ COMMENT ON COLUMN video_submissions.cooldown_overridden IS
 -- Create index for efficient querying of videos pending cooldown delivery
 CREATE INDEX IF NOT EXISTS idx_video_submissions_cooldown_pending 
   ON video_submissions(cooldown_expires_at) 
-  WHERE qc_status = 'approved' AND cooldown_expires_at IS NOT NULL AND cooldown_expires_at > NOW();
+  WHERE qc_status = 'approved' AND cooldown_expires_at IS NOT NULL;
 
 -- ============================================================================
 -- STEP 2: Create function to check if cooldown should apply
