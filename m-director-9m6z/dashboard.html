@@ -552,7 +552,9 @@
     
     .btn-danger:hover:not(:disabled) {
       background-color: #b91c1c;
-      border-color: #b91c1c);
+      border-color: #b91c1c;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
     
     /* Badge Component */
@@ -2027,18 +2029,27 @@
 
   <!-- Confirmation Modal -->
   <div id="confirm-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 500px;">
-      <div class="modal-header" style="border-bottom: 2px solid #436481;">
-        <h2 class="modal-title" id="confirm-modal-title">Confirm Action</h2>
+    <div class="modal-content" style="max-width: 460px;">
+      <div class="modal-header" style="border-bottom: 1px solid var(--color-border); padding: 24px 28px 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: #fee2e2; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <h2 class="modal-title" id="confirm-modal-title" style="font-size: 17px; font-weight: 600; margin: 0;">Confirm Action</h2>
+        </div>
       </div>
       
-      <div class="modal-section">
-        <p id="confirm-modal-message" style="color: #32343a; font-size: 16px; line-height: 1.6; margin: 0; white-space: pre-line;"></p>
+      <div style="padding: 24px 28px;">
+        <p id="confirm-modal-message" style="color: var(--color-text-secondary); font-size: 14px; line-height: 1.7; margin: 0; white-space: pre-line;"></p>
       </div>
       
-      <div style="display: flex; gap: 12px; justify-content: flex-end; padding: 20px; border-top: 2px solid #e0e0e0;">
-        <button class="btn-secondary" onclick="closeConfirmModal()">Cancel</button>
-        <button id="confirm-modal-action-btn" class="btn-danger">Confirm</button>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; padding: 16px 28px 24px; border-top: 1px solid var(--color-border);">
+        <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+        <button id="confirm-modal-action-btn" class="btn btn-danger">Delete Case</button>
       </div>
     </div>
   </div>
@@ -2422,7 +2433,7 @@
     }
     
     // Confirmation modal
-    function showConfirmModal(title, message, onConfirm) {
+    function showConfirmModal(title, message, onConfirm, confirmLabel = 'Confirm') {
       const modal = document.getElementById('confirm-modal');
       const modalTitle = document.getElementById('confirm-modal-title');
       const modalMessage = document.getElementById('confirm-modal-message');
@@ -2430,6 +2441,7 @@
       
       modalTitle.textContent = title;
       modalMessage.textContent = message;
+      actionBtn.textContent = confirmLabel;
       openModal('confirm-modal');
       
       // Set up the confirm action
@@ -2975,8 +2987,9 @@
     async function deleteCase(caseId, caseName) {
       showConfirmModal(
         'Delete Case',
-        `Are you sure you want to delete the case for "${caseName}"?\n\nThis will also permanently delete the associated family member's account.\n\nThis action cannot be undone.`,
-        () => performDeleteCase(caseId, caseName)
+        `Are you sure you want to delete the case for "${caseName}"?\n\nThis will permanently delete the associated family member's account and all related data.\n\nThis action cannot be undone.`,
+        () => performDeleteCase(caseId, caseName),
+        'Yes, Delete Case'
       );
     }
     
