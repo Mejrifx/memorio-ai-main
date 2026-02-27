@@ -2574,13 +2574,12 @@
                 }
             }
             
-            // Populate STATE OF BIRTH
-            if (currentCase.metadata?.state_of_birth) {
-                const stateField = document.getElementById('state_of_birth');
-                if (stateField) {
-                    stateField.value = currentCase.metadata.state_of_birth;
-                    console.log('✅ Pre-populated state_of_birth:', currentCase.metadata.state_of_birth);
-                }
+            // Populate STATE OF BIRTH (always set so n8n receives the field; use N/A if blank)
+            const stateOfBirthField = document.getElementById('state_of_birth');
+            if (stateOfBirthField) {
+                const stateOfBirthValue = currentCase.metadata?.state_of_birth || 'N/A';
+                stateOfBirthField.value = stateOfBirthValue;
+                console.log('✅ Pre-populated state_of_birth:', stateOfBirthValue);
             }
             
             // Populate COUNTRY OF BIRTH
@@ -2621,13 +2620,12 @@
                 }
             }
             
-            // Populate STATE OF DEATH
-            if (currentCase.metadata?.state_of_death) {
-                const stateField = document.getElementById('state_of_passing');
-                if (stateField) {
-                    stateField.value = currentCase.metadata.state_of_death;
-                    console.log('✅ Pre-populated state_of_passing:', currentCase.metadata.state_of_death);
-                }
+            // Populate STATE OF DEATH (always set so n8n receives the field; use N/A if blank)
+            const stateOfPassingField = document.getElementById('state_of_passing');
+            if (stateOfPassingField) {
+                const stateOfPassingValue = currentCase.metadata?.state_of_death || 'N/A';
+                stateOfPassingField.value = stateOfPassingValue;
+                console.log('✅ Pre-populated state_of_passing:', stateOfPassingValue);
             }
             
             // Populate COUNTRY OF DEATH

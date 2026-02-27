@@ -61,17 +61,15 @@ serve(async (req) => {
       metadata 
     } = body;
 
-    // Validate required fields
+    // Validate required fields (state is optional — not all countries use states/provinces)
     const requiredFields = {
       deceased_name,
       gender,
       date_of_birth,
       date_of_death,
       city_of_birth,
-      state_of_birth,
       country_of_birth,
       city_of_death,
-      state_of_death,
       country_of_death,
       service_date
     };
