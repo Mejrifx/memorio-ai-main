@@ -3321,7 +3321,7 @@
     // Load cases
     // Get video/QC status badge HTML
     // Map database status to workflow stage
-    function getCaseStage(status) {
+    function getCaseStage(status, caseId = null) {
       // Waiting on Family: Case created, waiting for family to complete intake
       if (['created', 'waiting_on_family', 'intake_in_progress'].includes(status)) {
         return {
@@ -3340,7 +3340,16 @@
         };
       }
       
-      // Awaiting Review: Video submitted to QC
+      // QC Reviewed + cooldown active: approved by QC, waiting to deliver
+      if (status === 'awaiting_review' && cooldownMap[caseId]) {
+        return {
+          label: 'QC Reviewed',
+          color: '#f59e0b', // Amber
+          icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>'
+        };
+      }
+      
+      // Awaiting Review: Video submitted to QC (not yet reviewed)
       if (['awaiting_review', 'revision_requested'].includes(status)) {
         return {
           label: 'Awaiting Review',
@@ -3412,6 +3421,9 @@
       `;
     }
     
+    // Map of case_id -> cooldown_expires_at for QC-reviewed cases pending delivery
+    let cooldownMap = {};
+    
     async function loadCases() {
       const casesList = document.getElementById('cases-list');
       const errorBox = document.getElementById('cases-error-box');
@@ -3420,8 +3432,6 @@
       casesList.innerHTML = '<p style="color: #32343a; opacity: 0.6;">Loading cases...</p>';
       
       try {
-        // Use admin_cases_view instead of cases table
-        // This view includes all necessary data and respects RLS policies
         const { data: cases, error } = await supabaseClient
           .from('admin_cases_view')
           .select('*')
@@ -3430,13 +3440,64 @@
         if (error) throw error;
         
         allCases = cases || [];
+        
+        // Fetch cooldown data for any awaiting_review cases
+        // (these may be QC-approved but in cooldown period)
+        const awaitingIds = allCases
+          .filter(c => c.status === 'awaiting_review')
+          .map(c => c.id);
+        
+        cooldownMap = {};
+        if (awaitingIds.length > 0) {
+          const { data: cooldownRows } = await supabaseClient
+            .from('video_submissions')
+            .select('case_id, cooldown_expires_at')
+            .in('case_id', awaitingIds)
+            .eq('qc_status', 'approved')
+            .not('cooldown_expires_at', 'is', null);
+          
+          (cooldownRows || []).forEach(row => {
+            cooldownMap[row.case_id] = row.cooldown_expires_at;
+          });
+        }
+        
         renderCases(allCases);
+        startCooldownTimers();
         
       } catch (error) {
         errorBox.textContent = `Error loading cases: ${error.message}`;
         errorBox.style.display = 'block';
         casesList.innerHTML = '';
       }
+    }
+    
+    // Tick all active countdown timers in case cards every second
+    let cooldownTimerInterval = null;
+    function startCooldownTimers() {
+      if (cooldownTimerInterval) clearInterval(cooldownTimerInterval);
+      
+      const hasCooldowns = Object.keys(cooldownMap).length > 0;
+      if (!hasCooldowns) return;
+      
+      cooldownTimerInterval = setInterval(() => {
+        Object.entries(cooldownMap).forEach(([caseId, expiresAt]) => {
+          const el = document.getElementById(`cooldown-timer-${caseId}`);
+          if (!el) return;
+          
+          const msLeft = new Date(expiresAt) - Date.now();
+          if (msLeft <= 0) {
+            // Cooldown expired — reload cases to pick up delivered status
+            clearInterval(cooldownTimerInterval);
+            loadCases();
+            return;
+          }
+          
+          const h = Math.floor(msLeft / 3600000);
+          const m = Math.floor((msLeft % 3600000) / 60000);
+          const s = Math.floor((msLeft % 60000) / 1000);
+          el.textContent = `Delivering in ${h}h ${m}m ${s}s`;
+        });
+      }, 1000);
     }
     
     // Helper function to generate SLA badge HTML
@@ -3510,11 +3571,12 @@
       }
       
       casesList.innerHTML = cases.map(c => {
-        const stage = getCaseStage(c.status);
+        const stage = getCaseStage(c.status, c.id);
         const slaBadge = getSLABadge(c);
         const serviceDate = c.case_metadata?.service_date 
           ? new Date(c.case_metadata.service_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
           : null;
+        const hasCooldown = cooldownMap[c.id];
         
         return `
           <div class="case-row" onclick="openCaseModal('${c.id}')">
@@ -3524,6 +3586,19 @@
                 <div class="case-row-meta-item" style="color: ${stage.color};">
                   ${stage.icon} <span>${stage.label}</span>
                 </div>
+                ${hasCooldown ? `
+                  <div class="case-row-meta-item" style="
+                    color: #f59e0b;
+                    font-size: 12px;
+                    font-weight: 600;
+                    background: #fef3c7;
+                    border: 1px solid #f59e0b;
+                    border-radius: 12px;
+                    padding: 2px 10px;
+                  ">
+                    <span id="cooldown-timer-${c.id}">Calculating...</span>
+                  </div>
+                ` : ''}
                 ${serviceDate ? `
                   <div class="case-row-meta-item">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
