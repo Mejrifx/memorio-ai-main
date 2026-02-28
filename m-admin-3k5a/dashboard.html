@@ -1852,35 +1852,30 @@
 
     .review-tab-bar {
       display: flex;
-      gap: 6px;
-      background: var(--bg-primary);
-      border: 1.5px solid var(--border-primary);
-      border-radius: 50px;
-      padding: 3px;
+      gap: 4px;
     }
 
     .review-tab {
-      flex: 1;
       background: transparent;
-      border: none;
+      border: 1.5px solid transparent;
       border-radius: 50px;
-      padding: 5px 10px;
-      font-size: 12px;
+      padding: 4px 12px;
+      font-size: 14px;
       font-weight: 600;
-      color: var(--text-secondary);
+      color: var(--text-tertiary);
       cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
+      transition: all 0.2s ease;
       white-space: nowrap;
     }
 
     .review-tab.active {
-      background: var(--accent-primary);
-      color: var(--text-inverse);
+      color: var(--text-primary);
+      border-color: var(--border-primary);
+      background: var(--bg-primary);
     }
 
     .review-tab:not(.active):hover {
-      background: var(--border-primary);
-      color: var(--text-primary);
+      color: var(--text-secondary);
     }
     
     .kanban-column-cards {
@@ -2868,11 +2863,7 @@
         
         <!-- Awaiting Review / Delivery Progress -->
         <div class="kanban-column">
-          <div class="kanban-column-header" style="flex-direction: column; align-items: stretch; gap: 10px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <h2 class="kanban-column-title">Review & Delivery</h2>
-              <span class="kanban-column-count" id="count-review">0</span>
-            </div>
+          <div class="kanban-column-header">
             <div class="review-tab-bar">
               <button class="review-tab active" id="tab-awaiting" onclick="switchReviewTab('awaiting')">
                 Awaiting Review&nbsp;<span id="count-tab-awaiting">0</span>
@@ -2881,6 +2872,7 @@
                 Delivery Progress&nbsp;<span id="count-tab-delivery">0</span>
               </button>
             </div>
+            <span class="kanban-column-count" id="count-review">0</span>
           </div>
           <div class="kanban-column-cards" id="column-review">
             <div class="loading">Loading...</div>
