@@ -60,7 +60,7 @@ SELECT
   users.role,
   users.status,
   users.metadata->>'name' AS name,
-  users.metadata->>'temp_password' AS temp_password,
+  users.temp_password,
   users.created_at,
   users.last_login_at,
   organizations.name AS org_name,
