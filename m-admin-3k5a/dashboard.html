@@ -5123,6 +5123,7 @@
           const m = Math.floor((msLeft % 3600000) / 60000);
           const s = Math.floor((msLeft % 60000) / 1000);
           el.textContent = `${h}h ${m}m ${s}s`;
+          el.closest('span').title = `Delivery cooldown — delivering in ${h}h ${m}m ${s}s`;
         });
       }, 1000);
     }
@@ -5227,22 +5228,34 @@
       
       // Cooldown timer badge (shown to left of SLA badge)
       const hasCooldown = adminCooldownMap[caseData.id];
+      let cooldownInitialText = '';
+      if (hasCooldown) {
+        const msLeft = new Date(adminCooldownMap[caseData.id]) - Date.now();
+        if (msLeft > 0) {
+          const h = Math.floor(msLeft / 3600000);
+          const m = Math.floor((msLeft % 3600000) / 60000);
+          const s = Math.floor((msLeft % 60000) / 1000);
+          cooldownInitialText = `${h}h ${m}m ${s}s`;
+        } else {
+          cooldownInitialText = 'Delivering...';
+        }
+      }
       const cooldownBadge = hasCooldown ? `
         <span style="
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          background: #fef3c7;
-          border: 1.5px solid #f59e0b;
-          color: #b45309;
+          background: #e0f2fe;
+          border: 1.5px solid #0ea5e9;
+          color: #0369a1;
           border-radius: 12px;
           padding: 3px 10px;
           font-size: 11px;
           font-weight: 700;
           white-space: nowrap;
         ">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>
-          <span id="admin-cooldown-timer-${caseData.id}">...</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="1"></rect><path d="M16 8h4l3 5v3h-7V8z"></path><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+          <span id="admin-cooldown-timer-${caseData.id}">${cooldownInitialText}</span>
         </span>` : '';
       
       return `
