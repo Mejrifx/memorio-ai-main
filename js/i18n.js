@@ -695,20 +695,17 @@ const i18n = {
   init() {
     // Load saved language preference
     const savedLang = localStorage.getItem('memorio_language') || 'en';
-    this.setLanguage(savedLang);
+    i18n.setLanguage(savedLang);
     
-    // Translate all elements
-    this.translatePage();
-    
-    // Set up language toggle buttons
-    this.setupToggle();
+    // Set up legacy toggle buttons
+    i18n.setupToggle();
   },
   
   /**
    * Get translation for a key
    */
   t(key, fallback = key) {
-    const translation = this.translations[this.currentLang]?.[key];
+    const translation = i18n.translations[i18n.currentLang]?.[key];
     return translation || fallback;
   },
   
@@ -716,12 +713,12 @@ const i18n = {
    * Set current language
    */
   setLanguage(lang) {
-    if (!this.translations[lang]) {
+    if (!i18n.translations[lang]) {
       console.warn(`Language '${lang}' not supported. Falling back to 'en'.`);
       lang = 'en';
     }
     
-    this.currentLang = lang;
+    i18n.currentLang = lang;
     localStorage.setItem('memorio_language', lang);
     
     // Update HTML lang attribute
@@ -736,7 +733,7 @@ const i18n = {
       }
     });
 
-    // Update new single-toggle button label + tooltip
+    // Update single-toggle button label + tooltip
     document.querySelectorAll('[data-i18n-toggle]').forEach(btn => {
       const label = btn.querySelector('.lang-label');
       if (label) label.textContent = lang.toUpperCase();
@@ -744,7 +741,7 @@ const i18n = {
     });
     
     // Translate the page
-    this.translatePage();
+    i18n.translatePage();
   },
   
   /**
@@ -754,7 +751,7 @@ const i18n = {
     // Translate text content
     document.querySelectorAll('[data-i18n]').forEach(element => {
       const key = element.dataset.i18n;
-      const translation = this.t(key);
+      const translation = i18n.t(key);
       
       // Handle different element types
       if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
@@ -774,7 +771,7 @@ const i18n = {
     // Translate placeholders specifically marked with data-i18n-placeholder
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
       const key = element.dataset.i18nPlaceholder;
-      const translation = this.t(key);
+      const translation = i18n.t(key);
       element.placeholder = translation;
     });
     
@@ -782,13 +779,21 @@ const i18n = {
     document.querySelectorAll('select').forEach(select => {
       select.querySelectorAll('option[data-i18n]').forEach(option => {
         const key = option.dataset.i18n;
-        option.textContent = this.t(key);
+        option.textContent = i18n.t(key);
       });
     });
   },
   
   /**
-   * Set up language toggle buttons
+   * Toggle between EN and ES — called directly via onclick="i18n.toggle()"
+   */
+  toggle() {
+    const newLang = i18n.currentLang === 'en' ? 'es' : 'en';
+    i18n.setLanguage(newLang);
+  },
+
+  /**
+   * Set up language toggle buttons (legacy addEventListener approach)
    */
   setupToggle() {
     // Legacy two-button system
@@ -796,16 +801,7 @@ const i18n = {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         const lang = btn.dataset.langBtn;
-        this.setLanguage(lang);
-      });
-    });
-
-    // New single-toggle button
-    document.querySelectorAll('[data-i18n-toggle]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const newLang = this.currentLang === 'en' ? 'es' : 'en';
-        this.setLanguage(newLang);
+        i18n.setLanguage(lang);
       });
     });
   }
