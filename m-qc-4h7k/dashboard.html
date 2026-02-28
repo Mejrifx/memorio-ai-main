@@ -20,33 +20,31 @@
        ============================================================================ */
     
     /* Language Toggle Styling */
-    .language-toggle {
-      display: flex;
-      gap: 8px;
+    .lang-toggle {
+      display: inline-flex;
       align-items: center;
-    }
-    
-    .language-button {
-      background: transparent;
-      border: 2px solid #436481;
+      gap: 5px;
+      padding: 6px 12px 6px 9px;
+      font-size: 12px;
+      font-weight: 700;
       color: #436481;
-      padding: 6px 16px;
-      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(67, 100, 129, 0.22);
+      border-radius: 100px;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.2s ease;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
-    
-    .language-button:hover {
+    .lang-toggle:hover {
       background: rgba(67, 100, 129, 0.1);
+      border-color: rgba(67, 100, 129, 0.35);
     }
-    
-    .language-button.active {
-      background: #436481;
-      color: white;
-    }
+    .lang-toggle svg { opacity: 0.55; flex-shrink: 0; }
+    .lang-toggle:hover svg { opacity: 0.85; }
     
     * {
       margin: 0;
@@ -670,10 +668,12 @@
           <span id="userName">QC User</span> ▾
         </button>
         <div class="topbar-profile-dropdown">
-          <div class="language-toggle" style="padding: 8px;">
-            <button class="language-button active" data-lang-btn="en">EN</button>
-            <button class="language-button" data-lang-btn="es">ES</button>
-          </div>
+          <button class="lang-toggle" data-i18n-toggle title="Switch to Español">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <span class="lang-label">EN</span>
+          </button>
           <a class="topbar-dropdown-item" id="logoutBtn" data-i18n="common.logout">Logout</a>
         </div>
       </div>

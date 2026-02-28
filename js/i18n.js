@@ -727,13 +727,20 @@ const i18n = {
     // Update HTML lang attribute
     document.documentElement.lang = lang;
     
-    // Update toggle button states
+    // Update legacy two-button toggle states
     document.querySelectorAll('[data-lang-btn]').forEach(btn => {
       if (btn.dataset.langBtn === lang) {
         btn.classList.add('active');
       } else {
         btn.classList.remove('active');
       }
+    });
+
+    // Update new single-toggle button label + tooltip
+    document.querySelectorAll('[data-i18n-toggle]').forEach(btn => {
+      const label = btn.querySelector('.lang-label');
+      if (label) label.textContent = lang.toUpperCase();
+      btn.title = lang === 'en' ? 'Switch to Español' : 'Switch to English';
     });
     
     // Translate the page
@@ -784,11 +791,21 @@ const i18n = {
    * Set up language toggle buttons
    */
   setupToggle() {
+    // Legacy two-button system
     document.querySelectorAll('[data-lang-btn]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         const lang = btn.dataset.langBtn;
         this.setLanguage(lang);
+      });
+    });
+
+    // New single-toggle button
+    document.querySelectorAll('[data-i18n-toggle]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const newLang = this.currentLang === 'en' ? 'es' : 'en';
+        this.setLanguage(newLang);
       });
     });
   }
