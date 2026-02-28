@@ -1849,6 +1849,39 @@
       font-size: 13px;
       font-weight: 600;
     }
+
+    .review-tab-bar {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-primary);
+      border: 1.5px solid var(--border-primary);
+      border-radius: 50px;
+      padding: 3px;
+    }
+
+    .review-tab {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-radius: 50px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .review-tab.active {
+      background: var(--accent-primary);
+      color: var(--text-inverse);
+    }
+
+    .review-tab:not(.active):hover {
+      background: var(--border-primary);
+      color: var(--text-primary);
+    }
     
     .kanban-column-cards {
       flex: 1;
@@ -2833,11 +2866,21 @@
           </div>
         </div>
         
-        <!-- Awaiting Review -->
+        <!-- Awaiting Review / Delivery Progress -->
         <div class="kanban-column">
-          <div class="kanban-column-header">
-            <h2 class="kanban-column-title">Awaiting Review</h2>
-            <span class="kanban-column-count" id="count-review">0</span>
+          <div class="kanban-column-header" style="flex-direction: column; align-items: stretch; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h2 class="kanban-column-title">Review & Delivery</h2>
+              <span class="kanban-column-count" id="count-review">0</span>
+            </div>
+            <div class="review-tab-bar">
+              <button class="review-tab active" id="tab-awaiting" onclick="switchReviewTab('awaiting')">
+                Awaiting Review&nbsp;<span id="count-tab-awaiting">0</span>
+              </button>
+              <button class="review-tab" id="tab-delivery" onclick="switchReviewTab('delivery')">
+                Delivery Progress&nbsp;<span id="count-tab-delivery">0</span>
+              </button>
+            </div>
           </div>
           <div class="kanban-column-cards" id="column-review">
             <div class="loading">Loading...</div>
@@ -5102,6 +5145,17 @@
     // Map of case_id -> cooldown_expires_at for admin kanban cooldown timers
     let adminCooldownMap = {};
     let adminCooldownTimerInterval = null;
+
+    // Active sub-tab for the Review & Delivery column
+    let reviewActiveTab = 'awaiting'; // 'awaiting' | 'delivery'
+
+    function switchReviewTab(tab) {
+      reviewActiveTab = tab;
+      document.getElementById('tab-awaiting').classList.toggle('active', tab === 'awaiting');
+      document.getElementById('tab-delivery').classList.toggle('active', tab === 'delivery');
+      renderReviewColumn();
+    }
+    window.switchReviewTab = switchReviewTab;
     
     function startAdminCooldownTimers() {
       if (adminCooldownTimerInterval) clearInterval(adminCooldownTimerInterval);
@@ -5129,48 +5183,70 @@
     }
     
     function renderKanbanBoard() {
-      const columns = {
+      const simpleColumns = {
         waiting: ['waiting_on_family', 'intake_in_progress'],
         progress: ['submitted', 'in_production'],
-        review: ['awaiting_review', 'revision_requested'],
         complete: ['delivered', 'closed']
       };
-      
-      // Build cooldown map for cases in review column
+
+      // Build cooldown map: only awaiting_review cases with an active, future cooldown
       adminCooldownMap = {};
       filteredCasesData.forEach(c => {
         if (c.cooldown_expires_at && c.status === 'awaiting_review') {
-          adminCooldownMap[c.id] = c.cooldown_expires_at;
+          const msLeft = new Date(c.cooldown_expires_at) - Date.now();
+          if (msLeft > 0) adminCooldownMap[c.id] = c.cooldown_expires_at;
         }
       });
-      
-      // Count cases per column
-      const counts = {
-        waiting: filteredCasesData.filter(c => columns.waiting.includes(c.status)).length,
-        progress: filteredCasesData.filter(c => columns.progress.includes(c.status)).length,
-        review: filteredCasesData.filter(c => columns.review.includes(c.status)).length,
-        complete: filteredCasesData.filter(c => columns.complete.includes(c.status)).length
-      };
-      
-      // Update counts
-      document.getElementById('count-waiting').textContent = counts.waiting;
-      document.getElementById('count-progress').textContent = counts.progress;
-      document.getElementById('count-review').textContent = counts.review;
-      document.getElementById('count-complete').textContent = counts.complete;
-      
-      // Render cards in each column
-      Object.keys(columns).forEach(columnKey => {
+
+      // Split review column into two sub-groups
+      const allReviewCases = filteredCasesData.filter(c =>
+        ['awaiting_review', 'revision_requested'].includes(c.status)
+      );
+      const awaitingReviewCases = allReviewCases.filter(c => !adminCooldownMap[c.id]);
+      const deliveryProgressCases = allReviewCases.filter(c => !!adminCooldownMap[c.id]);
+
+      // Update all counts
+      document.getElementById('count-waiting').textContent =
+        filteredCasesData.filter(c => simpleColumns.waiting.includes(c.status)).length;
+      document.getElementById('count-progress').textContent =
+        filteredCasesData.filter(c => simpleColumns.progress.includes(c.status)).length;
+      document.getElementById('count-review').textContent = allReviewCases.length;
+      document.getElementById('count-complete').textContent =
+        filteredCasesData.filter(c => simpleColumns.complete.includes(c.status)).length;
+      document.getElementById('count-tab-awaiting').textContent = awaitingReviewCases.length;
+      document.getElementById('count-tab-delivery').textContent = deliveryProgressCases.length;
+
+      // Render the three simple columns
+      Object.keys(simpleColumns).forEach(columnKey => {
         const columnEl = document.getElementById(`column-${columnKey}`);
-        const cases = filteredCasesData.filter(c => columns[columnKey].includes(c.status));
-        
-        if (cases.length === 0) {
-          columnEl.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 14px;">No cases</div>';
-        } else {
-          columnEl.innerHTML = cases.map(c => createCaseCard(c)).join('');
-        }
+        const cases = filteredCasesData.filter(c => simpleColumns[columnKey].includes(c.status));
+        columnEl.innerHTML = cases.length
+          ? cases.map(c => createCaseCard(c)).join('')
+          : '<div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 14px;">No cases</div>';
       });
-      
+
+      // Render the active review sub-tab
+      renderReviewColumn();
       startAdminCooldownTimers();
+    }
+
+    function renderReviewColumn() {
+      // Re-split so this can be called independently on tab switch too
+      const allReviewCases = filteredCasesData.filter(c =>
+        ['awaiting_review', 'revision_requested'].includes(c.status)
+      );
+      const awaitingReviewCases = allReviewCases.filter(c => !adminCooldownMap[c.id]);
+      const deliveryProgressCases = allReviewCases.filter(c => !!adminCooldownMap[c.id]);
+
+      const cases = reviewActiveTab === 'delivery' ? deliveryProgressCases : awaitingReviewCases;
+      const emptyMsg = reviewActiveTab === 'delivery'
+        ? 'No cases awaiting delivery'
+        : 'No cases awaiting review';
+
+      const columnEl = document.getElementById('column-review');
+      columnEl.innerHTML = cases.length
+        ? cases.map(c => createCaseCard(c)).join('')
+        : `<div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 14px;">${emptyMsg}</div>`;
     }
     
     // Helper function to generate SLA badge HTML
