@@ -1,7 +1,10 @@
 -- Migration 057: Add cooldown_expires_at and cooldown_overridden to admin_video_submissions_view
 -- These columns were added to video_submissions in migration 056 but were not included in the view.
+-- NOTE: Must DROP first — CREATE OR REPLACE VIEW cannot add new columns mid-list.
 
-CREATE OR REPLACE VIEW admin_video_submissions_view
+DROP VIEW IF EXISTS admin_video_submissions_view CASCADE;
+
+CREATE VIEW admin_video_submissions_view
 WITH (security_invoker = false, security_barrier = true)
 AS
 SELECT 
