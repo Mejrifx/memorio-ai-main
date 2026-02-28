@@ -4651,8 +4651,8 @@
     
     function showConfirmationModal(title, message, warning, onConfirm) {
       document.getElementById('confirmation-title').textContent = title;
-      document.getElementById('confirmation-message').textContent = message;
-      document.getElementById('confirmation-warning').textContent = warning;
+      document.getElementById('confirmation-message').innerHTML = message;
+      document.getElementById('confirmation-warning').innerHTML = warning;
       
       // Set up confirm button
       const confirmBtn = document.getElementById('confirm-delete-btn');
@@ -5685,12 +5685,8 @@
       
       showConfirmationModal(
         `Delete ${role.toUpperCase()} Account?`,
-        `Are you sure you want to permanently delete the account for:\n\n👤 ${name}\n📧 ${email}`,
-        `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg> This action cannot be undone. This will:\n• Remove the user from Supabase authentication\n• Delete all user data from the database\n• Revoke all access immediately`,
+        `Are you sure you want to permanently delete the account for <strong>${name}</strong> (${email})?`,
+        `This action cannot be undone. This will:<br><br>• Remove the user from Supabase authentication<br>• Delete all user data from the database<br>• Revoke all access immediately`,
         () => confirmDeleteAccount()
       );
     }
