@@ -1470,20 +1470,21 @@
       
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Loved One's Information</h3>
-          <p class="card-description">All fields are required to ensure complete obituary generation</p>
+          <h3 class="card-title" data-i18n="director.lovedOnesInfo">Loved One's Information</h3>
+          <p class="card-description" data-i18n="director.allFieldsRequired">All fields are required to ensure complete obituary generation</p>
         </div>
         <div class="card-content">
           <form id="create-case-form">
             <!-- Full Name -->
             <div class="form-row-single">
               <div class="form-group">
-                <label for="deceased-name" class="label">Full Name of Loved One</label>
+                <label for="deceased-name" class="label" data-i18n="director.fullName">Full Name of Loved One</label>
                 <input 
                   class="input" 
                   type="text" 
                   id="deceased-name" 
                   placeholder="John Michael Doe" 
+                  data-i18n-placeholder="director.fullNamePlaceholder"
                   required>
               </div>
             </div>
@@ -1509,7 +1510,8 @@
                   class="input" 
                   type="text" 
                   id="deceased-gender-custom" 
-                  placeholder="e.g., Non-binary, They/Them, etc.">
+                  placeholder="e.g., Non-binary, They/Them, etc."
+                  data-i18n-placeholder="director.genderSpecifyPlaceholder">
                 <small style="color: rgba(50, 52, 58, 0.6); font-size: 12px; display: block; margin-top: 4px;" data-i18n="director.gender.specifyHelper">
                   This will be used in the memorial tribute
                 </small>
@@ -1548,12 +1550,13 @@
                   required>
               </div>
               <div class="form-group">
-                <label for="deceased-birth-state" class="label" data-i18n="director.stateOfBirth">State/Province of Birth <span style="font-weight:400; color: rgba(50,52,58,0.5); font-size: 13px;">(optional)</span></label>
+                <label for="deceased-birth-state" class="label"><span data-i18n="director.stateOfBirth">State/Province of Birth</span> <span style="font-weight:400; color: rgba(50,52,58,0.5); font-size: 13px;" data-i18n="director.optional">(optional)</span></label>
                 <input 
                   class="input" 
                   type="text" 
                   id="deceased-birth-state" 
-                  placeholder="e.g. New York, Greater Manchester (leave blank if N/A)">
+                  placeholder="e.g. New York, Greater Manchester (leave blank if N/A)"
+                  data-i18n-placeholder="director.stateOptionalPlaceholder">
               </div>
               <div class="form-group">
                 <label for="deceased-birth-country" class="label" data-i18n="director.countryOfBirth">Country of Birth</label>
@@ -1579,12 +1582,13 @@
                   required>
               </div>
               <div class="form-group">
-                <label for="deceased-death-state" class="label" data-i18n="director.stateOfDeath">State/Province of Passing <span style="font-weight:400; color: rgba(50,52,58,0.5); font-size: 13px;">(optional)</span></label>
+                <label for="deceased-death-state" class="label"><span data-i18n="director.stateOfDeath">State/Province of Passing</span> <span style="font-weight:400; color: rgba(50,52,58,0.5); font-size: 13px;" data-i18n="director.optional">(optional)</span></label>
                 <input 
                   class="input" 
                   type="text" 
                   id="deceased-death-state" 
-                  placeholder="e.g. California, Greater Manchester (leave blank if N/A)">
+                  placeholder="e.g. California, Greater Manchester (leave blank if N/A)"
+                  data-i18n-placeholder="director.stateOptionalPlaceholder">
               </div>
               <div class="form-group">
                 <label for="deceased-death-country" class="label" data-i18n="director.countryOfDeath">Country of Passing</label>
@@ -1601,7 +1605,7 @@
             <!-- Service Date -->
           <div class="form-row-single">
             <div class="form-group">
-              <label for="deceased-service-date" class="label">Service Date</label>
+              <label for="deceased-service-date" class="label" data-i18n="director.serviceDate">Service Date</label>
               <input 
                 class="input" 
                 type="date" 
@@ -1703,19 +1707,19 @@
       
       <!-- Success Message -->
       <div id="family-success-box" class="success-box">
-        <h3><span class="success-icon"></span>Family Member Invited Successfully!</h3>
-        <p>Share these credentials with the family member. They will need them to access the tribute form.</p>
+        <h3><span class="success-icon"></span><span data-i18n="director.familyInvitedSuccess">Family Member Invited Successfully!</span></h3>
+        <p data-i18n="director.familyInvitedDesc">Share these credentials with the family member. They will need them to access the tribute form.</p>
         
         <div class="credential-box">
-          <div class="credential-label">Email Address</div>
+          <div class="credential-label" data-i18n="director.emailAddress">Email Address</div>
           <div class="credential-value" id="invited-email"></div>
-          <button class="copy-btn" onclick="copyToClipboard('invited-email')">Copy</button>
+          <button class="copy-btn" onclick="copyToClipboard('invited-email')" data-i18n="director.copy">Copy</button>
         </div>
         
         <div class="credential-box">
-          <div class="credential-label">Temporary Password</div>
+          <div class="credential-label" data-i18n="director.tempPassword">Temporary Password</div>
           <div class="credential-value" id="family-password"></div>
-          <button class="copy-btn" onclick="copyToClipboard('family-password')">Copy</button>
+          <button class="copy-btn" onclick="copyToClipboard('family-password')" data-i18n="director.copy">Copy</button>
         </div>
       </div>
       
@@ -1759,7 +1763,8 @@
               class="form-input" 
               type="password" 
               id="new-password" 
-              placeholder="Enter new password" 
+              placeholder="Enter new password"
+              data-i18n-placeholder="director.newPasswordPlaceholder"
               minlength="8"
               required>
             <small style="color: rgba(50, 52, 58, 0.6); font-size: 12px; display: block; margin-top: 4px;" data-i18n="director.passwordMinLength">
@@ -1773,7 +1778,8 @@
               class="form-input" 
               type="password" 
               id="confirm-password" 
-              placeholder="Confirm new password" 
+              placeholder="Confirm new password"
+              data-i18n-placeholder="director.confirmPasswordPlaceholder"
               minlength="8"
               required>
           </div>
@@ -1807,74 +1813,74 @@
       
       <div class="modal-body">
         <div class="modal-section">
-        <h3 class="modal-section-title">Case Information</h3>
+        <h3 class="modal-section-title" data-i18n="director.caseInfo">Case Information</h3>
         <div class="modal-info-grid">
           <div class="modal-info-item">
-            <div class="modal-info-label">Case ID</div>
+            <div class="modal-info-label" data-i18n="director.caseId">Case ID</div>
             <div class="modal-info-value" id="modal-case-id" style="font-size: 11px; word-break: break-all;">-</div>
-            <button class="copy-btn" onclick="copyToClipboard('modal-case-id')">Copy Full ID</button>
+            <button class="copy-btn" onclick="copyToClipboard('modal-case-id')" data-i18n="director.copyFullId">Copy Full ID</button>
           </div>
           <div class="modal-info-item">
-            <div class="modal-info-label">Status</div>
+            <div class="modal-info-label" data-i18n="director.statusLabel">Status</div>
             <div class="modal-info-value" id="modal-case-status">-</div>
           </div>
           <div class="modal-info-item">
-            <div class="modal-info-label">Created</div>
+            <div class="modal-info-label" data-i18n="director.createdLabel">Created</div>
             <div class="modal-info-value" id="modal-case-created">-</div>
           </div>
           <div class="modal-info-item">
-            <div class="modal-info-label">Service Date</div>
+            <div class="modal-info-label" data-i18n="director.serviceDate">Service Date</div>
             <div class="modal-info-value" id="modal-case-service-date">-</div>
           </div>
           <div class="modal-info-item">
-            <div class="modal-info-label">Last Updated</div>
+            <div class="modal-info-label" data-i18n="director.lastUpdated">Last Updated</div>
             <div class="modal-info-value" id="modal-case-updated">-</div>
           </div>
         </div>
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title">Family Information</h3>
+        <h3 class="modal-section-title" data-i18n="director.familyInfo">Family Information</h3>
         <div class="modal-info-grid">
           <div class="modal-info-item">
-            <div class="modal-info-label">Family Member</div>
+            <div class="modal-info-label" data-i18n="director.familyMember">Family Member</div>
             <div class="modal-info-value" id="modal-family-name">-</div>
           </div>
           <div class="modal-info-item">
-            <div class="modal-info-label">Email</div>
+            <div class="modal-info-label" data-i18n="director.emailLabel">Email</div>
             <div class="modal-info-value" id="modal-family-email">-</div>
           </div>
         </div>
         
         <div class="credentials-section">
           <div class="credentials-header">
-            <h4 class="credentials-title">Family Login Credentials</h4>
-            <button class="reveal-btn" id="reveal-credentials-btn" onclick="revealCredentials()">Reveal</button>
+            <h4 class="credentials-title" data-i18n="director.familyLoginCredentials">Family Login Credentials</h4>
+            <button class="reveal-btn" id="reveal-credentials-btn" onclick="revealCredentials()" data-i18n="director.reveal">Reveal</button>
           </div>
           <div class="credentials-grid">
             <div class="credential-item">
-              <div class="credential-label">Email</div>
-              <div class="credential-value blurred" id="modal-family-login-email">Click Reveal</div>
-              <button class="copy-btn" onclick="copyToClipboard('modal-family-login-email')">Copy</button>
+              <div class="credential-label" data-i18n="director.emailLabel">Email</div>
+              <div class="credential-value blurred" id="modal-family-login-email" data-i18n="director.clickReveal">Click Reveal</div>
+              <button class="copy-btn" onclick="copyToClipboard('modal-family-login-email')" data-i18n="director.copy">Copy</button>
             </div>
             <div class="credential-item">
-              <div class="credential-label">Password</div>
-              <div class="credential-value blurred" id="modal-family-password">Click Reveal</div>
-              <button class="copy-btn" onclick="copyToClipboard('modal-family-password')">Copy</button>
+              <div class="credential-label" data-i18n="director.passwordLabel">Password</div>
+              <div class="credential-value blurred" id="modal-family-password" data-i18n="director.clickReveal">Click Reveal</div>
+              <button class="copy-btn" onclick="copyToClipboard('modal-family-password')" data-i18n="director.copy">Copy</button>
             </div>
           </div>
         </div>
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title">Form Status</h3>
+        <h3 class="modal-section-title" data-i18n="director.formStatusTitle">Form Status</h3>
         <div class="modal-info-grid">
           <div class="modal-info-item">
-            <div class="modal-info-label">Form Status</div>
+            <div class="modal-info-label" data-i18n="director.formStatusLabel">Form Status</div>
             <div class="modal-info-value" id="modal-form-status">-</div>
           </div>
           <div class="modal-info-item">
-            <div class="modal-info-label">Submitted At</div>
+            <div class="modal-info-label" data-i18n="director.submittedAt">Submitted At</div>
             <div class="modal-info-value" id="modal-form-submitted">-</div>
           </div>
         </div>
@@ -1890,7 +1896,7 @@
             <line x1="16" y1="17" x2="8" y2="17"></line>
             <polyline points="10,9 9,9 8,9"></polyline>
           </svg>
-          Obituary Draft
+          <span data-i18n="director.obituaryDraft">Obituary Draft</span>
         </h3>
         <div style="
           background-color: #f4e8de;
@@ -1909,7 +1915,7 @@
           </div>
         </div>
         <div style="margin-top: 12px; font-size: 13px; color: rgba(50, 52, 58, 0.6);">
-          Last updated: <span id="obituary-updated">-</span>
+          <span data-i18n="director.lastUpdatedLabel">Last updated:</span> <span id="obituary-updated">-</span>
         </div>
       </div>
       
@@ -1921,7 +1927,7 @@
             <circle cx="8.5" cy="8.5" r="1.5"></circle>
             <polyline points="21,15 16,10 5,21"></polyline>
           </svg>
-          Photos & Assets
+          <span data-i18n="director.photosAssets">Photos & Assets</span>
         </h3>
         
         <!-- Upload Timer Banner -->
@@ -1943,9 +1949,9 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
               </svg>
-              Upload Photos
+              <span data-i18n="director.uploadPhotos">Upload Photos</span>
             </button>
-            <p style="margin-top: 12px; color: #666; font-size: 14px;">
+            <p style="margin-top: 12px; color: #666; font-size: 14px;" data-i18n="director.uploadPhotosHint">
               Click to select photos (JPEG, PNG, GIF)
             </p>
           </div>
@@ -1962,7 +1968,7 @@
           <!-- Photos will be populated here -->
         </div>
         
-        <div id="director-no-photos" style="text-align: center; padding: 20px; color: #666;">
+        <div id="director-no-photos" style="text-align: center; padding: 20px; color: #666;" data-i18n="director.noPhotos">
           No photos uploaded yet
         </div>
       </div>
@@ -1977,10 +1983,10 @@
           color: white;
           box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
         ">
-          <h3 style="font-size: 22px; font-weight: 700; margin: 0 0 8px 0;">
+          <h3 style="font-size: 22px; font-weight: 700; margin: 0 0 8px 0;" data-i18n="director.memorialComplete">
             Memorial Complete
           </h3>
-          <p style="font-size: 16px; margin: 0; opacity: 0.95;">
+          <p style="font-size: 16px; margin: 0; opacity: 0.95;" data-i18n="director.memorialDelivered">
             The obituary and video have been delivered to the family
           </p>
         </div>
@@ -1994,14 +2000,14 @@
             <polyline points="7,10 12,15 17,10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
-          Downloads
+          <span data-i18n="director.downloads">Downloads</span>
         </h3>
         <div style="display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start;">
           <button class="btn btn-primary" onclick="directorDownloadVideo()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
             </svg>
-            Download Memorial Video
+            <span data-i18n="director.downloadVideo">Download Memorial Video</span>
           </button>
           <button class="btn btn-primary" onclick="directorDownloadObituaryPDF()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2011,14 +2017,14 @@
               <line x1="16" y1="17" x2="8" y2="17"/>
               <polyline points="10,9 9,9 8,9"/>
             </svg>
-            Download Obituary PDF
+            <span data-i18n="director.downloadObituaryPdf">Download Obituary PDF</span>
           </button>
         </div>
       </div>
       </div>
       
       <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeCaseModal()">Close</button>
+        <button class="btn btn-ghost" onclick="closeCaseModal()" data-i18n="director.close">Close</button>
         <button class="btn btn-danger" onclick="deleteCase(currentCaseDetails.id, currentCaseDetails.deceased_name)">
           Delete Case
         </button>
@@ -2047,8 +2053,8 @@
       </div>
       
       <div style="display: flex; gap: 10px; justify-content: flex-end; padding: 16px 28px 24px; border-top: 1px solid var(--color-border);">
-        <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
-        <button id="confirm-modal-action-btn" class="btn btn-danger">Delete Case</button>
+        <button class="btn btn-secondary" onclick="closeConfirmModal()" data-i18n="director.cancel">Cancel</button>
+        <button id="confirm-modal-action-btn" class="btn btn-danger" data-i18n="director.deleteCase">Delete Case</button>
       </div>
     </div>
   </div>
