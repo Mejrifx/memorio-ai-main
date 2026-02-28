@@ -5558,13 +5558,20 @@
         console.log('👤 Opening account details for:', userId);
         
         // Find the account in our cached data
-        const account = allAccountsData.find(a => a.id === userId);
+        // user_analytics_combined view uses 'user_id' as the identifier, not 'id'
+        const account = allAccountsData.find(a => (a.user_id || a.id) === userId);
         
         if (!account) {
+          console.error('❌ Account not found for userId:', userId, '| Available IDs:', allAccountsData.map(a => a.user_id || a.id));
           showToast('Account not found', true);
           return;
         }
         
+        // Normalise the ID field so the rest of the code can use account.user_id reliably
+        const accountId = account.user_id || account.id;
+        // name may be a flat field from the analytics view or nested in metadata
+        const accountName = account.name || account.metadata?.name || 'No name';
+
         // Store current account details
         currentAccountDetails = account;
         
@@ -5578,7 +5585,7 @@
         
         // Populate modal with account data
         document.getElementById('modal-account-title').textContent = `${account.role.toUpperCase()} Account Details`;
-        document.getElementById('modal-account-name').textContent = account.metadata?.name || 'No name';
+        document.getElementById('modal-account-name').textContent = accountName;
         document.getElementById('modal-account-email').textContent = account.email;
         document.getElementById('modal-account-role').innerHTML = `<span class="account-role-badge ${account.role}">${account.role.toUpperCase()}</span>`;
         document.getElementById('modal-account-status').innerHTML = `<span class="account-status-badge ${account.status}">${account.status}</span>`;
@@ -5607,7 +5614,7 @@
             })
           : 'Never';
         
-        document.getElementById('modal-account-id').textContent = account.id;
+        document.getElementById('modal-account-id').textContent = accountId;
         
         // Set login URL based on role
         const loginUrls = {
@@ -5620,7 +5627,7 @@
         const deleteBtn = document.getElementById('modal-delete-account-btn');
         deleteBtn.onclick = () => {
           closeAccountDetailsModal();
-          openDeleteAccountModal(account.id, account.email, account.metadata?.name || 'No name', account.role);
+          openDeleteAccountModal(accountId, account.email, accountName, account.role);
         };
         
         // Show modal
