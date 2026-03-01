@@ -449,6 +449,15 @@ const i18n = {
       'form.serviceInfo': 'Would you like to include any service or event information?',
       'form.serviceInfoPlaceholder': 'Add info about upcoming services: time, place, dress code, or anything guests should know.',
       'form.formError': 'Oops! Something went wrong while submitting the form.',
+
+      // Family Form — obituary generation screen
+      'form.craftingStory': 'Crafting {name} story...',
+      'form.tributeCrafted': 'Thank you for sharing about {name}. Here\'s the tribute we\'ve crafted based on the memories you provided.',
+      'form.updatedObituaryTitle': 'Here\'s your obituary',
+      'form.obituaryTitleFor': 'for',
+      'form.editHint': 'You can always make changes in the dashboard',
+      'form.accessDashboard': 'Access Dashboard',
+
       'form.accordion.familyMembers': 'Family Members',
       'form.accordion.personalDetails': 'Personal Details',
       'form.accordion.education': 'Education',
@@ -1011,6 +1020,15 @@ const i18n = {
       'form.serviceInfo': '¿Te gustaría incluir información sobre el servicio o evento?',
       'form.serviceInfoPlaceholder': 'Agrega información sobre los servicios: hora, lugar, código de vestimenta o cualquier cosa que los asistentes deban saber.',
       'form.formError': '¡Ups! Algo salió mal al enviar el formulario.',
+
+      // Family Form — obituary generation screen (Spanish)
+      'form.craftingStory': 'Escribiendo la historia de {name}...',
+      'form.tributeCrafted': 'Gracias por compartir sobre {name}. Aquí está el tributo que hemos creado basado en los recuerdos que nos proporcionaste.',
+      'form.updatedObituaryTitle': 'Aquí está su obituario',
+      'form.obituaryTitleFor': 'para',
+      'form.editHint': 'Siempre puede hacer cambios en el panel',
+      'form.accessDashboard': 'Acceder al Panel',
+
       'form.accordion.familyMembers': 'Miembros de la Familia',
       'form.accordion.personalDetails': 'Detalles Personales',
       'form.accordion.education': 'Educación',
