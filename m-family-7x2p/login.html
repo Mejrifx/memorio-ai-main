@@ -248,8 +248,8 @@
     // Check if already logged in
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
       if (session && session.user.app_metadata?.role === 'family') {
-        // Already logged in, redirect to intake form
-        window.location.href = '/family/form';
+        // Already logged in — send to dashboard (handles all case states)
+        window.location.href = '/family/dashboard';
       }
     });
     
@@ -377,12 +377,12 @@
           await supabaseClient.auth.setSession(result.session);
         }
         
-        // Success - redirect to family form
+        // Success - redirect to family dashboard
         successMessage.textContent = i18n.t('family.loginSuccess');
         successMessage.style.display = 'block';
         
         setTimeout(() => {
-          window.location.href = '/family/form';
+          window.location.href = '/family/dashboard';
         }, 1000);
         
       } catch (error) {
