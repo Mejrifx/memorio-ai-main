@@ -1705,31 +1705,42 @@
             if (!container) return;
             if (!container.querySelector('#obituaryCard')) {
                 // Get deceased person's name for personalization
-                let deceasedFirstName = 'your loved one';
-                let deceasedPossessiveName = 'your loved one\'s';
-                
+                const lang = localStorage.getItem('memorio_language') || 'en';
+                let deceasedFirstName = lang === 'es' ? 'su ser querido' : 'your loved one';
+                let craftingText, memorialInfoText;
+
                 if (currentCase && currentCase.deceased_name) {
                     const firstName = currentCase.deceased_name.split(' ')[0];
                     deceasedFirstName = firstName;
-                    // Handle possessive form correctly (e.g., "James' story" vs "John's story")
-                    deceasedPossessiveName = firstName.endsWith('s') ? firstName + "'" : firstName + "'s";
+                    if (lang === 'es') {
+                        craftingText = i18n.t('form.craftingStory').replace('{name}', firstName);
+                    } else {
+                        const possessive = firstName.endsWith('s') ? firstName + "'" : firstName + "'s";
+                        craftingText = i18n.t('form.craftingStory').replace('{name}', possessive);
+                    }
+                } else {
+                    craftingText = lang === 'es'
+                        ? i18n.t('form.craftingStory').replace('{name}', 'su ser querido')
+                        : i18n.t('form.craftingStory').replace('{name}', 'your loved one\'s');
                 }
-                
+
+                memorialInfoText = i18n.t('form.tributeCrafted').replace('{name}', deceasedFirstName);
+
                 container.innerHTML = `
                     <div class="memorio-container">
                         <div id="writingStatus" class="writing-status">
-                            <div class="status-text">Crafting ${deceasedPossessiveName} story...</div>
+                            <div class="status-text">${craftingText}</div>
                             <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
                         </div>
                         <div id="memorialInfo" class="memorial-info hidden">
-                            Thank you for sharing about ${deceasedFirstName}. Here's the tribute we've crafted based on the memories you provided.
+                            ${memorialInfoText}
                         </div>
                         <div id="obituaryCard" class="obituary-card hidden">
-                            <div id="obituaryTitle" class="obituary-title">Here's your updated obituary</div>
+                            <div id="obituaryTitle" class="obituary-title">${i18n.t('form.updatedObituaryTitle')}</div>
                             <div id="obituaryContent" class="obituary-content"></div>
-                            <div class="edit-hint">You can always make changes in the dashboard</div>
+                            <div class="edit-hint">${i18n.t('form.editHint')}</div>
                             <div class="action-buttons">
-                                <a href="/family/dashboard" class="btn" style="background: #436481; text-decoration: none;">Access Dashboard</a>
+                                <a href="/family/dashboard" class="btn" style="background: #436481; text-decoration: none;">${i18n.t('form.accessDashboard')}</a>
                             </div>
                         </div>
                     </div>`;
@@ -1762,7 +1773,13 @@
         }
         function typeTitle() {
             const titleElement = document.getElementById('obituaryTitle');
-            titleElement.textContent = `Here's your updated obituary${obituaryData.name ? ` for ${obituaryData.name}` : ''}`;
+            const lang = localStorage.getItem('memorio_language') || 'en';
+            const nameClause = obituaryData.name
+                ? (lang === 'es'
+                    ? ` ${i18n.t('form.obituaryTitleFor')} ${obituaryData.name}`
+                    : ` for ${obituaryData.name}`)
+                : '';
+            titleElement.textContent = i18n.t('form.updatedObituaryTitle') + nameClause;
             setTimeout(() => { typeContent(); }, 200);
         }
         function typeContent() {
@@ -2378,6 +2395,9 @@
                 console.log('- music_selection field value:', document.getElementById('music_selection')?.value);
                 console.log('- music_selection field name:', document.getElementById('music_selection')?.name);
                 
+                // Pass the selected language so n8n generates the obituary in the right language
+                payload.language = localStorage.getItem('memorio_language') || 'en';
+
                 try {
                     console.log('Fetching from:', ENDPOINT);
                     const res = await fetch(ENDPOINT, {
