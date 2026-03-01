@@ -1859,6 +1859,7 @@
                                     ...originalFormPayload,
                                     obituary_name: obituaryData.name,
                                     obituary_content: finalContent,
+                                    obituary_language: localStorage.getItem('memorio_language') || 'en',
                                     generated_at: new Date().toISOString()
                                 },
                                 updated_at: new Date().toISOString()
@@ -2025,11 +2026,12 @@
                     return;
                 }
                 
-                // Update with obituary content
+                // Update with obituary content (store language so dashboard can translate correctly)
                 const updatedJson = {
                     ...existingForms.submitted_json,
                     obituary_name: obituaryName,
                     obituary_content: obituaryContent,
+                    obituary_language: localStorage.getItem('memorio_language') || 'en',
                     generated_at: new Date().toISOString()
                 };
                 
