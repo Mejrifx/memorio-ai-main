@@ -315,7 +315,20 @@ const i18n = {
       'family.cancel': 'Cancel',
       'family.obituaryPDFDownloaded': 'Obituary PDF downloaded!',
       'family.createdWithCare': 'Created with care by Memorio',
-      
+
+      // Family Form — Password Change Modal
+      'family.changePasswordTitle': '🔒 Change Your Password',
+      'family.changePasswordDesc': 'For security reasons, you must change your temporary password before accessing your account.',
+      'family.newPassword': 'New Password*',
+      'family.enterNewPassword': 'Enter new password',
+      'family.passwordMinLength': 'Must be at least 8 characters',
+      'family.confirmNewPassword': 'Confirm New Password*',
+      'family.confirmNewPasswordPlaceholder': 'Confirm new password',
+      'family.changePasswordBtn': 'CHANGE PASSWORD',
+      'family.passwordUpdated': 'Password Updated!',
+      'family.passwordUpdatedDesc': 'Your password has been successfully changed. You can now proceed with the form.',
+      'family.proceed': 'Proceed',
+
       // Family Form
       'form.title': 'Memorial Tribute Form',
       'form.subtitle': 'Help us create a meaningful tribute',
@@ -744,7 +757,20 @@ const i18n = {
       'family.cancel': 'Cancelar',
       'family.obituaryPDFDownloaded': '¡PDF de obituario descargado!',
       'family.createdWithCare': 'Creado con cuidado por Memorio',
-      
+
+      // Family Form — Password Change Modal
+      'family.changePasswordTitle': '🔒 Cambia Tu Contraseña',
+      'family.changePasswordDesc': 'Por razones de seguridad, debes cambiar tu contraseña temporal antes de acceder a tu cuenta.',
+      'family.newPassword': 'Nueva Contraseña*',
+      'family.enterNewPassword': 'Ingresa la nueva contraseña',
+      'family.passwordMinLength': 'Debe tener al menos 8 caracteres',
+      'family.confirmNewPassword': 'Confirmar Nueva Contraseña*',
+      'family.confirmNewPasswordPlaceholder': 'Confirma la nueva contraseña',
+      'family.changePasswordBtn': 'CAMBIAR CONTRASEÑA',
+      'family.passwordUpdated': '¡Contraseña Actualizada!',
+      'family.passwordUpdatedDesc': 'Tu contraseña ha sido cambiada exitosamente. Ahora puedes continuar con el formulario.',
+      'family.proceed': 'Continuar',
+
       // Family Form
       'form.title': 'Formulario de Tributo Conmemorativo',
       'form.subtitle': 'Ayúdenos a crear un tributo significativo',
