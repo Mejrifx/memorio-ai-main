@@ -316,6 +316,75 @@ const i18n = {
       'family.obituaryPDFDownloaded': 'Obituary PDF downloaded!',
       'family.createdWithCare': 'Created with care by Memorio',
 
+      // Family Dashboard — additional UI strings
+      'family.photosSection': 'Photos',
+      'family.uploadPhotos': 'Click to upload photos',
+      'family.memorialTributeVideo': 'Memorial Tribute Video',
+      'family.timelineUpdates': 'Timeline & Updates',
+      'family.makeChanges': 'Make Changes',
+      'family.noObituaryYet': 'No obituary submitted yet.',
+      'family.noCaseFound': 'No Case Found',
+      'family.noCaseAssigned': 'No case has been assigned to your account yet. Please contact your funeral director for assistance.',
+      'family.formSubmittedAwaiting': 'Form Submitted — Awaiting Processing',
+
+      // Family Dashboard — revision modal
+      'family.revisionOnlyOne': 'This is your only revision request',
+      'family.revisionPleaseSpecific': 'Please be specific about the changes you need. Your editor will review your feedback and make the necessary adjustments.',
+      'family.revisionWhatChanges': 'What changes would you like made to your memorial video?',
+      'family.revisionPlaceholder': 'Please describe the changes you\'d like to see in your memorial video.\n\nFor example:\n• Add or remove specific photos\n• Adjust the music selection\n• Change the timing or pacing\n• Correct any information\n\nBe as specific as possible so our editor can make the right changes.',
+      'family.confirmRevisionTitle': 'Confirm Revision Request',
+      'family.revisionConfirmText': 'Are you sure you want to submit this revision request? Once submitted, you won\'t be able to request another revision.',
+      'family.yesSubmitRevision': 'Yes, Submit Revision',
+
+      // Family Dashboard — case status labels
+      'family.status.created': 'Created',
+      'family.status.waitingOnFamily': 'Waiting on Form',
+      'family.status.intakeInProgress': 'Form In Progress',
+      'family.status.submitted': 'Form Submitted',
+      'family.status.inProduction': 'In Production',
+      'family.status.awaitingReview': 'Awaiting Review',
+      'family.status.delivered': 'Delivered',
+      'family.status.closed': 'Closed',
+
+      // Family Dashboard — dashboard title
+      'family.title.tributeReady': 'Your tribute is ready, {name}',
+      'family.title.thankYou': 'Thank you {name}. We\'ll take it from here.',
+
+      // Family Dashboard — timeline
+      'family.timeline.caseCreated': 'Case Created',
+      'family.timeline.caseCreatedDesc': 'Case created for {name}',
+      'family.timeline.formSubmitted': 'Obituary Form Submitted',
+      'family.timeline.formSubmittedDesc': 'Family completed and submitted the obituary form',
+      'family.timeline.awaitingProcessing': 'Awaiting Processing',
+      'family.timeline.awaitingProcessingDesc': 'Your obituary is being processed by our team',
+      'family.timeline.inProduction': 'In Production',
+      'family.timeline.inProductionDesc': 'Your memorial video is being created',
+      'family.timeline.delivered': 'Delivered',
+      'family.timeline.deliveredDesc': 'Your memorial video is ready for download',
+      'family.timeline.current': 'Current',
+
+      // Family Dashboard — notifications
+      'family.notif.actionRequired': 'Action Required',
+      'family.notif.actionRequiredText': 'Please complete the obituary form to proceed with your memorial video.',
+      'family.notif.formReceived': 'Form Received',
+      'family.notif.formReceivedText': 'Thank you! We have received your obituary form and will begin processing soon.',
+      'family.notif.inProgress': 'In Progress',
+      'family.notif.inProgressText': 'Your memorial video is currently being created. We will notify you when it\'s ready.',
+      'family.notif.noNotifications': 'No new notifications',
+      'family.notif.allCaughtUp': 'You\'re all caught up!',
+      'family.notif.now': 'Now',
+      'family.notif.recent': 'Recent',
+
+      // Family Dashboard — obituary editor modal
+      'family.editor.title': 'Edit Obituary',
+      'family.editor.titleLabel': 'Obituary Title',
+      'family.editor.contentLabel': 'Obituary Content',
+      'family.editor.hint': 'Feel free to make any changes to honor your loved one\'s memory.',
+      'family.editor.saveChanges': 'Save Changes',
+      'family.editor.cancel': 'Cancel',
+      'family.revisionInProgress': 'Revision in Progress',
+      'family.editorWorkingOnChanges': 'Our editor is working on the changes',
+
       // Family Form — Password Change Modal
       'family.changePasswordTitle': '🔒 Change Your Password',
       'family.changePasswordDesc': 'For security reasons, you must change your temporary password before accessing your account.',
@@ -811,6 +880,75 @@ const i18n = {
       'family.obituaryPDFDownloaded': '¡PDF de obituario descargado!',
       'family.createdWithCare': 'Creado con cuidado por Memorio',
 
+      // Family Dashboard — additional UI strings (Spanish)
+      'family.photosSection': 'Fotos',
+      'family.uploadPhotos': 'Haga clic para subir fotos',
+      'family.memorialTributeVideo': 'Video Tributo Conmemorativo',
+      'family.timelineUpdates': 'Cronología y Actualizaciones',
+      'family.makeChanges': 'Hacer Cambios',
+      'family.noObituaryYet': 'Aún no se ha enviado ningún obituario.',
+      'family.noCaseFound': 'No Se Encontró Caso',
+      'family.noCaseAssigned': 'Aún no se ha asignado ningún caso a su cuenta. Por favor contacte a su director de funeraria para obtener asistencia.',
+      'family.formSubmittedAwaiting': 'Formulario Enviado — En Espera de Procesamiento',
+
+      // Family Dashboard — revision modal (Spanish)
+      'family.revisionOnlyOne': 'Esta es su única solicitud de revisión',
+      'family.revisionPleaseSpecific': 'Por favor sea específico sobre los cambios que necesita. Su editor revisará sus comentarios y realizará los ajustes necesarios.',
+      'family.revisionWhatChanges': '¿Qué cambios le gustaría hacer a su video conmemorativo?',
+      'family.revisionPlaceholder': 'Por favor describa los cambios que desea ver en su video conmemorativo.\n\nPor ejemplo:\n• Agregar o eliminar fotos específicas\n• Ajustar la selección musical\n• Cambiar el ritmo o la cadencia\n• Corregir cualquier información\n\nSea lo más específico posible para que nuestro editor pueda hacer los cambios correctos.',
+      'family.confirmRevisionTitle': 'Confirmar Solicitud de Revisión',
+      'family.revisionConfirmText': '¿Está seguro de que desea enviar esta solicitud de revisión? Una vez enviada, no podrá solicitar otra revisión.',
+      'family.yesSubmitRevision': 'Sí, Enviar Revisión',
+
+      // Family Dashboard — case status labels (Spanish)
+      'family.status.created': 'Creado',
+      'family.status.waitingOnFamily': 'Esperando Formulario',
+      'family.status.intakeInProgress': 'Formulario en Progreso',
+      'family.status.submitted': 'Formulario Enviado',
+      'family.status.inProduction': 'En Producción',
+      'family.status.awaitingReview': 'En Espera de Revisión',
+      'family.status.delivered': 'Entregado',
+      'family.status.closed': 'Cerrado',
+
+      // Family Dashboard — dashboard title (Spanish)
+      'family.title.tributeReady': 'Su tributo está listo, {name}',
+      'family.title.thankYou': 'Gracias {name}. Nosotros nos encargamos a partir de aquí.',
+
+      // Family Dashboard — timeline (Spanish)
+      'family.timeline.caseCreated': 'Caso Creado',
+      'family.timeline.caseCreatedDesc': 'Caso creado para {name}',
+      'family.timeline.formSubmitted': 'Formulario de Obituario Enviado',
+      'family.timeline.formSubmittedDesc': 'La familia completó y envió el formulario de obituario',
+      'family.timeline.awaitingProcessing': 'En Espera de Procesamiento',
+      'family.timeline.awaitingProcessingDesc': 'Su obituario está siendo procesado por nuestro equipo',
+      'family.timeline.inProduction': 'En Producción',
+      'family.timeline.inProductionDesc': 'Su video conmemorativo está siendo creado',
+      'family.timeline.delivered': 'Entregado',
+      'family.timeline.deliveredDesc': 'Su video conmemorativo está listo para descargar',
+      'family.timeline.current': 'Actual',
+
+      // Family Dashboard — notifications (Spanish)
+      'family.notif.actionRequired': 'Acción Requerida',
+      'family.notif.actionRequiredText': 'Por favor complete el formulario de obituario para continuar con su video conmemorativo.',
+      'family.notif.formReceived': 'Formulario Recibido',
+      'family.notif.formReceivedText': '¡Gracias! Hemos recibido su formulario de obituario y comenzaremos a procesarlo pronto.',
+      'family.notif.inProgress': 'En Progreso',
+      'family.notif.inProgressText': 'Su video conmemorativo está siendo creado. Le notificaremos cuando esté listo.',
+      'family.notif.noNotifications': 'Sin nuevas notificaciones',
+      'family.notif.allCaughtUp': '¡Está al día!',
+      'family.notif.now': 'Ahora',
+      'family.notif.recent': 'Reciente',
+
+      // Family Dashboard — obituary editor modal (Spanish)
+      'family.editor.title': 'Editar Obituario',
+      'family.editor.titleLabel': 'Título del Obituario',
+      'family.editor.contentLabel': 'Contenido del Obituario',
+      'family.editor.hint': 'Siéntase libre de hacer cualquier cambio para honrar la memoria de su ser querido.',
+      'family.editor.saveChanges': 'Guardar Cambios',
+      'family.editor.cancel': 'Cancelar',
+      'family.revisionInProgress': 'Revisión en Progreso',
+      'family.editorWorkingOnChanges': 'Nuestro editor está trabajando en los cambios',
+
       // Family Form — Password Change Modal
       'family.changePasswordTitle': '🔒 Cambia Tu Contraseña',
       'family.changePasswordDesc': 'Por razones de seguridad, debes cambiar tu contraseña temporal antes de acceder a tu cuenta.',
@@ -1114,6 +1252,10 @@ const i18n = {
     // Re-apply form-specific translations if family form is loaded
     if (typeof window.translateFormContent === 'function') {
       window.translateFormContent();
+    }
+    // Re-render dynamic dashboard content if family dashboard is loaded
+    if (typeof window.translateDashboardContent === 'function') {
+      window.translateDashboardContent();
     }
   },
 
