@@ -1854,8 +1854,34 @@
       actionsContainer.innerHTML = actionButtons;
     }
     
+    // ---------- translation helper (MyMemory free API — no key required) ----------
+    async function translateObituaryIfNeeded(text) {
+      const lang = localStorage.getItem('memorio_language') || 'en';
+      if (lang !== 'es') return text;
+
+      const paragraphs = text.split('\n\n').filter(p => p.trim());
+      const translated = [];
+
+      for (const para of paragraphs) {
+        try {
+          const res = await fetch(
+            `https://api.mymemory.translated.net/get?q=${encodeURIComponent(para)}&langpair=en|es`,
+            { headers: { 'Accept': 'application/json' } }
+          );
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const json = await res.json();
+          translated.push(json.responseData?.translatedText || para);
+        } catch (err) {
+          console.warn('Translation failed for paragraph, using original:', err);
+          translated.push(para);
+        }
+        await new Promise(r => setTimeout(r, 100));
+      }
+      return translated.join('\n\n');
+    }
+
     // Display obituary
-    function displayObituary() {
+    async function displayObituary() {
       const obituaryContent = document.getElementById('obituaryContent');
       const editBtn = document.getElementById('editObituaryBtn');
       const downloadBtn = document.getElementById('downloadObituaryBtn');
@@ -1875,21 +1901,28 @@
         
         // Check for generated obituary content first, then fall back to original form data
         const obituaryName = obituaryData.obituary_name || obituaryData.loved_ones_name || obituaryData.name || 'Obituary';
-        const obituaryText = obituaryData.obituary_content || obituaryData.content || 'No content available';
-        
+        const rawObituaryText = obituaryData.obituary_content || obituaryData.content || 'No content available';
+
         console.log('Final display - Name:', obituaryName);
-        console.log('Final display - Text:', obituaryText);
+        console.log('Final display - Text:', rawObituaryText);
         console.log('=== END OBITUARY DEBUG ===\n');
-        
+
+        // Translate to Spanish if needed (runs fast for already-Spanish content)
         obituaryContent.innerHTML = `
           <h4 style="margin-top: 0; color: #32343a;">${obituaryName}</h4>
-          <div style="white-space: pre-wrap; line-height: 1.6;">${obituaryText}</div>
+          <div id="obituaryTextBody" style="white-space: pre-wrap; line-height: 1.6;">${rawObituaryText}</div>
         `;
-        
+
+        // Translate async — updates the displayed text without blocking the rest of the UI
+        translateObituaryIfNeeded(rawObituaryText).then(translatedText => {
+          const body = document.getElementById('obituaryTextBody');
+          if (body) body.textContent = translatedText;
+        });
+
         if (currentCase.status === 'submitted' || currentCase.status === 'in_production') {
           editBtn.textContent = i18n.t('family.makeChanges');
           editBtn.style.display = 'inline-block';
-          editBtn.onclick = () => openObituaryEditor(obituaryName, obituaryText);
+          editBtn.onclick = () => openObituaryEditor(obituaryName, rawObituaryText);
         }
         
         if (currentCase.status === 'delivered') {

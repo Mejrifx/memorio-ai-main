@@ -1944,6 +1944,34 @@
                 }
             }
         }
+        // ---------- translation helper (MyMemory free API — no key required) ----------
+        async function translateObituaryIfNeeded(text) {
+            const lang = localStorage.getItem('memorio_language') || 'en';
+            if (lang !== 'es') return text;
+
+            const paragraphs = text.split('\n\n').filter(p => p.trim());
+            const translated = [];
+
+            for (const para of paragraphs) {
+                try {
+                    const res = await fetch(
+                        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(para)}&langpair=en|es`,
+                        { headers: { 'Accept': 'application/json' } }
+                    );
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const json = await res.json();
+                    const translatedPara = json.responseData?.translatedText || para;
+                    translated.push(translatedPara);
+                } catch (err) {
+                    console.warn('Translation failed for paragraph, using original:', err);
+                    translated.push(para);
+                }
+                // Small delay between requests to be polite to the free API
+                await new Promise(r => setTimeout(r, 100));
+            }
+            return translated.join('\n\n');
+        }
+
         // ---------- response handling ----------
         async function displayObituary(data, formPayload = {}) {
             // Store original form payload for email submission
@@ -1962,8 +1990,11 @@
                 alert('No obituary content was generated. Please check the n8n workflow output.');
                 return;
             }
-            
-            // ✅ AUTO-SAVE: Save obituary to database immediately after N8N generates it
+
+            // Translate the obituary if Spanish is active (no n8n changes needed)
+            obituaryData.content = await translateObituaryIfNeeded(obituaryData.content);
+
+            // ✅ AUTO-SAVE: Save (translated) obituary to database
             await saveObituaryToDatabase(obituaryData.name, obituaryData.content);
             
             startTypewriter();
