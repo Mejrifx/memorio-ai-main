@@ -1078,7 +1078,7 @@
                         // Update the welcome heading with personalized greeting
                         const welcomeHeading = document.getElementById('welcome-heading');
                         if (welcomeHeading) {
-                            welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
+                            const _wlang = localStorage.getItem('memorio_language') || 'en'; welcomeHeading.textContent = _wlang === 'es' ? `¡Hola ${userName}, comencemos.` : `Hey ${userName}, Let's begin.`;
                         }
                     } else {
                         // Fallback to JWT user_metadata
@@ -1086,7 +1086,7 @@
                         if (fallbackName) {
                             const welcomeHeading = document.getElementById('welcome-heading');
                             if (welcomeHeading) {
-                                welcomeHeading.textContent = `Hey ${fallbackName}, Let's begin.`;
+                                const _wlang2 = localStorage.getItem('memorio_language') || 'en'; welcomeHeading.textContent = _wlang2 === 'es' ? `¡Hola ${fallbackName}, comencemos.` : `Hey ${fallbackName}, Let's begin.`;
                             }
                         }
                     }
@@ -1229,7 +1229,7 @@
                         // Update the welcome heading with personalized greeting
                         const welcomeHeading = document.getElementById('welcome-heading');
                         if (welcomeHeading) {
-                            welcomeHeading.textContent = `Hey ${userName}, Let's begin.`;
+                            const _wlang = localStorage.getItem('memorio_language') || 'en'; welcomeHeading.textContent = _wlang === 'es' ? `¡Hola ${userName}, comencemos.` : `Hey ${userName}, Let's begin.`;
                         }
                     } else {
                         console.warn('⚠️ Could not load user name from database:', userError);
@@ -1239,7 +1239,7 @@
                             console.log('✅ User name loaded from JWT:', fallbackName);
                             const welcomeHeading = document.getElementById('welcome-heading');
                             if (welcomeHeading) {
-                                welcomeHeading.textContent = `Hey ${fallbackName}, Let's begin.`;
+                                const _wlang2 = localStorage.getItem('memorio_language') || 'en'; welcomeHeading.textContent = _wlang2 === 'es' ? `¡Hola ${fallbackName}, comencemos.` : `Hey ${fallbackName}, Let's begin.`;
                             }
                         }
                     }
@@ -2156,7 +2156,12 @@
             // ── Buttons across all steps ──
             document.querySelectorAll('.button-primary.next').forEach(el => { el.textContent = t('form.nextBtn', 'NEXT'); });
             document.querySelectorAll('.div-block:not(.accordion):not(.back)').forEach(el => {
-                if (el.textContent.trim() === 'NEXT' || el.textContent.trim() === 'Next') el.textContent = t('form.nextBtn', 'NEXT');
+                if (el.textContent.trim() === 'NEXT' || el.textContent.trim() === 'Next' ||
+                    el.textContent.trim() === 'SIGUIENTE') el.textContent = t('form.nextBtn', 'NEXT');
+            });
+            // Submit inputs use .value not .textContent
+            document.querySelectorAll('input.submit-button[type="submit"]').forEach(el => {
+                el.value = t('form.submitBtn', 'SUBMIT');
             });
 
             // ── Error fallback ──
@@ -2640,7 +2645,7 @@
             const visualizeHeading = document.getElementById('visualize-story-heading');
             if (visualizeHeading && fullName) {
                 const possessiveName = fullName.endsWith('s') ? fullName + "'" : fullName + "'s";
-                const lang = localStorage.getItem('memorio-language') || 'en';
+                const lang = localStorage.getItem('memorio_language') || 'en';
                 visualizeHeading.textContent = lang === 'es'
                     ? `Visualiza la Historia de ${possessiveName}`
                     : `Visualize ${possessiveName} Story`;
@@ -2650,8 +2655,8 @@
             // Update "Upload your images below" to "Upload your images of {name} below"
             const uploadLabel = document.getElementById('upload-images-label');
             if (uploadLabel && deceasedName) {
-                const lang = localStorage.getItem('memorio-language') || 'en';
-                uploadLabel.textContent = lang === 'es'
+                const lang2 = localStorage.getItem('memorio_language') || 'en';
+                uploadLabel.textContent = lang2 === 'es'
                     ? `Sube tus imágenes de ${deceasedName} abajo`
                     : `Upload your images of ${deceasedName} below`;
                 console.log('✅ Updated upload label to:', uploadLabel.textContent);
