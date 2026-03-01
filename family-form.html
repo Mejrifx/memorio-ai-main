@@ -374,7 +374,7 @@
 
   <div class="nav" style="position: relative; padding: 0 20px;">
     <div class="logo-wrapper"><img src="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" loading="lazy" width="166" sizes="166px" alt="The Memorio Logo" srcset="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w"></div>
-    <button id="signOutBtn" onclick="handleSignOut()" title="Sign Out" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); padding: 10px 24px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; transition: background-color 0.2s; display: none;" onmouseover="this.style.backgroundColor='#1e3a52'" onmouseout="this.style.backgroundColor='#436481'">Sign Out</button>
+    <button id="signOutBtn" onclick="handleSignOut()" title="Sign Out" data-i18n="form.signOut" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); padding: 10px 24px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; transition: background-color 0.2s; display: none;" onmouseover="this.style.backgroundColor='#1e3a52'" onmouseout="this.style.backgroundColor='#436481'">Sign Out</button>
   </div>
   <div class="form-slider-padding">
     <div class="w-form">
@@ -2038,9 +2038,141 @@
         }
         
         // Initialize auto-expand for all textareas
+        // ============================================================
+        // FORM TRANSLATION — applies stored language to all form text
+        // ============================================================
+        function translateFormContent() {
+            if (typeof i18n === 'undefined') return;
+            const t = (key, fallback) => i18n.t(key) || fallback;
+            const lang = localStorage.getItem('memorio-language') || 'en';
+
+            // Helper: set textContent of element(s) by selector
+            const setText = (sel, key, fallback) => {
+                document.querySelectorAll(sel).forEach(el => { el.textContent = t(key, fallback); });
+            };
+            const setPlaceholder = (id, key, fallback) => {
+                const el = document.getElementById(id);
+                if (el) el.placeholder = t(key, fallback);
+            };
+
+            // ── Nav ──
+            const signOut = document.getElementById('signOutBtn');
+            if (signOut) signOut.textContent = t('form.signOut', 'Sign Out');
+
+            // ── Step 1 ──
+            setText('.text-block', 'form.header', 'Memorios Obituary Writer');
+            // welcome-heading is set dynamically by populateDeceasedName — skip here
+            setText('.form-slider-step-1:not(.upload):not(.finalcheck-step7) .paragraph', 'form.intro',
+                "Take your time, each question helps us gently piece together a heartfelt memory. There's no rush.");
+            // "Any other names" label parts
+            document.querySelectorAll('.field-label.loved-ones-name.other-names').forEach(el => {
+                const span = el.querySelector('#deceased-name-display');
+                const name = span ? span.textContent : '';
+                el.innerHTML = `<span>${t('form.otherNamesPrefix', 'Any other names you\'d like to include for ')}</span><span id="deceased-name-display">${name}</span><span>${t('form.otherNamesSuffix', '?')}</span>`;
+            });
+            setPlaceholder('loved_ones_salutation', 'form.salutationPlaceholder', 'Salutation');
+            setPlaceholder('loved_ones_middle_name', 'form.middleNamePlaceholder', 'Middle Name');
+            setPlaceholder('loved_ones_nickname', 'form.nicknamePlaceholder', 'Nickname');
+            setPlaceholder('loved_ones_maiden_name', 'form.maidenNamePlaceholder', 'Maiden Name');
+            const suffixEl = document.querySelector('#loved_ones_suffix option[value="Another option"]');
+            if (suffixEl) suffixEl.textContent = t('form.suffixOption', 'Suffix (Jr, Sr, etc.)');
+            setText('.text-block-2', 'form.requiredFields', '*Required Fields');
+
+            // ── Step 2 ──
+            // visualize-story-heading is set dynamically — skip
+            // upload-images-label is set dynamically — skip
+            document.querySelectorAll('.form-slider-step-1.upload .italic-text').forEach(el => {
+                el.textContent = t('form.photoIntro', "Every life is a collection of beautiful moments. Upload photos to help us honor your loved one's journey.");
+            });
+            const photoBtn = document.getElementById('photo-upload-btn');
+            if (photoBtn) {
+                const svg = photoBtn.querySelector('svg');
+                photoBtn.textContent = t('form.selectPhotos', 'Select Photos');
+                if (svg) photoBtn.insertBefore(svg, photoBtn.firstChild);
+            }
+            const musicLabel = document.querySelector('label[for="music_selection"].field-label');
+            if (musicLabel) musicLabel.textContent = t('form.musicQuestion', 'What music would you like for the tribute video?');
+            const pianoBtn = document.getElementById('music-piano-btn');
+            if (pianoBtn) pianoBtn.textContent = t('form.pianoOption', 'Piano');
+            const guitarBtn = document.getElementById('music-guitar-btn');
+            if (guitarBtn) guitarBtn.textContent = t('form.guitarOption', 'Guitar');
+            const quoteLabel = document.querySelector('label[for="tribute_quote"].field-label.quote');
+            if (quoteLabel) quoteLabel.textContent = t('form.tributeQuoteQuestion', "Is there a favorite quote, verse, or saying you'd like us to include in the tribute video?");
+            setPlaceholder('tribute_quote', 'form.tributeQuotePlaceholder', 'Something they always said or something that reminds you of them and captures their spirit.');
+
+            // ── Step 3 ──
+            const step3Heading = document.querySelector('.form-slider-step-1.finalcheck-step7 .heading-2');
+            if (step3Heading) step3Heading.textContent = t('form.specialDetails', 'Would You Like to Add Any Special Details?');
+            const step3Para = document.querySelector('.form-slider-step-1.finalcheck-step7 .paragraph');
+            if (step3Para) step3Para.textContent = t('form.almostDone', 'Almost done, just review the information and add any final details of your choice. Once you submit your obituary will be created.');
+            const anythingLabel = document.querySelector('label.field-label.final');
+            if (anythingLabel) anythingLabel.textContent = t('form.anythingElse', 'Is there anything else you want to include in the Obituary?');
+
+            // Accordion titles
+            const accordionTitles = [
+                { text: 'Family Members', key: 'form.accordion.familyMembers' },
+                { text: 'Personal Details', key: 'form.accordion.personalDetails' },
+                { text: 'Education', key: 'form.accordion.education' },
+                { text: 'Hobbies / Interests', key: 'form.accordion.hobbies' },
+                { text: 'Career Highlights', key: 'form.accordion.career' },
+                { text: 'Religion / Spirituality', key: 'form.accordion.religion' },
+                { text: 'Military Service', key: 'form.accordion.military' }
+            ];
+            document.querySelectorAll('.faq-title .text-block-3').forEach(el => {
+                const match = accordionTitles.find(a => el.textContent.trim() === a.text);
+                if (match) el.textContent = t(match.key, match.text);
+            });
+            // Accordion Save/Add buttons
+            document.querySelectorAll('.div-block.accordion.save').forEach(el => { el.textContent = t('form.accordion.save', 'Save'); });
+            document.querySelectorAll('.div-block.accordion._1,.div-block.accordion._2,.div-block.accordion._3,.div-block.accordion._4,.div-block.accordion._5,.div-block.accordion._6').forEach(el => { el.textContent = t('form.accordion.add', 'Add'); });
+
+            // Accordion labels & placeholders
+            const familyMembersLabel = document.querySelector('label[for="family_members"].field-label.accordion');
+            if (familyMembersLabel) familyMembersLabel.textContent = t('form.accordion.familyMembersLabel', 'Who were the important people in their life?');
+            setPlaceholder('family_members', 'form.accordion.familyMembersPlaceholder', 'Please share the names of parents, siblings, children, close relatives, or dear friends who were important in their life.');
+            const descLabel = document.querySelector('label[for="loved_ones_description"]');
+            if (descLabel) descLabel.textContent = t('form.accordion.personalDetailsLabel', 'Describe them as a person');
+            setPlaceholder('loved_ones_description', 'form.accordion.personalDetailsPlaceholder', 'What were they known for by loved ones?');
+            const achieveLabel = document.querySelector('label[for="loved_ones_achievements"]');
+            if (achieveLabel) achieveLabel.textContent = t('form.accordion.educationLabel', 'What were their achievements?');
+            setPlaceholder('loved_ones_achievements', 'form.accordion.educationPlaceholder', 'List the name and location of schools they attended. Include degrees, certificates, or special honors they received.');
+            const hobbiesLabel = document.querySelector('label[for="loved_ones_hobbies"]');
+            if (hobbiesLabel) hobbiesLabel.textContent = t('form.accordion.hobbiesLabel', 'What stood out to them?');
+            setPlaceholder('loved_ones_hobbies', 'form.accordion.hobbiesPlaceholder', 'List activities that or interests that were important to your loved one.');
+            const careerLabel = document.querySelector('label[for="loved_ones_career"]');
+            if (careerLabel) careerLabel.textContent = t('form.accordion.careerLabel', 'Tell us about their career highlights');
+            setPlaceholder('loved_ones_career', 'form.accordion.careerPlaceholder', 'List work experience and any related accomplishments. Feel free to include dates and proud moments.');
+            const religionLabel = document.querySelector('label[for="loved_ones_spiritual_beliefs"]');
+            if (religionLabel) religionLabel.textContent = t('form.accordion.religionLabel', 'What role did religion or spirituality have in their life?');
+            setPlaceholder('loved_ones_spiritual_beliefs', 'form.accordion.religionPlaceholder', 'List places of worship, acts of service, faith related travel, or important values your loved one held.');
+            const militaryLabel = document.querySelector('label[for="loved_ones_military_service"]');
+            if (militaryLabel) militaryLabel.textContent = t('form.accordion.militaryLabel', 'Tell us about their military service');
+            setPlaceholder('loved_ones_military_service', 'form.accordion.militaryPlaceholder', 'If they were a veteran, list the branch, rank, and time served, along with location.');
+
+            const serviceLabel = document.querySelector('label.field-label.finaldetails');
+            if (serviceLabel) serviceLabel.textContent = t('form.serviceInfo', 'Would you like to include any service or event information?');
+            setPlaceholder('final_details', 'form.serviceInfoPlaceholder', 'Add info about upcoming services: time, place, dress code, or anything guests should know.');
+
+            // ── Buttons across all steps ──
+            document.querySelectorAll('.button-primary.next').forEach(el => { el.textContent = t('form.nextBtn', 'NEXT'); });
+            document.querySelectorAll('.div-block:not(.accordion):not(.back)').forEach(el => {
+                if (el.textContent.trim() === 'NEXT' || el.textContent.trim() === 'Next') el.textContent = t('form.nextBtn', 'NEXT');
+            });
+
+            // ── Error fallback ──
+            const formFail = document.querySelector('.w-form-fail div');
+            if (formFail) formFail.textContent = t('form.formError', 'Oops! Something went wrong while submitting the form.');
+        }
+
+        // Make available globally so i18n toggle can call it
+        window.translateFormContent = translateFormContent;
+
         document.addEventListener('DOMContentLoaded', function() {
           // Initialise i18n so stored language preference is applied on load
-          if (typeof i18n !== 'undefined') i18n.init();
+          if (typeof i18n !== 'undefined') {
+            i18n.init();
+            translateFormContent();
+          }
 
           const textareas = document.querySelectorAll('textarea.textarea');
           
@@ -2508,14 +2640,20 @@
             const visualizeHeading = document.getElementById('visualize-story-heading');
             if (visualizeHeading && fullName) {
                 const possessiveName = fullName.endsWith('s') ? fullName + "'" : fullName + "'s";
-                visualizeHeading.textContent = `Visualize ${possessiveName} Story`;
+                const lang = localStorage.getItem('memorio-language') || 'en';
+                visualizeHeading.textContent = lang === 'es'
+                    ? `Visualiza la Historia de ${possessiveName}`
+                    : `Visualize ${possessiveName} Story`;
                 console.log('✅ Updated heading to:', visualizeHeading.textContent);
             }
             
             // Update "Upload your images below" to "Upload your images of {name} below"
             const uploadLabel = document.getElementById('upload-images-label');
             if (uploadLabel && deceasedName) {
-                uploadLabel.textContent = `Upload your images of ${deceasedName} below`;
+                const lang = localStorage.getItem('memorio-language') || 'en';
+                uploadLabel.textContent = lang === 'es'
+                    ? `Sube tus imágenes de ${deceasedName} abajo`
+                    : `Upload your images of ${deceasedName} below`;
                 console.log('✅ Updated upload label to:', uploadLabel.textContent);
             }
             
