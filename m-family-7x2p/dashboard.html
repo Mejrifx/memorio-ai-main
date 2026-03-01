@@ -1855,17 +1855,19 @@
     }
     
     // ---------- translation helper (MyMemory free API — no key required) ----------
-    async function translateObituaryIfNeeded(text) {
-      const lang = localStorage.getItem('memorio_language') || 'en';
-      if (lang !== 'es') return text;
+    // storedLang: the language the obituary is currently saved in ('en' or 'es')
+    async function translateObituaryIfNeeded(text, storedLang = 'en') {
+      const uiLang = localStorage.getItem('memorio_language') || 'en';
+      if (uiLang === storedLang) return text; // Already in the right language
 
+      const langpair = `${storedLang}|${uiLang}`;
       const paragraphs = text.split('\n\n').filter(p => p.trim());
       const translated = [];
 
       for (const para of paragraphs) {
         try {
           const res = await fetch(
-            `https://api.mymemory.translated.net/get?q=${encodeURIComponent(para)}&langpair=en|es`,
+            `https://api.mymemory.translated.net/get?q=${encodeURIComponent(para)}&langpair=${langpair}`,
             { headers: { 'Accept': 'application/json' } }
           );
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1902,19 +1904,21 @@
         // Check for generated obituary content first, then fall back to original form data
         const obituaryName = obituaryData.obituary_name || obituaryData.loved_ones_name || obituaryData.name || 'Obituary';
         const rawObituaryText = obituaryData.obituary_content || obituaryData.content || 'No content available';
+        // The language the obituary was saved in (defaults to 'en' for older cases)
+        const storedObituaryLang = obituaryData.obituary_language || 'en';
 
         console.log('Final display - Name:', obituaryName);
         console.log('Final display - Text:', rawObituaryText);
+        console.log('Stored obituary language:', storedObituaryLang);
         console.log('=== END OBITUARY DEBUG ===\n');
 
-        // Translate to Spanish if needed (runs fast for already-Spanish content)
         obituaryContent.innerHTML = `
           <h4 style="margin-top: 0; color: #32343a;">${obituaryName}</h4>
           <div id="obituaryTextBody" style="white-space: pre-wrap; line-height: 1.6;">${rawObituaryText}</div>
         `;
 
-        // Translate async — updates the displayed text without blocking the rest of the UI
-        translateObituaryIfNeeded(rawObituaryText).then(translatedText => {
+        // Translate async in the correct direction (en→es or es→en as needed)
+        translateObituaryIfNeeded(rawObituaryText, storedObituaryLang).then(translatedText => {
           const body = document.getElementById('obituaryTextBody');
           if (body) body.textContent = translatedText;
         });
