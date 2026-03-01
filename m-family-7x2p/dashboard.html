@@ -1837,7 +1837,7 @@
       const actionsContainer = document.getElementById('caseActions');
       let actionButtons = '';
       
-      if (caseData.status === 'waiting_on_family' || caseData.status === 'created') {
+      if (caseData.status === 'waiting_on_family' || caseData.status === 'created' || caseData.status === 'intake_in_progress') {
         actionButtons = `
           <a href="/family/form" class="btn-primary">${i18n.t('family.completeObituaryForm')}</a>
         `;
