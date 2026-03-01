@@ -385,6 +385,13 @@ const i18n = {
       'family.revisionInProgress': 'Revision in Progress',
       'family.editorWorkingOnChanges': 'Our editor is working on the changes',
 
+      // Family Dashboard — upload window timer
+      'family.upload.windowActive': 'Upload Window Active',
+      'family.upload.windowActiveDesc': 'Time remaining to upload additional photos. After this window closes, our editors will begin creating your memorial video.',
+      'family.upload.windowClosed': 'Upload Window Closed',
+      'family.upload.windowClosedDesc': 'The 12-hour upload window has ended. You can still view all your uploaded photos below.',
+      'family.upload.windowExpiredAlert': 'The 12-hour upload window has closed. You can no longer add photos to this case.',
+
       // Family Form — Password Change Modal
       'family.changePasswordTitle': '🔒 Change Your Password',
       'family.changePasswordDesc': 'For security reasons, you must change your temporary password before accessing your account.',
@@ -948,6 +955,13 @@ const i18n = {
       'family.editor.cancel': 'Cancelar',
       'family.revisionInProgress': 'Revisión en Progreso',
       'family.editorWorkingOnChanges': 'Nuestro editor está trabajando en los cambios',
+
+      // Family Dashboard — upload window timer (Spanish)
+      'family.upload.windowActive': 'Ventana de Carga Activa',
+      'family.upload.windowActiveDesc': 'Tiempo restante para subir fotos adicionales. Después de que esta ventana se cierre, nuestros editores comenzarán a crear su video conmemorativo.',
+      'family.upload.windowClosed': 'Ventana de Carga Cerrada',
+      'family.upload.windowClosedDesc': 'La ventana de carga de 12 horas ha terminado. Aún puede ver todas las fotos subidas a continuación.',
+      'family.upload.windowExpiredAlert': 'La ventana de carga de 12 horas se ha cerrado. Ya no puede agregar fotos a este caso.',
 
       // Family Form — Password Change Modal
       'family.changePasswordTitle': '🔒 Cambia Tu Contraseña',

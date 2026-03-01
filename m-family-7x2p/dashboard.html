@@ -1472,10 +1472,10 @@
         timerBanner.className = 'expired';
         timerBanner.innerHTML = `
           <div class="timer-title">
-            🔒 Upload Window Closed
+            🔒 ${i18n.t('family.upload.windowClosed')}
           </div>
           <div class="timer-message">
-            The 12-hour upload window has ended. You can still view all your uploaded photos below.
+            ${i18n.t('family.upload.windowClosedDesc')}
           </div>
         `;
         timerBanner.style.display = 'block';
@@ -1496,11 +1496,11 @@
         timerBanner.className = '';
         timerBanner.innerHTML = `
           <div class="timer-title">
-            ⏱️ Upload Window Active
+            ⏱️ ${i18n.t('family.upload.windowActive')}
           </div>
           <div class="timer-countdown">${timeString}</div>
           <div class="timer-message">
-            Time remaining to upload additional photos. After this window closes, our editors will begin creating your memorial video.
+            ${i18n.t('family.upload.windowActiveDesc')}
           </div>
         `;
         timerBanner.style.display = 'block';
@@ -1515,7 +1515,7 @@
       const uploadText = document.getElementById('upload-text');
       
       uploadArea.classList.add('locked');
-      uploadText.textContent = '🔒 Upload window closed';
+      uploadText.textContent = `🔒 ${i18n.t('family.upload.windowClosed')}`;
     }
     
     /**
@@ -1534,7 +1534,7 @@
      */
     function handleUploadClick() {
       if (uploadWindowExpired) {
-        alert('The 12-hour upload window has closed. You can no longer add photos to this case.');
+        alert(i18n.t('family.upload.windowExpiredAlert'));
         return;
       }
       
@@ -2179,7 +2179,7 @@
       
       // Check if upload window has expired
       if (uploadWindowExpired) {
-        alert('The 12-hour upload window has closed. You can no longer add photos to this case.');
+        alert(i18n.t('family.upload.windowExpiredAlert'));
         event.target.value = '';
         return;
       }
@@ -2915,6 +2915,7 @@
       if (!currentCase) return;
       // Re-render dynamic sections that use i18n.t() for their text
       displayCaseOverview(currentCase);
+      updateUploadTimerDisplay();
       displayObituary();
       displayTimeline(currentCase);
       displayNotifications();
