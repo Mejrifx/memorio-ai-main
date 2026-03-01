@@ -1082,16 +1082,16 @@
         <div class="case-info">
           <div class="info-item">
             <div class="info-label" data-i18n="family.caseID">Case ID</div>
-            <div class="info-value" id="caseId" data-i18n="family.loading">Loading...</div>
+            <div class="info-value" id="caseId">—</div>
             <button class="copy-btn" onclick="copyToClipboard('caseId')" style="margin-top: 5px; font-size: 12px;" data-i18n="common.copy">Copy</button>
           </div>
           <div class="info-item">
             <div class="info-label" data-i18n="family.created">Created</div>
-            <div class="info-value" id="caseCreated" data-i18n="family.loading">Loading...</div>
+            <div class="info-value" id="caseCreated">—</div>
           </div>
           <div class="info-item">
             <div class="info-label" data-i18n="family.lastUpdated">Last Updated</div>
-            <div class="info-value" id="caseUpdated" data-i18n="family.loading">Loading...</div>
+            <div class="info-value" id="caseUpdated">—</div>
           </div>
         </div>
         
@@ -1111,12 +1111,11 @@
           <div id="obituarySection">
             <div class="obituary-preview">
               <div class="obituary-content" id="obituaryContent">
-                Loading obituary...
               </div>
             </div>
             <div class="action-buttons">
-              <button class="btn-primary" id="editObituaryBtn" style="display: none;">Edit Obituary</button>
-              <button class="btn-secondary" id="downloadObituaryBtn" style="display: none;">Download PDF</button>
+              <button class="btn-primary" id="editObituaryBtn" style="display: none;" data-i18n="family.editObituary">Edit Obituary</button>
+              <button class="btn-secondary" id="downloadObituaryBtn" style="display: none;" data-i18n="family.downloadPDF">Download PDF</button>
             </div>
           </div>
         </div>
@@ -1125,7 +1124,7 @@
         <div class="dashboard-section">
           <h3 class="section-title">
             <span class="icon icon-photos"></span>
-            Photos
+            <span data-i18n="family.photosSection">Photos</span>
           </h3>
           
           <!-- Upload Timer Banner -->
@@ -1139,7 +1138,7 @@
                 <div class="upload-icon">
                   <span class="icon icon-upload"></span>
                 </div>
-                <div class="upload-text" id="upload-text">Click to upload photos</div>
+                <div class="upload-text" id="upload-text" data-i18n="family.uploadPhotos">Click to upload photos</div>
               </div>
             </div>
             <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
@@ -1154,10 +1153,10 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            Your Memorial is Complete
+            <span data-i18n="family.memorialComplete">Your Memorial is Complete</span>
           </div>
           <h2 class="memorial-title" id="memorialDeceasedName">Memorial Tribute</h2>
-          <p class="memorial-subtitle">Your memorial tribute video and obituary have been carefully created and reviewed</p>
+          <p class="memorial-subtitle" data-i18n="family.memorialCompleteDesc">Your memorial tribute video and obituary have been carefully created and reviewed</p>
         </div>
         
         <div class="memorial-content">
@@ -1167,7 +1166,7 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
-              Memorial Tribute Video
+              <span data-i18n="family.memorialTributeVideo">Memorial Tribute Video</span>
             </h3>
             <div style="display: flex; justify-content: center;">
               <div class="memorial-video-container">
@@ -1178,7 +1177,7 @@
                 <!-- Revision overlay - appears over video when paused -->
                 <div id="videoRevisionOverlay" class="memorial-video-overlay hidden">
                   <div class="memorial-video-overlay-text">
-                    Revision in Progress<br>Our editor is working on the changes
+                    <span data-i18n="family.revisionInProgress">Revision in Progress</span><br><span data-i18n="family.editorWorkingOnChanges">Our editor is working on the changes</span>
                   </div>
                 </div>
               </div>
@@ -1191,7 +1190,7 @@
           <!-- Obituary Section -->
           <div id="memorialObituarySection" class="memorial-obituary-section" style="display: none;">
             <h3 class="memorial-section-title">
-              📝 Obituary
+              📝 <span data-i18n="family.obituarySection">Obituary</span>
             </h3>
             <div id="memorialObituaryContent" class="memorial-obituary-content">
               <!-- Obituary content will be loaded here -->
@@ -1204,7 +1203,7 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
               </svg>
-              Download Video
+              <span data-i18n="family.downloadVideo">Download Video</span>
             </button>
             <button class="btn-download-obituary" onclick="downloadObituaryPDF()">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1214,7 +1213,7 @@
                 <line x1="16" y1="17" x2="8" y2="17"/>
                 <polyline points="10,9 9,9 8,9"/>
               </svg>
-              Download Obituary PDF
+              <span data-i18n="family.downloadObituaryPDF">Download Obituary PDF</span>
             </button>
             <button class="btn-request-revision" id="requestRevisionBtn" onclick="openRevisionRequestModal()" style="display: none;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1230,7 +1229,7 @@
       <div id="revisionRequestModal" class="revision-modal-overlay" style="display: none;">
         <div class="revision-modal-content">
           <div class="revision-modal-header">
-            <h2 class="revision-modal-title">Request Revision</h2>
+            <h2 class="revision-modal-title" data-i18n="family.requestRevision">Request Revision</h2>
             <button class="revision-modal-close" onclick="closeRevisionRequestModal()">&times;</button>
           </div>
           
@@ -1242,32 +1241,33 @@
                 <line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
               <div>
-                <strong>This is your only revision request</strong>
-                <p>Please be specific about the changes you need. Your editor will review your feedback and make the necessary adjustments.</p>
+                <strong data-i18n="family.revisionOnlyOne">This is your only revision request</strong>
+                <p data-i18n="family.revisionPleaseSpecific">Please be specific about the changes you need. Your editor will review your feedback and make the necessary adjustments.</p>
               </div>
             </div>
             
             <label for="revisionNotes" class="revision-label">
-              What changes would you like made to your memorial video?
+              <span data-i18n="family.revisionWhatChanges">What changes would you like made to your memorial video?</span>
               <span class="required">*</span>
             </label>
             <textarea 
               id="revisionNotes" 
               class="revision-textarea" 
+              data-i18n-placeholder="family.revisionPlaceholder"
               placeholder="Please describe the changes you'd like to see in your memorial video. For example:&#10;&#10;• Add or remove specific photos&#10;• Adjust the music selection&#10;• Change the timing or pacing&#10;• Correct any information&#10;&#10;Be as specific as possible so our editor can make the right changes."
               maxlength="1000"
               rows="8"
             ></textarea>
             <div class="revision-char-count">
-              <span id="revisionCharCount">0</span> / 1000 characters
-              <span class="revision-minimum">(minimum 25 characters)</span>
+              <span id="revisionCharCount">0</span> / 1000 <span data-i18n="family.revisionCharCount">characters</span>
+              <span class="revision-minimum" data-i18n="family.revisionMinimum">(minimum 25 characters)</span>
             </div>
           </div>
           
           <div class="revision-modal-footer">
-            <button class="btn-cancel" onclick="closeRevisionRequestModal()">Cancel</button>
+            <button class="btn-cancel" onclick="closeRevisionRequestModal()" data-i18n="common.cancel">Cancel</button>
             <button class="btn-submit-revision" onclick="submitRevisionRequest()" id="submitRevisionBtn" disabled>
-              Submit Revision Request
+              <span data-i18n="family.submitRevision">Submit Revision Request</span>
             </button>
           </div>
         </div>
@@ -1277,7 +1277,7 @@
       <div id="revisionConfirmModal" class="revision-modal-overlay" style="display: none;">
         <div class="revision-modal-content" style="max-width: 500px;">
           <div class="revision-modal-header">
-            <h2 class="revision-modal-title">Confirm Revision Request</h2>
+            <h2 class="revision-modal-title" data-i18n="family.confirmRevisionTitle">Confirm Revision Request</h2>
           </div>
           
           <div class="revision-modal-body">
@@ -1288,16 +1288,16 @@
                 <line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
               <div>
-                <strong>This is your only revision request</strong>
-                <p style="margin-top: 8px;">Are you sure you want to submit this revision request? Once submitted, you won't be able to request another revision.</p>
+                <strong data-i18n="family.revisionOnlyOne">This is your only revision request</strong>
+                <p style="margin-top: 8px;" data-i18n="family.revisionConfirmText">Are you sure you want to submit this revision request? Once submitted, you won't be able to request another revision.</p>
               </div>
             </div>
           </div>
           
           <div class="revision-modal-footer">
-            <button class="btn-cancel" onclick="closeRevisionConfirmModal()">Cancel</button>
+            <button class="btn-cancel" onclick="closeRevisionConfirmModal()" data-i18n="common.cancel">Cancel</button>
             <button class="btn-submit-revision" onclick="confirmRevisionSubmission()">
-              Yes, Submit Revision Request
+              <span data-i18n="family.yesSubmitRevision">Yes, Submit Revision</span>
             </button>
           </div>
         </div>
@@ -1307,7 +1307,7 @@
       <div class="dashboard-section">
         <h3 class="section-title">
           <span class="icon icon-timeline"></span>
-          Timeline & Updates
+          <span data-i18n="family.timelineUpdates">Timeline & Updates</span>
         </h3>
         <ul class="timeline" id="timelineList">
           <li class="timeline-item">
@@ -1326,7 +1326,7 @@
       <div class="dashboard-section">
         <h3 class="section-title">
           <span class="icon icon-notifications"></span>
-          Notifications
+          <span data-i18n="family.notifications">Notifications</span>
         </h3>
         <div id="notificationsList">
           <div class="notification-item">
@@ -1339,8 +1339,8 @@
     
     <div id="emptyState" class="empty-state" style="display: none;">
       <div class="empty-state-icon">📋</div>
-      <h2 class="empty-state-title">No Case Found</h2>
-      <p class="empty-state-text">
+      <h2 class="empty-state-title" data-i18n="family.noCaseFound">No Case Found</h2>
+      <p class="empty-state-text" data-i18n="family.noCaseAssigned">
         No case has been assigned to your account yet.<br>
         Please contact your funeral director for assistance.
       </p>
@@ -1815,14 +1815,14 @@
       
       // Status display text
       const statusText = {
-        'created': 'Created',
-        'waiting_on_family': 'Waiting on Form',
-        'intake_in_progress': 'Form In Progress',
-        'submitted': 'Form Submitted',
-        'in_production': 'In Production',
-        'awaiting_review': 'Awaiting Review',
-        'delivered': 'Delivered',
-        'closed': 'Closed'
+        'created': i18n.t('family.status.created'),
+        'waiting_on_family': i18n.t('family.status.waitingOnFamily'),
+        'intake_in_progress': i18n.t('family.status.intakeInProgress'),
+        'submitted': i18n.t('family.status.submitted'),
+        'in_production': i18n.t('family.status.inProduction'),
+        'awaiting_review': i18n.t('family.status.awaitingReview'),
+        'delivered': i18n.t('family.status.delivered'),
+        'closed': i18n.t('family.status.closed')
       };
       
       // Update case info
@@ -1839,15 +1839,15 @@
       
       if (caseData.status === 'waiting_on_family' || caseData.status === 'created') {
         actionButtons = `
-          <a href="/family/form" class="btn-primary">Complete Obituary Form</a>
+          <a href="/family/form" class="btn-primary">${i18n.t('family.completeObituaryForm')}</a>
         `;
       } else if (caseData.status === 'submitted') {
         actionButtons = `
-          <button class="btn-secondary" disabled>Form Submitted - Awaiting Processing</button>
+          <button class="btn-secondary" disabled>${i18n.t('family.formSubmittedAwaiting')}</button>
         `;
       } else if (caseData.status === 'delivered') {
         actionButtons = `
-          <button class="btn-primary" onclick="downloadObituary()">Download Final Obituary</button>
+          <button class="btn-primary" onclick="downloadObituary()">${i18n.t('family.downloadFinalObituary')}</button>
         `;
       }
       
@@ -1887,7 +1887,7 @@
         `;
         
         if (currentCase.status === 'submitted' || currentCase.status === 'in_production') {
-          editBtn.textContent = 'Make Changes';
+          editBtn.textContent = i18n.t('family.makeChanges');
           editBtn.style.display = 'inline-block';
           editBtn.onclick = () => openObituaryEditor(obituaryName, obituaryText);
         }
@@ -1897,7 +1897,7 @@
         }
       } else {
         obituaryContent.innerHTML = `
-          <p style="color: #666; font-style: italic;">No obituary submitted yet.</p>
+          <p style="color: #666; font-style: italic;">${i18n.t('family.noObituaryYet')}</p>
         `;
       }
     }
@@ -2005,18 +2005,18 @@
       // Case created
       timeline.push({
         icon: 'icon-check',
-        title: 'Case Created',
+        title: i18n.t('family.timeline.caseCreated'),
         date: new Date(caseData.created_at).toLocaleDateString(),
-        description: `Case created for ${caseData.deceased_name}`
+        description: i18n.t('family.timeline.caseCreatedDesc').replace('{name}', caseData.deceased_name)
       });
       
       // Form submitted
       if (currentForm && currentForm.submitted_at) {
         timeline.push({
           icon: 'icon-obituary',
-          title: 'Obituary Form Submitted',
+          title: i18n.t('family.timeline.formSubmitted'),
           date: new Date(currentForm.submitted_at).toLocaleDateString(),
-          description: 'Family completed and submitted the obituary form'
+          description: i18n.t('family.timeline.formSubmittedDesc')
         });
       }
       
@@ -2024,23 +2024,23 @@
       if (caseData.status === 'submitted') {
         timeline.push({
           icon: 'icon-clock',
-          title: 'Awaiting Processing',
-          date: 'Current',
-          description: 'Your obituary is being processed by our team'
+          title: i18n.t('family.timeline.awaitingProcessing'),
+          date: i18n.t('family.timeline.current'),
+          description: i18n.t('family.timeline.awaitingProcessingDesc')
         });
       } else if (caseData.status === 'in_production') {
         timeline.push({
           icon: 'icon-video',
-          title: 'In Production',
-          date: 'Current',
-          description: 'Your memorial video is being created'
+          title: i18n.t('family.timeline.inProduction'),
+          date: i18n.t('family.timeline.current'),
+          description: i18n.t('family.timeline.inProductionDesc')
         });
       } else if (caseData.status === 'delivered') {
         timeline.push({
           icon: 'icon-check',
-          title: 'Delivered',
-          date: 'Current',
-          description: 'Your memorial video is ready for download'
+          title: i18n.t('family.timeline.delivered'),
+          date: i18n.t('family.timeline.current'),
+          description: i18n.t('family.timeline.deliveredDesc')
         });
       }
       
@@ -2068,29 +2068,29 @@
       // Add status-based notifications
       if (currentCase.status === 'waiting_on_family') {
         notifications.push({
-          title: 'Action Required',
-          text: 'Please complete the obituary form to proceed with your memorial video.',
-          date: 'Now'
+          title: i18n.t('family.notif.actionRequired'),
+          text: i18n.t('family.notif.actionRequiredText'),
+          date: i18n.t('family.notif.now')
         });
       } else if (currentCase.status === 'submitted') {
         notifications.push({
-          title: 'Form Received',
-          text: 'Thank you! We have received your obituary form and will begin processing soon.',
-          date: 'Recent'
+          title: i18n.t('family.notif.formReceived'),
+          text: i18n.t('family.notif.formReceivedText'),
+          date: i18n.t('family.notif.recent')
         });
       } else if (currentCase.status === 'in_production') {
         notifications.push({
-          title: 'In Progress',
-          text: 'Your memorial video is currently being created. We will notify you when it\'s ready.',
-          date: 'Recent'
+          title: i18n.t('family.notif.inProgress'),
+          text: i18n.t('family.notif.inProgressText'),
+          date: i18n.t('family.notif.recent')
         });
       }
       
       if (notifications.length === 0) {
         notificationsList.innerHTML = `
           <div class="notification-item">
-            <h4 class="notification-title">No new notifications</h4>
-            <p class="notification-text">You're all caught up!</p>
+            <h4 class="notification-title">${i18n.t('family.notif.noNotifications')}</h4>
+            <p class="notification-text">${i18n.t('family.notif.allCaughtUp')}</p>
           </div>
         `;
       } else {
@@ -2110,11 +2110,11 @@
       if (!titleElement) return;
       
       if (status === 'delivered' && userName) {
-        titleElement.textContent = `Your tribute is ready, ${userName}`;
+        titleElement.textContent = i18n.t('family.title.tributeReady').replace('{name}', userName);
       } else if (userName) {
-        titleElement.textContent = `Thank you ${userName}. We'll take it from here.`;
+        titleElement.textContent = i18n.t('family.title.thankYou').replace('{name}', userName);
       } else {
-        titleElement.textContent = 'My Case';
+        titleElement.textContent = i18n.t('family.myCase');
       }
     }
     
@@ -2908,18 +2908,54 @@
       }
     });
     
+    /**
+     * Re-render dynamic dashboard text when language is toggled
+     */
+    window.translateDashboardContent = function() {
+      if (!currentCase) return;
+      // Re-render dynamic sections that use i18n.t() for their text
+      displayCaseOverview(currentCase);
+      displayObituary();
+      displayTimeline(currentCase);
+      displayNotifications();
+      updateDashboardTitle(currentCase.status);
+      // Update revision request button text (contains revision count)
+      const revBtn = document.getElementById('requestRevisionBtn');
+      if (revBtn) {
+        const span = document.getElementById('requestRevisionBtnText');
+        if (span) {
+          const usedCount = currentCase.revision_count || 0;
+          const maxCount = 1;
+          span.textContent = `${i18n.t('family.requestRevision')} (${usedCount}/${maxCount})`;
+        }
+      }
+      // Update obituary editor modal static text
+      const editorTitle = document.getElementById('obituaryEditorTitle');
+      if (editorTitle) editorTitle.textContent = i18n.t('family.editor.title');
+      const editorNameLabel = document.getElementById('editObituaryNameLabel');
+      if (editorNameLabel) editorNameLabel.textContent = i18n.t('family.editor.titleLabel');
+      const editorContentLabel = document.getElementById('editObituaryContentLabel');
+      if (editorContentLabel) editorContentLabel.textContent = i18n.t('family.editor.contentLabel');
+      const editorHint = document.getElementById('obituaryEditorHint');
+      if (editorHint) editorHint.textContent = i18n.t('family.editor.hint');
+      const editorCancelBtn = document.getElementById('obituaryEditorCancelBtn');
+      if (editorCancelBtn) editorCancelBtn.textContent = i18n.t('family.editor.cancel');
+      const saveObituaryBtn = document.getElementById('saveObituaryBtn');
+      if (saveObituaryBtn) saveObituaryBtn.textContent = i18n.t('family.editor.saveChanges');
+    };
+
   </script>
   
   <!-- Obituary Editor Modal -->
   <div id="obituaryEditorModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
     <div style="background-color: white; border-radius: 12px; padding: 32px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <h2 style="margin: 0; color: #32343a; font-size: 24px;">Edit Obituary</h2>
+        <h2 id="obituaryEditorTitle" style="margin: 0; color: #32343a; font-size: 24px;">Edit Obituary</h2>
         <button onclick="closeObituaryEditor()" style="background: none; border: none; font-size: 28px; color: #666; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</button>
       </div>
       
       <div style="margin-bottom: 20px;">
-        <label for="editObituaryName" style="display: block; margin-bottom: 8px; font-weight: 600; color: #32343a;">Obituary Title</label>
+        <label for="editObituaryName" id="editObituaryNameLabel" style="display: block; margin-bottom: 8px; font-weight: 600; color: #32343a;">Obituary Title</label>
         <input 
           type="text" 
           id="editObituaryName" 
@@ -2929,18 +2965,18 @@
       </div>
       
       <div style="margin-bottom: 24px;">
-        <label for="editObituaryContent" style="display: block; margin-bottom: 8px; font-weight: 600; color: #32343a;">Obituary Content</label>
+        <label for="editObituaryContent" id="editObituaryContentLabel" style="display: block; margin-bottom: 8px; font-weight: 600; color: #32343a;">Obituary Content</label>
         <textarea 
           id="editObituaryContent" 
           rows="15" 
           placeholder="Write the obituary content here..."
           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; line-height: 1.6; font-family: inherit; resize: vertical; box-sizing: border-box;"
         ></textarea>
-        <p style="margin-top: 8px; font-size: 14px; color: #666;">Feel free to make any changes to honor your loved one's memory.</p>
+        <p id="obituaryEditorHint" style="margin-top: 8px; font-size: 14px; color: #666;">Feel free to make any changes to honor your loved one's memory.</p>
       </div>
       
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
-        <button onclick="closeObituaryEditor()" style="padding: 12px 24px; border: 1px solid #ddd; background: white; color: #32343a; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 500;">Cancel</button>
+        <button id="obituaryEditorCancelBtn" onclick="closeObituaryEditor()" style="padding: 12px 24px; border: 1px solid #ddd; background: white; color: #32343a; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 500;">Cancel</button>
         <button id="saveObituaryBtn" onclick="saveObituaryChanges()" style="padding: 12px 24px; border: none; background: #4f46e5; color: white; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 500;">Save Changes</button>
       </div>
     </div>
