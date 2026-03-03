@@ -30,7 +30,7 @@ serve(async (req) => {
       );
     }
 
-    const fromEmail = from || Deno.env.get('SMTP_FROM') || 'support@memorio.ai';
+    const fromEmail = from || Deno.env.get('SMTP_FROM') || 'Memorio <onboarding@resend.dev>';
     
     // Check if Resend API key is configured (preferred method)
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
