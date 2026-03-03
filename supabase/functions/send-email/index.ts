@@ -32,7 +32,6 @@ serve(async (req) => {
 
     // Get SMTP credentials from environment
     const smtpHost = Deno.env.get('SMTP_HOST') || 'smtp.office365.com';
-    const smtpPort = parseInt(Deno.env.get('SMTP_PORT') || '587');
     const smtpUser = Deno.env.get('SMTP_USER');
     const smtpPass = Deno.env.get('SMTP_PASS');
     const fromEmail = from || Deno.env.get('SMTP_FROM') || 'support@memorio.ai';
@@ -45,67 +44,88 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Sending email to ${to} via ${smtpHost}:${smtpPort}`);
+    console.log(`Sending email to ${to} via ${smtpHost}:587`);
 
-    // Create email in RFC 5322 format
-    const boundary = `----=_Part_${Date.now()}`;
-    const emailBody = [
-      `From: ${fromEmail}`,
-      `To: ${to}`,
-      `Subject: ${subject}`,
-      `MIME-Version: 1.0`,
-      `Content-Type: multipart/alternative; boundary="${boundary}"`,
-      ``,
-      `--${boundary}`,
-      `Content-Type: text/html; charset=UTF-8`,
-      `Content-Transfer-Encoding: quoted-printable`,
-      ``,
-      html.replace(/\r?\n/g, '\r\n'),
-      ``,
-      `--${boundary}--`
-    ].join('\r\n');
-
-    // Connect to SMTP server using raw TCP
+    // Connect to SMTP server on port 587 (plain first, then STARTTLS)
     const conn = await Deno.connect({
       hostname: smtpHost,
-      port: smtpPort,
+      port: 587,
     });
 
-    // Upgrade to TLS
-    const tlsConn = await Deno.startTls(conn, { hostname: smtpHost });
-    
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
+    let currentConn: Deno.Conn | Deno.TlsConn = conn;
 
     // Helper to read SMTP responses
     async function readResponse(): Promise<string> {
       const buffer = new Uint8Array(4096);
-      const n = await tlsConn.read(buffer);
+      const n = await currentConn.read(buffer);
       if (!n) throw new Error('Connection closed');
-      return decoder.decode(buffer.subarray(0, n));
+      const response = decoder.decode(buffer.subarray(0, n));
+      console.log('SMTP <<', response.trim());
+      return response;
     }
 
     // Helper to send SMTP commands
     async function sendCommand(cmd: string): Promise<string> {
-      await tlsConn.write(encoder.encode(cmd + '\r\n'));
+      console.log('SMTP >>', cmd);
+      await currentConn.write(encoder.encode(cmd + '\r\n'));
       return await readResponse();
     }
 
     try {
-      // SMTP conversation
-      await readResponse(); // Read banner
+      // Read welcome banner
+      await readResponse();
+      
+      // Send EHLO to see server capabilities
       await sendCommand(`EHLO ${smtpHost}`);
-      await sendCommand(`AUTH LOGIN`);
+      
+      // Send STARTTLS command
+      await sendCommand('STARTTLS');
+      
+      // Upgrade connection to TLS
+      const tlsConn = await Deno.startTls(conn, { hostname: smtpHost });
+      currentConn = tlsConn;
+      
+      // Send EHLO again after TLS
+      await sendCommand(`EHLO ${smtpHost}`);
+      
+      // Authenticate
+      await sendCommand('AUTH LOGIN');
       await sendCommand(btoa(smtpUser));
       await sendCommand(btoa(smtpPass));
+      
+      // Send email
       await sendCommand(`MAIL FROM:<${fromEmail}>`);
       await sendCommand(`RCPT TO:<${to}>`);
       await sendCommand('DATA');
-      await tlsConn.write(encoder.encode(emailBody + '\r\n.\r\n'));
-      await readResponse();
-      await sendCommand('QUIT');
       
-      tlsConn.close();
+      // Send email content
+      const boundary = `----=_Part_${Date.now()}`;
+      const emailBody = [
+        `From: ${fromEmail}`,
+        `To: ${to}`,
+        `Subject: ${subject}`,
+        `MIME-Version: 1.0`,
+        `Content-Type: multipart/alternative; boundary="${boundary}"`,
+        ``,
+        `--${boundary}`,
+        `Content-Type: text/html; charset=UTF-8`,
+        `Content-Transfer-Encoding: 7bit`,
+        ``,
+        html,
+        ``,
+        `--${boundary}--`,
+        ``,
+        `.`
+      ].join('\r\n');
+      
+      await currentConn.write(encoder.encode(emailBody + '\r\n'));
+      await readResponse();
+      
+      // Close connection
+      await sendCommand('QUIT');
+      currentConn.close();
 
       console.log(`✅ Email sent successfully to ${to}`);
 
@@ -115,7 +135,9 @@ serve(async (req) => {
       );
 
     } catch (smtpError) {
-      tlsConn.close();
+      try {
+        currentConn.close();
+      } catch {}
       throw smtpError;
     }
 
