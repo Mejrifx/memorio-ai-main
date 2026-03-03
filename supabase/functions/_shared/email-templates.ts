@@ -92,7 +92,7 @@ export const directorInviteTemplate = (email: string, tempPassword: string, orgN
 </html>
 `;
 
-export const familyInviteTemplate = (name: string, deceasedName: string, magicLink: string, directorName: string) => `
+export const familyInviteTemplate = (name: string, deceasedName: string, email: string, tempPassword: string, directorName: string) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -133,6 +133,12 @@ export const familyInviteTemplate = (name: string, deceasedName: string, magicLi
       margin: 20px 0;
       text-align: center;
     }
+    .credentials {
+      background-color: #f4e8de;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+    }
     .button {
       display: inline-block;
       background-color: #32343a;
@@ -171,10 +177,16 @@ export const familyInviteTemplate = (name: string, deceasedName: string, magicLi
       
       <p>Take your time—each question helps us gently piece together a heartfelt memory. There's no rush.</p>
       
-      <p style="color: #6ca7d3; font-weight: bold;">🔒 This link is secure and only accessible to you. It will expire in 24 hours.</p>
+      <div class="credentials">
+        <p><strong>Your Login Credentials:</strong></p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Temporary Password:</strong> ${tempPassword}</p>
+      </div>
+      
+      <p style="color: #6ca7d3; font-weight: bold;">🔒 You'll be asked to change your password after first login for security.</p>
       
       <div style="text-align: center; margin-top: 30px;">
-        <a href="${magicLink}" class="button">Start Creating Tribute</a>
+        <a href="https://memorio.ai/family/login" class="button">Start Creating Tribute</a>
       </div>
     </div>
     
@@ -255,6 +267,192 @@ export const passwordResetTemplate = (resetLink: string) => `
     </div>
     
     <div class="footer">
+      <p>© 2025 Memorio. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+export const editorInviteTemplate = (email: string, tempPassword: string) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Dosis', Arial, sans-serif;
+      background-color: #f4e8de;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff3e9;
+      border: 3px solid #436481;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+    }
+    .header {
+      text-align: center;
+      color: #32343a;
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+    .content {
+      color: #32343a;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .credentials {
+      background-color: #f4e8de;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .button {
+      display: inline-block;
+      background-color: #32343a;
+      color: #f2eadd !important;
+      padding: 15px 30px;
+      border-radius: 60px;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .button:hover {
+      color: #6ca7d3 !important;
+      text-shadow: 0 3px 6px rgba(108, 167, 211, 0.24);
+    }
+    .footer {
+      text-align: center;
+      color: #33333373;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="header">Welcome to Memorio</h1>
+    <div class="content">
+      <p>You've been invited to join Memorio as a Video Editor.</p>
+      <p>As an Editor, you'll be able to create beautiful memorial tribute videos that honor the lives of those who have passed.</p>
+      
+      <div class="credentials">
+        <p><strong>Your Login Credentials:</strong></p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Temporary Password:</strong> ${tempPassword}</p>
+      </div>
+      
+      <p style="color: #6ca7d3; font-weight: bold;">🔒 Please login and change your password immediately for security.</p>
+      
+      <div style="text-align: center; margin-top: 30px;">
+        <a href="https://memorio.ai/editor/login" class="button">Login Now</a>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>If you didn't expect this invitation, please ignore this email.</p>
+      <p>© 2025 Memorio. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+export const qcInviteTemplate = (email: string, tempPassword: string) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Dosis', Arial, sans-serif;
+      background-color: #f4e8de;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff3e9;
+      border: 3px solid #436481;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+    }
+    .header {
+      text-align: center;
+      color: #32343a;
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+    .content {
+      color: #32343a;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .credentials {
+      background-color: #f4e8de;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .button {
+      display: inline-block;
+      background-color: #32343a;
+      color: #f2eadd !important;
+      padding: 15px 30px;
+      border-radius: 60px;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .button:hover {
+      color: #6ca7d3 !important;
+      text-shadow: 0 3px 6px rgba(108, 167, 211, 0.24);
+    }
+    .footer {
+      text-align: center;
+      color: #33333373;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="header">Welcome to Memorio</h1>
+    <div class="content">
+      <p>You've been invited to join Memorio as a Quality Control Reviewer.</p>
+      <p>As a QC Reviewer, you'll ensure that every memorial tribute video meets our high standards before delivery to families.</p>
+      
+      <div class="credentials">
+        <p><strong>Your Login Credentials:</strong></p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Temporary Password:</strong> ${tempPassword}</p>
+      </div>
+      
+      <p style="color: #6ca7d3; font-weight: bold;">🔒 Please login and change your password immediately for security.</p>
+      
+      <div style="text-align: center; margin-top: 30px;">
+        <a href="https://memorio.ai/qc/login" class="button">Login Now</a>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>If you didn't expect this invitation, please ignore this email.</p>
       <p>© 2025 Memorio. All rights reserved.</p>
     </div>
   </div>

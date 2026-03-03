@@ -4,6 +4,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, verifyAuth, generatePassword } from '../_shared/supabase-client.ts';
 import { directorInviteTemplate } from '../_shared/email-templates.ts';
+import { sendEmail } from '../_shared/email-sender.ts';
 import type { InviteDirectorRequest, ApiResponse } from '../_shared/types.ts';
 
 const corsHeaders = {
@@ -145,16 +146,27 @@ serve(async (req) => {
         }
       });
 
-    // Note: Email integration will be added later
-    // For now, credentials are returned in the response for the Admin to share manually
-    console.log(`Director invited: ${email} / ${tempPassword}`);
+    // Send email with credentials
+    const emailHtml = directorInviteTemplate(email, tempPassword, org.name);
+    const emailSent = await sendEmail(
+      email,
+      `Invitation to Manage ${org.name} on Memorio`,
+      emailHtml
+    );
+
+    if (!emailSent) {
+      console.warn(`⚠️ Email failed to send to ${email}, but user was created successfully`);
+    } else {
+      console.log(`✅ Invitation email sent to ${email}`);
+    }
 
     const response: ApiResponse = {
       success: true,
       data: {
         user_id: authData.user.id,
         temp_password: tempPassword,
-        email
+        email,
+        email_sent: emailSent
       },
       message: `Director invitation sent to ${email}`
     };
