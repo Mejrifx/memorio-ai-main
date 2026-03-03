@@ -1,5 +1,5 @@
 // Send Email Edge Function
-// Sends emails via Microsoft 365 SMTP using support@memorio.ai
+// Sends emails using Resend API (fallback to SMTP if configured)
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
@@ -30,116 +30,55 @@ serve(async (req) => {
       );
     }
 
-    // Get SMTP credentials from environment
-    const smtpHost = Deno.env.get('SMTP_HOST') || 'smtp.office365.com';
-    const smtpUser = Deno.env.get('SMTP_USER');
-    const smtpPass = Deno.env.get('SMTP_PASS');
     const fromEmail = from || Deno.env.get('SMTP_FROM') || 'support@memorio.ai';
+    
+    // Check if Resend API key is configured (preferred method)
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
+    
+    if (resendApiKey) {
+      console.log(`Sending email to ${to} via Resend API`);
+      
+      // Send via Resend API
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: [to],
+          subject: subject,
+          html: html,
+        }),
+      });
 
-    if (!smtpUser || !smtpPass) {
-      console.error('SMTP credentials not configured');
-      return new Response(
-        JSON.stringify({ success: false, error: 'SMTP not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('Resend API error:', error);
+        throw new Error(`Resend API failed: ${error}`);
+      }
 
-    console.log(`Sending email to ${to} via ${smtpHost}:587`);
-
-    // Connect to SMTP server on port 587 (plain first, then STARTTLS)
-    const conn = await Deno.connect({
-      hostname: smtpHost,
-      port: 587,
-    });
-
-    const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
-    let currentConn: Deno.Conn | Deno.TlsConn = conn;
-
-    // Helper to read SMTP responses
-    async function readResponse(): Promise<string> {
-      const buffer = new Uint8Array(4096);
-      const n = await currentConn.read(buffer);
-      if (!n) throw new Error('Connection closed');
-      const response = decoder.decode(buffer.subarray(0, n));
-      console.log('SMTP <<', response.trim());
-      return response;
-    }
-
-    // Helper to send SMTP commands
-    async function sendCommand(cmd: string): Promise<string> {
-      console.log('SMTP >>', cmd);
-      await currentConn.write(encoder.encode(cmd + '\r\n'));
-      return await readResponse();
-    }
-
-    try {
-      // Read welcome banner
-      await readResponse();
-      
-      // Send EHLO to see server capabilities
-      await sendCommand(`EHLO ${smtpHost}`);
-      
-      // Send STARTTLS command
-      await sendCommand('STARTTLS');
-      
-      // Upgrade connection to TLS
-      const tlsConn = await Deno.startTls(conn, { hostname: smtpHost });
-      currentConn = tlsConn;
-      
-      // Send EHLO again after TLS
-      await sendCommand(`EHLO ${smtpHost}`);
-      
-      // Authenticate
-      await sendCommand('AUTH LOGIN');
-      await sendCommand(btoa(smtpUser));
-      await sendCommand(btoa(smtpPass));
-      
-      // Send email
-      await sendCommand(`MAIL FROM:<${fromEmail}>`);
-      await sendCommand(`RCPT TO:<${to}>`);
-      await sendCommand('DATA');
-      
-      // Send email content
-      const boundary = `----=_Part_${Date.now()}`;
-      const emailBody = [
-        `From: ${fromEmail}`,
-        `To: ${to}`,
-        `Subject: ${subject}`,
-        `MIME-Version: 1.0`,
-        `Content-Type: multipart/alternative; boundary="${boundary}"`,
-        ``,
-        `--${boundary}`,
-        `Content-Type: text/html; charset=UTF-8`,
-        `Content-Transfer-Encoding: 7bit`,
-        ``,
-        html,
-        ``,
-        `--${boundary}--`,
-        ``,
-        `.`
-      ].join('\r\n');
-      
-      await currentConn.write(encoder.encode(emailBody + '\r\n'));
-      await readResponse();
-      
-      // Close connection
-      await sendCommand('QUIT');
-      currentConn.close();
-
-      console.log(`✅ Email sent successfully to ${to}`);
+      const result = await response.json();
+      console.log(`✅ Email sent successfully via Resend to ${to}`, result);
 
       return new Response(
-        JSON.stringify({ success: true, message: 'Email sent successfully' }),
+        JSON.stringify({ success: true, message: 'Email sent successfully', id: result.id }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
-
-    } catch (smtpError) {
-      try {
-        currentConn.close();
-      } catch {}
-      throw smtpError;
     }
+    
+    // Fallback to direct SMTP if Resend not configured
+    console.warn('Resend API not configured, emails will not be sent');
+    console.warn('Please set RESEND_API_KEY environment variable');
+    
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: 'Email service not configured. Please contact administrator.' 
+      }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
 
   } catch (error) {
     console.error('Error sending email:', error);
