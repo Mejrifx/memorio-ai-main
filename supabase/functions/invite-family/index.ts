@@ -4,6 +4,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, verifyAuth, generatePassword } from '../_shared/supabase-client.ts';
 import { familyInviteTemplate } from '../_shared/email-templates.ts';
+import { sendEmail } from '../_shared/email-sender.ts';
 import type { InviteFamilyRequest, ApiResponse } from '../_shared/types.ts';
 
 const corsHeaders = {
@@ -187,10 +188,20 @@ serve(async (req) => {
         }
       });
 
-    // Note: Email integration will be added later
-    // For now, credentials are returned in the response for the Director to share manually
-    console.log(`Family invited: ${email} for case ${case_id}`);
-    console.log(`Password: ${tempPassword}`);
+    // Send email with credentials
+    const directorName = userData.metadata?.name || userData.metadata?.full_name || 'Your Funeral Director';
+    const emailHtml = familyInviteTemplate(name, caseData.deceased_name, email, tempPassword, directorName);
+    const emailSent = await sendEmail(
+      email,
+      `Invitation to Create Memorial Tribute for ${caseData.deceased_name}`,
+      emailHtml
+    );
+
+    if (!emailSent) {
+      console.warn(`⚠️ Email failed to send to ${email}, but user was created successfully`);
+    } else {
+      console.log(`✅ Invitation email sent to ${email}`);
+    }
 
     const response: ApiResponse = {
       success: true,
@@ -198,7 +209,8 @@ serve(async (req) => {
         user_id: authData.user.id,
         temp_password: tempPassword,
         email,
-        case_id
+        case_id,
+        email_sent: emailSent
       },
       message: `Family invitation sent to ${email}`
     };

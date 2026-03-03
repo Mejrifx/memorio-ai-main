@@ -3,6 +3,8 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createSupabaseClient, verifyAuth, generatePassword } from '../_shared/supabase-client.ts';
+import { qcInviteTemplate } from '../_shared/email-templates.ts';
+import { sendEmail } from '../_shared/email-sender.ts';
 import type { ApiResponse, InviteQCRequest } from '../_shared/types.ts';
 
 const corsHeaders = {
@@ -125,16 +127,27 @@ serve(async (req) => {
         }
       });
 
-    // Note: Email integration will be added later
-    // For now, credentials are returned in the response for the Admin to share manually
-    console.log(`Global QC user invited: ${email} / ${tempPassword}`);
+    // Send email with credentials
+    const emailHtml = qcInviteTemplate(email, tempPassword);
+    const emailSent = await sendEmail(
+      email,
+      'Invitation to Join Memorio as Quality Control Reviewer',
+      emailHtml
+    );
+
+    if (!emailSent) {
+      console.warn(`⚠️ Email failed to send to ${email}, but user was created successfully`);
+    } else {
+      console.log(`✅ Invitation email sent to ${email}`);
+    }
 
     const response: ApiResponse = {
       success: true,
       data: {
         user_id: authData.user.id,
         temp_password: tempPassword,
-        email
+        email,
+        email_sent: emailSent
       },
       message: `QC user invitation sent to ${email} (Global Access)`
     };
