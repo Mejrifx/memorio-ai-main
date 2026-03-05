@@ -392,6 +392,9 @@
     
     .video-section {
       margin-bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     
     .section-title {
@@ -399,6 +402,8 @@
       font-weight: 600;
       color: #32343a;
       margin-bottom: 10px;
+      width: 100%;
+      text-align: center;
     }
     
     .video-player {
@@ -469,6 +474,7 @@
     .qc-feedback-section {
       margin-top: 20px;
       margin-bottom: 0;
+      padding-bottom: 24px;
     }
     
     .qc-textarea {
@@ -495,6 +501,7 @@
       display: flex;
       gap: 12px;
       margin-top: 16px;
+      padding-bottom: 8px;
     }
     
     .btn {
@@ -1290,7 +1297,7 @@
               <source src="${submission.video_url}" type="${submission.mime_type}">
               Your browser does not support the video tag.
             </video>
-            <p style="margin-top: 6px; font-size: 12px; color: rgba(50, 52, 58, 0.6);">
+            <p style="margin-top: 6px; font-size: 12px; color: rgba(50, 52, 58, 0.6); text-align: center; width: 100%;">
               Duration: ${formatDuration(submission.duration_seconds)} | 
               Size: ${formatFileSize(submission.file_size_bytes)}
             </p>
