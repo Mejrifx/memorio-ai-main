@@ -1296,11 +1296,13 @@
           <!-- LEFT COLUMN: Video -->
           <div class="video-section">
             <h3 class="section-title">Memorial Video</h3>
-            <video class="video-player" controls>
-              <source src="${submission.video_url}" type="${submission.mime_type}">
-              Your browser does not support the video tag.
-            </video>
-            <p style="margin-top: 6px; font-size: 12px; color: rgba(50, 52, 58, 0.6); text-align: center; width: 100%;">
+            <div style="display: flex; justify-content: center; width: 100%;">
+              <video class="video-player" controls>
+                <source src="${submission.video_url}" type="${submission.mime_type}">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <p style="margin-top: 6px; font-size: 12px; color: rgba(50, 52, 58, 0.6); text-align: center;">
               Duration: ${formatDuration(submission.duration_seconds)} | 
               Size: ${formatFileSize(submission.file_size_bytes)}
             </p>
