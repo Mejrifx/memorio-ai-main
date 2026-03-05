@@ -63,7 +63,8 @@ const i18n = {
       'website.nav.services': 'Services',
       'website.nav.familyLogin': 'Family Login',
       'website.hero.title': 'A Beautiful Way To Remember Someone You Love',
-      'website.hero.subtitle': 'When words are hard and time is short, Memorio helps families and funeral homes create meaningful video tributes and obituaries with care, dignity, and professional support.\n\nFamilies receive a simple guided experience.\nFuneral homes receive finished memorial assets within 48 hours.',
+      'website.hero.subtitle1': 'When words are hard and time is short, Memorio helps families and funeral homes create meaningful video tributes and obituaries with care, dignity, and professional support.',
+      'website.hero.subtitle2': 'Families receive a simple guided experience. Funeral homes receive finished memorial assets within 48 hours.',
       'website.hero.getStarted': 'Start Your Tribute',
       'website.hero.learnMore': 'For Funeral Homes →',
       
@@ -661,7 +662,8 @@ const i18n = {
       'website.nav.services': 'Servicios',
       'website.nav.familyLogin': 'Acceso Familiar',
       'website.hero.title': 'Una Hermosa Forma de Recordar a Alguien que Amas',
-      'website.hero.subtitle': 'Cuando las palabras son difíciles y el tiempo es corto, Memorio ayuda a las familias y funerarias a crear tributos en video significativos y obituarios con cuidado, dignidad y apoyo profesional.\n\nLas familias reciben una experiencia guiada simple.\nLas funerarias reciben los activos memoriales terminados en 48 horas.',
+      'website.hero.subtitle1': 'Cuando las palabras son difíciles y el tiempo es corto, Memorio ayuda a las familias y funerarias a crear tributos en video significativos y obituarios con cuidado, dignidad y apoyo profesional.',
+      'website.hero.subtitle2': 'Las familias reciben una experiencia guiada simple. Las funerarias reciben los activos memoriales terminados en 48 horas.',
       'website.hero.getStarted': 'Comience Su Tributo',
       'website.hero.learnMore': 'Para Funerarias →',
       

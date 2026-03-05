@@ -306,6 +306,13 @@
       transform: translateX(-50px);
       animation: slideInFromLeft 0.8s ease forwards 0.8s;
     }
+    .hero-subtitle p {
+      margin: 0;
+      font-size: inherit;
+      color: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+    }
     
     @keyframes slideInFromLeft {
       to {
@@ -1298,9 +1305,14 @@
   <section class="hero" id="home">
     <div class="hero-content">
       <h1 class="hero-title" data-i18n="website.hero.title">A Beautiful Way To Remember Someone You Love</h1>
-      <p class="hero-subtitle" data-i18n="website.hero.subtitle">
-        When words are hard and time is short, Memorio helps families and funeral homes create meaningful video tributes and obituaries with care, dignity, and guidance every step of the way.
-      </p>
+      <div class="hero-subtitle">
+        <p data-i18n="website.hero.subtitle1">
+          When words are hard and time is short, Memorio helps families and funeral homes create meaningful video tributes and obituaries with care, dignity, and professional support.
+        </p>
+        <p data-i18n="website.hero.subtitle2" style="margin-top: 20px;">
+          Families receive a simple guided experience. Funeral homes receive finished memorial assets within 48 hours.
+        </p>
+      </div>
       <div class="hero-buttons">
         <button class="btn-primary" id="heroLoginBtn" data-i18n="website.hero.getStarted">Start Your Tribute</button>
         <a href="services.html" class="btn-secondary" data-i18n="website.hero.learnMore">For Funeral Homes →</a>
