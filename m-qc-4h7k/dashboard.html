@@ -382,10 +382,10 @@
       color: rgba(50, 52, 58, 0.6);
     }
     
-    /* Two-column layout for video and content */
+    /* Two-column layout for obituary and notes (video is now full-width above) */
     .review-content-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 24px;
       margin-bottom: 20px;
     }
@@ -398,6 +398,39 @@
       justify-content: flex-start;
       text-align: center;
       width: 100%;
+    }
+    
+    /* Video section: full-width block directly under cooldown banner, centered */
+    .video-section-standalone {
+      width: 100%;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    
+    .video-section-standalone .section-title {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    
+    .video-section-standalone .video-wrapper {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    
+    .video-section-standalone .video-player {
+      width: auto !important;
+      max-width: 100%;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      display: block !important;
+    }
+    
+    .video-meta {
+      font-size: 12px;
+      color: rgba(50, 52, 58, 0.6);
+      margin: 0;
+      text-align: center;
     }
     
     /* Wrapper to center video within its column - same approach as cooldown banner */
@@ -1300,23 +1333,20 @@
           </div>
         ` : ''}
         
-        <div class="review-content-grid">
-          <!-- LEFT COLUMN: Video - centered like cooldown banner -->
-          <div class="video-section">
-            <h3 class="section-title">Memorial Video</h3>
-            <div class="video-wrapper">
-              <video class="video-player" controls>
-                <source src="${submission.video_url}" type="${submission.mime_type}">
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <p style="margin-top: 6px; font-size: 12px; color: rgba(50, 52, 58, 0.6); text-align: center;">
-              Duration: ${formatDuration(submission.duration_seconds)} | 
-              Size: ${formatFileSize(submission.file_size_bytes)}
-            </p>
+        <!-- Video: Full-width section directly under cooldown, centered like the banner -->
+        <div class="video-section-standalone">
+          <h3 class="section-title">Memorial Video</h3>
+          <div class="video-wrapper">
+            <video class="video-player" controls>
+              <source src="${submission.video_url}" type="${submission.mime_type}">
+              Your browser does not support the video tag.
+            </video>
           </div>
-          
-          <!-- RIGHT COLUMN: Obituary and Notes -->
+          <p class="video-meta">Duration: ${formatDuration(submission.duration_seconds)} | Size: ${formatFileSize(submission.file_size_bytes)}</p>
+        </div>
+        
+        <div class="review-content-grid">
+          <!-- Obituary and Notes -->
           <div>
             ${obituary ? `
               <div class="obituary-section">
