@@ -388,8 +388,6 @@
       grid-template-columns: 1fr 1fr;
       gap: 24px;
       margin-bottom: 20px;
-      align-items: start;
-      justify-items: center;
     }
     
     .video-section {
@@ -399,6 +397,7 @@
       align-items: center;
       justify-content: flex-start;
       text-align: center;
+      width: 100%;
     }
     
     .section-title {
@@ -412,14 +411,13 @@
     
     .video-player {
       width: auto;
-      max-width: 90%;
+      max-width: 100%;
       height: auto;
       max-height: 320px;
       border-radius: 8px;
       border: 2px solid #436481;
       background-color: black;
       object-fit: contain;
-      display: inline-block;
     }
     
     .editor-notes {
@@ -1296,7 +1294,7 @@
         
         <div class="review-content-grid">
           <!-- LEFT COLUMN: Video -->
-          <div class="video-section" style="width: 100%; margin-left: 30px;">
+          <div class="video-section">
             <h3 class="section-title">Memorial Video</h3>
             <video class="video-player" controls>
               <source src="${submission.video_url}" type="${submission.mime_type}">
