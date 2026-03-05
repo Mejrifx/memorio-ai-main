@@ -1260,6 +1260,25 @@
     }
     .lang-toggle svg { opacity: 0.55; flex-shrink: 0; }
     .lang-toggle:hover svg { opacity: 0.85; }
+    
+    /* Mission Section Cards */
+    .mission-card {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      border: 2px solid #e8dfd2;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .mission-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 768px) {
+      .mission-card {
+        padding: 30px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1330,13 +1349,44 @@
        MISSION SECTION
        ============================================================================ -->
   <section class="mission" style="background-color: #f9f4ef; padding: 80px 20px;">
-    <div class="section-container" style="max-width: 800px; margin: 0 auto; text-align: center;">
-      <h2 class="section-title" data-i18n="website.mission.title" style="margin-bottom: 24px;">Why Memorio Exists</h2>
-      <p class="section-subtitle" data-i18n="website.mission.desc" style="font-size: 18px; line-height: 1.8; color: #32343a; white-space: pre-line;">
-        Funeral professionals should spend their time with families, not editing videos or formatting obituaries.
-
-        Memorio was built to remove memorial production from the funeral home workflow, allowing directors and staff to focus on care, guidance, and the families they serve.
-      </p>
+    <div class="section-container" style="max-width: 1200px; margin: 0 auto;">
+      <h2 class="section-title" data-i18n="website.mission.title" style="text-align: center; margin-bottom: 60px;">Why Memorio Exists</h2>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; max-width: 900px; margin: 0 auto;">
+        
+        <!-- Card 1: The Problem -->
+        <div class="mission-card">
+          <div style="display: flex; align-items: center; margin-bottom: 20px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #436481 0%, #6ca7d3 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h3 data-i18n="website.mission.problem" style="font-size: 22px; color: #32343a; margin: 0; font-weight: 600;">The Problem</h3>
+          </div>
+          <p data-i18n="website.mission.problemDesc" style="font-size: 16px; line-height: 1.7; color: #555; margin: 0;">
+            Funeral professionals spend valuable time editing videos and formatting obituaries instead of being with families.
+          </p>
+        </div>
+        
+        <!-- Card 2: Our Solution -->
+        <div class="mission-card">
+          <div style="display: flex; align-items: center; margin-bottom: 20px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #6ca7d3 0%, #8ec5e3 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <h3 data-i18n="website.mission.solution" style="font-size: 22px; color: #32343a; margin: 0; font-weight: 600;">Our Solution</h3>
+          </div>
+          <p data-i18n="website.mission.solutionDesc" style="font-size: 16px; line-height: 1.7; color: #555; margin: 0;">
+            Memorio removes memorial production from your workflow, allowing you to focus on care, guidance, and families.
+          </p>
+        </div>
+        
+      </div>
     </div>
   </section>
   

@@ -70,7 +70,10 @@ const i18n = {
       
       // Mission Section
       'website.mission.title': 'Why Memorio Exists',
-      'website.mission.desc': 'Funeral professionals should spend their time with families, not editing videos or formatting obituaries.\n\nMemorio was built to remove memorial production from the funeral home workflow, allowing directors and staff to focus on care, guidance, and the families they serve.',
+      'website.mission.problem': 'The Problem',
+      'website.mission.problemDesc': 'Funeral professionals spend valuable time editing videos and formatting obituaries instead of being with families.',
+      'website.mission.solution': 'Our Solution',
+      'website.mission.solutionDesc': 'Memorio removes memorial production from your workflow, allowing you to focus on care, guidance, and families.',
       
       'website.features.title': 'Everything You Need to Honor a Life',
       'website.features.subtitle': 'Memorio provides a complete solution for creating meaningful memorial tributes',
@@ -669,7 +672,10 @@ const i18n = {
       
       // Mission Section
       'website.mission.title': 'Por Qué Existe Memorio',
-      'website.mission.desc': 'Los profesionales funerarios deben pasar su tiempo con las familias, no editando videos o formateando obituarios.\n\nMemorio fue construido para eliminar la producción memorial del flujo de trabajo de la funeraria, permitiendo que los directores y el personal se concentren en el cuidado, la orientación y las familias a las que sirven.',
+      'website.mission.problem': 'El Problema',
+      'website.mission.problemDesc': 'Los profesionales funerarios pasan un tiempo valioso editando videos y formateando obituarios en lugar de estar con las familias.',
+      'website.mission.solution': 'Nuestra Solución',
+      'website.mission.solutionDesc': 'Memorio elimina la producción memorial de su flujo de trabajo, permitiéndole concentrarse en el cuidado, la orientación y las familias.',
       
       'website.features.title': 'Todo Lo Que Necesitas Para Honrar Una Vida',
       'website.features.subtitle': 'Memorio proporciona una solución completa para crear tributos conmemorativos significativos',
