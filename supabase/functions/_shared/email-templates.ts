@@ -22,6 +22,14 @@ export const directorInviteTemplate = (email: string, tempPassword: string, orgN
       padding: 40px;
       box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
     }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo img {
+      max-width: 180px;
+      height: auto;
+    }
     .header {
       text-align: center;
       color: #32343a;
@@ -66,6 +74,9 @@ export const directorInviteTemplate = (email: string, tempPassword: string, orgN
 </head>
 <body>
   <div class="container">
+    <div class="logo">
+      <img src="https://memorio.ai/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio Logo">
+    </div>
     <h1 class="header">Welcome to Memorio</h1>
     <div class="content">
       <p>You've been invited to manage funeral home cases for <strong>${orgName}</strong> on Memorio.</p>
@@ -85,14 +96,14 @@ export const directorInviteTemplate = (email: string, tempPassword: string, orgN
     
     <div class="footer">
       <p>If you didn't expect this invitation, please ignore this email.</p>
-      <p>© 2025 Memorio. All rights reserved.</p>
+      <p>© 2026 Memorio. All rights reserved.</p>
     </div>
   </div>
 </body>
 </html>
 `;
 
-export const familyInviteTemplate = (name: string, deceasedName: string, email: string, tempPassword: string, directorName: string) => `
+export const familyInviteTemplate = (name: string, deceasedName: string, email: string, tempPassword: string, funeralHomeName: string) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -113,6 +124,14 @@ export const familyInviteTemplate = (name: string, deceasedName: string, email: 
       border-radius: 20px;
       padding: 40px;
       box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo img {
+      max-width: 180px;
+      height: auto;
     }
     .header {
       text-align: center;
@@ -165,10 +184,13 @@ export const familyInviteTemplate = (name: string, deceasedName: string, email: 
 </head>
 <body>
   <div class="container">
+    <div class="logo">
+      <img src="https://memorio.ai/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio Logo">
+    </div>
     <h1 class="header">Memorial Tribute Invitation</h1>
     <div class="content">
       <p>Dear ${name},</p>
-      <p>You've been invited by ${directorName} to create a meaningful tribute for <strong>${deceasedName}</strong>.</p>
+      <p>You've been invited by <strong>${funeralHomeName}</strong> to create a meaningful tribute for <strong>${deceasedName}</strong>.</p>
       
       <div class="highlight">
         <p style="font-size: 18px; font-weight: 600; margin: 0;">Create a Tribute for</p>
@@ -191,8 +213,8 @@ export const familyInviteTemplate = (name: string, deceasedName: string, email: 
     </div>
     
     <div class="footer">
-      <p>If you didn't expect this invitation, please contact ${directorName}.</p>
-      <p>© 2025 Memorio. All rights reserved.</p>
+      <p>If you didn't expect this invitation, please contact <strong>${funeralHomeName}</strong>.</p>
+      <p>© 2026 Memorio. All rights reserved.</p>
     </div>
   </div>
 </body>
@@ -221,6 +243,14 @@ export const passwordResetTemplate = (resetLink: string) => `
       padding: 40px;
       box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
     }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo img {
+      max-width: 180px;
+      height: auto;
+    }
     .header {
       text-align: center;
       color: #32343a;
@@ -254,6 +284,9 @@ export const passwordResetTemplate = (resetLink: string) => `
 </head>
 <body>
   <div class="container">
+    <div class="logo">
+      <img src="https://memorio.ai/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio Logo">
+    </div>
     <h1 class="header">Reset Your Password</h1>
     <div class="content">
       <p>You've requested to reset your Memorio password.</p>
@@ -267,7 +300,7 @@ export const passwordResetTemplate = (resetLink: string) => `
     </div>
     
     <div class="footer">
-      <p>© 2025 Memorio. All rights reserved.</p>
+      <p>© 2026 Memorio. All rights reserved.</p>
     </div>
   </div>
 </body>
@@ -296,6 +329,14 @@ export const editorInviteTemplate = (email: string, tempPassword: string) => `
       padding: 40px;
       box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
     }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo img {
+      max-width: 180px;
+      height: auto;
+    }
     .header {
       text-align: center;
       color: #32343a;
@@ -340,6 +381,9 @@ export const editorInviteTemplate = (email: string, tempPassword: string) => `
 </head>
 <body>
   <div class="container">
+    <div class="logo">
+      <img src="https://memorio.ai/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio Logo">
+    </div>
     <h1 class="header">Welcome to Memorio</h1>
     <div class="content">
       <p>You've been invited to join Memorio as a Video Editor.</p>
@@ -360,7 +404,7 @@ export const editorInviteTemplate = (email: string, tempPassword: string) => `
     
     <div class="footer">
       <p>If you didn't expect this invitation, please ignore this email.</p>
-      <p>© 2025 Memorio. All rights reserved.</p>
+      <p>© 2026 Memorio. All rights reserved.</p>
     </div>
   </div>
 </body>
@@ -389,6 +433,14 @@ export const qcInviteTemplate = (email: string, tempPassword: string) => `
       padding: 40px;
       box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
     }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo img {
+      max-width: 180px;
+      height: auto;
+    }
     .header {
       text-align: center;
       color: #32343a;
@@ -433,6 +485,9 @@ export const qcInviteTemplate = (email: string, tempPassword: string) => `
 </head>
 <body>
   <div class="container">
+    <div class="logo">
+      <img src="https://memorio.ai/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio Logo">
+    </div>
     <h1 class="header">Welcome to Memorio</h1>
     <div class="content">
       <p>You've been invited to join Memorio as a Quality Control Reviewer.</p>
@@ -453,7 +508,7 @@ export const qcInviteTemplate = (email: string, tempPassword: string) => `
     
     <div class="footer">
       <p>If you didn't expect this invitation, please ignore this email.</p>
-      <p>© 2025 Memorio. All rights reserved.</p>
+      <p>© 2026 Memorio. All rights reserved.</p>
     </div>
   </div>
 </body>
