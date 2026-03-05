@@ -13,6 +13,9 @@ const i18n = {
   // Current language (default: English)
   currentLang: 'en',
   
+  // Flag to track if i18n has been initialized
+  _initialized: false,
+  
   // Translation dictionary
   translations: {
     en: {
@@ -43,9 +46,19 @@ const i18n = {
       'common.loginFailed': 'Failed to sign in. Please check your credentials.',
       'common.unexpectedError': 'An unexpected error occurred. Please try again.',
       
+      // Navigation (shared across pages)
+      'nav.home': 'Home',
+      'nav.features': 'Features',
+      'nav.howItWorks': 'How It Works',
+      'nav.benefits': 'Benefits',
+      'nav.faq': 'FAQ',
+      'nav.services': 'Services',
+      'nav.familyLogin': 'Family Login',
+      
       // Main Website
       'website.nav.features': 'Features',
       'website.nav.howItWorks': 'How It Works',
+      'website.nav.benefits': 'Benefits',
       'website.nav.faq': 'FAQ',
       'website.nav.services': 'Services',
       'website.nav.familyLogin': 'Family Login',
@@ -624,9 +637,19 @@ const i18n = {
       'common.loginFailed': 'Error al iniciar sesión. Por favor, verifique sus credenciales.',
       'common.unexpectedError': 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.',
       
+      // Navigation (shared across pages)
+      'nav.home': 'Inicio',
+      'nav.features': 'Características',
+      'nav.howItWorks': 'Cómo Funciona',
+      'nav.benefits': 'Beneficios',
+      'nav.faq': 'Preguntas Frecuentes',
+      'nav.services': 'Servicios',
+      'nav.familyLogin': 'Acceso Familiar',
+      
       // Main Website
       'website.nav.features': 'Características',
       'website.nav.howItWorks': 'Cómo Funciona',
+      'website.nav.benefits': 'Beneficios',
       'website.nav.faq': 'Preguntas Frecuentes',
       'website.nav.services': 'Servicios',
       'website.nav.familyLogin': 'Acceso Familiar',
@@ -1184,19 +1207,57 @@ const i18n = {
    * - Sets up language toggle if it exists
    */
   init() {
+    // Prevent double initialization
+    if (i18n._initialized) {
+      console.warn('i18n already initialized');
+      return;
+    }
+    
     // Load saved language preference
     const savedLang = localStorage.getItem('memorio_language') || 'en';
     i18n.setLanguage(savedLang);
     
     // Set up legacy toggle buttons
     i18n.setupToggle();
+    
+    // Mark as initialized
+    i18n._initialized = true;
   },
   
   /**
    * Get translation for a key
    */
   t(key, fallback = key) {
+    // Auto-initialize if not yet initialized
+    if (!i18n._initialized) {
+      console.warn('i18n.t() called before init(), auto-initializing...');
+      const savedLang = localStorage.getItem('memorio_language') || 'en';
+      i18n.currentLang = savedLang;
+    }
+    
+    // Ensure currentLang is always valid
+    if (!i18n.currentLang || !i18n.translations[i18n.currentLang]) {
+      console.warn('Invalid currentLang detected, resetting to localStorage or en');
+      i18n.currentLang = localStorage.getItem('memorio_language') || 'en';
+    }
+    
+    // Get translation, with fallback chain
     const translation = i18n.translations[i18n.currentLang]?.[key];
+    
+    // If translation not found in current language, try English as fallback
+    if (!translation && i18n.currentLang !== 'en') {
+      const englishTranslation = i18n.translations['en']?.[key];
+      if (englishTranslation) {
+        console.warn(`Translation missing for key '${key}' in '${i18n.currentLang}', using English fallback`);
+        return englishTranslation;
+      }
+    }
+    
+    // If still no translation, return fallback (default is the key itself)
+    if (!translation) {
+      console.warn(`Translation missing for key '${key}' in all languages`);
+    }
+    
     return translation || fallback;
   },
   
@@ -1312,3 +1373,15 @@ if (document.readyState === 'loading') {
 } else {
   i18n.init();
 }
+
+// Add global error handler to catch translation issues
+window.addEventListener('error', (event) => {
+  if (event.message && event.message.includes('i18n')) {
+    console.error('i18n error detected:', event);
+    console.error('Current i18n state:', {
+      currentLang: i18n.currentLang,
+      initialized: i18n._initialized,
+      localStorage: localStorage.getItem('memorio_language')
+    });
+  }
+});

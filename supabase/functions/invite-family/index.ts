@@ -45,6 +45,15 @@ serve(async (req) => {
       );
     }
 
+    // Fetch organization name for email template
+    const { data: orgData, error: orgError } = await supabase
+      .from('organizations')
+      .select('name')
+      .eq('id', userData.org_id)
+      .single();
+
+    const funeralHomeName = orgData?.name || 'Your Funeral Home';
+
     // Parse request body
     const body: InviteFamilyRequest = await req.json();
     const { email, name, case_id, phone } = body;
@@ -189,8 +198,7 @@ serve(async (req) => {
       });
 
     // Send email with credentials
-    const directorName = userData.metadata?.name || userData.metadata?.full_name || 'Your Funeral Director';
-    const emailHtml = familyInviteTemplate(name, caseData.deceased_name, email, tempPassword, directorName);
+    const emailHtml = familyInviteTemplate(name, caseData.deceased_name, email, tempPassword, funeralHomeName);
     const emailSent = await sendEmail(
       email,
       `Invitation to Create Memorial Tribute for ${caseData.deceased_name}`,
