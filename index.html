@@ -1261,15 +1261,93 @@
     .lang-toggle svg { opacity: 0.55; flex-shrink: 0; }
     .lang-toggle:hover svg { opacity: 0.85; }
     
-    /* Mission Section - Apple-style Minimal */
-    .mission-card-minimal {
+    /* Mission Section - Clean 3D Cards */
+    .mission-points-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+      perspective: 1200px;
+    }
+    @media (max-width: 900px) {
+      .mission-points-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .mission-point-card {
       opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(40px) scale(0.96);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.4s ease;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(67, 100, 129, 0.12);
+      border-radius: 20px;
+      padding: 36px 32px;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(67, 100, 129, 0.06),
+                  0 1px 3px rgba(0, 0, 0, 0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    .mission-point-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #436481, #6ca7d3);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .mission-point-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 20px 48px rgba(67, 100, 129, 0.12),
+                  0 8px 16px rgba(0, 0, 0, 0.06);
+      border-color: rgba(67, 100, 129, 0.2);
+    }
+    .mission-point-card:hover::before {
+      opacity: 1;
+    }
+    .mission-point-number {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 24px;
+      background: linear-gradient(145deg, #436481 0%, #5a7d9a 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: white;
+      box-shadow: 0 8px 24px rgba(67, 100, 129, 0.25),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      letter-spacing: -0.5px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .mission-point-card:hover .mission-point-number {
+      transform: scale(1.08);
+      box-shadow: 0 12px 32px rgba(67, 100, 129, 0.3),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+    .mission-point-text {
+      font-size: 16px;
+      line-height: 1.75;
+      color: #32343a;
+      margin: 0;
+      font-weight: 500;
     }
     @media (max-width: 768px) {
       .mission {
         padding: 80px 20px !important;
+      }
+      .mission-point-card {
+        padding: 28px 24px;
       }
     }
   </style>
@@ -1351,28 +1429,28 @@
         <div style="width: 60px; height: 2px; background: linear-gradient(90deg, transparent, #436481, transparent); margin: 16px auto 0;"></div>
       </div>
       
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 48px; max-width: 1000px; margin: 0 auto;">
+      <div class="mission-points-grid">
         
         <!-- Point 1 -->
-        <div class="mission-card-minimal" data-mission-animate style="text-align: center;">
-          <div style="width: 48px; height: 48px; background: rgba(67, 100, 129, 0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 20px; font-weight: 700; color: #436481;">1</div>
-          <p data-i18n="website.mission.point1" style="font-size: 17px; line-height: 1.7; color: #32343a; margin: 0; font-weight: 500;">
+        <div class="mission-point-card" data-mission-animate data-mission-delay="0">
+          <div class="mission-point-number">1</div>
+          <p class="mission-point-text" data-i18n="website.mission.point1">
             When someone passes away, families deserve guidance, care, and presence from the people helping them through the process.
           </p>
         </div>
         
         <!-- Point 2 -->
-        <div class="mission-card-minimal" data-mission-animate style="animation-delay: 0.1s; text-align: center;">
-          <div style="width: 48px; height: 48px; background: rgba(67, 100, 129, 0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 20px; font-weight: 700; color: #436481;">2</div>
-          <p data-i18n="website.mission.point2" style="font-size: 17px; line-height: 1.7; color: #32343a; margin: 0; font-weight: 500;">
+        <div class="mission-point-card" data-mission-animate data-mission-delay="1">
+          <div class="mission-point-number">2</div>
+          <p class="mission-point-text" data-i18n="website.mission.point2">
             Funeral professionals should be able to focus on supporting families, not assembling tribute videos or formatting obituaries.
           </p>
         </div>
         
         <!-- Point 3 -->
-        <div class="mission-card-minimal" data-mission-animate style="animation-delay: 0.2s; text-align: center;">
-          <div style="width: 48px; height: 48px; background: rgba(67, 100, 129, 0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 20px; font-weight: 700; color: #436481;">3</div>
-          <p data-i18n="website.mission.point3" style="font-size: 17px; line-height: 1.7; color: #32343a; margin: 0; font-weight: 500;">
+        <div class="mission-point-card" data-mission-animate data-mission-delay="2">
+          <div class="mission-point-number">3</div>
+          <p class="mission-point-text" data-i18n="website.mission.point3">
             Memorio exists to handle memorial production behind the scenes so families receive meaningful tributes while funeral professionals stay focused on care and support.
           </p>
         </div>
@@ -1392,16 +1470,17 @@
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
+          entry.target.style.transform = 'translateY(0) scale(1)';
         }
       });
     }, observerOptions);
     
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('[data-mission-animate]').forEach(card => {
+        const delay = parseInt(card.getAttribute('data-mission-delay') || '0', 10) * 120;
         card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        card.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+        card.style.transform = 'translateY(40px) scale(0.96)';
+        card.style.transition = `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`;
         missionObserver.observe(card);
       });
       
