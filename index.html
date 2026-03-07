@@ -1459,6 +1459,38 @@
     </div>
   </section>
   
+  <script>
+    // Scroll Animation for Mission Cards
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    const missionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0) scale(1)';
+        }
+      });
+    }, observerOptions);
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-mission-animate]').forEach(card => {
+        const delay = parseInt(card.getAttribute('data-mission-delay') || '0', 10) * 120;
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(40px) scale(0.96)';
+        card.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ' + delay + 'ms, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ' + delay + 'ms';
+        missionObserver.observe(card);
+      });
+      const header = document.querySelector('.mission-header');
+      if (header) {
+        header.style.opacity = '0';
+        header.style.transform = 'translateY(20px)';
+        header.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        missionObserver.observe(header);
+      }
+    });
+  </script>
+  
   <!-- ============================================================================
        FEATURES SECTION
        ============================================================================ -->
@@ -1760,11 +1792,6 @@
   <!-- Supabase Client for Authentication -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- GSAP + ScrollTrigger for scroll animations -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="js/animations.js"></script>
-  
   <!-- ============================================================================
        JAVASCRIPT v2.0 - CACHE BUSTED
        ============================================================================ -->
