@@ -69,11 +69,10 @@ const i18n = {
       'website.hero.learnMore': 'For Funeral Homes →',
       
       // Mission Section
-      'website.mission.title': 'Why Memorio Exists',
-      'website.mission.problem': 'The Problem',
-      'website.mission.problemDesc': 'Funeral professionals spend valuable time editing videos and formatting obituaries instead of being with families.',
-      'website.mission.solution': 'Our Solution',
-      'website.mission.solutionDesc': 'Memorio removes memorial production from your workflow, allowing you to focus on care, guidance, and families.',
+      'website.mission.title': 'Why we built Memorio',
+      'website.mission.point1': 'When someone passes away, families deserve guidance, care, and presence from the people helping them through the process.',
+      'website.mission.point2': 'Funeral professionals should be able to focus on supporting families, not assembling tribute videos or formatting obituaries.',
+      'website.mission.point3': 'Memorio exists to handle memorial production behind the scenes so families receive meaningful tributes while funeral professionals stay focused on care and support.',
       
       'website.features.title': 'Everything You Need to Honor a Life',
       'website.features.subtitle': 'Memorio provides a complete solution for creating meaningful memorial tributes',
@@ -85,7 +84,7 @@ const i18n = {
       'website.howItWorks.step1Desc': 'Families answer guided questions and upload photos through a secure portal.',
       'website.howItWorks.step2': 'Memorio Produces the Tribute',
       'website.howItWorks.step2Desc': 'Memorio generates the obituary using advanced AI and assembles the tribute video with music, pacing, and professional editing. Each tribute is reviewed to ensure quality before delivery.',
-      'website.howItWorks.step3': 'Delivered to Family and Funeral Home',
+      'website.howItWorks.step3': 'Delivery',
       'website.howItWorks.step3Desc': 'Once approved, the final obituary and tribute video are delivered simultaneously to both the family and the funeral home within 48 hours of submission, ready for services or online sharing.',
       'website.faq.title': 'Frequently Asked Questions',
       'website.faq.subtitle': 'Everything you need to know about using Memorio.',
@@ -671,11 +670,10 @@ const i18n = {
       'website.hero.learnMore': 'Para Funerarias →',
       
       // Mission Section
-      'website.mission.title': 'Por Qué Existe Memorio',
-      'website.mission.problem': 'El Problema',
-      'website.mission.problemDesc': 'Los profesionales funerarios pasan un tiempo valioso editando videos y formateando obituarios en lugar de estar con las familias.',
-      'website.mission.solution': 'Nuestra Solución',
-      'website.mission.solutionDesc': 'Memorio elimina la producción memorial de su flujo de trabajo, permitiéndole concentrarse en el cuidado, la orientación y las familias.',
+      'website.mission.title': 'Por qué construimos Memorio',
+      'website.mission.point1': 'Cuando alguien fallece, las familias merecen orientación, cuidado y presencia de las personas que las ayudan durante el proceso.',
+      'website.mission.point2': 'Los profesionales funerarios deberían poder concentrarse en apoyar a las familias, no en ensamblar videos tributo o formatear obituarios.',
+      'website.mission.point3': 'Memorio existe para manejar la producción memorial detrás de escena, para que las familias reciban tributos significativos mientras los profesionales funerarios se mantienen enfocados en el cuidado y el apoyo.',
       
       'website.features.title': 'Todo Lo Que Necesitas Para Honrar Una Vida',
       'website.features.subtitle': 'Memorio proporciona una solución completa para crear tributos conmemorativos significativos',
@@ -735,7 +733,7 @@ const i18n = {
       'website.howItWorks.step1Desc': 'Las familias responden preguntas guiadas y suben fotos a través de un portal seguro.',
       'website.howItWorks.step2': 'Memorio Produce el Tributo',
       'website.howItWorks.step2Desc': 'Memorio genera el obituario usando IA avanzada y ensambla el video tributo con música, ritmo y edición profesional. Cada tributo se revisa para garantizar la calidad antes de la entrega.',
-      'website.howItWorks.step3': 'Entregado a la Familia y Funeraria',
+      'website.howItWorks.step3': 'Entrega',
       'website.howItWorks.step3Desc': 'Una vez aprobado, el obituario final y el video tributo se entregan simultáneamente tanto a la familia como a la funeraria dentro de 48 horas de la presentación, listos para servicios o para compartir en línea.',
       
       // Director Portal
