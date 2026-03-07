@@ -1324,7 +1324,8 @@ const i18n = {
     // Translate text content
     document.querySelectorAll('[data-i18n]').forEach(element => {
       const key = element.dataset.i18n;
-      const translation = i18n.t(key);
+      const fallback = (element.textContent || element.innerText || '').trim() || key;
+      const translation = i18n.t(key, fallback);
       
       // Handle different element types
       if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
@@ -1344,15 +1345,16 @@ const i18n = {
     // Translate placeholders specifically marked with data-i18n-placeholder
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
       const key = element.dataset.i18nPlaceholder;
-      const translation = i18n.t(key);
-      element.placeholder = translation;
+      const fallback = (element.placeholder || '').trim() || key;
+      element.placeholder = i18n.t(key, fallback);
     });
     
     // Also translate select dropdowns that have options with data-i18n
     document.querySelectorAll('select').forEach(select => {
       select.querySelectorAll('option[data-i18n]').forEach(option => {
         const key = option.dataset.i18n;
-        option.textContent = i18n.t(key);
+        const fallback = (option.textContent || '').trim() || key;
+        option.textContent = i18n.t(key, fallback);
       });
     });
   },
