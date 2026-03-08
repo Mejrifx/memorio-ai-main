@@ -697,7 +697,7 @@ const i18n = {
       'website.cta.subtitle': 'Si su funeraria trabaja con Memorio, su director funerario le proporcionará acceso seguro al portal familiar para comenzar.',
       'website.cta.button': 'Acceder al Portal Familiar',
       'website.footer.about': 'Acerca de Memorio',
-      'website.footer.aboutDesc': 'Memorio trabaja junto con las funerarias para producir obituarios y tributos en video que honran a los seres queridos con dignidad mientras simplifica el proceso memorial para las familias.',
+      'website.footer.aboutDesc': 'Memorio colabora con funerarias para crear obituarios y tributos en video que honran la vida de los seres queridos con dignidad, mientras simplifica el proceso memorial para las familias.',
       'website.footer.quickLinks': 'Enlaces Rápidos',
       'website.footer.login': 'Iniciar Sesión',
       'website.footer.support': 'Soporte',
@@ -1385,6 +1385,9 @@ const i18n = {
     });
   }
 };
+
+// Expose i18n to global scope for inline onclick handlers
+window.i18n = i18n;
 
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
