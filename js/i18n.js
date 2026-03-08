@@ -69,7 +69,7 @@ const i18n = {
       'website.hero.learnMore': 'For Funeral Homes →',
       
       // Mission Section
-      'website.mission.title': 'Why we built Memorio',
+      'website.mission.title': 'Why We Built Memorio',
       'website.mission.point1': 'When someone passes away, families deserve guidance, care, and presence from the people helping them through the process.',
       'website.mission.point2': 'Funeral professionals should be able to focus on supporting families, not assembling tribute videos or formatting obituaries.',
       'website.mission.point3': 'Memorio exists to handle memorial production behind the scenes so families receive meaningful tributes while funeral professionals stay focused on care and support.',
@@ -80,7 +80,7 @@ const i18n = {
       'website.features.realSupportDesc': 'If you need help or guidance, support is available every step of the way.',
       'website.howItWorks.title': 'How It Works',
       'website.howItWorks.subtitle': 'Creating a meaningful tribute doesn\'t have to be complicated.',
-      'website.howItWorks.step1': 'Your Funeral Home Gets You Started',
+      'website.howItWorks.step1': 'Family Completes Form',
       'website.howItWorks.step1Desc': 'Your funeral director provides a secure link to begin the process. Families answer compassionate, guided questions and upload cherished photos through a simple, easy-to-use portal designed for this difficult time.',
       'website.howItWorks.step2': 'Memorio Produces the Tribute',
       'website.howItWorks.step2Desc': 'Memorio generates the obituary using advanced AI and assembles the tribute video with music, pacing, and professional editing. Each tribute is reviewed to ensure quality before delivery.',
@@ -719,7 +719,7 @@ const i18n = {
       'website.features.everythingInOnePlace': 'Organizado en Un Solo Lugar',
       'website.features.everythingInOnePlaceDesc': 'Fotos, recuerdos y materiales de tributo se recopilan en una sola ubicación segura para simplificar todo el proceso.',
       'website.howItWorks.subtitle': 'Crear un tributo significativo no tiene que ser complicado.',
-      'website.howItWorks.step1': 'La Familia Comparte Recuerdos',
+      'website.howItWorks.step1': 'La Familia Completa el Formulario',
       'website.howItWorks.step1Desc': 'Las familias responden preguntas compasivas y guiadas, y suben fotos preciadas a través de un portal simple y fácil de usar diseñado para este momento difícil.',
       'website.howItWorks.step2': 'Memorio Produce el Tributo',
       'website.howItWorks.step2Desc': 'Memorio genera el obituario usando IA avanzada y ensambla el video tributo con música, ritmo y edición profesional. Cada tributo se revisa para garantizar la calidad antes de la entrega.',
