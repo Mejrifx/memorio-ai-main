@@ -70,6 +70,24 @@ export const directorInviteTemplate = (email: string, tempPassword: string, orgN
       font-size: 14px;
       margin-top: 30px;
     }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a1a !important;
+      }
+      .container {
+        background-color: #ffffff !important;
+        border-color: #436481 !important;
+      }
+      .credentials {
+        background-color: #f5f5f5 !important;
+      }
+      .header {
+        color: #32343a !important;
+      }
+      .content {
+        color: #32343a !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -179,6 +197,27 @@ export const familyInviteTemplate = (name: string, deceasedName: string, email: 
       color: #33333373;
       font-size: 14px;
       margin-top: 30px;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a1a !important;
+      }
+      .container {
+        background-color: #ffffff !important;
+        border-color: #436481 !important;
+      }
+      .highlight {
+        background-color: #f5f5f5 !important;
+      }
+      .credentials {
+        background-color: #f5f5f5 !important;
+      }
+      .header {
+        color: #32343a !important;
+      }
+      .content {
+        color: #32343a !important;
+      }
     }
   </style>
 </head>
@@ -377,6 +416,24 @@ export const editorInviteTemplate = (email: string, tempPassword: string) => `
       font-size: 14px;
       margin-top: 30px;
     }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a1a !important;
+      }
+      .container {
+        background-color: #ffffff !important;
+        border-color: #436481 !important;
+      }
+      .credentials {
+        background-color: #f5f5f5 !important;
+      }
+      .header {
+        color: #32343a !important;
+      }
+      .content {
+        color: #32343a !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -480,6 +537,24 @@ export const qcInviteTemplate = (email: string, tempPassword: string) => `
       color: #33333373;
       font-size: 14px;
       margin-top: 30px;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a1a !important;
+      }
+      .container {
+        background-color: #ffffff !important;
+        border-color: #436481 !important;
+      }
+      .credentials {
+        background-color: #f5f5f5 !important;
+      }
+      .header {
+        color: #32343a !important;
+      }
+      .content {
+        color: #32343a !important;
+      }
     }
   </style>
 </head>
