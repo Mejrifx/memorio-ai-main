@@ -225,7 +225,7 @@ const i18n = {
 
       // Services page
       'services.heroTitle': 'Built for Funeral Homes That Want Staff Focused on Families',
-      'services.heroSubtitle': 'Memorio removes obituary writing and tribute video production from your staff's workload. Families submit photos and memories, and your funeral home receives finished memorial assets within 48 hours.',
+      'services.heroSubtitle': 'Memorio removes obituary writing and tribute video production from your staff\'s workload. Families submit photos and memories, and your funeral home receives finished memorial assets within 48 hours.',
       'services.whatStaffTitle': 'What Your Staff Actually Does',
       'services.whatStaffStep1': 'Enter basic information',
       'services.whatStaffStep2': 'Create a case',
