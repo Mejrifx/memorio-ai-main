@@ -49,14 +49,8 @@
       transition: color 0.2s ease;
     }
     .legal-header a:hover { color: #2d5070; }
-    .logo-link {
-      display: flex;
-      align-items: center;
-    }
-    .logo-link img {
-      height: 36px;
-      width: auto;
-    }
+    .logo-link { display: flex; align-items: center; }
+    .logo-link img { height: 36px; width: auto; }
     .legal-main {
       max-width: 800px;
       margin: 0 auto;
@@ -72,37 +66,72 @@
     .legal-main .effective-date {
       font-size: 14px;
       color: rgba(50, 52, 58, 0.7);
+      margin-bottom: 24px;
+    }
+    .legal-intro {
+      font-size: 16px;
+      color: rgba(50, 52, 58, 0.9);
       margin-bottom: 32px;
     }
-    .legal-main > p:first-of-type {
-      font-size: 16px;
-      margin-bottom: 40px;
-      color: rgba(50, 52, 58, 0.9);
+    .legal-accordion { margin-top: 8px; }
+    .legal-accordion details {
+      border: 1px solid rgba(67, 100, 129, 0.15);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.6);
+      overflow: hidden;
     }
-    .legal-main h2 {
-      font-size: 20px;
-      font-weight: 700;
+    .legal-accordion details[open] {
+      border-color: rgba(67, 100, 129, 0.3);
+      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.08);
+    }
+    .legal-accordion summary {
+      padding: 18px 20px;
+      font-size: 17px;
+      font-weight: 600;
       color: #436481;
-      margin-top: 40px;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(67, 100, 129, 0.2);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background 0.2s ease;
     }
-    .legal-main h2:first-of-type { margin-top: 0; }
-    .legal-main p {
-      margin-bottom: 16px;
+    .legal-accordion summary::-webkit-details-marker { display: none; }
+    .legal-accordion summary::marker { content: none; }
+    .legal-accordion summary::after {
+      content: '';
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-right: 2px solid #436481;
+      border-bottom: 2px solid #436481;
+      transform: rotate(45deg);
+      margin-top: -6px;
+      transition: transform 0.25s ease;
+    }
+    .legal-accordion details[open] summary::after {
+      transform: rotate(-135deg);
+      margin-top: 4px;
+    }
+    .legal-accordion summary:hover { background: rgba(67, 100, 129, 0.06); }
+    .legal-accordion-body {
+      padding: 0 20px 20px;
+      border-top: 1px solid rgba(67, 100, 129, 0.08);
+    }
+    .legal-accordion-body p {
+      margin-bottom: 14px;
       font-size: 15px;
       color: #32343a;
+      padding-top: 16px;
     }
-    .legal-main ul {
-      margin: 12px 0 20px 24px;
+    .legal-accordion-body p:first-child { padding-top: 16px; }
+    .legal-accordion-body ul {
+      margin: 8px 0 16px 24px;
       list-style: disc;
     }
-    .legal-main li {
-      margin-bottom: 8px;
-      font-size: 15px;
-    }
-    .legal-main .sub-list { list-style: circle; margin-left: 20px; }
+    .legal-accordion-body li { margin-bottom: 6px; font-size: 15px; }
     .legal-footer {
       max-width: 800px;
       margin: 0 auto;
@@ -128,137 +157,115 @@
 
   <main class="legal-main">
     <h1>Memorio Privacy Policy</h1>
-    <p class="effective-date">Effective Date: [Insert Date]</p>
+    <p class="effective-date">Effective Date: 26/02/2026</p>
+    <p class="legal-intro">This Privacy Policy describes how Cross Dimensions LLC, operating as Memorio (“Memorio,” “we,” “us,” or “our”), collects, uses, stores, and protects information when you access or use our services. This policy applies to funeral homes, families, visitors, and any person who interacts with our services or platform.</p>
 
-    <p>This Privacy Policy describes how Cross Dimensions LLC, operating as Memorio (“Memorio,” “we,” “us,” or “our”), collects, uses, stores, and protects information when you access or use our services. This policy applies to funeral homes, families, visitors, and any person who interacts with our services or platform.</p>
-
-    <h2>1. Scope of This Policy</h2>
-    <p>This Privacy Policy applies to all personal information processed by Memorio in connection with its memorial production services, website, intake systems, communications, and related operations. It does not apply to third-party services that may be linked or integrated but are governed by their own policies.</p>
-
-    <h2>2. Information We Collect</h2>
-    <p>We collect information necessary to provide memorial production services and operate our business.</p>
-
-    <p><strong>A. Information You Provide</strong></p>
-    <p>This may include:</p>
-    <ul>
-      <li>names of deceased individuals</li>
-      <li>obituary information</li>
-      <li>dates of birth and death</li>
-      <li>family member names</li>
-      <li>photographs and media</li>
-      <li>email addresses</li>
-      <li>contact information</li>
-      <li>service details</li>
-      <li>written messages or submissions</li>
-    </ul>
-
-    <p><strong>B. Account and Access Information</strong></p>
-    <p>When funeral homes or authorized users access our system, we may collect:</p>
-    <ul>
-      <li>login credentials</li>
-      <li>user role</li>
-      <li>organization name</li>
-      <li>activity logs</li>
-    </ul>
-
-    <p><strong>C. Technical Data</strong></p>
-    <p>We may automatically collect:</p>
-    <ul>
-      <li>IP address</li>
-      <li>device type</li>
-      <li>browser type</li>
-      <li>timestamps</li>
-      <li>usage data</li>
-      <li>system diagnostics</li>
-    </ul>
-
-    <p><strong>D. Communications</strong></p>
-    <p>If you contact us, we may store correspondence and support records.</p>
-
-    <h2>3. How We Use Information</h2>
-    <p>We process information solely for legitimate business and service purposes, including:</p>
-    <ul>
-      <li>producing memorial content</li>
-      <li>delivering finished materials</li>
-      <li>verifying submissions</li>
-      <li>maintaining platform security</li>
-      <li>responding to inquiries</li>
-      <li>improving service quality</li>
-      <li>complying with legal obligations</li>
-    </ul>
-    <p>We do not sell personal information.</p>
-
-    <h2>4. Legal Basis for Processing</h2>
-    <p>Where applicable, we process information under one or more of the following legal bases:</p>
-    <ul>
-      <li>contractual necessity</li>
-      <li>legitimate business interests</li>
-      <li>legal compliance obligations</li>
-      <li>consent where required</li>
-    </ul>
-
-    <h2>5. How Information Is Shared</h2>
-    <p>We may share information only when necessary to operate services, including with:</p>
-    <ul>
-      <li>cloud hosting providers</li>
-      <li>storage providers</li>
-      <li>infrastructure vendors</li>
-      <li>authorized editors or quality-control personnel</li>
-      <li>payment processors (if applicable)</li>
-    </ul>
-    <p>All such parties are required to maintain confidentiality and security safeguards. We do not share information for advertising purposes.</p>
-
-    <h2>6. Data Retention</h2>
-    <p>We retain information only for as long as reasonably necessary to:</p>
-    <ul>
-      <li>fulfill services</li>
-      <li>maintain records</li>
-      <li>comply with legal obligations</li>
-      <li>resolve disputes</li>
-      <li>enforce agreements</li>
-    </ul>
-    <p>Submitted memorial materials may be deleted or anonymized after completion unless retention is required or requested.</p>
-
-    <h2>7. Data Security</h2>
-    <p>We implement commercially reasonable administrative, technical, and physical safeguards designed to protect information, including:</p>
-    <ul>
-      <li>encrypted data transmission</li>
-      <li>access controls</li>
-      <li>authentication safeguards</li>
-      <li>system monitoring</li>
-      <li>audit logging</li>
-    </ul>
-    <p>No system can guarantee absolute security; however, we maintain safeguards consistent with industry standards.</p>
-
-    <h2>8. Your Rights</h2>
-    <p>Depending on your jurisdiction, you may have the right to:</p>
-    <ul>
-      <li>request access to your information</li>
-      <li>request correction</li>
-      <li>request deletion</li>
-      <li>restrict processing</li>
-      <li>request data portability</li>
-    </ul>
-    <p>Requests may be submitted using the contact information listed below. We may require identity verification before fulfilling requests.</p>
-
-    <h2>9. Funeral Home Role and Responsibility</h2>
-    <p>Funeral homes that submit materials to Memorio are responsible for ensuring they have lawful authority to provide submitted information and media. Memorio processes submitted data solely on behalf of funeral homes and for the purpose of providing services.</p>
-
-    <h2>10. Children's Privacy</h2>
-    <p>Our services are intended for use by adults and authorized representatives. We do not knowingly collect personal information directly from children. However, we may process information relating to minors when such information is submitted by a parent, guardian, funeral home, or other authorized individual for legitimate memorial or service-related purposes. If you believe information has been submitted without proper authorization, please contact us and we will take appropriate action.</p>
-
-    <h2>11. International Access</h2>
-    <p>Our services are operated from the United States. If you access them from another jurisdiction, you acknowledge that information may be transferred to and processed in the United States.</p>
-
-    <h2>12. Third-Party Services</h2>
-    <p>Our services may rely on third-party providers for hosting, storage, infrastructure, analytics, or communications. Such providers may process information as necessary to perform services on our behalf.</p>
-
-    <h2>13. Policy Updates</h2>
-    <p>We may update this Privacy Policy from time to time. When updates occur, the revised version will be posted with a new effective date. Continued use of services constitutes acceptance of the updated policy.</p>
-
-    <h2>14. Contact Information</h2>
-    <p>For privacy-related inquiries or requests:</p>
-    <p><strong>Cross Dimensions LLC</strong><br>support@memorio.ai</p>
+    <div class="legal-accordion">
+      <details>
+        <summary>1. Scope of This Policy</summary>
+        <div class="legal-accordion-body">
+          <p>This Privacy Policy applies to all personal information processed by Memorio in connection with its memorial production services, website, intake systems, communications, and related operations. It does not apply to third-party services that may be linked or integrated but are governed by their own policies.</p>
+        </div>
+      </details>
+      <details>
+        <summary>2. Information We Collect</summary>
+        <div class="legal-accordion-body">
+          <p>We collect information necessary to provide memorial production services and operate our business.</p>
+          <p><strong>A. Information You Provide</strong></p>
+          <p>This may include:</p>
+          <ul>
+            <li>names of deceased individuals</li>
+            <li>obituary information</li>
+            <li>dates of birth and death</li>
+            <li>family member names</li>
+            <li>photographs and media</li>
+            <li>email addresses</li>
+            <li>contact information</li>
+            <li>service details</li>
+            <li>written messages or submissions</li>
+          </ul>
+          <p><strong>B. Account and Access Information</strong></p>
+          <p>When funeral homes or authorized users access our system, we may collect: login credentials, user role, organization name, activity logs.</p>
+          <p><strong>C. Technical Data</strong></p>
+          <p>We may automatically collect: IP address, device type, browser type, timestamps, usage data, system diagnostics.</p>
+          <p><strong>D. Communications</strong></p>
+          <p>If you contact us, we may store correspondence and support records.</p>
+        </div>
+      </details>
+      <details>
+        <summary>3. How We Use Information</summary>
+        <div class="legal-accordion-body">
+          <p>We process information solely for legitimate business and service purposes, including: producing memorial content, delivering finished materials, verifying submissions, maintaining platform security, responding to inquiries, improving service quality, complying with legal obligations. We do not sell personal information.</p>
+        </div>
+      </details>
+      <details>
+        <summary>4. Legal Basis for Processing</summary>
+        <div class="legal-accordion-body">
+          <p>Where applicable, we process information under one or more of: contractual necessity, legitimate business interests, legal compliance obligations, consent where required.</p>
+        </div>
+      </details>
+      <details>
+        <summary>5. How Information Is Shared</summary>
+        <div class="legal-accordion-body">
+          <p>We may share information only when necessary to operate services, including with: cloud hosting providers, storage providers, infrastructure vendors, authorized editors or quality-control personnel, payment processors (if applicable). All such parties are required to maintain confidentiality and security safeguards. We do not share information for advertising purposes.</p>
+        </div>
+      </details>
+      <details>
+        <summary>6. Data Retention</summary>
+        <div class="legal-accordion-body">
+          <p>We retain information only for as long as reasonably necessary to: fulfill services, maintain records, comply with legal obligations, resolve disputes, enforce agreements. Submitted memorial materials may be deleted or anonymized after completion unless retention is required or requested.</p>
+        </div>
+      </details>
+      <details>
+        <summary>7. Data Security</summary>
+        <div class="legal-accordion-body">
+          <p>We implement commercially reasonable administrative, technical, and physical safeguards designed to protect information, including: encrypted data transmission, access controls, authentication safeguards, system monitoring, audit logging. No system can guarantee absolute security; however, we maintain safeguards consistent with industry standards.</p>
+        </div>
+      </details>
+      <details>
+        <summary>8. Your Rights</summary>
+        <div class="legal-accordion-body">
+          <p>Depending on your jurisdiction, you may have the right to: request access to your information, request correction, request deletion, restrict processing, request data portability. Requests may be submitted using the contact information listed below. We may require identity verification before fulfilling requests.</p>
+        </div>
+      </details>
+      <details>
+        <summary>9. Funeral Home Role and Responsibility</summary>
+        <div class="legal-accordion-body">
+          <p>Funeral homes that submit materials to Memorio are responsible for ensuring they have lawful authority to provide submitted information and media. Memorio processes submitted data solely on behalf of funeral homes and for the purpose of providing services.</p>
+        </div>
+      </details>
+      <details>
+        <summary>10. Children's Privacy</summary>
+        <div class="legal-accordion-body">
+          <p>Our services are intended for use by adults and authorized representatives. We do not knowingly collect personal information directly from children. However, we may process information relating to minors when such information is submitted by a parent, guardian, funeral home, or other authorized individual for legitimate memorial or service-related purposes. If you believe information has been submitted without proper authorization, please contact us and we will take appropriate action.</p>
+        </div>
+      </details>
+      <details>
+        <summary>11. International Access</summary>
+        <div class="legal-accordion-body">
+          <p>Our services are operated from the United States. If you access them from another jurisdiction, you acknowledge that information may be transferred to and processed in the United States.</p>
+        </div>
+      </details>
+      <details>
+        <summary>12. Third-Party Services</summary>
+        <div class="legal-accordion-body">
+          <p>Our services may rely on third-party providers for hosting, storage, infrastructure, analytics, or communications. Such providers may process information as necessary to perform services on our behalf.</p>
+        </div>
+      </details>
+      <details>
+        <summary>13. Policy Updates</summary>
+        <div class="legal-accordion-body">
+          <p>We may update this Privacy Policy from time to time. When updates occur, the revised version will be posted with a new effective date. Continued use of services constitutes acceptance of the updated policy.</p>
+        </div>
+      </details>
+      <details>
+        <summary>14. Contact Information</summary>
+        <div class="legal-accordion-body">
+          <p>For privacy-related inquiries or requests:</p>
+          <p><strong>Cross Dimensions LLC</strong><br>support@memorio.ai</p>
+        </div>
+      </details>
+    </div>
   </main>
 
   <footer class="legal-footer">
