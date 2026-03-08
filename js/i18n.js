@@ -64,7 +64,6 @@ const i18n = {
       'website.nav.familyLogin': 'Family Login',
       'website.hero.title': 'A Beautiful Way To Remember Someone You Love',
       'website.hero.subtitle1': 'When words are hard and time is short, Memorio helps families and funeral homes create meaningful video tributes and obituaries with care, dignity, and professional support.',
-      'website.hero.subtitle2': 'Families receive a simple guided experience. Funeral homes receive finished memorial assets within 48 hours.',
       'website.hero.getStarted': 'Start Your Tribute',
       'website.hero.learnMore': 'For Funeral Homes →',
       
@@ -663,7 +662,6 @@ const i18n = {
       'website.nav.familyLogin': 'Acceso Familiar',
       'website.hero.title': 'Una Hermosa Forma de Recordar a un Ser Querido',
       'website.hero.subtitle1': 'Cuando las palabras faltan y el tiempo es limitado, Memorio ayuda a familias y funerarias a crear tributos en video y obituarios significativos, con cuidado, dignidad y acompañamiento profesional.',
-      'website.hero.subtitle2': 'Las familias cuentan con una experiencia guiada y fácil de seguir. Las funerarias reciben los tributos memoriales completos en 48 horas.',
       'website.hero.getStarted': 'Crear un Tributo',
       'website.hero.learnMore': 'Acceso para Funerarias →',
       
