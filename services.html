@@ -345,7 +345,7 @@
       margin-bottom: 56px;
     }
     
-    /* Timeline vertical line */
+    /* Timeline vertical line - uniform opacity */
     .what-staff-steps::before {
       content: '';
       position: absolute;
@@ -353,7 +353,7 @@
       top: 40px;
       bottom: 40px;
       width: 3px;
-      background: linear-gradient(180deg, #436481 0%, rgba(67, 100, 129, 0.3) 100%);
+      background: rgba(67, 100, 129, 0.3);
       border-radius: 2px;
     }
     
@@ -945,6 +945,54 @@
        RESPONSIVE
        ============================================================================ */
     @media (max-width: 768px) {
+      .hero {
+        padding: 100px 16px 60px;
+        min-height: auto;
+      }
+      
+      .hero-title {
+        font-size: 36px;
+      }
+      
+      .hero-subtitle {
+        font-size: 18px;
+      }
+      
+      .what-staff-section {
+        padding: 60px 16px;
+      }
+      
+      .what-staff-title {
+        font-size: 32px;
+        margin-bottom: 48px;
+      }
+      
+      .what-staff-steps::before {
+        left: 23px;
+      }
+      
+      .what-staff-step {
+        padding: 20px 20px 20px 68px;
+        font-size: 17px;
+        margin-bottom: 24px;
+      }
+      
+      .what-staff-step::before,
+      .what-staff-step::after {
+        left: 8px;
+        width: 28px;
+        height: 28px;
+      }
+      
+      .what-staff-step::after {
+        font-size: 13px;
+      }
+      
+      .what-staff-footer {
+        padding: 24px;
+        margin-top: 48px;
+      }
+      
       .mobile-menu-toggle {
         display: flex;
       }
