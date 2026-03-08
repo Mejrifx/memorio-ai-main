@@ -257,11 +257,11 @@
        HERO SECTION
        ============================================================================ */
     .hero {
-      padding: 120px 24px 100px;
+      padding: 120px 24px 80px;
       text-align: center;
       position: relative;
       overflow: visible;
-      min-height: 100vh;
+      min-height: auto;
       display: flex;
       align-items: flex-start;
       justify-content: center;
@@ -317,44 +317,121 @@
     }
     
     /* ============================================================================
-       WHAT STAFF DOES SECTION
+       WHAT STAFF DOES SECTION - MODERN TIMELINE
        ============================================================================ */
     .what-staff-section {
       padding: 100px 24px;
-      background: transparent;
+      background: linear-gradient(180deg, rgba(67, 100, 129, 0.02) 0%, transparent 100%);
       position: relative;
     }
     
     .what-staff-container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
-      text-align: center;
     }
     
     .what-staff-title {
-      font-size: 38px;
+      font-size: 42px;
       font-weight: 700;
       color: #436481;
-      margin-bottom: 48px;
+      margin-bottom: 64px;
       line-height: 1.2;
+      text-align: center;
     }
     
     .what-staff-steps {
-      margin-bottom: 48px;
+      position: relative;
+      padding-left: 0;
+      margin-bottom: 56px;
+    }
+    
+    /* Timeline vertical line */
+    .what-staff-steps::before {
+      content: '';
+      position: absolute;
+      left: 31px;
+      top: 40px;
+      bottom: 40px;
+      width: 3px;
+      background: linear-gradient(180deg, #436481 0%, rgba(67, 100, 129, 0.3) 100%);
+      border-radius: 2px;
     }
     
     .what-staff-step {
+      position: relative;
+      padding: 24px 24px 24px 88px;
+      margin-bottom: 32px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(67, 100, 129, 0.15);
+      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.08);
       font-size: 20px;
-      font-weight: 500;
+      font-weight: 600;
       color: #32343a;
-      line-height: 1.8;
-      margin-bottom: 12px;
+      line-height: 1.6;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .what-staff-step:hover {
+      transform: translateX(8px);
+      box-shadow: 0 8px 24px rgba(67, 100, 129, 0.15);
+      border-color: rgba(67, 100, 129, 0.3);
+    }
+    
+    .what-staff-step:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* Timeline step numbers/dots */
+    .what-staff-step::before {
+      content: '';
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #436481 0%, #2d5070 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(67, 100, 129, 0.1), 0 4px 8px rgba(67, 100, 129, 0.2);
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+    
+    .what-staff-step:hover::before {
+      transform: translateY(-50%) scale(1.15);
+      box-shadow: 0 0 0 6px rgba(67, 100, 129, 0.15), 0 6px 12px rgba(67, 100, 129, 0.3);
+    }
+    
+    /* Step number inside dot */
+    .what-staff-step::after {
+      content: attr(data-step);
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      z-index: 3;
+      line-height: 1;
+      pointer-events: none;
     }
     
     .what-staff-footer {
-      margin-top: 56px;
-      padding-top: 40px;
-      border-top: 1px solid rgba(67, 100, 129, 0.2);
+      margin-top: 64px;
+      padding: 32px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(67, 100, 129, 0.08) 0%, rgba(67, 100, 129, 0.04) 100%);
+      border: 1px solid rgba(67, 100, 129, 0.15);
+      text-align: center;
     }
     
     .what-staff-time {
@@ -1133,9 +1210,9 @@
       <h2 class="what-staff-title" data-i18n="services.whatStaffTitle">What Your Staff Actually Does</h2>
       
       <div class="what-staff-steps">
-        <div class="what-staff-step" data-i18n="services.whatStaffStep1">Enter basic information</div>
-        <div class="what-staff-step" data-i18n="services.whatStaffStep2">Create a case</div>
-        <div class="what-staff-step" data-i18n="services.whatStaffStep3">Provide the family with secure login access</div>
+        <div class="what-staff-step" data-step="1" data-i18n="services.whatStaffStep1">Enter basic information</div>
+        <div class="what-staff-step" data-step="2" data-i18n="services.whatStaffStep2">Create a case</div>
+        <div class="what-staff-step" data-step="3" data-i18n="services.whatStaffStep3">Provide the family with secure login access</div>
       </div>
       
       <div class="what-staff-footer">
