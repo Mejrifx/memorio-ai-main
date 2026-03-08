@@ -317,6 +317,57 @@
     }
     
     /* ============================================================================
+       WHAT STAFF DOES SECTION
+       ============================================================================ */
+    .what-staff-section {
+      padding: 80px 24px;
+      background: rgba(255, 255, 255, 0.5);
+      text-align: center;
+    }
+    
+    .what-staff-container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .what-staff-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #436481;
+      margin-bottom: 32px;
+    }
+    
+    .what-staff-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .what-staff-step {
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+      color: #32343a;
+      border: 2px solid rgba(67, 100, 129, 0.1);
+    }
+    
+    .what-staff-time {
+      font-size: 16px;
+      color: #436481;
+      font-weight: 600;
+      margin: 24px 0 16px;
+    }
+    
+    .what-staff-rest {
+      font-size: 18px;
+      font-weight: 600;
+      color: #32343a;
+    }
+    
+    /* ============================================================================
        SECTION STYLES
        ============================================================================ */
     .section {
@@ -1050,10 +1101,26 @@
   <section class="hero" id="heroSection">
     <img src="images/memorio-services-background.png" alt="Memorio Services" class="hero-background-image" id="heroBackgroundImage">
     <div class="hero-content">
-      <h1 class="hero-title" data-i18n="services.heroTitle">Built For Funeral Homes</h1>
+      <h1 class="hero-title" data-i18n="services.heroTitle">Built for Funeral Homes That Want Staff Focused on Families</h1>
       <p class="hero-subtitle" data-i18n="services.heroSubtitle">
-        Streamline your operations, reduce administrative burden, and deliver consistent, professional tributes that honor every life with dignity.
+        Memorio removes obituary writing and tribute video production from your staff's workload. Families submit photos and memories, and your funeral home receives finished memorial assets within 48 hours.
       </p>
+    </div>
+  </section>
+  
+  <!-- ============================================================================
+       WHAT YOUR STAFF ACTUALLY DOES
+       ============================================================================ -->
+  <section class="what-staff-section">
+    <div class="what-staff-container">
+      <h2 class="what-staff-title" data-i18n="services.whatStaffTitle">What Your Staff Actually Does</h2>
+      <div class="what-staff-steps">
+        <div class="what-staff-step" data-i18n="services.whatStaffStep1">Enter basic information</div>
+        <div class="what-staff-step" data-i18n="services.whatStaffStep2">Create a case</div>
+        <div class="what-staff-step" data-i18n="services.whatStaffStep3">Provide the family with secure login access</div>
+      </div>
+      <div class="what-staff-time" data-i18n="services.whatStaffTime">Time required: about 2 minutes</div>
+      <div class="what-staff-rest" data-i18n="services.whatStaffRest">Memorio handles everything else.</div>
     </div>
   </section>
   
@@ -1073,7 +1140,7 @@
       <div class="section-header">
         <h2 class="section-title" data-i18n="services.whyTitle">Why Funeral Homes Choose Memorio</h2>
         <p class="section-subtitle" data-i18n="services.whySubtitle">
-          Consistent quality, faster turnaround, and less work for your staff, without adding complexity to your operation.
+          Less work for your staff, faster turnaround, and a more consistent memorial process without adding complexity to your operation.
         </p>
       </div>
       
@@ -1084,8 +1151,8 @@
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
           </div>
-          <h3 class="feature-title" data-i18n="services.feat1Title">Consistent, Professional Results</h3>
-          <p class="feature-description" data-i18n="services.feat1Desc">Every family receives a polished, well-written obituary and tribute video that meets the same standard every time, regardless of staff workload or schedule.</p>
+          <h3 class="feature-title" data-i18n="services.feat1Title">Less Work for Your Staff</h3>
+          <p class="feature-description" data-i18n="services.feat1Desc">Your staff no longer needs to chase photos, write obituaries, or assemble tribute videos. Memorio handles the production while your team stays focused on families.</p>
         </div>
         
         <div class="feature-card">
@@ -1094,8 +1161,8 @@
               <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
             </svg>
           </div>
-          <h3 class="feature-title" data-i18n="services.feat2Title">48-Hour Video Turnaround</h3>
-          <p class="feature-description" data-i18n="services.feat2Desc">Tribute videos are delivered within 48 hours of submission, helping you move cases forward without delays or bottlenecks.</p>
+          <h3 class="feature-title" data-i18n="services.feat2Title">48-Hour Turnaround</h3>
+          <p class="feature-description" data-i18n="services.feat2Desc">Tribute videos and obituaries are delivered within 48 hours of submission, helping you move cases forward without delays or bottlenecks.</p>
         </div>
         
         <div class="feature-card">
@@ -1104,8 +1171,8 @@
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
             </svg>
           </div>
-          <h3 class="feature-title" data-i18n="services.feat3Title">Less Work for Your Staff</h3>
-          <p class="feature-description" data-i18n="services.feat3Desc">Your staff no longer needs to chase photos, write obituaries, or build videos. Memorio handles the most time-consuming parts so your team can focus on families and core services.</p>
+          <h3 class="feature-title" data-i18n="services.feat3Title">Better Family Experience</h3>
+          <p class="feature-description" data-i18n="services.feat3Desc">Families get a simple, guided way to submit information and receive a finished memorial without confusion or back-and-forth.</p>
         </div>
         
         <div class="feature-card">
@@ -1114,8 +1181,8 @@
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
             </svg>
           </div>
-          <h3 class="feature-title" data-i18n="services.feat4Title">A Reliable, Repeatable Process</h3>
-          <p class="feature-description" data-i18n="services.feat4Desc">Each case follows the same clear process from start to finish, helping ensure nothing gets missed and nothing falls through the cracks.</p>
+          <h3 class="feature-title" data-i18n="services.feat4Title">Consistent Professional Results</h3>
+          <p class="feature-description" data-i18n="services.feat4Desc">Every family receives a polished obituary and tribute video that meets the same standard every time, regardless of staff workload or schedule.</p>
         </div>
         
         <div class="feature-card">
@@ -1124,8 +1191,8 @@
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
             </svg>
           </div>
-          <h3 class="feature-title" data-i18n="services.feat5Title">Better Family Experience</h3>
-          <p class="feature-description" data-i18n="services.feat5Desc">Families get a simple, guided way to provide information and receive a finished memorial without confusion or back-and-forth.</p>
+          <h3 class="feature-title" data-i18n="services.feat5Title">A Reliable, Repeatable Process</h3>
+          <p class="feature-description" data-i18n="services.feat5Desc">Each case follows the same clear process from start to finish, helping ensure nothing gets missed and nothing falls through the cracks.</p>
         </div>
         
         <div class="feature-card">
@@ -1160,9 +1227,9 @@
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
           </div>
-          <h3 class="benefit-title" data-i18n="services.ops1Title">Reduced Admin</h3>
+          <h3 class="benefit-title" data-i18n="services.ops1Title">Less Administrative Work</h3>
           <p class="benefit-description" data-i18n="services.ops1Desc">
-            Automate case management, family communications, and status tracking. No more spreadsheets or manual follow-ups.
+            Reduce manual coordination, status tracking, and production oversight by moving memorial production into one managed workflow.
           </p>
         </div>
         
@@ -1172,9 +1239,9 @@
               <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
             </svg>
           </div>
-          <h3 class="benefit-title" data-i18n="services.ops2Title">Fewer Follow-ups</h3>
+          <h3 class="benefit-title" data-i18n="services.ops2Title">Fewer Family Follow-Ups</h3>
           <p class="benefit-description" data-i18n="services.ops2Desc">
-            Families receive automated reminders and clear instructions. The system tracks progress so you know exactly where each case stands.
+            Families receive clear instructions and submit materials through a guided process, reducing repeated follow-ups from your staff.
           </p>
         </div>
         
@@ -1184,9 +1251,9 @@
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
           </div>
-          <h3 class="benefit-title" data-i18n="services.ops3Title">Predictable Turnaround</h3>
+          <h3 class="benefit-title" data-i18n="services.ops3Title">Reliable 48-Hour Delivery</h3>
           <p class="benefit-description" data-i18n="services.ops3Desc">
-            Standardized workflow means consistent delivery times. Set expectations with families and meet them every time.
+            A standardized workflow creates predictable turnaround so your team can set expectations clearly and meet them consistently.
           </p>
         </div>
         
@@ -1196,9 +1263,9 @@
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
           </div>
-          <h3 class="benefit-title" data-i18n="services.ops4Title">Professional Standards</h3>
+          <h3 class="benefit-title" data-i18n="services.ops4Title">Consistent Professional Quality</h3>
           <p class="benefit-description" data-i18n="services.ops4Desc">
-            Every tribute meets the same high-quality standards. No more worrying about inconsistent results or rushed work.
+            Every tribute is produced to the same standard, reducing rushed work, inconsistent output, and avoidable errors.
           </p>
         </div>
       </div>
@@ -1248,9 +1315,9 @@
               <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
             </svg>
           </div>
-          <h3 class="benefit-title" data-i18n="services.sec3Title">Privacy-First by Design</h3>
+          <h3 class="benefit-title" data-i18n="services.sec3Title">Family Data Protected</h3>
           <p class="benefit-description" data-i18n="services.sec3Desc">
-            Memorio is built from the ground up for sensitive situations, not for marketing data or advertising.
+            Memorio is built for sensitive situations, with privacy protections designed around family information and memorial content.
           </p>
         </div>
       </div>
@@ -1265,7 +1332,7 @@
       <div class="cta-card">
         <h2 class="cta-title" data-i18n="services.ctaTitle">Ready to Simplify Your Operations?</h2>
         <p class="cta-subtitle" data-i18n="services.ctaSubtitle">
-          See how Memorio can reduce your administrative burden and help you deliver exceptional tributes consistently.
+          See how Memorio can reduce your administrative burden and help you deliver exceptional memorial tributes consistently.
         </p>
         <div class="cta-buttons">
           <a href="mailto:support@memorio.ai?subject=Book a Demo" class="btn-primary">
@@ -1293,8 +1360,7 @@
       <div class="footer-section">
         <h3 data-i18n="footer.aboutTitle">About Memorio</h3>
         <p data-i18n="footer.aboutDesc">
-          Memorio helps funeral homes create beautiful, personalized video tributes & personalised obituaries 
-          that honor and celebrate the lives of loved ones with dignity and care.
+          Memorio works alongside funeral homes to produce obituaries and tribute videos for every service, removing production work from staff while delivering consistent memorial assets within 48 hours.
         </p>
       </div>
       
