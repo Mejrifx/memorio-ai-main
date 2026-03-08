@@ -1117,7 +1117,6 @@
        HERO SECTION
        ============================================================================ -->
   <section class="hero" id="heroSection">
-    <img src="images/memorio-services-background.png" alt="Memorio Services" class="hero-background-image" id="heroBackgroundImage">
     <div class="hero-content">
       <h1 class="hero-title" data-i18n="services.heroTitle">Built for Funeral Homes That Want Staff Focused on Families</h1>
       <p class="hero-subtitle" data-i18n="services.heroSubtitle">
@@ -1145,14 +1144,6 @@
       </div>
     </div>
   </section>
-  
-  <!-- ============================================================================
-       FULL SCREEN IMAGE MODAL
-       ============================================================================ -->
-  <div class="image-modal" id="imageModal">
-    <div class="image-modal-close" id="modalClose">&times;</div>
-    <img src="images/memorio-services-laptop-bg.png" alt="Memorio Services" class="image-modal-content" id="modalImage">
-  </div>
   
   <!-- ============================================================================
        WHY FUNERAL HOMES CHOOSE MEMORIO
@@ -1455,54 +1446,6 @@
         window.location.href = 'family-form.html';
       });
     }
-    
-    // ============================================================================
-    // FULL SCREEN IMAGE MODAL
-    // ============================================================================
-    const heroBackgroundImage = document.getElementById('heroBackgroundImage');
-    const imageModal = document.getElementById('imageModal');
-    const modalClose = document.getElementById('modalClose');
-    const modalImage = document.getElementById('modalImage');
-    
-    // Open modal when clicking on the background image only
-    if (heroBackgroundImage && imageModal) {
-      heroBackgroundImage.addEventListener('click', () => {
-        imageModal.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-      });
-    }
-    
-    // Close modal functions
-    function closeModal() {
-      if (imageModal) {
-        imageModal.classList.remove('active');
-        document.body.style.overflow = ''; // Restore scrolling
-      }
-    }
-    
-    // Close on close button click
-    if (modalClose) {
-      modalClose.addEventListener('click', (e) => {
-        e.stopPropagation();
-        closeModal();
-      });
-    }
-    
-    // Close on modal background click
-    if (imageModal) {
-      imageModal.addEventListener('click', (e) => {
-        if (e.target === imageModal) {
-          closeModal();
-        }
-      });
-    }
-    
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && imageModal && imageModal.classList.contains('active')) {
-        closeModal();
-      }
-    });
     
     // ============================================================================
     // BENEFITS CARDS ANIMATION
