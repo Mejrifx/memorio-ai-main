@@ -133,7 +133,12 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-# Cache static assets for better performance
+# Cache static assets for better performance (but not i18n.js which needs to update)
+[[headers]]
+  for = "/js/i18n.js"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"
+
 [[headers]]
   for = "/css/*"
   [headers.values]
