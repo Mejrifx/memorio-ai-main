@@ -326,111 +326,58 @@
     }
     
     .what-staff-container {
-      max-width: 1100px;
+      max-width: 800px;
       margin: 0 auto;
-    }
-    
-    .what-staff-header {
       text-align: center;
-      margin-bottom: 56px;
     }
     
     .what-staff-title {
       font-size: 38px;
       font-weight: 700;
       color: #436481;
-      margin-bottom: 16px;
+      margin-bottom: 48px;
       line-height: 1.2;
     }
     
-    .what-staff-subtitle {
-      font-size: 18px;
-      color: #32343a;
-      opacity: 0.8;
-      max-width: 600px;
-      margin: 0 auto;
-      line-height: 1.6;
-    }
-    
     .what-staff-steps {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
       margin-bottom: 48px;
     }
     
     .what-staff-step {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(10px);
-      padding: 32px 24px;
-      border-radius: 16px;
-      text-align: center;
-      border: 1px solid rgba(67, 100, 129, 0.15);
-      box-shadow: 0 4px 16px rgba(67, 100, 129, 0.08);
-      transition: all 0.3s ease;
-      position: relative;
-    }
-    
-    .what-staff-step:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(67, 100, 129, 0.12);
-      border-color: rgba(67, 100, 129, 0.25);
-    }
-    
-    .what-staff-step-number {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #436481, #6ca7d3);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      font-weight: 800;
-      color: white;
-      margin: 0 auto 20px;
-      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.25);
-    }
-    
-    .what-staff-step-text {
-      font-size: 17px;
-      font-weight: 600;
+      font-size: 20px;
+      font-weight: 500;
       color: #32343a;
-      line-height: 1.5;
+      line-height: 1.8;
+      margin-bottom: 12px;
     }
     
     .what-staff-footer {
-      text-align: center;
-      padding: 40px 32px;
-      background: rgba(67, 100, 129, 0.05);
-      border-radius: 16px;
-      border: 2px dashed rgba(67, 100, 129, 0.2);
+      margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(67, 100, 129, 0.2);
     }
     
     .what-staff-time {
-      font-size: 16px;
+      font-size: 17px;
       color: #436481;
-      font-weight: 700;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 16px;
     }
     
     .what-staff-rest {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       color: #436481;
       line-height: 1.4;
     }
     
-    @media (max-width: 900px) {
-      .what-staff-steps {
-        grid-template-columns: 1fr;
-        gap: 24px;
-      }
-      
+    @media (max-width: 768px) {
       .what-staff-title {
         font-size: 32px;
+      }
+      
+      .what-staff-step {
+        font-size: 18px;
       }
       
       .what-staff-rest {
@@ -1184,25 +1131,12 @@
        ============================================================================ -->
   <section class="what-staff-section">
     <div class="what-staff-container">
-      <div class="what-staff-header">
-        <h2 class="what-staff-title" data-i18n="services.whatStaffTitle">What Your Staff Actually Does</h2>
-      </div>
+      <h2 class="what-staff-title" data-i18n="services.whatStaffTitle">What Your Staff Actually Does</h2>
       
       <div class="what-staff-steps">
-        <div class="what-staff-step">
-          <div class="what-staff-step-number">1</div>
-          <div class="what-staff-step-text" data-i18n="services.whatStaffStep1">Enter basic information</div>
-        </div>
-        
-        <div class="what-staff-step">
-          <div class="what-staff-step-number">2</div>
-          <div class="what-staff-step-text" data-i18n="services.whatStaffStep2">Create a case</div>
-        </div>
-        
-        <div class="what-staff-step">
-          <div class="what-staff-step-number">3</div>
-          <div class="what-staff-step-text" data-i18n="services.whatStaffStep3">Provide the family with secure login access</div>
-        </div>
+        <div class="what-staff-step" data-i18n="services.whatStaffStep1">Enter basic information</div>
+        <div class="what-staff-step" data-i18n="services.whatStaffStep2">Create a case</div>
+        <div class="what-staff-step" data-i18n="services.whatStaffStep3">Provide the family with secure login access</div>
       </div>
       
       <div class="what-staff-footer">
