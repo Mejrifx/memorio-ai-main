@@ -72,20 +72,27 @@ export const directorInviteTemplate = (email: string, tempPassword: string, orgN
     }
     @media (prefers-color-scheme: dark) {
       body {
-        background-color: #1a1a1a !important;
+        background-color: #f4e8de !important;
       }
       .container {
-        background-color: #ffffff !important;
+        background-color: #fff3e9 !important;
         border-color: #436481 !important;
       }
       .credentials {
-        background-color: #f5f5f5 !important;
+        background-color: #f4e8de !important;
       }
       .header {
         color: #32343a !important;
       }
       .content {
         color: #32343a !important;
+      }
+      .button {
+        background-color: #32343a !important;
+        color: #f2eadd !important;
+      }
+      .footer {
+        color: #33333373 !important;
       }
     }
   </style>
@@ -200,23 +207,30 @@ export const familyInviteTemplate = (name: string, deceasedName: string, email: 
     }
     @media (prefers-color-scheme: dark) {
       body {
-        background-color: #1a1a1a !important;
+        background-color: #f4e8de !important;
       }
       .container {
-        background-color: #ffffff !important;
+        background-color: #fff3e9 !important;
         border-color: #436481 !important;
       }
       .highlight {
-        background-color: #f5f5f5 !important;
+        background-color: #f4e8de !important;
       }
       .credentials {
-        background-color: #f5f5f5 !important;
+        background-color: #f4e8de !important;
       }
       .header {
         color: #32343a !important;
       }
       .content {
         color: #32343a !important;
+      }
+      .button {
+        background-color: #32343a !important;
+        color: #f2eadd !important;
+      }
+      .footer {
+        color: #33333373 !important;
       }
     }
   </style>
@@ -319,6 +333,21 @@ export const passwordResetTemplate = (resetLink: string) => `
       font-size: 14px;
       margin-top: 30px;
     }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a1a !important;
+      }
+      .container {
+        background-color: #ffffff !important;
+        border-color: #436481 !important;
+      }
+      .header {
+        color: #32343a !important;
+      }
+      .content {
+        color: #32343a !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -418,20 +447,27 @@ export const editorInviteTemplate = (email: string, tempPassword: string) => `
     }
     @media (prefers-color-scheme: dark) {
       body {
-        background-color: #1a1a1a !important;
+        background-color: #f4e8de !important;
       }
       .container {
-        background-color: #ffffff !important;
+        background-color: #fff3e9 !important;
         border-color: #436481 !important;
       }
       .credentials {
-        background-color: #f5f5f5 !important;
+        background-color: #f4e8de !important;
       }
       .header {
         color: #32343a !important;
       }
       .content {
         color: #32343a !important;
+      }
+      .button {
+        background-color: #32343a !important;
+        color: #f2eadd !important;
+      }
+      .footer {
+        color: #33333373 !important;
       }
     }
   </style>
@@ -540,20 +576,27 @@ export const qcInviteTemplate = (email: string, tempPassword: string) => `
     }
     @media (prefers-color-scheme: dark) {
       body {
-        background-color: #1a1a1a !important;
+        background-color: #f4e8de !important;
       }
       .container {
-        background-color: #ffffff !important;
+        background-color: #fff3e9 !important;
         border-color: #436481 !important;
       }
       .credentials {
-        background-color: #f5f5f5 !important;
+        background-color: #f4e8de !important;
       }
       .header {
         color: #32343a !important;
       }
       .content {
         color: #32343a !important;
+      }
+      .button {
+        background-color: #32343a !important;
+        color: #f2eadd !important;
+      }
+      .footer {
+        color: #33333373 !important;
       }
     }
   </style>
