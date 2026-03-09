@@ -79,14 +79,24 @@ serve(async (req) => {
       throw new Error('Cannot delete admin users');
     }
 
-    // Directors can only delete family users in their own organization
+    // Permission checks based on caller role
     if (callerRole === 'director') {
+      // Directors can only delete family users in their own organization
       if (userData.role !== 'family') {
         throw new Error('Directors can only delete family users');
       }
       if (userData.org_id !== callerOrgId) {
         throw new Error('Directors can only delete family users in their own organization');
       }
+    } else if (callerRole === 'admin') {
+      // Admins can delete editor, qc, director, and family users
+      // But if deleting editor/qc/director, verify they're in the same org
+      if (['editor', 'qc', 'director'].includes(userData.role)) {
+        if (userData.org_id !== callerOrgId) {
+          throw new Error('Admins can only delete staff users in their own organization');
+        }
+      }
+      // Family users can be deleted from any org (they're assigned to specific cases)
     }
 
     // Log the deletion event BEFORE deleting (so we still have the user_id reference)
