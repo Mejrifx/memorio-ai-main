@@ -1563,7 +1563,11 @@
             // Create compact container
             const compactContainer = document.createElement('div');
             compactContainer.style.cssText = 'display: inline-block; position: relative; cursor: pointer;';
-            compactContainer.onclick = openGalleryModal;
+            compactContainer.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openGalleryModal();
+            };
             
             // Primary thumbnail (first photo)
             const thumbnail = document.createElement('div');
@@ -1619,7 +1623,11 @@
                 gridItem.style.cssText = 'position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.3s;';
                 gridItem.onmouseover = () => gridItem.style.transform = 'scale(1.05)';
                 gridItem.onmouseout = () => gridItem.style.transform = 'scale(1)';
-                gridItem.onclick = () => openLightbox(index);
+                gridItem.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openLightbox(index);
+                };
                 
                 const img = document.createElement('img');
                 img.src = dataUrl;
@@ -1631,6 +1639,7 @@
                 removeBtn.type = 'button';
                 removeBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; background: rgba(0, 0, 0, 0.7); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 20px; line-height: 1; z-index: 10; transition: background 0.3s;';
                 removeBtn.onclick = (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     removePhoto(index);
                 };
@@ -1733,16 +1742,34 @@
          */
         function initPhotoModals() {
             // Gallery modal close button
-            document.getElementById('gallery-close-btn').onclick = closeGalleryModal;
+            document.getElementById('gallery-close-btn').onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeGalleryModal();
+            };
             
             // Lightbox controls
-            document.getElementById('lightbox-close-btn').onclick = closeLightbox;
-            document.getElementById('lightbox-prev-btn').onclick = lightboxPrev;
-            document.getElementById('lightbox-next-btn').onclick = lightboxNext;
+            document.getElementById('lightbox-close-btn').onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeLightbox();
+            };
+            document.getElementById('lightbox-prev-btn').onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                lightboxPrev();
+            };
+            document.getElementById('lightbox-next-btn').onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                lightboxNext();
+            };
             
             // Close lightbox when clicking outside image
             document.getElementById('photo-lightbox-modal').onclick = (e) => {
                 if (e.target.id === 'photo-lightbox-modal') {
+                    e.preventDefault();
+                    e.stopPropagation();
                     closeLightbox();
                 }
             };
@@ -1751,13 +1778,23 @@
             document.addEventListener('keydown', (e) => {
                 const lightbox = document.getElementById('photo-lightbox-modal');
                 if (lightbox.style.display === 'block') {
-                    if (e.key === 'ArrowLeft') lightboxPrev();
-                    if (e.key === 'ArrowRight') lightboxNext();
-                    if (e.key === 'Escape') closeLightbox();
+                    if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        lightboxPrev();
+                    }
+                    if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        lightboxNext();
+                    }
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        closeLightbox();
+                    }
                 }
                 
                 const gallery = document.getElementById('photo-gallery-modal');
                 if (gallery.style.display === 'block' && e.key === 'Escape') {
+                    e.preventDefault();
                     closeGalleryModal();
                 }
             });
