@@ -335,10 +335,10 @@ export const passwordResetTemplate = (resetLink: string) => `
     }
     @media (prefers-color-scheme: dark) {
       body {
-        background-color: #1a1a1a !important;
+        background-color: #f4e8de !important;
       }
       .container {
-        background-color: #ffffff !important;
+        background-color: #fff3e9 !important;
         border-color: #436481 !important;
       }
       .header {
@@ -346,6 +346,13 @@ export const passwordResetTemplate = (resetLink: string) => `
       }
       .content {
         color: #32343a !important;
+      }
+      .button {
+        background-color: #32343a !important;
+        color: #f2eadd !important;
+      }
+      .footer {
+        color: #33333373 !important;
       }
     }
   </style>
