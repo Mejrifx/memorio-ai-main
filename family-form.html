@@ -1428,14 +1428,19 @@
                     return;
                 }
                 
-                selectedPhotos = files;
+                // Get the current number of photos before appending
+                const previousCount = selectedPhotos.length;
                 
-                console.log(`📷 ${files.length} photo(s) selected`);
+                // APPEND new files to existing selection instead of replacing
+                selectedPhotos = [...selectedPhotos, ...files];
                 
-                // Clear preview
-                preview.innerHTML = '';
+                console.log(`📷 ${files.length} new photo(s) selected`);
+                console.log(`📷 Total: ${selectedPhotos.length} photo(s) (${previousCount} previous + ${files.length} new)`);
                 
-                // Show loading state immediately
+                // Clear the file input so the same files can be selected again if needed
+                input.value = '';
+                
+                // Show loading state for new photos
                 const loadingContainer = document.createElement('div');
                 loadingContainer.id = 'photo-loading-container';
                 loadingContainer.style.cssText = 'padding: 24px; background: rgba(67, 100, 129, 0.05); border-radius: 12px; text-align: center; margin-bottom: 20px;';
@@ -1453,7 +1458,7 @@
                 
                 const loadingText = document.createElement('p');
                 loadingText.style.cssText = 'font-size: 16px; font-weight: 600; color: #436481; margin: 0 0 8px 0; font-family: "Dosis Variablefont Wght", Arial, sans-serif;';
-                loadingText.textContent = 'Preparing photos...';
+                loadingText.textContent = previousCount > 0 ? `Adding ${files.length} more photos...` : 'Preparing photos...';
                 
                 const progressText = document.createElement('p');
                 progressText.id = 'photo-progress-text';
@@ -1471,6 +1476,8 @@
                 
                 for (let index = 0; index < files.length; index++) {
                     const file = files[index];
+                    // Use global index for removal functionality
+                    const globalIndex = previousCount + index;
                     
                     const promise = new Promise((resolve) => {
                         const reader = new FileReader();
@@ -1478,6 +1485,7 @@
                         reader.onload = (event) => {
                             const wrapper = document.createElement('div');
                             wrapper.style.cssText = 'position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s ease;';
+                            wrapper.dataset.photoIndex = globalIndex; // Store index for removal
                             
                             const img = document.createElement('img');
                             img.src = event.target.result;
@@ -1488,8 +1496,26 @@
                             removeBtn.type = 'button';
                             removeBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 18px; line-height: 20px;';
                             removeBtn.onclick = () => {
-                                selectedPhotos.splice(index, 1);
+                                // Remove from selectedPhotos array
+                                const indexToRemove = parseInt(wrapper.dataset.photoIndex);
+                                selectedPhotos.splice(indexToRemove, 1);
+                                
+                                // Update all subsequent photo indices
+                                const allWrappers = preview.querySelectorAll('[data-photo-index]');
+                                allWrappers.forEach(w => {
+                                    const idx = parseInt(w.dataset.photoIndex);
+                                    if (idx > indexToRemove) {
+                                        w.dataset.photoIndex = idx - 1;
+                                    }
+                                });
+                                
+                                // Remove the wrapper
                                 wrapper.remove();
+                                
+                                // Update total count message
+                                updateTotalCount();
+                                
+                                console.log(`📷 Photo removed. Total: ${selectedPhotos.length} photo(s)`);
                             };
                             
                             wrapper.appendChild(img);
@@ -1534,10 +1560,10 @@
                     }
                 });
                 
-                // Show success message
+                // Show success message with total count
                 const successMessage = document.createElement('div');
                 successMessage.style.cssText = 'padding: 12px 20px; background: rgba(67, 100, 129, 0.1); border-radius: 8px; text-align: center; margin-bottom: 20px; border-left: 4px solid #436481;';
-                successMessage.innerHTML = `<p style="font-size: 14px; font-weight: 600; color: #436481; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">✓ ${files.length} photo${files.length !== 1 ? 's' : ''} ready to upload</p>`;
+                successMessage.innerHTML = `<p style="font-size: 14px; font-weight: 600; color: #436481; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">✓ ${selectedPhotos.length} photo${selectedPhotos.length !== 1 ? 's' : ''} ready to upload (${files.length} just added)</p>`;
                 preview.insertBefore(successMessage, preview.firstChild);
                 
                 // Auto-remove success message after 3 seconds
@@ -1549,6 +1575,30 @@
                 
                 console.log(`✅ ${processedCount} photos prepared for upload`);
             });
+        }
+        
+        /**
+         * Update the total photo count display
+         */
+        function updateTotalCount() {
+            const preview = document.getElementById('photo-preview');
+            let countDisplay = preview.querySelector('#total-photo-count');
+            
+            if (selectedPhotos.length > 0 && !countDisplay) {
+                // Create count display if it doesn't exist
+                countDisplay = document.createElement('div');
+                countDisplay.id = 'total-photo-count';
+                countDisplay.style.cssText = 'padding: 12px 20px; background: rgba(67, 100, 129, 0.1); border-radius: 8px; text-align: center; margin-bottom: 20px; border-left: 4px solid #436481; position: sticky; top: 0; z-index: 10;';
+                preview.insertBefore(countDisplay, preview.firstChild);
+            }
+            
+            if (countDisplay) {
+                if (selectedPhotos.length === 0) {
+                    countDisplay.remove();
+                } else {
+                    countDisplay.innerHTML = `<p style="font-size: 14px; font-weight: 600; color: #436481; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">📷 ${selectedPhotos.length} photo${selectedPhotos.length !== 1 ? 's' : ''} selected</p>`;
+                }
+            }
         }
         
         /**
