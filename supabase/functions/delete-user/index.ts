@@ -71,8 +71,11 @@ serve(async (req) => {
       .single();
 
     if (userFetchError) {
+      console.error('User fetch error:', userFetchError);
       throw new Error(`User not found: ${userFetchError.message}`);
     }
+
+    console.log('Target user:', userData.email, 'Role:', userData.role, 'Org:', userData.org_id);
 
     // Don't allow deleting admin users (safety measure)
     if (userData.role === 'admin') {
@@ -90,9 +93,11 @@ serve(async (req) => {
       }
     } else if (callerRole === 'admin') {
       // Admins can delete editor, qc, director, and family users
-      // But if deleting editor/qc/director, verify they're in the same org
+      // But if deleting editor/qc/director, verify they're in the same org (if both have org_id)
       if (['editor', 'qc', 'director'].includes(userData.role)) {
-        if (userData.org_id !== callerOrgId) {
+        // Only enforce org check if both users have org_id
+        if (userData.org_id && callerOrgId && userData.org_id !== callerOrgId) {
+          console.error('Org mismatch - Target org:', userData.org_id, 'Caller org:', callerOrgId);
           throw new Error('Admins can only delete staff users in their own organization');
         }
       }
