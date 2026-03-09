@@ -522,25 +522,7 @@
                     </div>
                   </div>
                   
-                  <!-- Lightbox Modal (for viewing single photo) -->
-                  <div id="photo-lightbox-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.98); z-index: 10002; overflow: hidden;">
-                    <button id="lightbox-close-btn" type="button" style="position: fixed; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.2); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 24px; line-height: 1; z-index: 10003; transition: background 0.3s;">&times;</button>
-                    
-                    <!-- Navigation arrows -->
-                    <button id="lightbox-prev-btn" type="button" style="position: fixed; left: 20px; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.2); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; font-size: 24px; line-height: 1; z-index: 10003; transition: background 0.3s;">‹</button>
-                    
-                    <button id="lightbox-next-btn" type="button" style="position: fixed; right: 20px; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.2); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; font-size: 24px; line-height: 1; z-index: 10003; transition: background 0.3s;">›</button>
-                    
-                    <!-- Current photo display -->
-                    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; padding: 80px 100px;">
-                      <img id="lightbox-image" src="" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    </div>
-                    
-                    <!-- Photo counter -->
-                    <div id="lightbox-counter" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); color: white; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 16px; z-index: 10003;"></div>
-                  </div>
-                  
-                  <!-- Responsive CSS for photo modals -->
+                  <!-- Responsive CSS for photo modal -->
                   <style>
                     @media (max-width: 768px) {
                       #photo-gallery-grid {
@@ -553,20 +535,6 @@
                       #gallery-close-btn {
                         top: 10px !important;
                         right: 10px !important;
-                      }
-                      #lightbox-prev-btn, #lightbox-next-btn {
-                        width: 40px !important;
-                        height: 40px !important;
-                        font-size: 20px !important;
-                      }
-                      #lightbox-prev-btn {
-                        left: 10px !important;
-                      }
-                      #lightbox-next-btn {
-                        right: 10px !important;
-                      }
-                      #photo-lightbox-modal > div {
-                        padding: 60px 50px !important;
                       }
                     }
                   </style>
@@ -1633,21 +1601,16 @@
             const grid = document.getElementById('photo-gallery-grid');
             const title = document.getElementById('gallery-title');
             
-            title.textContent = `${selectedPhotos.length} Photo${selectedPhotos.length !== 1 ? 's' : ''}`;
+            title.textContent = `${selectedPhotos.length} Photo${selectedPhotos.length !== 1 ? 's' : ''} Selected`;
             
             // Clear and populate grid
             grid.innerHTML = '';
             
             photoDataUrls.forEach((dataUrl, index) => {
                 const gridItem = document.createElement('div');
-                gridItem.style.cssText = 'position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.3s;';
+                gridItem.style.cssText = 'position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(255,255,255,0.1); transition: transform 0.3s;';
                 gridItem.onmouseover = () => gridItem.style.transform = 'scale(1.05)';
                 gridItem.onmouseout = () => gridItem.style.transform = 'scale(1)';
-                gridItem.onclick = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    openLightbox(index);
-                };
                 
                 const img = document.createElement('img');
                 img.src = dataUrl;
@@ -1657,14 +1620,14 @@
                 const removeBtn = document.createElement('button');
                 removeBtn.textContent = '×';
                 removeBtn.type = 'button';
-                removeBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; background: rgba(0, 0, 0, 0.7); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 20px; line-height: 1; z-index: 10; transition: background 0.3s;';
+                removeBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; background: rgba(255, 0, 0, 0.8); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 22px; line-height: 1; z-index: 10; transition: background 0.3s; font-weight: bold;';
                 removeBtn.onclick = (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     removePhoto(index);
                 };
-                removeBtn.onmouseover = () => removeBtn.style.background = 'rgba(255, 0, 0, 0.8)';
-                removeBtn.onmouseout = () => removeBtn.style.background = 'rgba(0, 0, 0, 0.7)';
+                removeBtn.onmouseover = () => removeBtn.style.background = 'rgba(200, 0, 0, 1)';
+                removeBtn.onmouseout = () => removeBtn.style.background = 'rgba(255, 0, 0, 0.8)';
                 
                 gridItem.appendChild(img);
                 gridItem.appendChild(removeBtn);
@@ -1685,53 +1648,6 @@
         }
         
         /**
-         * Open lightbox to view single photo
-         */
-        let currentLightboxIndex = 0;
-        function openLightbox(index) {
-            currentLightboxIndex = index;
-            updateLightboxImage();
-            
-            const lightbox = document.getElementById('photo-lightbox-modal');
-            lightbox.style.display = 'block';
-        }
-        
-        /**
-         * Close lightbox
-         */
-        function closeLightbox() {
-            const lightbox = document.getElementById('photo-lightbox-modal');
-            lightbox.style.display = 'none';
-        }
-        
-        /**
-         * Navigate to previous photo in lightbox
-         */
-        function lightboxPrev() {
-            currentLightboxIndex = (currentLightboxIndex - 1 + photoDataUrls.length) % photoDataUrls.length;
-            updateLightboxImage();
-        }
-        
-        /**
-         * Navigate to next photo in lightbox
-         */
-        function lightboxNext() {
-            currentLightboxIndex = (currentLightboxIndex + 1) % photoDataUrls.length;
-            updateLightboxImage();
-        }
-        
-        /**
-         * Update lightbox image and counter
-         */
-        function updateLightboxImage() {
-            const img = document.getElementById('lightbox-image');
-            const counter = document.getElementById('lightbox-counter');
-            
-            img.src = photoDataUrls[currentLightboxIndex];
-            counter.textContent = `${currentLightboxIndex + 1} / ${photoDataUrls.length}`;
-        }
-        
-        /**
          * Remove photo from selection
          */
         function removePhoto(index) {
@@ -1745,7 +1661,7 @@
                 // Refresh gallery grid
                 const grid = document.getElementById('photo-gallery-grid');
                 const title = document.getElementById('gallery-title');
-                title.textContent = `${selectedPhotos.length} Photo${selectedPhotos.length !== 1 ? 's' : ''}`;
+                title.textContent = `${selectedPhotos.length} Photo${selectedPhotos.length !== 1 ? 's' : ''} Selected`;
                 
                 // Remove the specific grid item
                 grid.children[index].remove();
@@ -1768,50 +1684,17 @@
                 closeGalleryModal();
             };
             
-            // Lightbox controls
-            document.getElementById('lightbox-close-btn').onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                closeLightbox();
-            };
-            document.getElementById('lightbox-prev-btn').onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                lightboxPrev();
-            };
-            document.getElementById('lightbox-next-btn').onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                lightboxNext();
-            };
-            
-            // Close lightbox when clicking outside image
-            document.getElementById('photo-lightbox-modal').onclick = (e) => {
-                if (e.target.id === 'photo-lightbox-modal') {
+            // Close gallery when clicking outside
+            document.getElementById('photo-gallery-modal').onclick = (e) => {
+                if (e.target.id === 'photo-gallery-modal') {
                     e.preventDefault();
                     e.stopPropagation();
-                    closeLightbox();
+                    closeGalleryModal();
                 }
             };
             
-            // Keyboard navigation for lightbox
+            // Keyboard ESC to close gallery
             document.addEventListener('keydown', (e) => {
-                const lightbox = document.getElementById('photo-lightbox-modal');
-                if (lightbox.style.display === 'block') {
-                    if (e.key === 'ArrowLeft') {
-                        e.preventDefault();
-                        lightboxPrev();
-                    }
-                    if (e.key === 'ArrowRight') {
-                        e.preventDefault();
-                        lightboxNext();
-                    }
-                    if (e.key === 'Escape') {
-                        e.preventDefault();
-                        closeLightbox();
-                    }
-                }
-                
                 const gallery = document.getElementById('photo-gallery-modal');
                 if (gallery.style.display === 'block' && e.key === 'Escape') {
                     e.preventDefault();
@@ -1863,41 +1746,8 @@
                 return;
             }
             
-            // Create upload progress overlay
-            const uploadOverlay = document.createElement('div');
-            uploadOverlay.id = 'photo-upload-overlay';
-            uploadOverlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;';
-            
-            const uploadContainer = document.createElement('div');
-            uploadContainer.style.cssText = 'background: white; padding: 40px; border-radius: 16px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);';
-            
-            const spinner = document.createElement('div');
-            spinner.style.cssText = 'width: 60px; height: 60px; border: 6px solid rgba(67, 100, 129, 0.2); border-top-color: #436481; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;';
-            
-            const uploadTitle = document.createElement('h3');
-            uploadTitle.style.cssText = 'font-size: 24px; font-weight: 700; color: #436481; margin: 0 0 12px 0; font-family: "Dosis Variablefont Wght", Arial, sans-serif;';
-            uploadTitle.textContent = 'Uploading Photos';
-            
-            const uploadProgress = document.createElement('p');
-            uploadProgress.id = 'upload-progress-text';
-            uploadProgress.style.cssText = 'font-size: 18px; color: #666; margin: 0 0 8px 0; font-family: "Dosis Variablefont Wght", Arial, sans-serif;';
-            uploadProgress.textContent = `Uploading 0 of ${selectedPhotos.length} photos...`;
-            
-            const uploadSubtext = document.createElement('p');
-            uploadSubtext.style.cssText = 'font-size: 14px; color: #999; margin: 0; font-family: "Dosis Variablefont Wght", Arial, sans-serif;';
-            uploadSubtext.textContent = 'Please don\'t close this page';
-            
-            uploadContainer.appendChild(spinner);
-            uploadContainer.appendChild(uploadTitle);
-            uploadContainer.appendChild(uploadProgress);
-            uploadContainer.appendChild(uploadSubtext);
-            uploadOverlay.appendChild(uploadContainer);
-            document.body.appendChild(uploadOverlay);
-            
             try {
                 console.log(`📷 Uploading ${selectedPhotos.length} photo(s) to Supabase Storage...`);
-                
-                let uploadedCount = 0;
                 
                 for (let i = 0; i < selectedPhotos.length; i++) {
                     const file = selectedPhotos[i];
@@ -1950,49 +1800,15 @@
                         } else {
                             console.log('✅ Photo saved to assets table');
                         }
-                        
-                        // Update progress
-                        uploadedCount++;
-                        const progressEl = document.getElementById('upload-progress-text');
-                        if (progressEl) {
-                            progressEl.textContent = `Uploading ${uploadedCount} of ${selectedPhotos.length} photos...`;
-                        }
                     } catch (photoError) {
                         console.error('❌ Error processing individual photo:', photoError);
                     }
                 }
                 
-                // Show success state briefly before removing overlay
-                uploadTitle.textContent = 'Upload Complete!';
-                uploadProgress.textContent = `Successfully uploaded ${uploadedCount} photo${uploadedCount !== 1 ? 's' : ''}`;
-                uploadSubtext.textContent = 'Finalizing your submission...';
-                spinner.style.display = 'none';
-                
                 console.log('✅ All photos processed');
-                
-                // Remove overlay after brief delay
-                setTimeout(() => {
-                    uploadOverlay.remove();
-                }, 1500);
                 
             } catch (error) {
                 console.error('❌ Error saving uploaded photos:', error);
-                
-                // Show error state
-                const uploadTitle = uploadOverlay.querySelector('h3');
-                const uploadProgress = uploadOverlay.querySelector('#upload-progress-text');
-                const uploadSubtext = uploadOverlay.querySelector('p:last-child');
-                const spinner = uploadOverlay.querySelector('div');
-                
-                if (uploadTitle) uploadTitle.textContent = 'Upload Error';
-                if (uploadProgress) uploadProgress.textContent = 'Some photos failed to upload';
-                if (uploadSubtext) uploadSubtext.textContent = 'Your form will still be submitted';
-                if (spinner) spinner.style.display = 'none';
-                
-                // Remove overlay after delay
-                setTimeout(() => {
-                    uploadOverlay.remove();
-                }, 2500);
             }
         }
         
