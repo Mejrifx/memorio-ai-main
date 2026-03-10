@@ -952,8 +952,18 @@
           </svg>
           Uploaded Photos
         </h3>
-        <div id="photos-content" class="photo-gallery">
+        <!-- Compact thumbnail preview (renders via JS) -->
+        <div id="photos-content">
           <!-- Photos will be loaded here -->
+        </div>
+      </div>
+
+      <!-- Editor Photo Gallery Modal (full-screen overlay) -->
+      <div id="editor-gallery-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.96); z-index: 99999; overflow-y: auto;" onclick="handleEditorGalleryBackdrop(event)">
+        <div style="position: relative; min-height: 100vh; padding: 64px 20px 40px;">
+          <button onclick="closeEditorGallery()" type="button" style="position: fixed; top: 16px; right: 16px; background: rgba(255,255,255,0.15); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-size: 26px; line-height: 1; z-index: 100000; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">&times;</button>
+          <h3 id="editor-gallery-title" style="color: white; text-align: center; margin: 0 0 28px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 22px; font-weight: 600;"></h3>
+          <div id="editor-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; max-width: 1400px; margin: 0 auto;"></div>
         </div>
       </div>
       
@@ -1024,17 +1034,38 @@
               style="width: 100%; min-height: 80px; padding: 12px; border: 1.5px solid #436481; border-radius: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; resize: vertical;"></textarea>
           </div>
           
-          <div id="upload-progress" style="display: none; margin-bottom: 16px;">
-            <div style="background-color: #f0f0f0; border-radius: 8px; overflow: hidden; height: 24px;">
-              <div id="progress-bar" style="background: linear-gradient(90deg, #28a745, #34c759); height: 100%; width: 0%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 13px; border-radius: 8px;"></div>
+          <!-- Upload progress (shown during upload) -->
+          <div id="upload-progress" style="display: none; margin-bottom: 16px; background: #f8fffe; border: 1.5px solid #c3e6cb; border-radius: 10px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+              <div id="upload-spinner" style="width: 20px; height: 20px; border: 3px solid #dee2e6; border-top-color: #28a745; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0;"></div>
+              <p id="upload-status" style="color: #155724; font-size: 14px; font-weight: 600; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></p>
             </div>
-            <div style="display: flex; justify-content: space-between; margin-top: 6px;">
-              <p id="upload-status" style="color: #666; font-size: 13px; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></p>
-              <p id="upload-eta" style="color: #436481; font-size: 13px; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-weight: 600;"></p>
+            <div style="background: #dee2e6; border-radius: 6px; overflow: hidden; height: 10px; margin-bottom: 8px;">
+              <div id="progress-bar" style="background: linear-gradient(90deg, #28a745, #34c759); height: 100%; width: 0%; transition: width 0.35s ease; border-radius: 6px;"></div>
             </div>
-            <p style="margin: 8px 0 0; font-size: 11px; color: #999; text-align: center; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <p id="upload-percent" style="color: #28a745; font-size: 13px; font-weight: 700; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">0%</p>
+              <p id="upload-eta" style="color: #666; font-size: 12px; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></p>
+            </div>
+            <p style="margin: 8px 0 0; font-size: 11px; color: #888; text-align: center; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
               Please keep this tab open until the upload completes
             </p>
+          </div>
+
+          <!-- Upload success card (shown after successful upload) -->
+          <div id="upload-success-card" style="display: none; margin-bottom: 16px; background: #d4edda; border: 1.5px solid #28a745; border-radius: 10px; padding: 18px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div style="width: 36px; height: 36px; background: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div>
+                <p style="margin: 0 0 4px; font-weight: 700; color: #155724; font-size: 15px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Video submitted successfully!</p>
+                <p id="success-file-info" style="margin: 0 0 6px; color: #1d643b; font-size: 13px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></p>
+                <p style="margin: 0; font-size: 12px; color: #2e7d45; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Status: <strong>Pending QC Review</strong></p>
+              </div>
+            </div>
           </div>
           
           <button 
@@ -1850,12 +1881,14 @@
         submitBtnEl.style.borderColor = '#28a745';
         submitBtnEl.style.cursor = 'pointer';
       }
-      // Also reset the file info card and progress bar
+      // Also reset the file info card, progress bar, and success card
       const fileInfoEl = document.getElementById('video-file-info');
       const uploadProgressEl = document.getElementById('upload-progress');
+      const uploadSuccessCardEl = document.getElementById('upload-success-card');
       const videoFileInputEl = document.getElementById('video-file-input');
       if (fileInfoEl) fileInfoEl.style.display = 'none';
       if (uploadProgressEl) uploadProgressEl.style.display = 'none';
+      if (uploadSuccessCardEl) uploadSuccessCardEl.style.display = 'none';
       if (videoFileInputEl) { videoFileInputEl.value = ''; videoFileInputEl.disabled = false; }
       
       try {
@@ -2007,25 +2040,10 @@
         // INITIALIZE PHOTO ACCESS TIMER (12-hour window check)
         initializePhotoAccessTimer(formSubmittedAt);
         
-        // DISPLAY PHOTOS WITH INDIVIDUAL DOWNLOAD BUTTONS
+        // DISPLAY PHOTOS — compact thumbnail with gallery modal
         const photosContent = document.getElementById('photos-content');
         const photos = caseData.assets?.filter(a => a.mime_type?.startsWith('image/')) || [];
-        
-        if (photos.length > 0) {
-          photosContent.innerHTML = photos.map((asset, index) => {
-            const assetUrl = getAssetUrl(asset.file_key);
-            return `
-              <div class="photo-item" onclick="viewPhoto('${assetUrl}', ${index + 1})">
-                <img src="${assetUrl}" alt="Photo ${index + 1}" loading="lazy">
-                <button class="photo-download-btn" onclick="event.stopPropagation(); downloadPhoto('${assetUrl}', ${index + 1})">
-                  ⬇
-                </button>
-              </div>
-            `;
-          }).join('');
-        } else {
-          photosContent.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No photos uploaded yet.</p>';
-        }
+        renderEditorPhotoPreview(photos, photosContent);
         
         // Update download all button
         const downloadBtn = document.getElementById('download-all-btn');
@@ -2105,6 +2123,71 @@
       photosAccessLocked = false;
     }
     
+    // ── Editor Photo Gallery ──────────────────────────────────────────────────
+    let editorGalleryPhotos = [];
+
+    function renderEditorPhotoPreview(photos, container) {
+      if (!photos || photos.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No photos uploaded yet.</p>';
+        return;
+      }
+
+      editorGalleryPhotos = photos;
+      const firstUrl = getAssetUrl(photos[0].file_key);
+      const extra = photos.length - 1;
+
+      container.innerHTML = `
+        <div onclick="openEditorGallery()" style="display: inline-flex; flex-direction: column; align-items: flex-start; cursor: pointer; gap: 10px; text-decoration: none;">
+          <div style="position: relative; width: 190px; height: 190px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.14); border: 2.5px solid transparent; transition: border-color 0.2s;" onmouseover="this.style.borderColor='#436481'" onmouseout="this.style.borderColor='transparent'">
+            <img src="${firstUrl}" alt="Photo 1" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            ${extra > 0 ? `<div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.75); color: white; padding: 5px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; letter-spacing: 0.3px;">+${extra}</div>` : ''}
+            <div style="position: absolute; inset: 0; background: rgba(67,100,129,0); transition: background 0.2s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(67,100,129,0.18)'" onmouseout="this.style.background='rgba(67,100,129,0)'">
+            </div>
+          </div>
+          <div style="padding-left: 2px;">
+            <span style="font-size: 13px; font-weight: 700; color: #436481; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">${photos.length} photo${photos.length !== 1 ? 's' : ''} uploaded</span><br>
+            <span style="font-size: 12px; color: #999; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Click to view all</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function openEditorGallery() {
+      const modal = document.getElementById('editor-gallery-modal');
+      const grid = document.getElementById('editor-gallery-grid');
+      const title = document.getElementById('editor-gallery-title');
+
+      title.textContent = `${editorGalleryPhotos.length} Photo${editorGalleryPhotos.length !== 1 ? 's' : ''}`;
+
+      grid.innerHTML = editorGalleryPhotos.map((asset, i) => {
+        const url = getAssetUrl(asset.file_key);
+        return `
+          <div style="position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #1a1a1a; group">
+            <img src="${url}" alt="Photo ${i + 1}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+            <div style="position: absolute; top: 0; right: 0; opacity: 0; transition: opacity 0.2s; padding: 6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
+              <button type="button" onclick="downloadPhoto('${url}', ${i + 1})" style="background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 13px;" title="Download">⬇</button>
+            </div>
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.55)); padding: 18px 8px 6px; opacity: 0; transition: opacity 0.2s;" onmouseover="this.parentElement.querySelector('div:last-child').style.opacity=1" onmouseout="this.parentElement.querySelector('div:last-child').style.opacity=0">
+              <span style="color: rgba(255,255,255,0.8); font-size: 11px;">${i + 1} / ${editorGalleryPhotos.length}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditorGallery() {
+      document.getElementById('editor-gallery-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function handleEditorGalleryBackdrop(e) {
+      if (e.target === document.getElementById('editor-gallery-modal')) closeEditorGallery();
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     // View individual photo in new tab
     function viewPhoto(photoUrl, photoNumber) {
       console.log(`🖼️ Opening photo ${photoNumber} in new tab: ${photoUrl}`);
@@ -2465,39 +2548,65 @@
 
     async function performVideoSubmission(videoFile, editorNotes, submitBtn, progressDiv, progressBar, statusText) {
       const uploadStartTime = Date.now();
-      let uploadedBytes = 0;
       let videoUrl = '';
       let beforeUnloadHandler = null;
 
-      const etaEl = document.getElementById('upload-eta');
+      const etaEl      = document.getElementById('upload-eta');
+      const percentEl  = document.getElementById('upload-percent');
+      const successCard = document.getElementById('upload-success-card');
+      const successFileInfo = document.getElementById('success-file-info');
+      const spinnerEl  = document.getElementById('upload-spinner');
 
       function updateProgress(loaded, total) {
         const pct = Math.round((loaded / total) * 100);
         progressBar.style.width = `${pct}%`;
-        progressBar.textContent = `${pct}%`;
-        uploadedBytes = loaded;
+        if (percentEl) percentEl.textContent = `${pct}%`;
 
-        // Speed and ETA
         const elapsed = (Date.now() - uploadStartTime) / 1000;
-        if (elapsed > 1 && loaded > 0) {
+        if (elapsed > 1 && loaded > 0 && etaEl) {
           const bps = loaded / elapsed;
           const remaining = Math.ceil((total - loaded) / bps);
           const speed = formatBytes(bps) + '/s';
           const eta = remaining < 60 ? `${remaining}s` : `${Math.ceil(remaining / 60)}min`;
-          if (etaEl) etaEl.textContent = `${speed} · ${eta} left`;
+          etaEl.textContent = `${speed} · ${eta} left`;
         }
+      }
+
+      function showProgress(message) {
+        progressDiv.style.display = 'block';
+        if (spinnerEl) spinnerEl.style.display = 'block';
+        statusText.textContent = message;
+        progressBar.style.width = '0%';
+        if (percentEl) percentEl.textContent = '0%';
+        if (etaEl) etaEl.textContent = '';
+        if (successCard) successCard.style.display = 'none';
+      }
+
+      function showSuccess() {
+        // Transition progress bar to 100% green then hide it
+        progressBar.style.width = '100%';
+        if (percentEl) percentEl.textContent = '100%';
+        statusText.textContent = 'Saving to database...';
+
+        setTimeout(() => {
+          if (spinnerEl) spinnerEl.style.display = 'none';
+          progressDiv.style.display = 'none';
+
+          // Show the persistent success card
+          if (successCard) {
+            if (successFileInfo) {
+              successFileInfo.textContent = `${videoFile.name} · ${formatBytes(videoFile.size)}`;
+            }
+            successCard.style.display = 'block';
+          }
+        }, 700);
       }
 
       try {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Uploading...';
-        progressDiv.style.display = 'block';
-        progressBar.style.width = '0%';
-        progressBar.textContent = '0%';
-        statusText.textContent = 'Preparing upload...';
-        if (etaEl) etaEl.textContent = '';
+        submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:6px;animation:spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>Uploading...`;
+        showProgress('Preparing upload...');
 
-        // Warn user not to close the tab during upload
         beforeUnloadHandler = (e) => {
           e.preventDefault();
           e.returnValue = 'Video is still uploading. Leaving now will cancel the upload.';
@@ -2512,27 +2621,24 @@
           statusText.textContent = 'Uploading to Cloudflare Stream...';
           console.log('Using Cloudflare Stream upload:', cfData.videoUid);
 
-          // Use XMLHttpRequest so we get progress events for TUS upload
           await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', cfData.uploadURL);
             xhr.setRequestHeader('Upload-Length', videoFile.size.toString());
 
-            xhr.upload.onprogress = (e) => {
-              if (e.lengthComputable) updateProgress(e.loaded, e.total);
-            };
+            xhr.upload.onprogress = (e) => { if (e.lengthComputable) updateProgress(e.loaded, e.total); };
             xhr.onload = () => {
               if (xhr.status >= 200 && xhr.status < 300) resolve();
               else reject(new Error(`Cloudflare upload failed: ${xhr.status}`));
             };
             xhr.onerror = () => reject(new Error('Network error during Cloudflare upload'));
 
-            const formData = new FormData();
-            formData.append('file', videoFile);
-            xhr.send(formData);
+            const fd = new FormData();
+            fd.append('file', videoFile);
+            xhr.send(fd);
           });
 
-          videoUrl = cfData.playerUrl; // e.g. "cf-stream:{uid}"
+          videoUrl = cfData.playerUrl;
           console.log('✅ Cloudflare Stream upload complete, UID:', cfData.videoUid);
 
         } else {
@@ -2544,21 +2650,19 @@
           const fileExt = videoFile.name.split('.').pop();
           const filePath = `videos/case_${currentCase.id}_${timestamp}.${fileExt}`;
 
-          // Supabase JS SDK doesn't expose upload progress natively via the standard call.
-          // Use XMLHttpRequest for progress tracking.
           const { data: { session } } = await supabaseClient.auth.getSession();
           const uploadUrl = `${SUPABASE_URL}/storage/v1/object/case-assets/${filePath}`;
 
           await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', uploadUrl);
+            // Send raw bytes — Supabase Storage REST API does NOT accept multipart/form-data
             xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
+            xhr.setRequestHeader('Content-Type', videoFile.type || 'application/octet-stream');
             xhr.setRequestHeader('x-upsert', 'false');
             xhr.setRequestHeader('cache-control', '3600');
 
-            xhr.upload.onprogress = (e) => {
-              if (e.lengthComputable) updateProgress(e.loaded, e.total);
-            };
+            xhr.upload.onprogress = (e) => { if (e.lengthComputable) updateProgress(e.loaded, e.total); };
             xhr.onload = () => {
               if (xhr.status >= 200 && xhr.status < 300) resolve();
               else {
@@ -2569,9 +2673,7 @@
             };
             xhr.onerror = () => reject(new Error('Network error during upload'));
 
-            const formData = new FormData();
-            formData.append('', videoFile, filePath);
-            xhr.send(formData);
+            xhr.send(videoFile); // raw bytes — correct for Supabase Storage REST API
           });
 
           const { data: urlData } = supabaseClient.storage
@@ -2582,7 +2684,7 @@
 
         // ---- Save submission record ----
         updateProgress(videoFile.size, videoFile.size);
-        statusText.textContent = 'Finalising submission...';
+        statusText.textContent = 'Saving submission record...';
         if (etaEl) etaEl.textContent = '';
 
         const { data: previousSubmissions } = await supabaseClient
@@ -2620,25 +2722,25 @@
           .update({ status: 'awaiting_review' })
           .eq('id', currentCase.id);
 
-        // ---- Success ----
-        statusText.textContent = '✓ Video submitted successfully!';
-        showToast('✓ Video submitted to Quality Control!');
+        // ---- Show success UI ----
+        showSuccess();
+        showToast('Video submitted to Quality Control!');
 
         // Reset form fields
-        const fileInputEl = document.getElementById('video-file-input');
+        const fileInputEl  = document.getElementById('video-file-input');
         const notesInputEl = document.getElementById('editor-notes-input');
-        const fileInfoEl = document.getElementById('video-file-info');
-        if (fileInputEl) fileInputEl.value = '';
-        if (fileInfoEl) fileInfoEl.style.display = 'none';
+        const fileInfoEl   = document.getElementById('video-file-info');
+        if (fileInputEl)  fileInputEl.value = '';
         if (notesInputEl) notesInputEl.value = '';
+        if (fileInfoEl)   fileInfoEl.style.display = 'none';
 
-        submitBtn.textContent = '✓ Submitted for Review';
+        submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:6px;"><polyline points="20 6 9 17 4 12"></polyline></svg>Submitted for Review`;
         submitBtn.style.backgroundColor = '#6c757d';
         submitBtn.style.borderColor = '#6c757d';
         submitBtn.style.cursor = 'not-allowed';
 
+        // Refresh case list in background
         setTimeout(async () => {
-          progressDiv.style.display = 'none';
           await loadAssignedCases();
 
           const { data: newSubmissions } = await supabaseClient
@@ -2649,19 +2751,21 @@
             .limit(1);
 
           if (newSubmissions?.length > 0) displaySubmissionStatus(newSubmissions[0]);
-        }, 2000);
+        }, 3000);
 
       } catch (error) {
         console.error('Error submitting video:', error);
         showToast('Error submitting video: ' + error.message, true);
         progressDiv.style.display = 'none';
+        if (successCard) successCard.style.display = 'none';
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit to Quality Control';
+        submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>Submit to Quality Control`;
+        submitBtn.style.backgroundColor = '#28a745';
+        submitBtn.style.borderColor = '#28a745';
+        submitBtn.style.cursor = 'pointer';
         if (etaEl) etaEl.textContent = '';
       } finally {
-        if (beforeUnloadHandler) {
-          window.removeEventListener('beforeunload', beforeUnloadHandler);
-        }
+        if (beforeUnloadHandler) window.removeEventListener('beforeunload', beforeUnloadHandler);
       }
     }
     
