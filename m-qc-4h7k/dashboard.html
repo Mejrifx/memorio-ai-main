@@ -1681,16 +1681,86 @@
           </p>`;
       }
 
-      // Fallback: regular HTML5 player for Supabase-stored videos
+      // Fallback: custom click-to-load player for Supabase-stored videos.
+      //
+      // WHY NOT preload="metadata":
+      // Most video encoders place the moov atom (metadata) at the END of the MP4
+      // file. With preload="metadata" the browser fetches the start, fails to find
+      // the metadata, then downloads the entire file end-to-end before playback
+      // can begin — causing the 20-minute load time. preload="none" avoids this
+      // entirely by deferring all network activity until the user clicks play.
+      // Once the browser does start loading, it uses HTTP range requests so only
+      // the chunk being watched is fetched — the whole file is never downloaded.
+      const videoId = `qc-video-${Date.now()}`;
+      const wrapperId = `qc-video-wrapper-${Date.now()}`;
       return `
-        <video
-          class="video-player"
-          controls
-          preload="metadata"
-          style="width: 100%; border-radius: 8px; max-height: 520px; background: #000;">
-          <source src="${url}" type="${submission.mime_type || 'video/mp4'}">
-          Your browser does not support the video tag.
-        </video>`;
+        <div id="${wrapperId}" style="position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #000; min-height: 200px;">
+
+          <!-- Click-to-load overlay (hidden once video starts loading) -->
+          <div id="${wrapperId}-overlay"
+            onclick="loadQCVideo('${videoId}','${wrapperId}','${url.replace(/'/g, "\\'")}','${submission.mime_type || 'video/mp4'}')"
+            style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%); z-index: 2;">
+            <div style="width: 72px; height: 72px; background: rgba(255,255,255,0.15); border: 2.5px solid rgba(255,255,255,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; transition: background 0.2s;"
+              onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="white" style="margin-left: 3px;">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </div>
+            <p style="color: rgba(255,255,255,0.9); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 6px;">Click to load video</p>
+            <p style="color: rgba(255,255,255,0.5); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 12px; margin: 0;">Video streams in chunks — no full download required</p>
+          </div>
+
+          <!-- Loading spinner (shown while video buffers after click) -->
+          <div id="${wrapperId}-loading"
+            style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 2;">
+            <div style="width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;"></div>
+            <p style="color: rgba(255,255,255,0.7); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 14px; margin: 0;">Loading video...</p>
+          </div>
+
+          <!-- The actual video element — preload="none" so nothing loads until explicitly triggered -->
+          <video
+            id="${videoId}"
+            class="video-player"
+            controls
+            preload="none"
+            style="width: 100%; border-radius: 8px; max-height: 520px; background: #000; display: none;"
+            oncanplay="showQCVideoPlayer('${videoId}','${wrapperId}')"
+            onwaiting="document.getElementById('${wrapperId}-loading').style.display='flex'"
+            onplaying="document.getElementById('${wrapperId}-loading').style.display='none'">
+            <source src="${url}" type="${submission.mime_type || 'video/mp4'}">
+            Your browser does not support the video tag.
+          </video>
+        </div>`;
+    }
+
+    function loadQCVideo(videoId, wrapperId, url, mimeType) {
+      const overlay  = document.getElementById(wrapperId + '-overlay');
+      const loading  = document.getElementById(wrapperId + '-loading');
+      const videoEl  = document.getElementById(videoId);
+
+      if (!videoEl) return;
+
+      // Hide overlay, show spinner
+      overlay.style.display  = 'none';
+      loading.style.display  = 'flex';
+
+      // Set source now so the browser starts a range request
+      if (!videoEl.src) {
+        videoEl.src = url;
+      }
+
+      videoEl.load();
+      videoEl.play().catch(() => {
+        // Autoplay blocked — just show the player controls
+        showQCVideoPlayer(videoId, wrapperId);
+      });
+    }
+
+    function showQCVideoPlayer(videoId, wrapperId) {
+      const loading = document.getElementById(wrapperId + '-loading');
+      const videoEl = document.getElementById(videoId);
+      if (loading) loading.style.display = 'none';
+      if (videoEl) videoEl.style.display = 'block';
     }
     
     function formatStatus(status) {
