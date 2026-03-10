@@ -2536,7 +2536,15 @@
       let beforeUnloadHandler = null;
 
       function updateProgress(loaded, total) {
-        const pct = Math.round((loaded / total) * 100);
+        // Cap at 99% — the final 1% is reserved for the server-side write phase.
+        // xhr.upload.onprogress fires when bytes are sent from the browser, but
+        // the server still needs to write the file and return its HTTP response.
+        // For large files this can take 30-120s, making the ETA read "0s" while
+        // the editor waits. Capping at 99% + showing "Server is saving..." makes
+        // it clear something is still happening rather than appearing frozen.
+        const rawPct = (loaded / total) * 100;
+        const pct    = Math.min(Math.round(rawPct), 99);
+
         progressBar.style.width = `${pct}%`;
         if (percentEl) percentEl.textContent = `${pct}%`;
 
@@ -2544,9 +2552,16 @@
         if (elapsed > 1 && loaded > 0 && etaEl) {
           const bps       = loaded / elapsed;
           const remaining = Math.ceil((total - loaded) / bps);
-          const speed     = formatBytes(bps) + '/s';
-          const eta       = remaining < 60 ? `${remaining}s` : `${Math.ceil(remaining / 60)}min`;
-          etaEl.textContent = `${speed} · ${eta} left`;
+
+          if (rawPct >= 99.5) {
+            // All bytes sent — waiting for server to confirm receipt
+            statusText.textContent = 'Server is saving your video...';
+            etaEl.textContent      = 'Almost done — please wait';
+          } else {
+            const speed = formatBytes(bps) + '/s';
+            const eta   = remaining < 60 ? `${remaining}s` : `${Math.ceil(remaining / 60)}min`;
+            etaEl.textContent = `${speed} · ${eta} left`;
+          }
         }
       }
 
@@ -2619,8 +2634,11 @@
 
         uploadedVideoFile = file;
 
-        // ── Show success: video is ready ──
-        updateProgress(file.size, file.size);
+        // ── Show success: video is ready — jump bar to 100% ──
+        progressBar.style.width = '100%';
+        if (percentEl) percentEl.textContent = '100%';
+        if (etaEl) etaEl.textContent = '';
+        statusText.textContent = 'Upload complete!';
         progressBar.style.background = 'linear-gradient(90deg, #28a745, #34c759)';
 
         setTimeout(() => {
