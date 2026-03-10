@@ -522,6 +522,30 @@
                     </div>
                   </div>
                   
+                  <!-- Photo Upload Progress Bar (fixed at bottom of screen) -->
+                  <div id="photo-upload-progress" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1e2d3d; color: white; padding: 14px 20px; z-index: 99999; box-shadow: 0 -4px 20px rgba(0,0,0,0.4);">
+                    <div style="max-width: 800px; margin: 0 auto;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span id="upload-progress-title" style="font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-weight: 600; font-size: 15px;">📤 Uploading Photos...</span>
+                        <span id="upload-progress-count" style="font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 13px; opacity: 0.85; font-weight: 600;"></span>
+                      </div>
+                      <div style="background: rgba(255,255,255,0.2); border-radius: 4px; height: 8px; overflow: hidden;">
+                        <div id="upload-progress-bar" style="background: linear-gradient(90deg, #4caf50, #66bb6a); height: 100%; width: 0%; transition: width 0.4s ease; border-radius: 4px;"></div>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; margin-top: 6px; align-items: center;">
+                        <span id="upload-progress-status" style="font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 11px; opacity: 0.7;">Preparing...</span>
+                        <span id="upload-progress-eta" style="font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 11px; opacity: 0.7;"></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Interrupted Upload Recovery Banner (hidden by default) -->
+                  <div id="resume-upload-banner" style="display: none; background: #fff3e9; border: 2px solid #436481; border-radius: 12px; padding: 16px 20px; margin-top: 15px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+                    <p style="margin: 0 0 8px; font-weight: 600; color: #436481; font-size: 15px;">📷 Previous upload was interrupted</p>
+                    <p id="resume-upload-message" style="margin: 0 0 12px; font-size: 13px; color: #32343a; line-height: 1.5;"></p>
+                    <button id="dismiss-resume-btn" type="button" onclick="document.getElementById('resume-upload-banner').style.display='none'" style="background: #436481; color: white; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 13px; font-weight: 600;">Got it</button>
+                  </div>
+
                   <!-- Responsive CSS for photo modal -->
                   <style>
                     @media (max-width: 768px) {
@@ -820,7 +844,14 @@
         let currentUser = null;
         let currentCase = null;
         let selectedPhotos = []; // Store selected photo files
-        
+
+        // Upload state management
+        let isSubmittingForm = false;        // Prevents auth redirect during active upload
+        const UPLOAD_STATE_KEY = 'memorio_upload_state'; // localStorage key prefix
+        const UPLOAD_BATCH_SIZE = 15;        // Photos per batch
+        const UPLOAD_PARALLEL = 5;           // Concurrent uploads within each batch
+        const MAX_RETRY_ATTEMPTS = 3;        // Retries per failed photo
+
         // Redirect lock to prevent infinite loops between index.html and dashboard.html
         const REDIRECT_LOCK_KEY = 'memorio-family-redirect-lock';
         const REDIRECT_LOCK_DURATION = 3000; // 3 seconds
@@ -1320,16 +1351,29 @@
                     const isEditMode = urlParams.get('mode') === 'edit';
                     
                     if (!formError && forms && forms.submitted_at && !isEditMode) {
-                        console.log('✅ Form already submitted, redirecting to dashboard immediately...');
-                        // Form is already completed and not in edit mode, redirect immediately without showing form
-                        if (canRedirect()) {
-                            setRedirectLock();
-                            window.location.href = '/family/dashboard';
+                        // Check if an upload was interrupted for this case
+                        const pendingUploadKey = `${UPLOAD_STATE_KEY}_${cases.id}`;
+                        const pendingUploadRaw = localStorage.getItem(pendingUploadKey);
+
+                        if (isSubmittingForm) {
+                            // Active upload in progress - block redirect
+                            console.log('⏳ Upload in progress - blocking redirect');
+                            return true;
+                        } else if (pendingUploadRaw) {
+                            // Interrupted upload found - stay on form to allow re-upload
+                            console.log('📷 Interrupted upload found for case', cases.id, '- staying on form page');
+                            // Continue loading case so user can re-select and upload remaining photos
                         } else {
-                            console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
-                            alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
+                            console.log('✅ Form already submitted, redirecting to dashboard immediately...');
+                            if (canRedirect()) {
+                                setRedirectLock();
+                                window.location.href = '/family/dashboard';
+                            } else {
+                                console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
+                                alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
+                            }
+                            return false;
                         }
-                        return false; // Stop execution
                     } else {
                         // Clear redirect lock when staying on form page
                         sessionStorage.removeItem(REDIRECT_LOCK_KEY);
@@ -1375,6 +1419,9 @@
                 
                 currentCase = cases;
                 console.log('✅ Case loaded:', currentCase.deceased_name, '| Case ID:', currentCase.id);
+
+                // Check for any interrupted uploads from a previous session
+                checkInterruptedUpload(currentCase.id);
                 
                 // Show the form content now that we know user hasn't completed it
                 const formContent = document.querySelector('.form-container, .form-wrapper, .w-form');
@@ -1733,82 +1780,231 @@
         }
         
         /**
-         * Save uploaded photos to Supabase Storage and assets table
+         * Upload a single photo with automatic retry logic.
+         * Returns an asset record object on success, or null on failure.
+         */
+        async function uploadSinglePhoto(file, globalIndex) {
+            let attempts = 0;
+            while (attempts < MAX_RETRY_ATTEMPTS) {
+                try {
+                    const fileExt = (file.name.split('.').pop() || 'jpg').toLowerCase();
+                    // Unique path: case_id/timestamp_index.ext
+                    const fileName = `${currentCase.id}/${Date.now()}_${globalIndex}.${fileExt}`;
+
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('case-assets')
+                        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: { publicUrl } } = supabaseClient.storage
+                        .from('case-assets')
+                        .getPublicUrl(fileName);
+
+                    return {
+                        case_id: currentCase.id,
+                        uploader_user_id: currentUser.id,
+                        file_key: publicUrl,
+                        mime_type: file.type || 'image/jpeg',
+                        size_bytes: file.size,
+                        metadata: {
+                            source: 'supabase_storage',
+                            original_filename: file.name,
+                            uploaded_via: 'form_submission'
+                        }
+                    };
+                } catch (err) {
+                    attempts++;
+                    if (attempts >= MAX_RETRY_ATTEMPTS) {
+                        console.error(`❌ Photo ${globalIndex} failed after ${MAX_RETRY_ATTEMPTS} attempts:`, err);
+                        return null;
+                    }
+                    // Exponential backoff: 1s, 2s, 4s
+                    await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempts - 1)));
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Show the upload progress bar at the bottom of the screen.
+         */
+        function showPhotoUploadProgress(completed, total) {
+            const bar = document.getElementById('photo-upload-progress');
+            if (bar) bar.style.display = 'block';
+            updatePhotoUploadProgress(completed, total, 0, null);
+        }
+
+        /**
+         * Update the progress bar values.
+         */
+        function updatePhotoUploadProgress(completed, total, failed, startTime) {
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+            const countEl = document.getElementById('upload-progress-count');
+            const barEl = document.getElementById('upload-progress-bar');
+            const statusEl = document.getElementById('upload-progress-status');
+            const etaEl = document.getElementById('upload-progress-eta');
+            const titleEl = document.getElementById('upload-progress-title');
+
+            if (countEl) countEl.textContent = `${completed} / ${total} photos`;
+            if (barEl) barEl.style.width = `${pct}%`;
+
+            if (failed > 0 && statusEl) {
+                statusEl.textContent = `${failed} photo${failed !== 1 ? 's' : ''} failed — continuing...`;
+            } else if (statusEl) {
+                statusEl.textContent = pct < 100 ? 'Uploading — please keep this page open' : 'Finalising...';
+            }
+
+            if (titleEl && pct === 100) {
+                titleEl.textContent = '✅ Upload complete!';
+            }
+
+            // ETA estimate
+            if (etaEl && startTime && completed > 0 && completed < total) {
+                const elapsed = (Date.now() - startTime) / 1000;
+                const rate = completed / elapsed;
+                const remaining = Math.ceil((total - completed) / rate);
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                etaEl.textContent = mins > 0 ? `~${mins}m ${secs}s remaining` : `~${secs}s remaining`;
+            } else if (etaEl) {
+                etaEl.textContent = '';
+            }
+        }
+
+        /**
+         * Hide the upload progress bar.
+         */
+        function hidePhotoUploadProgress() {
+            const bar = document.getElementById('photo-upload-progress');
+            if (bar) {
+                // Brief delay so user sees "complete"
+                setTimeout(() => { bar.style.display = 'none'; }, 2500);
+            }
+        }
+
+        /**
+         * Check localStorage for an interrupted upload for the current case
+         * and surface a recovery banner if found.
+         */
+        function checkInterruptedUpload(caseId) {
+            const stateKey = `${UPLOAD_STATE_KEY}_${caseId}`;
+            const raw = localStorage.getItem(stateKey);
+            if (!raw) return;
+
+            try {
+                const state = JSON.parse(raw);
+                const banner = document.getElementById('resume-upload-banner');
+                const msg = document.getElementById('resume-upload-message');
+                if (banner && msg) {
+                    const uploaded = state.completed - (state.failed || 0);
+                    msg.textContent = `${uploaded} of ${state.total} photos were uploaded before the interruption. ` +
+                        `Please re-select any photos that were not yet uploaded to complete your submission.`;
+                    banner.style.display = 'block';
+                }
+                // Clear state — user has been notified
+                localStorage.removeItem(stateKey);
+            } catch (e) {
+                localStorage.removeItem(`${UPLOAD_STATE_KEY}_${caseId}`);
+            }
+        }
+
+        /**
+         * Save uploaded photos to Supabase Storage and assets table.
+         * Uses batched parallel uploads for reliability with 300+ photos.
          */
         async function saveUploadedPhotos() {
             if (!currentCase || !currentUser) {
                 console.warn('⚠️ No case or user loaded, skipping photo save');
                 return;
             }
-            
+
             if (!selectedPhotos || selectedPhotos.length === 0) {
                 console.log('📷 No photos selected');
                 return;
             }
-            
+
+            const totalPhotos = selectedPhotos.length;
+            console.log(`📷 Starting batched upload of ${totalPhotos} photos…`);
+
+            // Persist upload state for crash recovery
+            const stateKey = `${UPLOAD_STATE_KEY}_${currentCase.id}`;
+            const uploadState = { caseId: currentCase.id, total: totalPhotos, completed: 0, failed: 0, startedAt: Date.now() };
+            localStorage.setItem(stateKey, JSON.stringify(uploadState));
+
+            // Block auth redirect and warn on navigation
+            isSubmittingForm = true;
+            const beforeUnloadHandler = (e) => {
+                e.preventDefault();
+                e.returnValue = 'Photos are still uploading. Leaving now will interrupt the upload.';
+                return e.returnValue;
+            };
+            window.addEventListener('beforeunload', beforeUnloadHandler);
+
+            let completedCount = 0;
+            let failedCount = 0;
+            const startTime = Date.now();
+
+            showPhotoUploadProgress(0, totalPhotos);
+
             try {
-                console.log(`📷 Uploading ${selectedPhotos.length} photo(s) to Supabase Storage...`);
-                
-                for (let i = 0; i < selectedPhotos.length; i++) {
-                    const file = selectedPhotos[i];
-                    
-                    try {
-                        // Generate unique file path
-                        const fileExt = file.name.split('.').pop();
-                        const fileName = `${currentCase.id}/${Date.now()}_${i}.${fileExt}`;
-                        
-                        console.log(`📷 Uploading: ${file.name} → ${fileName}`);
-                        
-                        // Upload to Supabase Storage
-                        const { data: uploadData, error: uploadError } = await supabaseClient.storage
-                            .from('case-assets')
-                            .upload(fileName, file, {
-                                cacheControl: '3600',
-                                upsert: false
-                            });
-                        
-                        if (uploadError) {
-                            console.error('❌ Error uploading photo:', uploadError);
-                            continue;
-                        }
-                        
-                        // Get public URL
-                        const { data: { publicUrl } } = supabaseClient.storage
-                            .from('case-assets')
-                            .getPublicUrl(fileName);
-                        
-                        console.log(`✅ Photo uploaded: ${publicUrl}`);
-                        
-                        // Save to assets table
-                        const { error: assetError } = await supabaseClient
-                            .from('assets')
-                            .insert({
-                                case_id: currentCase.id,
-                                uploader_user_id: currentUser.id,
-                                file_key: publicUrl,
-                                mime_type: file.type,
-                                size_bytes: file.size,
-                                metadata: {
-                                    source: 'supabase_storage',
-                                    original_filename: file.name,
-                                    uploaded_via: 'form_submission'
-                                }
-                            });
-                        
-                        if (assetError) {
-                            console.error('❌ Error saving photo to assets table:', assetError);
-                        } else {
-                            console.log('✅ Photo saved to assets table');
-                        }
-                    } catch (photoError) {
-                        console.error('❌ Error processing individual photo:', photoError);
+                const totalBatches = Math.ceil(totalPhotos / UPLOAD_BATCH_SIZE);
+
+                for (let batchIdx = 0; batchIdx < totalBatches; batchIdx++) {
+                    const batchStart = batchIdx * UPLOAD_BATCH_SIZE;
+                    const batch = selectedPhotos.slice(batchStart, batchStart + UPLOAD_BATCH_SIZE);
+                    const assetRecords = [];
+
+                    console.log(`📦 Batch ${batchIdx + 1}/${totalBatches} — photos ${batchStart + 1}–${batchStart + batch.length}`);
+
+                    // Upload within each batch in parallel chunks of UPLOAD_PARALLEL
+                    for (let chunkStart = 0; chunkStart < batch.length; chunkStart += UPLOAD_PARALLEL) {
+                        const chunk = batch.slice(chunkStart, chunkStart + UPLOAD_PARALLEL);
+                        const globalBase = batchStart + chunkStart;
+
+                        const results = await Promise.allSettled(
+                            chunk.map((file, i) => uploadSinglePhoto(file, globalBase + i))
+                        );
+
+                        results.forEach(result => {
+                            completedCount++;
+                            if (result.status === 'fulfilled' && result.value) {
+                                assetRecords.push(result.value);
+                            } else {
+                                failedCount++;
+                            }
+                            updatePhotoUploadProgress(completedCount, totalPhotos, failedCount, startTime);
+                        });
                     }
+
+                    // Bulk insert asset records for this entire batch (single DB round-trip)
+                    if (assetRecords.length > 0) {
+                        const { error: bulkErr } = await supabaseClient.from('assets').insert(assetRecords);
+                        if (bulkErr) {
+                            console.error(`❌ Bulk insert failed for batch ${batchIdx + 1}:`, bulkErr);
+                        } else {
+                            console.log(`✅ Batch ${batchIdx + 1}: ${assetRecords.length} records saved`);
+                        }
+                    }
+
+                    // Update localStorage progress
+                    uploadState.completed = completedCount;
+                    uploadState.failed = failedCount;
+                    localStorage.setItem(stateKey, JSON.stringify(uploadState));
                 }
-                
-                console.log('✅ All photos processed');
-                
-            } catch (error) {
-                console.error('❌ Error saving uploaded photos:', error);
+
+                const successCount = completedCount - failedCount;
+                console.log(`✅ Upload complete — ${successCount}/${totalPhotos} photos uploaded${failedCount > 0 ? `, ${failedCount} failed` : ''}`);
+
+                // Clear recovery state — upload finished successfully
+                localStorage.removeItem(stateKey);
+
+            } catch (err) {
+                console.error('❌ Unexpected error during photo upload:', err);
+            } finally {
+                window.removeEventListener('beforeunload', beforeUnloadHandler);
+                isSubmittingForm = false;
+                hidePhotoUploadProgress();
             }
         }
         

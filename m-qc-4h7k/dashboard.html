@@ -1337,10 +1337,7 @@
         <div class="video-section-standalone">
           <h3 class="section-title">Memorial Video</h3>
           <div class="video-wrapper">
-            <video class="video-player" controls>
-              <source src="${submission.video_url}" type="${submission.mime_type}">
-              Your browser does not support the video tag.
-            </video>
+            ${buildVideoPlayer(submission)}
           </div>
           <p class="video-meta">Duration: ${formatDuration(submission.duration_seconds)} | Size: ${formatFileSize(submission.file_size_bytes)}</p>
         </div>
@@ -1637,11 +1634,63 @@
       const secs = seconds % 60;
       return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
-    
+
     function formatFileSize(bytes) {
       if (!bytes) return 'Unknown';
       const mb = (bytes / (1024 * 1024)).toFixed(2);
       return `${mb} MB`;
+    }
+
+    /**
+     * Build the appropriate video player HTML based on the storage provider.
+     *
+     * Videos uploaded via Cloudflare Stream are stored as "cf-stream:{uid}".
+     * All other video_url values are treated as direct Supabase Storage URLs.
+     *
+     * Cloudflare Stream provides:
+     *  - Adaptive bitrate streaming (HLS) — instant playback even for large files
+     *  - No buffering — QC can seek to any position immediately
+     *  - Global CDN delivery
+     *
+     * Fallback (Supabase URL):
+     *  - Standard HTML5 <video> element
+     *  - preload="metadata" so only the first bytes are fetched initially
+     */
+    function buildVideoPlayer(submission) {
+      const url = submission.video_url || '';
+
+      if (url.startsWith('cf-stream:')) {
+        // Extract the Cloudflare Stream video UID
+        const uid = url.replace('cf-stream:', '').trim();
+
+        // iframe.videodelivery.net is Cloudflare's universal embed URL that works
+        // for any account without needing the per-account customer subdomain.
+        // It delivers adaptive bitrate HLS streaming for instant, buffer-free playback.
+        return `
+          <div style="position: relative; padding-top: 56.25%; width: 100%;">
+            <iframe
+              src="https://iframe.videodelivery.net/${uid}"
+              loading="lazy"
+              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+              allowfullscreen
+              style="border: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 8px;">
+            </iframe>
+          </div>
+          <p style="font-size: 11px; color: #999; margin-top: 6px; text-align: right; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+            Streaming via Cloudflare Stream
+          </p>`;
+      }
+
+      // Fallback: regular HTML5 player for Supabase-stored videos
+      return `
+        <video
+          class="video-player"
+          controls
+          preload="metadata"
+          style="width: 100%; border-radius: 8px; max-height: 520px; background: #000;">
+          <source src="${url}" type="${submission.mime_type || 'video/mp4'}">
+          Your browser does not support the video tag.
+        </video>`;
     }
     
     function formatStatus(status) {
