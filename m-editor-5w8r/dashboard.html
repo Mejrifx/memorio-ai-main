@@ -1832,9 +1832,31 @@
     async function openCaseModal(caseId) {
       const modal = document.getElementById('case-modal');
       modal.style.display = 'flex';
-      
+
       // Prevent body scroll when modal is open
       document.body.style.overflow = 'hidden';
+
+      // ── Reset upload form to default visible state ──
+      // The form may have been hidden by a previous case's displaySubmissionStatus call.
+      const uploadFormEl = document.getElementById('upload-form-section');
+      const submitBtnEl = document.getElementById('submit-video-btn');
+      const statusDisplayEl = document.getElementById('submission-status-display');
+      if (uploadFormEl) { uploadFormEl.style.display = 'block'; uploadFormEl.style.opacity = '1'; uploadFormEl.style.pointerEvents = 'auto'; }
+      if (statusDisplayEl) statusDisplayEl.style.display = 'none';
+      if (submitBtnEl) {
+        submitBtnEl.disabled = false;
+        submitBtnEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>Submit to Quality Control`;
+        submitBtnEl.style.backgroundColor = '#28a745';
+        submitBtnEl.style.borderColor = '#28a745';
+        submitBtnEl.style.cursor = 'pointer';
+      }
+      // Also reset the file info card and progress bar
+      const fileInfoEl = document.getElementById('video-file-info');
+      const uploadProgressEl = document.getElementById('upload-progress');
+      const videoFileInputEl = document.getElementById('video-file-input');
+      if (fileInfoEl) fileInfoEl.style.display = 'none';
+      if (uploadProgressEl) uploadProgressEl.style.display = 'none';
+      if (videoFileInputEl) { videoFileInputEl.value = ''; videoFileInputEl.disabled = false; }
       
       try {
         // Load case details with all related data
@@ -2226,11 +2248,13 @@
         if (submission) {
           displaySubmissionStatus(submission);
         } else {
-          // No submission yet - reset button to allow new submission
+          // No submission yet — ensure the upload form is fully visible and enabled
           statusDisplay.style.display = 'none';
+          const uploadForm = document.getElementById('upload-form-section');
+          if (uploadForm) { uploadForm.style.display = 'block'; uploadForm.style.opacity = '1'; uploadForm.style.pointerEvents = 'auto'; }
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit to Quality Control';
+            submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>Submit to Quality Control`;
             submitBtn.style.backgroundColor = '#28a745';
             submitBtn.style.borderColor = '#28a745';
             submitBtn.style.cursor = 'pointer';
@@ -2303,19 +2327,26 @@
         </div>
       `;
       statusDisplay.style.display = 'block';
-      
-      // Disable submit button if video is already submitted and not awaiting revision
+
+      // Always keep the upload form visible — only control interactivity via button state
+      uploadForm.style.display = 'block';
+
       if (disableSubmit && submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = '✓ Submitted for Review';
+        const label = submission.qc_status === 'pending' ? '⏳ Pending QC Review'
+          : submission.qc_status === 'in_review' ? '🔍 Currently Being Reviewed'
+          : '✓ Submitted for Review';
+        submitBtn.textContent = label;
         submitBtn.style.backgroundColor = '#6c757d';
         submitBtn.style.borderColor = '#6c757d';
         submitBtn.style.cursor = 'not-allowed';
-      }
-      
-      // Show or hide upload form
-      if (showForm || submission.qc_status === 'pending' || submission.qc_status === 'in_review') {
-        uploadForm.style.display = showForm ? 'block' : 'none';
+      } else if (!disableSubmit && submitBtn) {
+        // Revision requested — re-enable the form
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>Submit Revised Video`;
+        submitBtn.style.backgroundColor = '#dc3545';
+        submitBtn.style.borderColor = '#dc3545';
+        submitBtn.style.cursor = 'pointer';
       }
     }
     
@@ -2593,9 +2624,13 @@
         statusText.textContent = '✓ Video submitted successfully!';
         showToast('✓ Video submitted to Quality Control!');
 
-        fileInput.value = '';
-        document.getElementById('video-file-info').style.display = 'none';
-        notesInput.value = '';
+        // Reset form fields
+        const fileInputEl = document.getElementById('video-file-input');
+        const notesInputEl = document.getElementById('editor-notes-input');
+        const fileInfoEl = document.getElementById('video-file-info');
+        if (fileInputEl) fileInputEl.value = '';
+        if (fileInfoEl) fileInfoEl.style.display = 'none';
+        if (notesInputEl) notesInputEl.value = '';
 
         submitBtn.textContent = '✓ Submitted for Review';
         submitBtn.style.backgroundColor = '#6c757d';
