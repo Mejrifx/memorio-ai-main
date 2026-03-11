@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -233,7 +233,11 @@
     }
     .lang-toggle svg { opacity: 0.55; flex-shrink: 0; }
     .lang-toggle:hover svg { opacity: 0.85; }
-    
+    /* Mobile-only lang toggle in nav bar — hidden on desktop */
+    .nav-mobile-lang {
+      display: none;
+    }
+
     .mobile-menu-toggle {
       display: none;
       flex-direction: column;
@@ -944,11 +948,6 @@
        RESPONSIVE
        ============================================================================ */
     @media (max-width: 768px) {
-      .hero {
-        padding: 100px 16px 24px;
-        min-height: auto;
-      }
-      
       .hero-content {
         padding-top: 0;
       }
@@ -1000,14 +999,23 @@
         font-size: 18px;
       }
       
+      /* Mobile lang toggle: visible, pushed right by auto margin */
+      .nav-mobile-lang {
+        display: inline-flex;
+        margin-left: auto;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+
       .mobile-menu-toggle {
         display: flex;
-        margin-left: auto;
+        margin-left: 0; /* nav-mobile-lang now provides the auto-margin push */
+        flex-shrink: 0;
       }
       
       .nav-container {
         padding: 12px 16px;
-        align-items: flex-start;
+        align-items: center;
       }
       
       .header.scrolled .nav-container {
@@ -1088,6 +1096,7 @@
         margin: 0;
         padding: 24px;
         padding-right: max(16px, env(safe-area-inset-right));
+        padding-bottom: max(32px, env(safe-area-inset-bottom)); /* home indicator */
         display: flex;
         flex-direction: column;
         flex: 1;
@@ -1142,8 +1151,8 @@
       /* Do NOT raise header above drawer — drawer (9999) sits above header (1000) naturally. */
       
       .hero {
-        padding: 100px 24px 60px;
-        min-height: 100vh;
+        padding: 100px 16px 24px;
+        min-height: auto; /* services hero is content-sized, not full-screen */
       }
       
       .hero-background-image {
@@ -1156,11 +1165,11 @@
       }
       
       .hero-title {
-        font-size: 36px;
+        font-size: clamp(26px, 8.5vw, 36px); /* fluid: 26px @ 306px → 36px @ 424px */
       }
       
       .hero-subtitle {
-        font-size: 18px;
+        font-size: clamp(16px, 4.5vw, 18px);
       }
       
       .section {
@@ -1168,7 +1177,7 @@
       }
       
       .section-title {
-        font-size: 32px;
+        font-size: clamp(24px, 7.5vw, 32px);
       }
       
       .workflow-steps,
@@ -1193,6 +1202,46 @@
       .btn-secondary {
         width: 100%;
         justify-content: center;
+      }
+    }
+
+    /* ============================================================================
+       SUB-480PX — Small phone refinements (iPhone SE, Galaxy A, etc.)
+       ============================================================================ */
+    @media (max-width: 480px) {
+      .hero-content {
+        padding-top: 12px;
+      }
+
+      .what-staff-step {
+        padding: 20px 16px 20px 64px;
+      }
+
+      .what-staff-step-number {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+        left: 12px;
+      }
+
+      .feature-card {
+        padding: 24px 16px;
+      }
+
+      .benefit-card {
+        padding: 20px 16px;
+      }
+
+      .cta-card {
+        padding: 32px 20px;
+      }
+
+      .cta-title {
+        font-size: 24px;
+      }
+
+      .nav-container {
+        padding: 10px 14px;
       }
     }
     
@@ -1282,6 +1331,14 @@
         <img src="images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio Logo">
       </a>
       
+      <!-- Mobile-only language toggle — sits to the left of the hamburger -->
+      <button class="lang-toggle nav-mobile-lang" id="navMobileLang" data-i18n-toggle onclick="i18n.toggle()" title="Switch language" aria-label="Switch language">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span class="lang-label">EN</span>
+      </button>
+
       <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
         <span></span>
         <span></span>
