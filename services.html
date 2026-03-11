@@ -1101,11 +1101,11 @@
         min-height: 0;
       }
       
-      /* Scroll lock */
+      /* Scroll lock — overflow:hidden only, no position:fixed on the body.
+         position:fixed on body breaks position:fixed children on mobile WebKit. */
+      html.nav-drawer-open,
       body.nav-drawer-open {
         overflow: hidden;
-        position: fixed;
-        width: 100%;
       }
       
       body.nav-drawer-open .header {
@@ -1648,8 +1648,7 @@
     
     function openDrawer() {
       if (!navDrawerPanel || !navDrawerOverlay) return;
-      const scrollY = window.scrollY;
-      document.body.style.top = '-' + scrollY + 'px';
+      document.documentElement.classList.add('nav-drawer-open');
       document.body.classList.add('nav-drawer-open');
       navDrawerPanel.classList.add('active');
       navDrawerOverlay.classList.add('active');
@@ -1658,13 +1657,11 @@
     
     function closeDrawer() {
       if (!navDrawerPanel || !navDrawerOverlay) return;
-      const scrollY = Math.abs(parseInt(document.body.style.top || '0', 10));
       navDrawerPanel.classList.remove('active');
       navDrawerOverlay.classList.remove('active');
       navDrawerOverlay.setAttribute('aria-hidden', 'true');
+      document.documentElement.classList.remove('nav-drawer-open');
       document.body.classList.remove('nav-drawer-open');
-      document.body.style.top = '';
-      window.scrollTo(0, scrollY);
     }
     
     function toggleDrawer() {
