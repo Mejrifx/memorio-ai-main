@@ -1109,7 +1109,9 @@
       .header.scrolled .nav-container {
         width: calc(100% - 32px);
         min-width: auto;
-        border-radius: 16px;
+        /* Keep border-radius: 9999px from the base rule — no override here.
+           Overriding to 16px caused a rectangle flash because the bounce
+           easing briefly overshoots toward 0 during the transition. */
       }
       
       nav {
