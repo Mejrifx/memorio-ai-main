@@ -1086,47 +1086,38 @@
       }
     }
     
-    /* Mobile drawer overlay and panel header: only visible on small screens */
-    .nav-drawer-overlay {
+    /* Drawer overlay & panel are body-level elements — hidden on desktop */
+    .nav-drawer-overlay,
+    .nav-drawer-panel {
       display: none;
     }
-    
-    .nav-drawer-panel .nav-drawer-header {
-      display: none;
-    }
-    
+
     @media (max-width: 768px) {
       .mobile-menu-toggle {
         display: block;
-        margin-left: auto; /* Push hamburger to top-right of nav bar */
+        margin-left: auto;
       }
       
       .nav-container {
         padding: 12px 16px;
-        align-items: flex-start; /* Align logo and hamburger to top */
+        align-items: flex-start;
       }
       
       .header.scrolled .nav-container {
         width: calc(100% - 32px);
         min-width: auto;
-        /* Keep border-radius: 9999px from the base rule — no override here.
-           Overriding to 16px caused a rectangle flash because the bounce
-           easing briefly overshoots toward 0 during the transition. */
+      }
+
+      /* Hide the desktop nav-menu on mobile — drawer handles navigation */
+      header nav .nav-menu {
+        display: none;
       }
       
-      nav {
-        position: static;
-      }
-      
-      /* Right-side slide-in drawer overlay (mobile only) */
+      /* ── Overlay ── */
       .nav-drawer-overlay {
         display: block;
         position: fixed;
         inset: 0;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
         background-color: rgba(0, 0, 0, 0.4);
         opacity: 0;
         visibility: hidden;
@@ -1140,8 +1131,10 @@
         visibility: visible;
       }
       
-      /* Drawer panel: slides in from the right (contains header + menu) */
+      /* ── Drawer panel ── */
       .nav-drawer-panel {
+        display: flex;
+        flex-direction: column;
         position: fixed;
         top: 0;
         right: 0;
@@ -1149,8 +1142,6 @@
         left: auto;
         width: min(320px, 85vw);
         max-width: 320px;
-        display: flex;
-        flex-direction: column;
         background-color: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
@@ -1170,8 +1161,8 @@
         pointer-events: all;
       }
       
-      .nav-drawer-panel .nav-drawer-header {
-        display: block;
+      /* ── Drawer logo header ── */
+      .nav-drawer-header {
         flex-shrink: 0;
         padding: max(24px, env(safe-area-inset-top)) 24px 20px;
         padding-right: max(16px, env(safe-area-inset-right));
@@ -1184,50 +1175,29 @@
         display: block;
       }
       
-      .nav-drawer-panel .nav-menu {
-        position: static;
-        transform: none;
-        flex: 1;
-        flex-direction: column;
-        display: flex;
-        align-items: stretch;
-        gap: 0;
+      /* ── Drawer menu list ── */
+      .nav-drawer-menu {
+        list-style: none;
         margin: 0;
         padding: 24px;
         padding-right: max(16px, env(safe-area-inset-right));
-        box-shadow: none;
-        background: transparent;
-        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: 0;
       }
       
-      /* Prevent background scroll while drawer is open.
-         NOTE: do NOT use position:fixed on the body — on mobile WebKit,
-         position:fixed on the body breaks all position:fixed children
-         (like the header), causing them to jump off-screen. */
-      html.nav-drawer-open,
-      body.nav-drawer-open {
-        overflow: hidden;
-      }
-      
-      /* Keep header (and hamburger) above overlay so it stays tappable */
-      body.nav-drawer-open .header {
-        z-index: 10000;
-      }
-      
-      .nav-drawer-panel .nav-menu li {
+      .nav-drawer-menu li {
         width: 100%;
-        flex-shrink: 0;
       }
       
-      /* Center language toggle underneath Family Login */
-      .nav-drawer-panel .nav-menu li.nav-menu-lang {
+      .nav-drawer-menu li.nav-drawer-lang {
         display: flex;
         justify-content: center;
         margin-top: 12px;
       }
       
-      .nav-drawer-panel .nav-link,
-      .nav-drawer-panel .btn-login {
+      .nav-drawer-menu .nav-link {
         display: block;
         width: 100%;
         text-align: left;
@@ -1235,12 +1205,15 @@
         font-size: 15px;
       }
       
-      .nav-drawer-panel .btn-login {
+      .nav-drawer-menu .btn-login {
+        display: block;
         width: 100%;
         text-align: center;
+        padding: 12px 16px;
+        font-size: 15px;
         margin-top: 8px;
         background-color: white;
-        box-shadow: 
+        box-shadow:
           0 0 24px rgba(34, 42, 53, 0.06),
           0 1px 1px rgba(0, 0, 0, 0.05),
           0 0 0 1px rgba(34, 42, 53, 0.04),
@@ -1248,9 +1221,20 @@
           0 16px 68px rgba(47, 48, 55, 0.05),
           0 1px 0 rgba(255, 255, 255, 0.1) inset;
       }
-      
-      .btn-login:hover {
+
+      .nav-drawer-menu .btn-login:hover {
         background-color: white;
+      }
+      
+      /* ── Scroll lock ── */
+      html.nav-drawer-open,
+      body.nav-drawer-open {
+        overflow: hidden;
+      }
+      
+      /* Keep header (hamburger) above the overlay so it stays tappable */
+      body.nav-drawer-open .header {
+        z-index: 10000;
       }
       
       .hero-title {
@@ -1370,32 +1354,51 @@
       </button>
       
       <nav>
-        <!-- Mobile only: overlay behind the drawer (tap to close) -->
-        <div class="nav-drawer-overlay" id="navDrawerOverlay" aria-hidden="true"></div>
-        <!-- Mobile drawer panel: logo header + menu list -->
-        <div class="nav-drawer-panel" id="navDrawerPanel">
-          <div class="nav-drawer-header">
-            <img src="images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio">
-          </div>
-          <ul class="nav-menu" id="navMenu">
-            <li><a href="#features" class="nav-link" data-i18n="website.nav.features">Features</a></li>
-            <li><a href="#how-it-works" class="nav-link" data-i18n="website.nav.howItWorks">How It Works</a></li>
-            <li><a href="#faq" class="nav-link" data-i18n="website.nav.faq">FAQ</a></li>
-            <li><a href="services.html" class="nav-link" data-i18n="website.nav.services">Services</a></li>
-            <li><button class="btn-login" id="loginBtn" data-i18n="website.nav.familyLogin">Family Login</button></li>
-            <li class="nav-menu-lang">
-              <button class="lang-toggle" data-i18n-toggle onclick="i18n.toggle()" title="Switch to Español">
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="#features" class="nav-link" data-i18n="website.nav.features">Features</a></li>
+          <li><a href="#how-it-works" class="nav-link" data-i18n="website.nav.howItWorks">How It Works</a></li>
+          <li><a href="#faq" class="nav-link" data-i18n="website.nav.faq">FAQ</a></li>
+          <li><a href="services.html" class="nav-link" data-i18n="website.nav.services">Services</a></li>
+          <li><button class="btn-login" id="loginBtn" data-i18n="website.nav.familyLogin">Family Login</button></li>
+          <li>
+            <button class="lang-toggle" data-i18n-toggle onclick="i18n.toggle()" title="Switch to Español">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
               </svg>
               <span class="lang-label">EN</span>
             </button>
-            </li>
-          </ul>
-        </div>
+          </li>
+        </ul>
       </nav>
   </div>
   </header>
+
+  <!-- ============================================================================
+       MOBILE DRAWER NAVIGATION
+       Placed outside <header> so it lives in the root stacking context and is
+       never trapped inside the nav-container's backdrop-filter stacking context.
+       ============================================================================ -->
+  <div class="nav-drawer-overlay" id="navDrawerOverlay" aria-hidden="true"></div>
+  <div class="nav-drawer-panel" id="navDrawerPanel">
+    <div class="nav-drawer-header">
+      <img src="images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" alt="Memorio">
+    </div>
+    <ul class="nav-drawer-menu">
+      <li><a href="#features" class="nav-link" data-i18n="website.nav.features">Features</a></li>
+      <li><a href="#how-it-works" class="nav-link" data-i18n="website.nav.howItWorks">How It Works</a></li>
+      <li><a href="#faq" class="nav-link" data-i18n="website.nav.faq">FAQ</a></li>
+      <li><a href="services.html" class="nav-link" data-i18n="website.nav.services">Services</a></li>
+      <li><button class="btn-login" id="drawerLoginBtn">Family Login</button></li>
+      <li class="nav-drawer-lang">
+        <button class="lang-toggle" data-i18n-toggle onclick="i18n.toggle()" title="Switch to Español">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          <span class="lang-label">EN</span>
+        </button>
+      </li>
+    </ul>
+  </div>
   
   <!-- ============================================================================
        HERO SECTION
@@ -1806,16 +1809,19 @@
       });
       
       // ============================================================================
-      // MOBILE DRAWER MENU (slide-in from right, overlay, scroll lock)
+      // MOBILE DRAWER MENU
+      // Drawer lives outside <header> in the root stacking context, so it
+      // is never clipped by the nav-container's backdrop-filter stacking context.
       // ============================================================================
       const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-      const navDrawerPanel = document.getElementById('navDrawerPanel');
+      const navDrawerPanel   = document.getElementById('navDrawerPanel');
       const navDrawerOverlay = document.getElementById('navDrawerOverlay');
-      
+      const drawerLoginBtn   = document.getElementById('drawerLoginBtn');
+
       function isMobileNav() {
         return window.matchMedia('(max-width: 768px)').matches;
       }
-      
+
       function openDrawer() {
         if (!navDrawerPanel || !navDrawerOverlay) return;
         document.documentElement.classList.add('nav-drawer-open');
@@ -1824,7 +1830,7 @@
         navDrawerOverlay.classList.add('active');
         navDrawerOverlay.setAttribute('aria-hidden', 'false');
       }
-      
+
       function closeDrawer() {
         if (!navDrawerPanel || !navDrawerOverlay) return;
         navDrawerPanel.classList.remove('active');
@@ -1833,27 +1839,31 @@
         document.documentElement.classList.remove('nav-drawer-open');
         document.body.classList.remove('nav-drawer-open');
       }
-      
+
       function toggleDrawer() {
         if (!isMobileNav()) return;
-        if (navDrawerPanel.classList.contains('active')) closeDrawer();
-        else openDrawer();
+        navDrawerPanel.classList.contains('active') ? closeDrawer() : openDrawer();
       }
-      
+
       if (mobileMenuToggle && navDrawerPanel && navDrawerOverlay) {
         mobileMenuToggle.addEventListener('click', () => toggleDrawer());
-        
         navDrawerOverlay.addEventListener('click', () => closeDrawer());
-        
-        // Close drawer when any nav link is selected
-        document.querySelectorAll('.nav-link').forEach(link => {
+
+        // Close on any drawer nav link
+        navDrawerPanel.querySelectorAll('.nav-link').forEach(link => {
           link.addEventListener('click', () => closeDrawer());
         });
-        
-        // Close drawer when Family Login or language toggle is used
-        const loginBtnNav = document.getElementById('loginBtn');
-        if (loginBtnNav) loginBtnNav.addEventListener('click', () => closeDrawer());
-        document.querySelectorAll('.nav-menu .lang-toggle').forEach(btn => {
+
+        // Drawer login: close drawer then redirect
+        if (drawerLoginBtn) {
+          drawerLoginBtn.addEventListener('click', () => {
+            closeDrawer();
+            window.location.href = '/family/login';
+          });
+        }
+
+        // Close on language toggle inside drawer
+        navDrawerPanel.querySelectorAll('.lang-toggle').forEach(btn => {
           btn.addEventListener('click', () => closeDrawer());
         });
       }
