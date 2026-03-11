@@ -1792,10 +1792,13 @@
       // HEADER SCROLL EFFECT
       // ============================================================================
       window.addEventListener('scroll', () => {
+        // Don't update header state while drawer is open — position:fixed on
+        // the body resets scrollY to 0 which would incorrectly remove .scrolled
+        if (document.body.classList.contains('nav-drawer-open')) return;
         const header = document.getElementById('header');
         if (window.scrollY > 50) {
           header.classList.add('scrolled');
-                    } else {
+        } else {
           header.classList.remove('scrolled');
         }
       });
@@ -1813,18 +1816,26 @@
       
       function openDrawer() {
         if (!navDrawerPanel || !navDrawerOverlay) return;
+        // Save scroll position and lock body in place so position:fixed
+        // doesn't cause a scroll-to-top jump that breaks header state
+        const scrollY = window.scrollY;
+        document.body.style.top = '-' + scrollY + 'px';
+        document.body.classList.add('nav-drawer-open');
         navDrawerPanel.classList.add('active');
         navDrawerOverlay.classList.add('active');
         navDrawerOverlay.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('nav-drawer-open');
       }
       
       function closeDrawer() {
         if (!navDrawerPanel || !navDrawerOverlay) return;
+        // Restore scroll position before removing position:fixed
+        const scrollY = Math.abs(parseInt(document.body.style.top || '0', 10));
         navDrawerPanel.classList.remove('active');
         navDrawerOverlay.classList.remove('active');
         navDrawerOverlay.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('nav-drawer-open');
+        document.body.style.top = '';
+        window.scrollTo(0, scrollY);
       }
       
       function toggleDrawer() {
