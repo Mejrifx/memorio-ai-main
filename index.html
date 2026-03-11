@@ -220,10 +220,6 @@
       position: relative;
       z-index: 20;
     }
-    /* Mobile-only lang toggle — hidden on desktop, shown by mobile media query */
-    .nav-mobile-lang {
-      display: none;
-    }
     
     .mobile-menu-toggle span {
       display: block;
@@ -1402,6 +1398,10 @@
     }
     .lang-toggle svg { opacity: 0.55; flex-shrink: 0; }
     .lang-toggle:hover svg { opacity: 0.85; }
+    /* Hide mobile-only lang toggle on desktop — must come after .lang-toggle to win */
+    @media (min-width: 769px) {
+      .nav-mobile-lang { display: none; }
+    }
   </style>
 </head>
 <body>
