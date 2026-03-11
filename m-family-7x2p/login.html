@@ -245,11 +245,13 @@
       }
     });
     
-    // Check if already logged in
+    // Check if already logged in — send returning users to the dashboard, not the form.
+    // The family form has its own auth check that redirects to the dashboard if the form
+    // is already submitted, but that causes a visible /family/form flash for returning
+    // users. Sending directly to /family/dashboard avoids that extra hop.
     supabaseClient.auth.getSession().then(({ data: { session } }) => {
       if (session && session.user.app_metadata?.role === 'family') {
-        // Already logged in, redirect to intake form
-        window.location.href = '/family/form';
+        window.location.href = '/family/dashboard';
       }
     });
     

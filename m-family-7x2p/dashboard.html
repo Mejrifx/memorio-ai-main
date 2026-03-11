@@ -1675,10 +1675,13 @@
             // Form is submitted, allow access to dashboard
             sessionStorage.removeItem(REDIRECT_LOCK_KEY); // Clear lock on success
           } else {
-            console.log('⚠️ Form not submitted yet, redirecting to home...');
+            // Form not yet submitted — send them to complete it, not back to the homepage.
+            // Previously this redirected to '/' which caused a dead-end for returning users
+            // with an active session who hadn't finished their form yet.
+            console.log('⚠️ Form not submitted yet, redirecting to family form...');
             if (canRedirect()) {
               setRedirectLock();
-              window.location.href = '/';
+              window.location.href = '/family/form';
             } else {
               console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
               alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
@@ -1688,8 +1691,7 @@
           
         } catch (e) {
           console.error('❌ Error checking form submission:', e);
-          // On error, redirect to home to be safe
-          window.location.href = '/';
+          window.location.href = '/family/form';
           return false;
         }
         
