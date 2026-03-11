@@ -550,6 +550,10 @@
       margin: 0 auto;
     }
     
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .memorial-video-player {
       width: 100%;
       max-height: 450px;
@@ -1181,12 +1185,40 @@
               <span data-i18n="family.memorialTributeVideo">Memorial Tribute Video</span>
             </h3>
             <div style="display: flex; justify-content: center;">
-              <div class="memorial-video-container">
-                <video id="memorialVideo" class="memorial-video-player" controls>
+              <div class="memorial-video-container" style="background: #000; border-radius: 12px; overflow: hidden; min-height: 220px;">
+
+                <!-- Click-to-load overlay (z-index 15 — covers everything until user clicks) -->
+                <div id="familyVideoClickOverlay"
+                  onclick="loadFamilyVideo()"
+                  style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%); z-index: 15; border-radius: 12px;">
+                  <div style="width: 72px; height: 72px; background: rgba(255,255,255,0.15); border: 2.5px solid rgba(255,255,255,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; transition: background 0.2s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white" style="margin-left: 3px;">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                  </div>
+                  <p style="color: rgba(255,255,255,0.9); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 6px;">Click to load video</p>
+                  <p style="color: rgba(255,255,255,0.5); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 12px; margin: 0;">Streams in chunks — no full download required</p>
+                </div>
+
+                <!-- Loading spinner (shown while video buffers after click) -->
+                <div id="familyVideoLoading"
+                  style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 15; border-radius: 12px;">
+                  <div style="width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;"></div>
+                  <p style="color: rgba(255,255,255,0.7); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 14px; margin: 0;">Loading video...</p>
+                </div>
+
+                <!-- Video — preload="none" so nothing loads until user clicks play -->
+                <video id="memorialVideo" class="memorial-video-player" controls preload="none"
+                  style="display: none;"
+                  oncanplay="showFamilyVideoPlayer()"
+                  onwaiting="document.getElementById('familyVideoLoading').style.display='flex'"
+                  onplaying="document.getElementById('familyVideoLoading').style.display='none'">
                   <source id="memorialVideoSource" src="" type="video/mp4">
                   Your browser does not support the video tag.
                 </video>
-                <!-- Revision overlay - appears over video when paused -->
+
+                <!-- Revision overlay - appears over video when paused (z-index 10, beneath click-to-load) -->
                 <div id="videoRevisionOverlay" class="memorial-video-overlay hidden">
                   <div class="memorial-video-overlay-text">
                     <span data-i18n="family.revisionInProgress">Revision in Progress</span><br><span data-i18n="family.editorWorkingOnChanges">Our editor is working on the changes</span>
@@ -2417,12 +2449,38 @@
         document.getElementById('completedMemorialSection').style.display = 'block';
         document.getElementById('memorialDeceasedName').textContent = caseData.deceased_name;
         
-        // Set up video player
+        // Set up video player — click-to-load so the page shows instantly,
+        // video only fetches bytes when the user explicitly clicks play.
         const videoElement = document.getElementById('memorialVideo');
-        const videoSource = document.getElementById('memorialVideoSource');
-        videoSource.src = videoSubmission.video_url;
-        videoSource.type = videoSubmission.mime_type || 'video/mp4';
-        videoElement.load();
+        const videoSource  = document.getElementById('memorialVideoSource');
+        const clickOverlay = document.getElementById('familyVideoClickOverlay');
+        const loadingEl    = document.getElementById('familyVideoLoading');
+
+        // Reset state (may have been set by a previous case load)
+        videoElement.style.display = 'none';
+        if (clickOverlay) clickOverlay.style.display = 'flex';
+        if (loadingEl)    loadingEl.style.display    = 'none';
+
+        const videoUrl = videoSubmission.video_url || '';
+        if (videoUrl.startsWith('cf-stream:')) {
+          // Cloudflare Stream — replace container with an adaptive-bitrate iframe
+          const uid = videoUrl.replace('cf-stream:', '').trim();
+          const container = videoElement.closest('.memorial-video-container');
+          if (container) {
+            container.innerHTML = `
+              <div style="position:relative;padding-top:56.25%;width:100%;">
+                <iframe src="https://iframe.videodelivery.net/${uid}" loading="lazy"
+                  allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
+                  allowfullscreen
+                  style="border:none;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:12px;">
+                </iframe>
+              </div>`;
+          }
+        } else {
+          // Supabase Storage — set src but defer loading until user clicks
+          videoSource.src  = videoUrl;
+          videoSource.type = videoSubmission.mime_type || 'video/mp4';
+        }
         
         // Display video details
         const duration = videoSubmission.duration_seconds 
@@ -2513,6 +2571,37 @@
       }
     }
     
+    // Triggered when user clicks the click-to-load overlay on the family video player
+    function loadFamilyVideo() {
+      const clickOverlay = document.getElementById('familyVideoClickOverlay');
+      const loadingEl    = document.getElementById('familyVideoLoading');
+      const videoEl      = document.getElementById('memorialVideo');
+      if (!videoEl) return;
+
+      if (clickOverlay) clickOverlay.style.display = 'none';
+      if (loadingEl)    loadingEl.style.display    = 'flex';
+
+      // Ensure src is set (in case the element was rebuilt)
+      if (!videoEl.src || videoEl.src === window.location.href) {
+        const source = document.getElementById('memorialVideoSource');
+        if (source && source.src) videoEl.src = source.src;
+      }
+
+      videoEl.load();
+      videoEl.play().catch(() => {
+        // Autoplay blocked by browser policy — just surface the controls
+        showFamilyVideoPlayer();
+      });
+    }
+
+    // Called by oncanplay — hide spinner, show the video element
+    function showFamilyVideoPlayer() {
+      const loadingEl = document.getElementById('familyVideoLoading');
+      const videoEl   = document.getElementById('memorialVideo');
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (videoEl)   videoEl.style.display   = 'block';
+    }
+
     // Download memorial video
     async function downloadMemorialVideo() {
       if (!window.memorialVideoUrl) {

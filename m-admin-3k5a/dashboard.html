@@ -2595,6 +2595,17 @@
       background-color: var(--error-border);
       color: white;
     }
+
+    .support-action-btn.override {
+      border-color: #f57c00;
+      color: #e65100;
+    }
+
+    .support-action-btn.override:hover {
+      background-color: #ff9800;
+      border-color: #ff9800;
+      color: white;
+    }
     
     /* Empty States */
     .modal-empty-state {
@@ -6749,12 +6760,93 @@
         // Show success modal instead of alert
         showSuccessModal('Video pushed to revision successfully! The editor has been notified.');
         closeCaseDetailModal();
-        
+
         // Reload cases to reflect updated status
         await loadAllCases();
-        
+
       } catch (error) {
         console.error('Error pushing to revision:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    // ── Admin: Override Video Delivery ──────────────────────────────────────────
+    // Force-delivers a case at any stage — bypasses cooldown, QC review, and any
+    // active revision. Works even if the case is already delivered (re-delivers).
+    async function overrideDeliveryFromModal() {
+      if (!currentCaseDetailId) return;
+
+      const confirmed = confirm(
+        'Override video delivery for this case?\n\n' +
+        'This will:\n' +
+        '  • Mark the video as approved (bypassing any pending QC review)\n' +
+        '  • Cancel any active cooldown period\n' +
+        '  • Immediately set case status to "delivered"\n\n' +
+        'This override works at any stage and cannot be undone. Continue?'
+      );
+      if (!confirmed) return;
+
+      try {
+        // Get the latest video submission for this case
+        const { data: latestSubmission, error: submissionError } = await supabaseClient
+          .from('video_submissions')
+          .select('*')
+          .eq('case_id', currentCaseDetailId)
+          .order('submitted_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (submissionError || !latestSubmission) {
+          throw new Error('No video submission found for this case. The editor must upload a video first.');
+        }
+
+        const previousStatus = latestSubmission.qc_status;
+
+        // Force-approve the submission: clear cooldown, mark overridden
+        const { error: updateSubError } = await supabaseClient
+          .from('video_submissions')
+          .update({
+            qc_status:         'approved',
+            qc_reviewer_id:    currentUser.id,
+            qc_notes:          '[Admin Override] Force delivered by admin',
+            qc_reviewed_at:    new Date().toISOString(),
+            cooldown_expires_at: null,
+            cooldown_overridden: true
+          })
+          .eq('id', latestSubmission.id);
+
+        if (updateSubError) throw updateSubError;
+
+        // Set case to delivered immediately
+        const { error: updateCaseError } = await supabaseClient
+          .from('cases')
+          .update({ status: 'delivered' })
+          .eq('id', currentCaseDetailId);
+
+        if (updateCaseError) throw updateCaseError;
+
+        // Audit trail
+        await supabaseClient
+          .from('events')
+          .insert({
+            actor_user_id: currentUser.id,
+            actor_role:    'admin',
+            action_type:   'admin_override_delivery',
+            target_type:   'video_submission',
+            target_id:     latestSubmission.id,
+            payload: {
+              case_id:         currentCaseDetailId,
+              previous_status: previousStatus,
+              admin_override:  true
+            }
+          });
+
+        showSuccessModal('Video delivery override applied! The case is now marked as delivered.');
+        closeCaseDetailModal();
+        await loadAllCases();
+
+      } catch (error) {
+        console.error('Error overriding delivery:', error);
         alert('Error: ' + error.message);
       }
     }
@@ -6902,6 +6994,10 @@
             <button class="support-action-btn danger" onclick="pushToRevisionFromModal()">
               <span>🔄</span>
               <span>Push to Revision</span>
+            </button>
+            <button class="support-action-btn override" onclick="overrideDeliveryFromModal()">
+              <span>⚡</span>
+              <span>Override Video Delivery</span>
             </button>
             <button class="support-action-btn" onclick="showCaseIdInfo()">
               <span>🆔</span>
