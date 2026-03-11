@@ -851,7 +851,7 @@
         const UPLOAD_BATCH_SIZE = 15;        // Photos per batch
         const UPLOAD_PARALLEL = 5;           // Concurrent uploads within each batch
         const MAX_RETRY_ATTEMPTS = 3;        // Retries per failed photo
-
+        
         // Redirect lock to prevent infinite loops between index.html and dashboard.html
         const REDIRECT_LOCK_KEY = 'memorio-family-redirect-lock';
         const REDIRECT_LOCK_DURATION = 3000; // 3 seconds
@@ -1364,14 +1364,14 @@
                             console.log('📷 Interrupted upload found for case', cases.id, '- staying on form page');
                             // Continue loading case so user can re-select and upload remaining photos
                         } else {
-                            console.log('✅ Form already submitted, redirecting to dashboard immediately...');
-                            if (canRedirect()) {
-                                setRedirectLock();
+                        console.log('✅ Form already submitted, redirecting to dashboard immediately...');
+                        if (canRedirect()) {
+                            setRedirectLock();
                                 window.location.href = '/family/dashboard';
-                            } else {
-                                console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
-                                alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
-                            }
+                        } else {
+                            console.error('🛑 Redirect loop detected! Stopping to prevent infinite loop.');
+                            alert('There seems to be an issue with your account setup. Please contact support or clear your browser cache and try again.');
+                        }
                             return false;
                         }
                     } else {
@@ -1577,7 +1577,7 @@
          */
         function readFileAsDataURL(file) {
             return new Promise((resolve, reject) => {
-                const reader = new FileReader();
+                    const reader = new FileReader();
                 reader.onload = (e) => resolve(e.target.result);
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
@@ -1615,8 +1615,8 @@
                 thumbnail.style.transform = 'scale(1)';
                 thumbnail.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
             };
-            
-            const img = document.createElement('img');
+                        
+                        const img = document.createElement('img');
             img.src = photoDataUrls[0];
             img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
             thumbnail.appendChild(img);
@@ -1664,9 +1664,9 @@
                 img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
                 
                 // Remove button
-                const removeBtn = document.createElement('button');
-                removeBtn.textContent = '×';
-                removeBtn.type = 'button';
+                        const removeBtn = document.createElement('button');
+                        removeBtn.textContent = '×';
+                        removeBtn.type = 'button';
                 removeBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; background: rgba(255, 0, 0, 0.8); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 22px; line-height: 1; z-index: 10; transition: background 0.3s; font-weight: bold;';
                 removeBtn.onclick = (e) => {
                     e.preventDefault();
@@ -1698,7 +1698,7 @@
          * Remove photo from selection
          */
         function removePhoto(index) {
-            selectedPhotos.splice(index, 1);
+                            selectedPhotos.splice(index, 1);
             photoDataUrls.splice(index, 1);
             
             if (selectedPhotos.length === 0) {
@@ -1792,26 +1792,26 @@
                     const fileName = `${currentCase.id}/${Date.now()}_${globalIndex}.${fileExt}`;
 
                     const { error: uploadError } = await supabaseClient.storage
-                        .from('case-assets')
+                            .from('case-assets')
                         .upload(fileName, file, { cacheControl: '3600', upsert: false });
-
+                        
                     if (uploadError) throw uploadError;
-
-                    const { data: { publicUrl } } = supabaseClient.storage
-                        .from('case-assets')
-                        .getPublicUrl(fileName);
-
+                        
+                        const { data: { publicUrl } } = supabaseClient.storage
+                            .from('case-assets')
+                            .getPublicUrl(fileName);
+                        
                     return {
-                        case_id: currentCase.id,
-                        uploader_user_id: currentUser.id,
-                        file_key: publicUrl,
+                                case_id: currentCase.id,
+                                uploader_user_id: currentUser.id,
+                                file_key: publicUrl,
                         mime_type: file.type || 'image/jpeg',
-                        size_bytes: file.size,
-                        metadata: {
-                            source: 'supabase_storage',
-                            original_filename: file.name,
-                            uploaded_via: 'form_submission'
-                        }
+                                size_bytes: file.size,
+                                metadata: {
+                                    source: 'supabase_storage',
+                                    original_filename: file.name,
+                                    uploaded_via: 'form_submission'
+                                }
                     };
                 } catch (err) {
                     attempts++;
@@ -1830,56 +1830,107 @@
          * Show the upload progress bar at the bottom of the screen.
          */
         function showPhotoUploadProgress(completed, total) {
+            // Show fixed bottom bar
             const bar = document.getElementById('photo-upload-progress');
             if (bar) bar.style.display = 'block';
+
+            // Show the prominent in-page card (only if success area is visible)
+            const card      = document.getElementById('photo-phase-card');
+            const connector = document.getElementById('phase-connector');
+            const writing   = document.getElementById('writingStatus');
+            if (card) card.style.display = 'block';
+            if (connector) connector.style.display = 'block';
+            // Push the writing status down — it'll animate in after photos are done
+            if (writing) {
+                writing.style.opacity = '0.35';
+                writing.style.filter  = 'grayscale(1)';
+                writing.style.pointerEvents = 'none';
+            }
+
             updatePhotoUploadProgress(completed, total, 0, null);
         }
 
         /**
-         * Update the progress bar values.
+         * Update the progress bar values — both the fixed bottom bar and the in-page card.
          */
         function updatePhotoUploadProgress(completed, total, failed, startTime) {
             const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-            const countEl = document.getElementById('upload-progress-count');
-            const barEl = document.getElementById('upload-progress-bar');
+
+            // ── Fixed bottom bar ──
+            const countEl  = document.getElementById('upload-progress-count');
+            const barEl    = document.getElementById('upload-progress-bar');
             const statusEl = document.getElementById('upload-progress-status');
-            const etaEl = document.getElementById('upload-progress-eta');
-            const titleEl = document.getElementById('upload-progress-title');
+            const etaElBar = document.getElementById('upload-progress-eta');
+            const titleEl  = document.getElementById('upload-progress-title');
 
             if (countEl) countEl.textContent = `${completed} / ${total} photos`;
-            if (barEl) barEl.style.width = `${pct}%`;
-
+            if (barEl)   barEl.style.width   = `${pct}%`;
             if (failed > 0 && statusEl) {
                 statusEl.textContent = `${failed} photo${failed !== 1 ? 's' : ''} failed — continuing...`;
             } else if (statusEl) {
                 statusEl.textContent = pct < 100 ? 'Uploading — please keep this page open' : 'Finalising...';
             }
+            if (titleEl && pct === 100) titleEl.textContent = '✅ Upload complete!';
 
-            if (titleEl && pct === 100) {
-                titleEl.textContent = '✅ Upload complete!';
-            }
+            // ── In-page card ──
+            const cardBar    = document.getElementById('photo-phase-bar');
+            const cardCount  = document.getElementById('photo-phase-count');
+            const cardEta    = document.getElementById('photo-phase-eta');
+            const cardTitle  = document.getElementById('photo-phase-title');
 
-            // ETA estimate
-            if (etaEl && startTime && completed > 0 && completed < total) {
-                const elapsed = (Date.now() - startTime) / 1000;
-                const rate = completed / elapsed;
+            if (cardBar)   cardBar.style.width = `${pct}%`;
+            if (cardCount) cardCount.textContent = `${completed} / ${total} photos`;
+
+            // ETA calculation (shared between both displays)
+            let etaText = '';
+            if (startTime && completed > 0 && completed < total) {
+                const elapsed   = (Date.now() - startTime) / 1000;
+                const rate      = completed / elapsed;
                 const remaining = Math.ceil((total - completed) / rate);
                 const mins = Math.floor(remaining / 60);
                 const secs = remaining % 60;
-                etaEl.textContent = mins > 0 ? `~${mins}m ${secs}s remaining` : `~${secs}s remaining`;
-            } else if (etaEl) {
-                etaEl.textContent = '';
+                etaText = mins > 0 ? `~${mins}m ${secs}s remaining` : `~${secs}s remaining`;
+            }
+            if (etaElBar) etaElBar.textContent = etaText;
+            if (cardEta)  cardEta.textContent  = etaText;
+
+            if (failed > 0 && cardTitle) {
+                cardTitle.textContent = `Uploading your photos... (${failed} failed, retrying)`;
             }
         }
 
         /**
-         * Hide the upload progress bar.
+         * Hide the upload progress bar and transition the in-page card to success state.
          */
-        function hidePhotoUploadProgress() {
+        function hidePhotoUploadProgress(totalUploaded) {
+            // Hide fixed bottom bar after a brief delay
             const bar = document.getElementById('photo-upload-progress');
-            if (bar) {
-                // Brief delay so user sees "complete"
-                setTimeout(() => { bar.style.display = 'none'; }, 2500);
+            if (bar) setTimeout(() => { bar.style.display = 'none'; }, 2500);
+
+            // Transition in-page card to success state
+            const card      = document.getElementById('photo-phase-card');
+            const cardBar   = document.getElementById('photo-phase-bar');
+            const cardTitle = document.getElementById('photo-phase-title');
+            const cardBadge = document.getElementById('photo-phase-badge');
+            const cardCount = document.getElementById('photo-phase-count');
+            const cardEta   = document.getElementById('photo-phase-eta');
+            const cardIcon  = document.getElementById('photo-phase-icon');
+
+            if (cardBar)   { cardBar.style.width = '100%'; cardBar.style.background = 'linear-gradient(90deg, #28a745, #34c759)'; }
+            if (cardTitle) cardTitle.textContent = `${totalUploaded || ''} photo${totalUploaded !== 1 ? 's' : ''} uploaded successfully!`;
+            if (cardBadge) { cardBadge.textContent = 'Complete'; cardBadge.style.background = 'rgba(40,167,69,0.12)'; cardBadge.style.color = '#28a745'; }
+            if (cardCount) cardCount.style.color = '#28a745';
+            if (cardEta)   cardEta.textContent = '';
+            if (cardIcon)  { cardIcon.style.background = 'linear-gradient(135deg, #28a745, #34c759)'; cardIcon.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'; }
+            if (card)      card.style.border = '2px solid #28a745';
+
+            // Restore the writing status section (obituary generation phase)
+            const writing = document.getElementById('writingStatus');
+            if (writing) {
+                writing.style.transition = 'opacity 0.6s ease, filter 0.6s ease';
+                writing.style.opacity    = '1';
+                writing.style.filter     = 'none';
+                writing.style.pointerEvents = 'auto';
             }
         }
 
@@ -1920,7 +1971,13 @@
             }
 
             if (!selectedPhotos || selectedPhotos.length === 0) {
-                console.log('📷 No photos selected');
+                console.log('📷 No photos selected — skipping photo upload phase');
+                // No photos: hide the phase card and connector so obituary generation
+                // is the only thing visible on the success screen
+                const card      = document.getElementById('photo-phase-card');
+                const connector = document.getElementById('phase-connector');
+                if (card)      card.style.display      = 'none';
+                if (connector) connector.style.display = 'none';
                 return;
             }
 
@@ -2004,7 +2061,8 @@
             } finally {
                 window.removeEventListener('beforeunload', beforeUnloadHandler);
                 isSubmittingForm = false;
-                hidePhotoUploadProgress();
+                const successCount = completedCount - failedCount;
+                hidePhotoUploadProgress(successCount);
             }
         }
         
@@ -2146,7 +2204,7 @@
                 const lang = localStorage.getItem('memorio_language') || 'en';
                 let deceasedFirstName = lang === 'es' ? 'su ser querido' : 'your loved one';
                 let craftingText, memorialInfoText;
-
+                
                 if (currentCase && currentCase.deceased_name) {
                     const firstName = currentCase.deceased_name.split(' ')[0];
                     deceasedFirstName = firstName;
@@ -2163,9 +2221,47 @@
                 }
 
                 memorialInfoText = i18n.t('form.tributeCrafted').replace('{name}', deceasedFirstName);
-
+                
                 container.innerHTML = `
                     <div class="memorio-container">
+
+                        <!-- ── Phase 1: Photo upload progress card ── -->
+                        <div id="photo-phase-card" style="background: white; border: 2px solid #436481; border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(67,100,129,0.12); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; display: none;">
+                            <div style="display: flex; align-items: flex-start; gap: 16px;">
+                                <div id="photo-phase-icon" style="width: 46px; height: 46px; background: linear-gradient(135deg, #436481, #5a82a0); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="16 16 12 12 8 16"></polyline>
+                                        <line x1="12" y1="12" x2="12" y2="21"></line>
+                                        <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+                                    </svg>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                        <span id="photo-phase-title" style="font-size: 16px; font-weight: 700; color: #32343a;">Uploading your photos...</span>
+                                        <span id="photo-phase-badge" style="font-size: 11px; font-weight: 700; background: rgba(67,100,129,0.12); color: #436481; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">In Progress</span>
+                                    </div>
+                                    <div style="font-size: 13px; color: #888; margin-bottom: 14px;">Please keep this tab open while your photos upload</div>
+
+                                    <div style="background: #e9ecef; border-radius: 6px; overflow: hidden; height: 8px; margin-bottom: 10px;">
+                                        <div id="photo-phase-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #436481, #5a82a0); border-radius: 6px; transition: width 0.4s ease;"></div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span id="photo-phase-count" style="font-size: 13px; font-weight: 600; color: #436481;">0 / 0 photos</span>
+                                        <span id="photo-phase-eta" style="font-size: 12px; color: #999;"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connector between phases (only shown when photo phase visible) -->
+                        <div id="phase-connector" style="display: none; text-align: center; margin: 4px 0 12px; color: #adb5bd;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <polyline points="19 12 12 19 5 12"></polyline>
+                            </svg>
+                        </div>
+
+                        <!-- ── Phase 2: Obituary generation status ── -->
                         <div id="writingStatus" class="writing-status">
                             <div class="status-text">${craftingText}</div>
                             <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -2429,7 +2525,7 @@
                 alert('No obituary content was generated. Please check the n8n workflow output.');
                 return;
             }
-
+            
             // Translate the obituary if Spanish is active (no n8n changes needed)
             obituaryData.content = await translateObituaryIfNeeded(obituaryData.content);
 
@@ -2868,26 +2964,42 @@
                 
                 // Pass the selected language so n8n generates the obituary in the right language
                 payload.language = localStorage.getItem('memorio_language') || 'en';
+                
+                // ── Run n8n webhook AND photo upload/DB save in parallel ──
+                // Photos can be large (minutes to upload), so we don't want to
+                // block the n8n call on them. Both start at the same time;
+                // the obituary is only displayed once BOTH are complete.
+                let n8nRaw = null;
+                let n8nError = null;
 
                 try {
-                    console.log('Fetching from:', ENDPOINT);
-                    const res = await fetch(ENDPOINT, {
+                    console.log('Starting parallel: n8n fetch + photo upload/DB save');
+
+                    const n8nPromise = fetch(ENDPOINT, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                         mode: 'cors',
                         body: JSON.stringify(payload)
+                    }).then(res => {
+                        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                        return res.json();
                     });
-                    
-                    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-                    const raw = await res.json();
-                    console.log('N8N Response:', raw);
-                    
-                    // ✅ DUAL SUBMISSION: After N8N succeeds, save to database
-                    await saveFormToDatabase(payload);
-                    
-                    displayObituary(raw, payload);
+
+                    const dbPromise = saveFormToDatabase(payload);
+
+                    // Wait for both — photos show their own progress in the UI
+                    const [raw] = await Promise.all([n8nPromise, dbPromise]);
+                    n8nRaw = raw;
+                    console.log('N8N Response:', n8nRaw);
+
+                    // Brief pause to let the photo success state render before the obituary loads
+                    await new Promise(r => setTimeout(r, 1200));
+                    displayObituary(n8nRaw, payload);
+
                 } catch (err) {
                     console.error('Submit error:', err);
+                    n8nError = err;
+
                     if (err.name === 'TypeError' && err.message.includes('fetch')) {
                         alert(`Network Error: Cannot reach the webhook. This could be due to:\n1. CORS policy blocking the request\n2. Webhook endpoint is down\n3. Network connectivity issues`);
                     }
