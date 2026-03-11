@@ -1232,10 +1232,9 @@
         overflow: hidden;
       }
       
-      /* Keep header (hamburger) above the overlay so it stays tappable */
-      body.nav-drawer-open .header {
-        z-index: 10000;
-      }
+      /* Drawer (9999) and overlay (9998) sit above header (1000) naturally.
+         Do NOT raise header z-index here — that would push the header above
+         the drawer panel and cause it to overlap the open drawer. */
       
       .hero-title {
         font-size: 42px;
