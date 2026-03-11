@@ -1200,11 +1200,13 @@
         min-height: 0;
       }
       
-      /* Prevent background scroll while drawer is open */
+      /* Prevent background scroll while drawer is open.
+         NOTE: do NOT use position:fixed on the body — on mobile WebKit,
+         position:fixed on the body breaks all position:fixed children
+         (like the header), causing them to jump off-screen. */
+      html.nav-drawer-open,
       body.nav-drawer-open {
         overflow: hidden;
-        position: fixed;
-        width: 100%;
       }
       
       /* Keep header (and hamburger) above overlay so it stays tappable */
@@ -1816,10 +1818,7 @@
       
       function openDrawer() {
         if (!navDrawerPanel || !navDrawerOverlay) return;
-        // Save scroll position and lock body in place so position:fixed
-        // doesn't cause a scroll-to-top jump that breaks header state
-        const scrollY = window.scrollY;
-        document.body.style.top = '-' + scrollY + 'px';
+        document.documentElement.classList.add('nav-drawer-open');
         document.body.classList.add('nav-drawer-open');
         navDrawerPanel.classList.add('active');
         navDrawerOverlay.classList.add('active');
@@ -1828,14 +1827,11 @@
       
       function closeDrawer() {
         if (!navDrawerPanel || !navDrawerOverlay) return;
-        // Restore scroll position before removing position:fixed
-        const scrollY = Math.abs(parseInt(document.body.style.top || '0', 10));
         navDrawerPanel.classList.remove('active');
         navDrawerOverlay.classList.remove('active');
         navDrawerOverlay.setAttribute('aria-hidden', 'true');
+        document.documentElement.classList.remove('nav-drawer-open');
         document.body.classList.remove('nav-drawer-open');
-        document.body.style.top = '';
-        window.scrollTo(0, scrollY);
       }
       
       function toggleDrawer() {
