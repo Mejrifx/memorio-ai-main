@@ -3600,6 +3600,15 @@
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
+  <!-- Admin Photo Gallery Modal -->
+  <div id="admin-gallery-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.96); z-index: 99999; overflow-y: auto;" onclick="handleAdminGalleryBackdrop(event)">
+    <div style="position: relative; min-height: 100vh; padding: 64px 20px 40px;">
+      <button onclick="closeAdminGallery()" type="button" style="position: fixed; top: 16px; right: 16px; background: rgba(255,255,255,0.15); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-size: 26px; line-height: 1; z-index: 100000;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">&times;</button>
+      <h3 id="admin-gallery-title" style="color: white; text-align: center; margin: 0 0 28px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 22px; font-weight: 600;"></h3>
+      <div id="admin-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; max-width: 1400px; margin: 0 auto;"></div>
+    </div>
+  </div>
+
   <script>
     // Initialize Supabase client
     const SUPABASE_URL = 'https://gkabtvqwwuvigcdubwyv.supabase.co';
@@ -4790,6 +4799,35 @@
       );
     }
     
+    // ── Admin Photo Gallery ───────────────────────────────────────────────────
+    let adminGalleryPhotos = [];
+
+    function openAdminGallery() {
+      const modal = document.getElementById('admin-gallery-modal');
+      const grid  = document.getElementById('admin-gallery-grid');
+      const title = document.getElementById('admin-gallery-title');
+
+      title.textContent = `${adminGalleryPhotos.length} Photo${adminGalleryPhotos.length !== 1 ? 's' : ''}`;
+      grid.innerHTML = adminGalleryPhotos.map((url, i) => `
+        <div style="aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #1a1a1a;">
+          <img src="${url}" alt="Photo ${i + 1}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      `).join('');
+
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAdminGallery() {
+      document.getElementById('admin-gallery-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function handleAdminGalleryBackdrop(e) {
+      if (e.target === document.getElementById('admin-gallery-modal')) closeAdminGallery();
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     // Toast notification functions
     function showToast(message, isError = false) {
       const toast = document.getElementById('toast');
@@ -5919,44 +5957,45 @@
         const uploadsContainer = document.getElementById('modal-uploads-content');
         let html = '';
         
-        // Render assets
-        if (assets && assets.length > 0) {
-          html += '<h3 class="modal-form-data-title">Uploaded Photos</h3>';
-          html += '<div class="modal-assets-grid">';
-          assets.forEach(asset => {
-            // Determine the correct image URL based on the source
-            let imageUrl;
-            
-            if (asset.metadata?.source === 'uploadcare') {
-              // Uploadcare photo from initial form submission
-              const fileId = asset.metadata?.uploadcare_file_id || asset.file_key;
-              
-              // Ensure we have a proper Uploadcare URL
-              if (!asset.file_key.includes('ucarecdn.com')) {
-                imageUrl = `https://ucarecdn.com/${fileId}/`;
-              } else {
-                imageUrl = asset.file_key.replace(/\/$/, '') + '/';
-              }
-              
-              console.log('📸 Admin viewing Uploadcare photo:', fileId, '→', imageUrl);
-            } else if (asset.file_key.startsWith('http://') || asset.file_key.startsWith('https://')) {
-              // file_key already contains a full URL (Supabase Storage or other)
-              imageUrl = asset.file_key;
-              console.log('📸 Admin viewing full URL photo:', imageUrl);
-            } else {
-              // file_key is a relative path - construct Supabase Storage URL
-              imageUrl = `${SUPABASE_URL}/storage/v1/object/public/case-assets/${asset.file_key}`;
-              console.log('📸 Admin viewing relative path photo:', asset.file_key, '→', imageUrl);
-            }
-            
-            html += `
-              <div class="modal-asset-item" onclick="window.open('${imageUrl}', '_blank')">
-                <img src="${imageUrl}" alt="Asset" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'padding: 20px; text-align: center;\\'>❌ Error loading image</div>'">
+        // Resolve asset URL (Uploadcare, full URL, or relative Supabase path)
+        function resolveAdminAssetUrl(asset) {
+          if (asset.metadata?.source === 'uploadcare') {
+            const fileId = asset.metadata?.uploadcare_file_id || asset.file_key;
+            let base = asset.file_key.includes('ucarecdn.com')
+              ? asset.file_key
+              : `https://ucarecdn.com/${fileId}`;
+            return base.replace(/\/$/, '');
+          }
+          if (asset.file_key && (asset.file_key.startsWith('http://') || asset.file_key.startsWith('https://'))) {
+            return asset.file_key;
+          }
+          return `${SUPABASE_URL}/storage/v1/object/public/case-assets/${asset.file_key}`;
+        }
+
+        // Render assets — compact thumbnail with gallery modal
+        const imageAssets = (assets || []).filter(a => a.mime_type?.startsWith('image/'));
+        if (imageAssets.length > 0) {
+          // Store for gallery
+          adminGalleryPhotos = imageAssets.map(a => resolveAdminAssetUrl(a));
+
+          const firstUrl = adminGalleryPhotos[0];
+          const extra    = imageAssets.length - 1;
+
+          html += `<h3 class="modal-form-data-title">Uploaded Photos</h3>`;
+          html += `
+            <div onclick="openAdminGallery()" style="display: inline-flex; flex-direction: column; align-items: flex-start; cursor: pointer; gap: 10px; margin-bottom: 20px;">
+              <div style="position: relative; width: 190px; height: 190px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.14); border: 2.5px solid transparent; transition: border-color 0.2s;" onmouseover="this.style.borderColor='#436481'" onmouseout="this.style.borderColor='transparent'">
+                <img src="${firstUrl}" alt="Photo 1" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                ${extra > 0 ? `<div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.75); color: white; padding: 5px 10px; border-radius: 20px; font-size: 13px; font-weight: 700;">+${extra}</div>` : ''}
               </div>
-            `;
-          });
-          html += '</div>';
+              <div>
+                <span style="font-size: 13px; font-weight: 700; color: #436481; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">${imageAssets.length} photo${imageAssets.length !== 1 ? 's' : ''} uploaded</span><br>
+                <span style="font-size: 12px; color: #999; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Click to view all</span>
+              </div>
+            </div>
+          `;
         } else {
+          adminGalleryPhotos = [];
           html += '<div class="modal-empty-state">No photos uploaded yet</div>';
         }
         

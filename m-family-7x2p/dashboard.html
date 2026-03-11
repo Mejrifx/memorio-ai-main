@@ -1133,6 +1133,9 @@
           </div>
           
           <div id="assetsSection">
+            <!-- Compact photo thumbnail (populated by displayAssets) -->
+            <div id="family-photo-preview" style="margin-bottom: 16px;"></div>
+
             <div class="assets-grid" id="assetsGrid">
               <div class="upload-area" id="upload-area" onclick="handleUploadClick()">
                 <div class="upload-icon">
@@ -1142,6 +1145,15 @@
               </div>
             </div>
             <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
+          </div>
+
+          <!-- Family Photo Gallery Modal -->
+          <div id="family-gallery-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.96); z-index: 99999; overflow-y: auto;" onclick="handleFamilyGalleryBackdrop(event)">
+            <div style="position: relative; min-height: 100vh; padding: 64px 20px 40px;">
+              <button onclick="closeFamilyGallery()" type="button" style="position: fixed; top: 16px; right: 16px; background: rgba(255,255,255,0.15); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-size: 26px; line-height: 1; z-index: 100000;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">&times;</button>
+              <h3 id="family-gallery-title" style="color: white; text-align: center; margin: 0 0 28px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 22px; font-weight: 600;"></h3>
+              <div id="family-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; max-width: 1400px; margin: 0 auto;"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1940,98 +1952,80 @@
     }
     
     // Display assets
-    function displayAssets() {
-      const assetsGrid = document.getElementById('assetsGrid');
-      
-      console.log('=== ASSETS DISPLAY DEBUG ===');
-      console.log('currentCase.id:', currentCase?.id);
-      console.log('currentAssets count:', currentAssets?.length);
-      console.log('currentAssets:', currentAssets);
-      currentAssets.forEach((asset, index) => {
-        console.log(`Asset ${index + 1}:`, {
-          id: asset.id,
-          case_id: asset.case_id,
-          file_key: asset.file_key,
-          uploader_user_id: asset.uploader_user_id,
-          source: asset.metadata?.source
-        });
-      });
-      console.log('=== END ASSETS DEBUG ===\n');
-      
-      // Clear existing assets (except upload area)
-      const uploadArea = assetsGrid.querySelector('.upload-area');
-      assetsGrid.innerHTML = '';
-      
-      if (currentAssets.length > 0) {
-        currentAssets.forEach(asset => {
-          const assetItem = document.createElement('div');
-          assetItem.className = 'asset-item';
-          assetItem.onclick = () => viewAsset(asset);
-          
-          const icon = asset.mime_type.startsWith('image/') ? 'icon-photo' : 'icon-video';
-          
-          // Handle different asset sources
-          let fileName = 'Unknown';
-          let thumbnailUrl = null;
-          
-          if (asset.metadata?.source === 'uploadcare') {
-            // Uploadcare photo from initial form submission
-            const fileId = asset.metadata?.uploadcare_file_id || asset.file_key;
-            fileName = fileId.length > 20 ? `Photo-${fileId.substring(0, 8)}` : fileId;
-            
-            // Construct proper Uploadcare URL
-            let baseUrl = asset.file_key;
-            
-            // Ensure we have a proper Uploadcare URL
-            if (!baseUrl.includes('ucarecdn.com')) {
-              // If it's just the UUID, construct the full URL
-              baseUrl = `https://ucarecdn.com/${fileId}`;
-            }
-            
-            // Remove trailing slash if present
-            baseUrl = baseUrl.replace(/\/$/, '');
-            
-            // Generate thumbnail URL with Uploadcare transformations
-            thumbnailUrl = `${baseUrl}/-/scale_crop/200x200/center/`;
-            
-            console.log(`📸 Displaying Uploadcare photo: ${fileId} → ${thumbnailUrl}`);
-          } else if (asset.metadata?.source === 'supabase_storage' || asset.file_key.includes('supabase.co')) {
-            // Supabase Storage photo uploaded via dashboard
-            fileName = asset.metadata?.original_filename || asset.file_key.split('/').pop();
-            // Use the public URL as thumbnail (since bucket is public)
-            thumbnailUrl = asset.file_key;
-            console.log(`📸 Displaying Supabase Storage photo: ${fileName} → ${thumbnailUrl}`);
-          } else {
-            // Unknown source - try to use file_key as URL
-            fileName = asset.file_key.split('/').pop();
-            if (asset.file_key.startsWith('http')) {
-              thumbnailUrl = asset.file_key;
-            }
-          }
-          
-          // Use thumbnail if available, otherwise use icon
-          if (thumbnailUrl && asset.mime_type.startsWith('image/')) {
-            assetItem.innerHTML = `
-              <div class="asset-thumbnail" style="width: 100%; height: 150px; overflow: hidden; border-radius: 8px; margin-bottom: 8px;">
-                <img src="${thumbnailUrl}" alt="${fileName}" style="width: 100%; height: 100%; object-fit: cover;" />
-              </div>
-              <div class="asset-name" style="font-size: 12px; text-align: center;">${fileName}</div>
-            `;
-          } else {
-            assetItem.innerHTML = `
-              <div class="asset-icon">
-                <span class="icon ${icon}"></span>
-              </div>
-              <div class="asset-name">${fileName}</div>
-            `;
-          }
-          
-          assetsGrid.appendChild(assetItem);
-        });
+    // ── Resolve asset URL (Uploadcare, Supabase Storage, or raw HTTP) ──────────
+    function resolveFamilyAssetUrl(asset) {
+      if (asset.metadata?.source === 'uploadcare') {
+        const fileId = asset.metadata?.uploadcare_file_id || asset.file_key;
+        let base = asset.file_key.includes('ucarecdn.com')
+          ? asset.file_key
+          : `https://ucarecdn.com/${fileId}`;
+        return base.replace(/\/$/, '');
       }
-      
-      // Add upload area back
-      assetsGrid.appendChild(uploadArea);
+      if (asset.file_key && asset.file_key.startsWith('http')) return asset.file_key;
+      return `${SUPABASE_URL}/storage/v1/object/public/case-assets/${asset.file_key}`;
+    }
+
+    // ── Gallery state ────────────────────────────────────────────────────────
+    let familyGalleryPhotos = [];
+
+    function displayAssets() {
+      console.log('📸 displayAssets — images:', currentAssets?.length);
+
+      const preview  = document.getElementById('family-photo-preview');
+      const images   = (currentAssets || []).filter(a => a.mime_type?.startsWith('image/'));
+
+      if (images.length === 0) {
+        if (preview) preview.innerHTML = '';
+        return;
+      }
+
+      familyGalleryPhotos = images;
+      const firstUrl = resolveFamilyAssetUrl(images[0]);
+      const extra    = images.length - 1;
+
+      if (preview) {
+        preview.innerHTML = `
+          <div onclick="openFamilyGallery()" style="display: inline-flex; flex-direction: column; align-items: flex-start; cursor: pointer; gap: 10px;">
+            <div style="position: relative; width: 190px; height: 190px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.14); border: 2.5px solid transparent; transition: border-color 0.2s;" onmouseover="this.style.borderColor='#436481'" onmouseout="this.style.borderColor='transparent'">
+              <img src="${firstUrl}" alt="Photo 1" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+              ${extra > 0 ? `<div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.75); color: white; padding: 5px 10px; border-radius: 20px; font-size: 13px; font-weight: 700;">+${extra}</div>` : ''}
+            </div>
+            <div>
+              <span style="font-size: 13px; font-weight: 700; color: #436481; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">${images.length} photo${images.length !== 1 ? 's' : ''} uploaded</span><br>
+              <span style="font-size: 12px; color: #999; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Click to view all</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function openFamilyGallery() {
+      const modal = document.getElementById('family-gallery-modal');
+      const grid  = document.getElementById('family-gallery-grid');
+      const title = document.getElementById('family-gallery-title');
+
+      title.textContent = `${familyGalleryPhotos.length} Photo${familyGalleryPhotos.length !== 1 ? 's' : ''}`;
+
+      grid.innerHTML = familyGalleryPhotos.map((asset, i) => {
+        const url = resolveFamilyAssetUrl(asset);
+        return `
+          <div style="aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #1a1a1a;">
+            <img src="${url}" alt="Photo ${i + 1}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+          </div>
+        `;
+      }).join('');
+
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeFamilyGallery() {
+      document.getElementById('family-gallery-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function handleFamilyGalleryBackdrop(e) {
+      if (e.target === document.getElementById('family-gallery-modal')) closeFamilyGallery();
     }
     
     // Display timeline
