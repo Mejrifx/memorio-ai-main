@@ -948,8 +948,12 @@
        ============================================================================ */
     @media (max-width: 768px) {
       .hero {
-        padding: 100px 16px 60px;
+        padding: 100px 16px 32px;
         min-height: auto;
+      }
+      
+      .hero-content {
+        padding-top: 16px;
       }
       
       .hero-title {
@@ -961,7 +965,7 @@
       }
       
       .what-staff-section {
-        padding: 60px 16px;
+        padding: 40px 16px 60px;
       }
       
       .what-staff-title {
@@ -1622,6 +1626,7 @@
     // HEADER SCROLL EFFECT
     // ============================================================================
     window.addEventListener('scroll', () => {
+      if (document.body.classList.contains('nav-drawer-open')) return;
       const header = document.getElementById('header');
       if (window.scrollY > 50) {
         header.classList.add('scrolled');
@@ -1643,18 +1648,23 @@
     
     function openDrawer() {
       if (!navDrawerPanel || !navDrawerOverlay) return;
+      const scrollY = window.scrollY;
+      document.body.style.top = '-' + scrollY + 'px';
+      document.body.classList.add('nav-drawer-open');
       navDrawerPanel.classList.add('active');
       navDrawerOverlay.classList.add('active');
       navDrawerOverlay.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('nav-drawer-open');
     }
     
     function closeDrawer() {
       if (!navDrawerPanel || !navDrawerOverlay) return;
+      const scrollY = Math.abs(parseInt(document.body.style.top || '0', 10));
       navDrawerPanel.classList.remove('active');
       navDrawerOverlay.classList.remove('active');
       navDrawerOverlay.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('nav-drawer-open');
+      document.body.style.top = '';
+      window.scrollTo(0, scrollY);
     }
     
     function toggleDrawer() {
