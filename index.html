@@ -284,15 +284,16 @@
     .hero-title .word {
       display: inline-block;
       opacity: 0;
-      transform: translateY(30px);
-      animation: slideUpWord 0.6s ease forwards;
+      transform: translateX(-40px);
+      animation: slideInWord 0.6s ease forwards;
       margin-right: 0.25em;
     }
     
-    @keyframes slideUpWord {
+    /* Match subtitle direction: slide in from the left on entrance */
+    @keyframes slideInWord {
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0);
       }
     }
     
@@ -1309,18 +1310,18 @@
         <p data-i18n="website.hero.subtitle1">
           When words are hard and time is short, Memorio helps families and funeral homes create meaningful video tributes and obituaries with care, dignity, and professional support.
         </p>
-      </div>
+          </div>
       <div class="hero-buttons">
         <button class="btn-primary" id="heroLoginBtn" data-i18n="website.hero.getStarted">Start Your Tribute</button>
         <a href="services.html" class="btn-secondary" data-i18n="website.hero.learnMore">For Funeral Homes →</a>
-          </div>
             </div>
+          </div>
     
     <div class="hero-scroll-indicator" onclick="document.getElementById('features').scrollIntoView({ behavior: 'smooth' })">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
       </svg>
-          </div>
+              </div>
   </section>
   
   <!-- ============================================================================
@@ -1341,43 +1342,43 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7v-7zm4-3h2v10h-2V7zm4 6h2v4h-2v-4z"/>
             </svg>
-              </div>
+            </div>
           <h3 class="feature-title" data-i18n="website.features.guidedProcess">Gentle, Guided Process</h3>
           <p class="feature-description" data-i18n="website.features.guidedProcessDesc">
             A simple, step-by-step experience designed for families during a difficult time. No technical skills required.
           </p>
-            </div>
+          </div>
         
         <div class="feature-card">
           <div class="feature-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
             </svg>
-          </div>
+        </div>
           <h3 class="feature-title" data-i18n="website.features.privateSecure">Private and Secure</h3>
           <p class="feature-description" data-i18n="website.features.privateSecureDesc">
             Your family's memories and personal information are protected with strong security and strict access controls.
           </p>
-        </div>
+          </div>
         
         <div class="feature-card">
           <div class="feature-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
             </svg>
-          </div>
+            </div>
           <h3 class="feature-title" data-i18n="website.features.beautifullyCrafted">Beautifully Crafted</h3>
           <p class="feature-description" data-i18n="website.features.beautifullyCraftedDesc">
             Each tribute is thoughtfully assembled with music, photos, and pacing that honors your loved one with dignity.
           </p>
-            </div>
+          </div>
         
         <div class="feature-card">
           <div class="feature-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
             </svg>
-          </div>
+              </div>
           <h3 class="feature-title" data-i18n="website.features.readyWhenNeeded">Ready When You Need It</h3>
           <p class="feature-description" data-i18n="website.features.readyWhenNeededDesc">
             Tributes are completed quickly and carefully, without sacrificing quality or attention to detail.
@@ -1389,26 +1390,26 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
             </svg>
-              </div>
+            </div>
           <h3 class="feature-title" data-i18n="website.features.everythingInOnePlace">Everything in One Place</h3>
           <p class="feature-description" data-i18n="website.features.everythingInOnePlaceDesc">
             All photos and memories are collected in one simple, organized place, making it easier to create a complete and meaningful tribute.
           </p>
-            </div>
+          </div>
         
         <div class="feature-card">
           <div class="feature-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"/>
             </svg>
-          </div>
+        </div>
           <h3 class="feature-title" data-i18n="website.features.realSupport">Real, Compassionate Support</h3>
           <p class="feature-description" data-i18n="website.features.realSupportDesc">
             If you need help or guidance, support is available every step of the way.
           </p>
-        </div>
           </div>
             </div>
+          </div>
   </section>
   
   <!-- ============================================================================
@@ -1421,7 +1422,7 @@
         <p class="section-subtitle" data-i18n="website.howItWorks.subtitle">
           Creating a meaningful tribute doesn't have to be complicated.
         </p>
-          </div>
+              </div>
       
       <div class="steps-container">
         <div class="step" data-step="1">
@@ -1438,7 +1439,7 @@
           <p class="step-description" data-i18n="website.howItWorks.step2Desc">
             Memorio generates the obituary using advanced AI and assembles the tribute video with music, pacing, and professional editing. Each tribute is reviewed to ensure quality before delivery.
           </p>
-              </div>
+            </div>
         
         <div class="step" data-step="3">
           <div class="step-number"><span>3</span></div>
@@ -1446,7 +1447,7 @@
           <p class="step-description" data-i18n="website.howItWorks.step3Desc">
             Once approved, the final obituary and tribute video are delivered simultaneously to both the family and the funeral home within 48 hours of submission, ready for services or online sharing.
           </p>
-            </div>
+          </div>
         </div>
           </div>
   </section>
@@ -1571,7 +1572,7 @@
           </button>
                     </div>
                   </div>
-                    </div>
+              </div>
   </section>
   
   <!-- ============================================================================
@@ -1585,7 +1586,7 @@
           Memorio helps funeral homes create beautiful, personalized video tributes & personalised obituaries 
           that honor and celebrate the lives of loved ones with dignity and care.
         </p>
-                      </div>
+              </div>
       
       <div class="footer-section">
         <h3 data-i18n="website.footer.quickLinks">Quick Links</h3>
@@ -1594,7 +1595,7 @@
           <li><a href="#how-it-works" data-i18n="website.nav.howItWorks">How It Works</a></li>
           <li><a href="#faq" data-i18n="website.nav.faq">FAQ</a></li>
         </ul>
-                    </div>
+            </div>
       
       <div class="footer-section">
         <h3 data-i18n="website.footer.login">Login</h3>
@@ -1602,7 +1603,7 @@
           <li><a href="/family/login" data-i18n="website.footer.familyPortal">Family Portal</a></li>
           <li><a href="/director/login" data-i18n="website.footer.directorPortal">Director Portal</a></li>
         </ul>
-                    </div>
+          </div>
       
       <div class="footer-section">
         <h3 data-i18n="website.footer.support">Support</h3>
@@ -1611,17 +1612,21 @@
           <li><a href="privacy.html" data-i18n="website.footer.privacyPolicy">Privacy Policy</a></li>
           <li><a href="terms-of-service.html" data-i18n="website.footer.termsOfService">Terms of Service</a></li>
         </ul>
-                  </div>
+        </div>
       
-                      </div>
+              </div>
     
     <div class="footer-bottom">
       <p data-i18n="website.footer.copyright">&copy; 2026 Memorio. All rights reserved. Honoring life, one story at a time.</p>
-                    </div>
+                </div>
   </footer>
   
   <!-- Supabase Client for Authentication -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- GSAP + ScrollTrigger (scroll-reveal animations) -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 
   <!-- ============================================================================
        JAVASCRIPT v2.0 - CACHE BUSTED
@@ -1659,8 +1664,10 @@
       console.log('✨ Hero title animation initialized');
     }
     
-    // Run hero animation immediately
-    animateHeroTitle();
+    /* Run hero title word-wrap after DOM and i18n are ready so the title slides in like the subtitle */
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(animateHeroTitle, 0);
+    });
     
     // ============================================================================
     // CONFIGURATION
@@ -1799,75 +1806,115 @@
       });
       
       // ============================================================================
-      // SLIDE-UP ANIMATION FOR HOW IT WORKS STEPS
+      // GSAP SCROLL-REVEAL (ScrollTrigger) — same pattern as Services page
       // ============================================================================
-      const steps = document.querySelectorAll('.step');
-      let stepsAnimated = false;
-      
-      const animateSteps = () => {
-        if (stepsAnimated) return;
-        
-        steps.forEach((step, index) => {
-          setTimeout(() => {
-            step.classList.add('animate-in');
-          }, index * 200); // 200ms delay between each step
+      (function initScrollReveal() {
+        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Section headers
+        document.querySelectorAll('.section-header').forEach(function (el) {
+          gsap.fromTo(el, { opacity: 0, y: 60 }, {
+            opacity: 1,
+            y: 0,
+            duration: 1.2,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 80%',
+              toggleActions: 'play none none none',
+            },
+          });
         });
-        
-        stepsAnimated = true;
-      };
-      
-      // Use Intersection Observer to trigger animation when section is visible
-      const stepsObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !stepsAnimated) {
-            animateSteps();
-          }
+
+        // Feature cards
+        document.querySelectorAll('.feature-card').forEach(function (el, index) {
+          gsap.fromTo(el, { opacity: 0, y: 50, scale: 0.95 }, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.9,
+            ease: 'power3.out',
+            delay: index * 0.15,
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          });
         });
-      }, {
-        threshold: 0.2, // Trigger when 20% of section is visible
-        rootMargin: '0px 0px -100px 0px'
-      });
-      
-      const howItWorksSection = document.getElementById('how-it-works');
-      if (howItWorksSection) {
-        stepsObserver.observe(howItWorksSection);
-      }
-      
-      // ============================================================================
-      // SLIDE-UP ANIMATION FOR BENEFITS SECTION
-      // ============================================================================
-      const benefitItems = document.querySelectorAll('.benefit-item');
-      let benefitsAnimated = false;
-      
-      const animateBenefits = () => {
-        if (benefitsAnimated) return;
-        
-        benefitItems.forEach((item, index) => {
-          setTimeout(() => {
-            item.classList.add('animate-in');
-          }, index * 150); // 150ms delay between each item
+
+        // How it works steps
+        document.querySelectorAll('.step').forEach(function (el, index) {
+          gsap.fromTo(el, { opacity: 0, y: 50, scale: 0.95 }, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.9,
+            ease: 'power3.out',
+            delay: index * 0.15,
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          });
         });
-        
-        benefitsAnimated = true;
-      };
-      
-      // Use Intersection Observer to trigger animation when section is visible
-      const benefitsObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !benefitsAnimated) {
-            animateBenefits();
-          }
+
+        // Benefit items (if present)
+        document.querySelectorAll('.benefit-item').forEach(function (el, index) {
+          gsap.fromTo(el, { opacity: 0, y: 50, scale: 0.95 }, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.9,
+            ease: 'power3.out',
+            delay: index * 0.15,
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          });
         });
-      }, {
-        threshold: 0.2, // Trigger when 20% of section is visible
-        rootMargin: '0px 0px -100px 0px'
-      });
-      
-      const benefitsSection = document.getElementById('benefits');
-      if (benefitsSection) {
-        benefitsObserver.observe(benefitsSection);
-      }
-      
+
+        // FAQ items (stagger)
+        document.querySelectorAll('.faq-item').forEach(function (el, index) {
+          gsap.fromTo(el, { opacity: 0, y: 40 }, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+            delay: index * 0.08,
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          });
+        });
+
+        // CTA card (horizontal slide)
+        const ctaCard = document.querySelector('.cta-card');
+        if (ctaCard) {
+          gsap.fromTo(ctaCard, { opacity: 0, x: -50 }, {
+            opacity: 1,
+            x: 0,
+            duration: 1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: ctaCard,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          });
+        }
+
+        window.addEventListener('beforeunload', function () {
+          ScrollTrigger.getAll().forEach(function (t) { t.kill(); });
+        });
+      })();
+
       // ============================================================================
       // FAQ ACCORDION
       // ============================================================================
