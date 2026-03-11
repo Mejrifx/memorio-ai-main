@@ -1526,6 +1526,10 @@
     </div>
   </footer>
   
+  <!-- GSAP + ScrollTrigger (scroll-reveal animations) -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
   <!-- ============================================================================
        JAVASCRIPT
        ============================================================================ -->
@@ -1573,56 +1577,132 @@
     }
     
     // ============================================================================
-    // BENEFITS CARDS ANIMATION
+    // GSAP SCROLL-REVEAL (ScrollTrigger)
     // ============================================================================
-    const benefitCards = document.querySelectorAll('.benefit-card');
-    let benefitsAnimated = false;
-    
-    const animateBenefits = () => {
-      if (benefitsAnimated) return;
-      
-      benefitCards.forEach((card, index) => {
-        setTimeout(() => {
-          card.classList.add('animate-in');
-        }, index * 100);
-      });
-      
-      benefitsAnimated = true;
-    };
-    
-    const benefitsSection = document.querySelector('.section:has(.benefits-grid)');
-    if (benefitsSection) {
-      const benefitsObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !benefitsAnimated) {
-            animateBenefits();
-          }
+    (function initScrollReveal() {
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+      gsap.registerPlugin(ScrollTrigger);
+
+      // —— Section headers: fade in + slide up when top hits 80% of viewport ——
+      document.querySelectorAll('.section-header').forEach(function (el) {
+        gsap.fromTo(el, { opacity: 0, y: 60 }, {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+          },
         });
-      }, {
-        threshold: 0.2,
-        rootMargin: '0px 0px -100px 0px'
       });
-      
-      benefitsObserver.observe(benefitsSection);
-    } else {
-      // Fallback: find by class if :has() is not supported
-      const benefitsGrid = document.querySelector('.benefits-grid');
-      if (benefitsGrid) {
-        const benefitsObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting && !benefitsAnimated) {
-              animateBenefits();
-            }
-          });
-        }, {
-          threshold: 0.2,
-          rootMargin: '0px 0px -100px 0px'
+
+      // —— "What Your Staff" title ——
+      const whatStaffTitle = document.querySelector('.what-staff-title');
+      if (whatStaffTitle) {
+        gsap.fromTo(whatStaffTitle, { opacity: 0, y: 60 }, {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: whatStaffTitle,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+          },
         });
-        
-        benefitsObserver.observe(benefitsGrid.closest('.section'));
       }
-    }
-    
+
+      // —— "What Your Staff" steps (cards with stagger) ——
+      document.querySelectorAll('.what-staff-step').forEach(function (el, index) {
+        gsap.fromTo(el, { opacity: 0, y: 50, scale: 0.95 }, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.9,
+          ease: 'power3.out',
+          delay: index * 0.15,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+
+      // —— Feature cards (Why Funeral Homes) ——
+      document.querySelectorAll('.feature-card').forEach(function (el, index) {
+        gsap.fromTo(el, { opacity: 0, y: 50, scale: 0.95 }, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.9,
+          ease: 'power3.out',
+          delay: index * 0.15,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+
+      // —— Benefit cards (Operational Benefits + Security) ——
+      document.querySelectorAll('.benefit-card').forEach(function (el, index) {
+        gsap.fromTo(el, { opacity: 0, y: 50, scale: 0.95 }, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.9,
+          ease: 'power3.out',
+          delay: index * 0.15,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+
+      // —— CTA card (horizontal slide for variety) ——
+      const ctaCard = document.querySelector('.cta-card');
+      if (ctaCard) {
+        gsap.fromTo(ctaCard, { opacity: 0, x: -50 }, {
+          opacity: 1,
+          x: 0,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: ctaCard,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        });
+      }
+
+      // —— What-staff footer (time + rest) ——
+      const whatStaffFooter = document.querySelector('.what-staff-footer');
+      if (whatStaffFooter) {
+        gsap.fromTo(whatStaffFooter, { opacity: 0, y: 40 }, {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: whatStaffFooter,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        });
+      }
+
+      // Cleanup on page unload (avoids duplicate triggers on SPA-style nav or refresh)
+      window.addEventListener('beforeunload', function () {
+        ScrollTrigger.getAll().forEach(function (t) { t.kill(); });
+      });
+    })();
+
     // ============================================================================
     // 3D TILT EFFECT FOR FEATURE CARDS
     // ============================================================================
