@@ -220,6 +220,10 @@
       position: relative;
       z-index: 20;
     }
+    /* Mobile-only lang toggle — hidden on desktop, shown by mobile media query */
+    .nav-mobile-lang {
+      display: none;
+    }
     
     .mobile-menu-toggle span {
       display: block;
@@ -1395,10 +1399,6 @@
       background: rgba(67, 100, 129, 0.1);
       border-color: rgba(67, 100, 129, 0.3);
       color: #2d5070;
-    }
-    /* Mobile-only lang toggle in nav bar — hidden on desktop */
-    .nav-mobile-lang {
-      display: none;
     }
     .lang-toggle svg { opacity: 0.55; flex-shrink: 0; }
     .lang-toggle:hover svg { opacity: 0.85; }
