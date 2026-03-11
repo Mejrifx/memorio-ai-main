@@ -263,7 +263,7 @@
        HERO SECTION
        ============================================================================ */
     .hero {
-      padding: 120px 24px 80px;
+      padding: 100px 24px 40px;
       text-align: center;
       position: relative;
       overflow: visible;
@@ -295,39 +295,36 @@
       margin: 0 auto;
       position: relative;
       z-index: 2;
-      padding-top: 40px;
+      padding-top: 0;
       pointer-events: none;
     }
     
     .hero-title {
-      font-size: 56px;
+      font-size: 52px;
       font-weight: 800;
       color: #436481;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       letter-spacing: -1px;
       line-height: 1.2;
-      text-shadow: 0 2px 8px rgba(255, 255, 255, 0.8);
     }
     
     .hero-subtitle {
-      font-size: 22px;
+      font-size: 20px;
       color: #32343a;
-      margin-bottom: 40px;
-      opacity: 0.9;
+      margin-bottom: 0;
+      opacity: 0.85;
       font-weight: 500;
-      max-width: 800px;
+      max-width: 760px;
       margin-left: auto;
       margin-right: auto;
       line-height: 1.6;
-      text-shadow: 0 1px 4px rgba(255, 255, 255, 0.8);
     }
     
     /* ============================================================================
        WHAT STAFF DOES SECTION - MODERN TIMELINE
        ============================================================================ */
     .what-staff-section {
-      padding: 100px 24px;
-      background: linear-gradient(180deg, rgba(67, 100, 129, 0.02) 0%, transparent 100%);
+      padding: 56px 24px 100px;
       position: relative;
     }
     
@@ -948,12 +945,12 @@
        ============================================================================ */
     @media (max-width: 768px) {
       .hero {
-        padding: 100px 16px 32px;
+        padding: 100px 16px 24px;
         min-height: auto;
       }
       
       .hero-content {
-        padding-top: 16px;
+        padding-top: 0;
       }
       
       .hero-title {
@@ -965,7 +962,7 @@
       }
       
       .what-staff-section {
-        padding: 40px 16px 60px;
+        padding: 32px 16px 60px;
       }
       
       .what-staff-title {
@@ -1142,9 +1139,7 @@
         overflow: hidden;
       }
       
-      body.nav-drawer-open .header {
-        z-index: 10000;
-      }
+      /* Do NOT raise header above drawer — drawer (9999) sits above header (1000) naturally. */
       
       .hero {
         padding: 100px 24px 60px;
