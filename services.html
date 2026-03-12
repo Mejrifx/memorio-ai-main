@@ -264,64 +264,105 @@
     }
     
     /* ============================================================================
-       HERO SECTION
+       HERO SECTION — Full-bleed background (matches main site hero)
        ============================================================================ */
     .hero {
-      padding: 100px 24px 40px;
-      text-align: center;
       position: relative;
-      overflow: visible;
-      min-height: auto;
+      min-height: 100vh;
+      min-height: 100svh;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
+      background-image: url('images/services-page-background.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      padding-top: 0;
     }
     
-    .hero-background-image {
+    .hero::before {
+      content: '';
       position: absolute;
-      width: 60%;
-      height: auto;
-      left: 50%;
-      top: calc(50% + 121px);
-      transform: translate(-50%, -50%);
-      z-index: 0;
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-      pointer-events: auto;
-    }
-    
-    .hero-background-image:hover {
-      opacity: 0.9;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 243, 233, 0.65) 0%, rgba(242, 234, 221, 0.60) 100%);
     }
     
     .hero-content {
-      max-width: 1000px;
-      margin: 0 auto;
       position: relative;
       z-index: 2;
-      padding-top: 0;
-      pointer-events: none;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 24px;
+      text-align: center;
     }
     
     .hero-title {
       font-size: 52px;
       font-weight: 800;
       color: #436481;
-      margin-bottom: 20px;
-      letter-spacing: -1px;
+      margin-bottom: 24px;
       line-height: 1.2;
+      letter-spacing: -1px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      opacity: 0;
+      transform: translateX(-40px);
+      animation: slideInFromLeft 0.6s ease forwards;
     }
     
     .hero-subtitle {
-      font-size: 20px;
+      font-size: 22px;
       color: #32343a;
       margin-bottom: 0;
-      opacity: 0.85;
       font-weight: 500;
+      line-height: 1.5;
       max-width: 760px;
       margin-left: auto;
       margin-right: auto;
-      line-height: 1.6;
+      opacity: 0;
+      transform: translateX(-50px);
+      animation: slideInFromLeft 0.8s ease forwards 0.4s;
+    }
+    
+    .hero-subtitle p {
+      margin: 0;
+      font-size: inherit;
+      color: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+    }
+    
+    @keyframes slideInFromLeft {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .hero-scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s infinite;
+      cursor: pointer;
+      z-index: 3;
+    }
+    
+    .hero-scroll-indicator svg {
+      width: 32px;
+      height: 32px;
+      fill: #436481;
+      opacity: 0.7;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+      40% { transform: translateX(-50%) translateY(8px); }
+      60% { transform: translateX(-50%) translateY(4px); }
     }
     
     /* ============================================================================
@@ -1151,25 +1192,21 @@
       /* Do NOT raise header above drawer — drawer (9999) sits above header (1000) naturally. */
       
       .hero {
-        padding: 100px 16px 24px;
-        min-height: auto; /* services hero is content-sized, not full-screen */
-      }
-      
-      .hero-background-image {
-        width: 60%;
-        top: calc(50% + 121px);
+        background-attachment: scroll; /* fixed broken on iOS Safari */
+        min-height: 100svh;
+        padding: 100px 16px 60px;
       }
       
       .hero-content {
-        padding-top: 20px;
+        padding: 40px 20px 20px;
       }
       
       .hero-title {
-        font-size: clamp(26px, 8.5vw, 36px); /* fluid: 26px @ 306px → 36px @ 424px */
+        font-size: clamp(26px, 8.5vw, 42px);
       }
       
       .hero-subtitle {
-        font-size: clamp(16px, 4.5vw, 18px);
+        font-size: clamp(16px, 4.5vw, 20px);
       }
       
       .section {
@@ -1210,7 +1247,7 @@
        ============================================================================ */
     @media (max-width: 480px) {
       .hero-content {
-        padding-top: 12px;
+        padding: 28px 16px 16px;
       }
 
       .what-staff-step {
@@ -1402,12 +1439,17 @@
         Memorio removes obituary writing and tribute video production from your staff's workload. Families submit photos and memories, and your funeral home receives finished memorial assets within 48 hours.
       </p>
     </div>
+    <div class="hero-scroll-indicator" onclick="document.getElementById('what-staff-section').scrollIntoView({ behavior: 'smooth' })">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+      </svg>
+    </div>
   </section>
   
   <!-- ============================================================================
        WHAT YOUR STAFF ACTUALLY DOES
        ============================================================================ -->
-  <section class="what-staff-section">
+  <section class="what-staff-section" id="what-staff-section">
     <div class="what-staff-container">
       <h2 class="what-staff-title" data-i18n="services.whatStaffTitle">What Your Staff Actually Does</h2>
       
