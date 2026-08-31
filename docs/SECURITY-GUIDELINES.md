@@ -29,7 +29,7 @@
 4. 📝 **DOCUMENT** the incident and prevention measures
 
 ## Current Service Key
-- **New Service Key**: `sbp_[REMOVED]`
+- **New Service Key**: `sbp_[REDACTED - rotate any token that was previously committed here]`
 - **Status**: Active (rotated after security incident)
 - **Location**: Supabase Edge Function environment variables
 

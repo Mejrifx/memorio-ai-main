@@ -5,7 +5,7 @@
   <meta name="google" content="notranslate">
   <title>QC Dashboard - Memorio</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="../css/normalize.css" rel="stylesheet" type="text/css">
   <link href="../css/webflow.css" rel="stylesheet" type="text/css">
   <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
@@ -19,6 +19,18 @@
     /* ============================================================================
        MEMORIO QC DASHBOARD - BRAND-CONSISTENT DESIGN
        ============================================================================ */
+
+    :root {
+      --paper: #fffbf7;
+      --cream: #fff3e9;
+      --sand: #f4e8de;
+      --ink: #32343a;
+      --ink-soft: #565a63;
+      --slate: #436481;
+      --slate-deep: #38536b;
+      --slate-dark: #2c4459;
+      --sky: #6ca7d3;
+    }
     
     /* Language Toggle Styling */
     .lang-toggle {
@@ -54,8 +66,9 @@
     }
     
     body {
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      background-color: #f4e8de;
+      font-family: 'Public Sans', Arial, sans-serif;
+      background-color: var(--paper);
+      color: var(--ink);
       min-height: 100vh;
       overflow-x: hidden;
     }
@@ -70,9 +83,9 @@
       top: 0;
       width: 280px;
       height: 100vh;
-      background-color: #fff3e9;
-      border-right: 3px solid #436481;
-      box-shadow: 4px 0 15px rgba(67, 100, 129, 0.1);
+      background-color: var(--slate-dark);
+      border-right: 1px solid rgba(67, 100, 129, 0.18);
+      box-shadow: 4px 0 15px rgba(44, 68, 89, 0.15);
       z-index: 1000;
       display: flex;
       flex-direction: column;
@@ -81,7 +94,8 @@
     .sidebar-logo {
       height: 70px;
       padding: 0;
-      border-bottom: 2px solid #436481;
+      background-color: var(--cream);
+      border-bottom: 1px solid rgba(67, 100, 129, 0.18);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -106,26 +120,26 @@
       gap: 14px;
       padding: 14px 24px;
       margin: 4px 12px;
-      color: #32343a;
+      color: #f2ede7;
       text-decoration: none;
       font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
       border-radius: 8px;
-      border: 1.5px solid transparent;
+      border: 1px solid transparent;
     }
     
     .sidebar-nav-item:hover {
-      background-color: #f4e8de;
-      border-color: #6ca7d3;
-      color: #436481;
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: rgba(108, 167, 211, 0.45);
+      color: #ffffff;
     }
     
     .sidebar-nav-item.active {
-      background-color: #f4e8de;
-      border-color: #436481;
-      color: #436481;
+      background-color: rgba(255, 255, 255, 0.12);
+      border-color: rgba(242, 237, 231, 0.35);
+      color: #ffffff;
     }
     
     .sidebar-nav-item svg {
@@ -144,9 +158,9 @@
       left: 280px;
       right: 0;
       height: 70px;
-      background-color: #fff3e9;
-      border-bottom: 2px solid #436481;
-      box-shadow: 0 2px 8px rgba(67, 100, 129, 0.1);
+      background-color: var(--cream);
+      border-bottom: 1px solid rgba(67, 100, 129, 0.18);
+      box-shadow: 0 2px 8px rgba(67, 100, 129, 0.08);
       z-index: 999;
       display: flex;
       align-items: center;
@@ -156,7 +170,8 @@
     
     .topbar-title {
       color: #32343a;
-      font-size: 26px;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 28px;
       font-weight: 600;
     }
     
@@ -173,15 +188,15 @@
     
     .topbar-profile-btn {
       padding: 10px 20px;
-      background-color: #fff3e9;
-      border: 1.5px solid #436481;
-      border-radius: 60px;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.35);
+      border-radius: 999px;
       font-size: 15px;
       font-weight: 500;
       color: #32343a;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
     }
     
     .topbar-profile-btn:hover {
@@ -195,9 +210,9 @@
       left: 0;
       right: 0;
       width: 100%;
-      background-color: #fff3e9;
-      border: 1.5px solid #436481;
-      border-radius: 60px;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 12px;
       box-shadow: 0 4px 12px rgba(67, 100, 129, 0.2);
       opacity: 0;
       visibility: hidden;
@@ -263,9 +278,10 @@
     }
     
     .review-list {
-      background-color: #fff3e9;
-      border: 2px solid #436481;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
       border-radius: 12px;
+      box-shadow: 0 6px 18px -14px rgba(44, 68, 89, 0.3);
       padding: 20px;
       overflow-y: auto;
     }
@@ -276,13 +292,13 @@
       color: #32343a;
       margin-bottom: 16px;
       padding-bottom: 12px;
-      border-bottom: 1.5px solid #436481;
+      border-bottom: 1px solid rgba(67, 100, 129, 0.18);
     }
     
     .review-list-item {
       padding: 16px;
       background-color: white;
-      border: 1.5px solid #436481;
+      border: 1px solid rgba(67, 100, 129, 0.25);
       border-radius: 8px;
       margin-bottom: 12px;
       cursor: pointer;
@@ -295,9 +311,9 @@
     }
     
     .review-list-item.active {
-      background-color: #f4e8de;
+      background-color: var(--sand);
       border-color: #436481;
-      border-width: 2px;
+      box-shadow: 0 0 0 1px #436481;
     }
     
     .review-item-name {
@@ -310,20 +326,20 @@
     .review-item-status {
       display: inline-block;
       padding: 4px 12px;
-      border-radius: 20px;
+      border-radius: 999px;
       font-size: 12px;
       font-weight: 500;
       margin-top: 6px;
     }
     
     .status-pending {
-      background-color: #fff3cd;
-      color: #856404;
+      background-color: #fdf0dd;
+      color: #9a5b00;
     }
     
     .status-in-review {
-      background-color: #cce5ff;
-      color: #004085;
+      background-color: #edf2f7;
+      color: #436481;
     }
     
     .review-item-date {
@@ -333,9 +349,10 @@
     }
     
     .review-details {
-      background-color: #fff3e9;
-      border: 2px solid #436481;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
       border-radius: 12px;
+      box-shadow: 0 6px 18px -14px rgba(44, 68, 89, 0.3);
       padding: 24px;
       overflow-y: auto;
       max-height: calc(100vh - 120px);
@@ -365,11 +382,12 @@
     .review-content-header {
       margin-bottom: 16px;
       padding-bottom: 12px;
-      border-bottom: 2px solid #436481;
+      border-bottom: 1px solid rgba(67, 100, 129, 0.18);
     }
     
     .review-content-title {
-      font-size: 22px;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 24px;
       font-weight: 600;
       color: #32343a;
       margin-bottom: 6px;
@@ -456,14 +474,14 @@
       height: auto;
       max-height: 320px;
       border-radius: 8px;
-      border: 2px solid #436481;
+      border: 1px solid rgba(67, 100, 129, 0.18);
       background-color: black;
       object-fit: contain;
     }
     
     .editor-notes {
       background-color: white;
-      border: 1.5px solid #436481;
+      border: 1px solid rgba(67, 100, 129, 0.25);
       border-radius: 8px;
       padding: 12px;
       margin-bottom: 16px;
@@ -472,8 +490,8 @@
     
     /* Family Revision Notes (distinct from editor notes) */
     .family-revision-notes {
-      background-color: #e8f5e9;
-      border: 2px solid #4caf50;
+      background-color: #e7f3ec;
+      border: 1px solid rgba(29, 107, 69, 0.35);
       border-radius: 8px;
       padding: 12px;
       margin-bottom: 16px;
@@ -489,9 +507,9 @@
     .family-revision-badge {
       display: inline-block;
       padding: 4px 12px;
-      background-color: #4caf50;
+      background-color: #1d6b45;
       color: white;
-      border-radius: 12px;
+      border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
     }
@@ -502,13 +520,15 @@
     
     .obituary-content {
       background-color: white;
-      border: 1.5px solid #436481;
+      border: 1px solid rgba(67, 100, 129, 0.25);
       border-radius: 8px;
       padding: 12px;
       max-height: 250px;
       overflow-y: auto;
       line-height: 1.8;
       color: #32343a;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 16px;
     }
     
     /* ============================================================================
@@ -525,10 +545,10 @@
       width: 100%;
       min-height: 80px;
       padding: 12px 16px;
-      border: 1.5px solid #436481;
+      border: 1px solid rgba(67, 100, 129, 0.35);
       border-radius: 8px;
       font-size: 14px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       background-color: white;
       color: #32343a;
       resize: vertical;
@@ -551,34 +571,35 @@
     .btn {
       padding: 10px 24px;
       border: none;
-      border-radius: 60px;
+      border-radius: 999px;
       font-size: 14px;
       font-weight: 600;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     
     .btn-approve {
-      background-color: #28a745;
+      background-color: #1d6b45;
       color: white;
     }
     
     .btn-approve:hover {
-      background-color: #218838;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+      background-color: #165636;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -10px rgba(29, 107, 69, 0.45);
     }
     
     .btn-revision {
-      background-color: #ffc107;
-      color: #32343a;
+      background-color: #fdf0dd;
+      color: #9a5b00;
+      border: 1px solid rgba(154, 91, 0, 0.4);
     }
     
     .btn-revision:hover {
-      background-color: #e0a800;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+      background-color: #f8e5c2;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -10px rgba(154, 91, 0, 0.35);
     }
     
     .btn:disabled {
@@ -600,11 +621,12 @@
     }
     
     .stat-card {
-      background-color: #fff3e9;
-      border: 2px solid #436481;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
       border-radius: 12px;
       padding: 24px;
       transition: all 0.2s ease;
+      box-shadow: 0 6px 18px -14px rgba(44, 68, 89, 0.3);
     }
     
     .stat-card:hover {
@@ -632,8 +654,8 @@
       position: fixed;
       bottom: 32px;
       right: 32px;
-      background-color: #32343a;
-      color: #f2eadd;
+      background-color: var(--slate-dark);
+      color: #f2ede7;
       padding: 16px 24px;
       border-radius: 8px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
@@ -651,12 +673,12 @@
     }
     
     .toast.error {
-      background-color: #dc3545;
+      background-color: #a33b2e;
       color: white;
     }
     
     .toast.success {
-      background-color: #28a745;
+      background-color: #1d6b45;
       color: white;
     }
     
@@ -815,17 +837,17 @@
 
   <!-- Confirmation Modal -->
   <div id="confirm-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 10000;">
-    <div style="background-color: white; border-radius: 10px; padding: 0; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);">
-      <div style="background-color: #f4e8de; padding: 20px; border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center;">
-        <h2 id="confirm-title" style="color: #32343a; font-size: 24px; font-weight: 600; margin: 0;">Confirm Action</h2>
+    <div style="background-color: white; border-radius: 12px; padding: 0; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);">
+      <div style="background-color: #f4e8de; padding: 20px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;">
+        <h2 id="confirm-title" style="color: #32343a; font-family: 'Newsreader', Georgia, serif; font-size: 24px; font-weight: 600; margin: 0;">Confirm Action</h2>
         <button onclick="closeConfirmModal()" style="background: none; border: none; font-size: 28px; color: #666; cursor: pointer; padding: 0; width: 30px; height: 30px;">&times;</button>
       </div>
       <div style="padding: 30px;">
         <p id="confirm-message" style="color: #32343a; font-size: 16px; line-height: 1.6; margin: 0; white-space: pre-line;"></p>
       </div>
       <div style="padding: 0 30px 30px; display: flex; gap: 10px; justify-content: flex-end;">
-        <button onclick="closeConfirmModal()" style="background-color: transparent; color: #32343a; border: 1.35px solid #32343a; border-radius: 60px; padding: 11px 24px; cursor: pointer; font-weight: 600;">Cancel</button>
-        <button id="confirm-action-btn" style="background-color: #436481; color: white; border: none; border-radius: 60px; padding: 11px 24px; cursor: pointer; font-weight: 600;">Confirm</button>
+        <button onclick="closeConfirmModal()" style="background-color: transparent; color: #436481; border: 1px solid #436481; border-radius: 999px; padding: 11px 24px; cursor: pointer; font-weight: 600;">Cancel</button>
+        <button id="confirm-action-btn" style="background-color: #436481; color: white; border: none; border-radius: 999px; padding: 11px 24px; cursor: pointer; font-weight: 600;">Confirm</button>
       </div>
     </div>
   </div>
@@ -1041,7 +1063,7 @@
       
       if (reviews.length === 0) {
         listContainer.innerHTML = `
-          <div style="background-color: #fff3e9; border: 2px solid #436481; border-radius: 12px; padding: 32px; text-align: center;">
+          <div style="background-color: #fff3e9; border: 1px solid rgba(67, 100, 129, 0.18); border-radius: 12px; padding: 32px; text-align: center;">
             <p style="color: rgba(50, 52, 58, 0.6); font-size: 16px;">No reviews yet. Start reviewing videos to build your history!</p>
           </div>
         `;
@@ -1050,16 +1072,16 @@
       
       listContainer.innerHTML = reviews.map(review => {
         const reviewDate = new Date(review.qc_reviewed_at);
-        const statusColor = review.qc_status === 'approved' ? '#4caf50' : '#ff9800';
-        const statusBgColor = review.qc_status === 'approved' ? '#e8f5e9' : '#fff3e0';
+        const statusColor = review.qc_status === 'approved' ? '#1d6b45' : '#9a5b00';
+        const statusBgColor = review.qc_status === 'approved' ? '#e7f3ec' : '#fdf0dd';
         const statusIcon = review.qc_status === 'approved' ? '✓' : '⟳';
         const statusText = review.qc_status === 'approved' ? 'Approved' : 'Revision Requested';
         
         return `
           <div style="
             background-color: #ffffff;
-            border: 2px solid #e0e0e0;
-            border-left: 5px solid ${statusColor};
+            border: 1px solid rgba(67, 100, 129, 0.18);
+            border-left: 4px solid ${statusColor};
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 20px;
@@ -1073,7 +1095,7 @@
               align-items: center;
               margin-bottom: 20px;
               padding-bottom: 16px;
-              border-bottom: 2px solid #f0f0f0;
+              border-bottom: 1px solid #f0f0f0;
             ">
               <div>
                 <h3 style="
@@ -1153,25 +1175,25 @@
             
             <!-- Review Date -->
             <div style="
-              background-color: #f0f7ff;
+              background-color: #edf2f7;
               padding: 10px 16px;
               border-radius: 6px;
               margin-bottom: ${review.qc_notes ? '16px' : '0'};
-              border-left: 3px solid #2196f3;
+              border-left: 3px solid #436481;
             ">
               <div style="
                 font-size: 13px;
-                color: #1976d2;
+                color: #436481;
                 font-weight: 600;
-              ">📅 Reviewed: ${reviewDate.toLocaleDateString()} at ${reviewDate.toLocaleTimeString()}</div>
+              ">Reviewed: ${reviewDate.toLocaleDateString()} at ${reviewDate.toLocaleTimeString()}</div>
             </div>
             
             ${review.qc_notes ? `
             <!-- QC Notes -->
             <div style="
               background-color: #fff3e9;
-              border: 2px solid #436481;
-              border-radius: 10px;
+              border: 1px solid rgba(67, 100, 129, 0.18);
+              border-radius: 12px;
               padding: 16px;
               margin-top: 16px;
             ">
@@ -1182,7 +1204,7 @@
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
                 margin-bottom: 10px;
-              ">📝 Your Review Notes</div>
+              ">Your Review Notes</div>
               <div style="
                 color: #32343a;
                 font-size: 15px;
@@ -1223,7 +1245,7 @@
         <div class="review-list-item" data-id="${sub.id}" onclick="selectSubmission('${sub.id}')">
           <div class="review-item-name">${sub.cases.deceased_name}</div>
           <div class="review-item-date" style="font-size: 13px; color: #436481;">
-            🏢 ${sub.cases.organizations?.name || 'Unknown Organization'}
+            ${sub.cases.organizations?.name || 'Unknown Organization'}
           </div>
           <div class="review-item-status status-${sub.qc_status.replace('_', '-')}">${formatStatus(sub.qc_status)}</div>
           <div class="review-item-date">Submitted: ${formatDate(sub.submitted_at)}</div>
@@ -1311,8 +1333,8 @@
         
         ${cooldownInfo && cooldownInfo.active ? `
           <div style="
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-            border: 2px solid #ff9800;
+            background: #fdf0dd;
+            border: 1px solid rgba(154, 91, 0, 0.4);
             border-radius: 8px;
             padding: 12px 16px;
             margin-bottom: 16px;
@@ -1320,13 +1342,13 @@
             align-items: center;
             gap: 12px;
           ">
-            <svg style="width: 20px; height: 20px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="2">
+            <svg style="width: 20px; height: 20px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="#9a5b00" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
             <div style="flex: 1; font-size: 13px;">
-              <strong style="color: #e65100;">⏱️ 40-Hour Cooldown Active</strong>
-              <p style="margin: 2px 0 0 0; color: #ef6c00; font-size: 12px;">
+              <strong style="color: #9a5b00;">40-Hour Cooldown Active</strong>
+              <p style="margin: 2px 0 0 0; color: #9a5b00; font-size: 12px;">
                 Delivery in ~${cooldownInfo.hoursUntil} hours (${cooldownInfo.expiresAt.toLocaleString()})
               </p>
             </div>
@@ -1364,12 +1386,12 @@
             ${familyRevisionNotes ? `
               <div class="family-revision-notes" style="margin-top: 16px;">
                 <div class="family-revision-header">
-                  <strong style="color: #2e7d32; font-size: 14px;">👨‍👩‍👧 Family Revision</strong>
+                  <strong style="color: #1d6b45; font-size: 14px;">Family Revision</strong>
                   <span class="family-revision-badge">From Family</span>
                 </div>
                 <p style="margin-top: 8px; color: #333; line-height: 1.5; font-size: 13px;">${familyRevisionNotes}</p>
                 <p style="margin-top: 6px; font-size: 11px; color: #666; font-style: italic;">
-                  ⚠️ Verify all changes before approving.
+                  Verify all changes before approving.
                 </p>
               </div>
             ` : ''}
@@ -1390,11 +1412,11 @@
             </button>
             ${cooldownInfo && cooldownInfo.active ? `
               <button class="btn btn-override" onclick="handleApprove(true)" style="
-                background-color: #ff9800;
+                background-color: #9a5b00;
                 color: white;
-                border: 2px solid #f57c00;
+                border: none;
               ">
-                ⚡ Override & Deliver Now
+                Override & Deliver Now
               </button>
             ` : ''}
             <button class="btn btn-revision" onclick="handleRevision()">
@@ -1405,7 +1427,7 @@
       `;
     }
     
-    // Pure JS cooldown check — no RPC needed, uses first_submission_at from already-fetched case data
+    // Pure JS cooldown check - no RPC needed, uses first_submission_at from already-fetched case data
     function checkCooldown(submission) {
       const firstSubmissionAt = submission.cases?.first_submission_at;
       if (!firstSubmissionAt) return { active: false };
@@ -1426,13 +1448,13 @@
       
       if (overrideCooldown && cooldown.active) {
         showConfirmModal(
-          '⚠️ Override Cooldown & Deliver Immediately',
-          '🚨 WARNING: You are about to bypass the 40-hour cooldown period.\n\nThe family may still be editing the obituary. Are you absolutely sure you want to deliver the video immediately?\n\nThis action will:\n• Mark the video as approved\n• Deliver the video to the family RIGHT NOW\n• Skip the cooldown timer',
+          'Override Cooldown & Deliver Immediately',
+          'WARNING: You are about to bypass the 40-hour cooldown period.\n\nThe family may still be editing the obituary. Are you absolutely sure you want to deliver the video immediately?\n\nThis action will:\n• Mark the video as approved\n• Deliver the video to the family RIGHT NOW\n• Skip the cooldown timer',
           () => performApprove(true)
         );
       } else {
         const cooldownMessage = shouldApplyCooldown
-          ? `\n\n⏱️ COOLDOWN ACTIVE: Video will be delivered to family in approximately ${cooldown.hoursUntil} hours (at ${cooldown.expiresAt.toLocaleString()}).\n\nThe family still has time to edit the obituary.`
+          ? `\n\nCOOLDOWN ACTIVE: Video will be delivered to family in approximately ${cooldown.hoursUntil} hours (at ${cooldown.expiresAt.toLocaleString()}).\n\nThe family still has time to edit the obituary.`
           : '';
         showConfirmModal(
           shouldApplyCooldown ? '✓ Approve Video (Delivery Scheduled)' : '✓ Approve & Deliver Video',
@@ -1444,7 +1466,7 @@
       }
     }
     
-    // Perform the actual approval — direct DB updates, no RPC dependency
+    // Perform the actual approval - direct DB updates, no RPC dependency
     async function performApprove(overrideCooldown = false) {
       const notes = document.getElementById('qcNotes').value;
       const cooldown = checkCooldown(currentSubmission);
@@ -1648,8 +1670,8 @@
      * All other video_url values are treated as direct Supabase Storage URLs.
      *
      * Cloudflare Stream provides:
-     *  - Adaptive bitrate streaming (HLS) — instant playback even for large files
-     *  - No buffering — QC can seek to any position immediately
+     *  - Adaptive bitrate streaming (HLS) - instant playback even for large files
+     *  - No buffering - QC can seek to any position immediately
      *  - Global CDN delivery
      *
      * Fallback (Supabase URL):
@@ -1676,7 +1698,7 @@
               style="border: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 8px;">
             </iframe>
           </div>
-          <p style="font-size: 11px; color: #999; margin-top: 6px; text-align: right; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+          <p style="font-size: 11px; color: #999; margin-top: 6px; text-align: right; font-family: 'Public Sans', Arial, sans-serif;">
             Streaming via Cloudflare Stream
           </p>`;
       }
@@ -1687,10 +1709,10 @@
       // Most video encoders place the moov atom (metadata) at the END of the MP4
       // file. With preload="metadata" the browser fetches the start, fails to find
       // the metadata, then downloads the entire file end-to-end before playback
-      // can begin — causing the 20-minute load time. preload="none" avoids this
+      // can begin - causing the 20-minute load time. preload="none" avoids this
       // entirely by deferring all network activity until the user clicks play.
       // Once the browser does start loading, it uses HTTP range requests so only
-      // the chunk being watched is fetched — the whole file is never downloaded.
+      // the chunk being watched is fetched - the whole file is never downloaded.
       const videoId = `qc-video-${Date.now()}`;
       const wrapperId = `qc-video-wrapper-${Date.now()}`;
       return `
@@ -1699,25 +1721,25 @@
           <!-- Click-to-load overlay (hidden once video starts loading) -->
           <div id="${wrapperId}-overlay"
             onclick="loadQCVideo('${videoId}','${wrapperId}','${url.replace(/'/g, "\\'")}','${submission.mime_type || 'video/mp4'}')"
-            style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%); z-index: 2;">
+            style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: #2c4459; z-index: 2;">
             <div style="width: 72px; height: 72px; background: rgba(255,255,255,0.15); border: 2.5px solid rgba(255,255,255,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; transition: background 0.2s;"
               onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="white" style="margin-left: 3px;">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
             </div>
-            <p style="color: rgba(255,255,255,0.9); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 6px;">Click to load video</p>
-            <p style="color: rgba(255,255,255,0.5); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 12px; margin: 0;">Video streams in chunks — no full download required</p>
+            <p style="color: rgba(255,255,255,0.9); font-family: 'Public Sans', Arial, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 6px;">Click to load video</p>
+            <p style="color: rgba(255,255,255,0.5); font-family: 'Public Sans', Arial, sans-serif; font-size: 12px; margin: 0;">Video streams in chunks, no full download required</p>
           </div>
 
           <!-- Loading spinner (shown while video buffers after click) -->
           <div id="${wrapperId}-loading"
             style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 2;">
             <div style="width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;"></div>
-            <p style="color: rgba(255,255,255,0.7); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 14px; margin: 0;">Loading video...</p>
+            <p style="color: rgba(255,255,255,0.7); font-family: 'Public Sans', Arial, sans-serif; font-size: 14px; margin: 0;">Loading video...</p>
           </div>
 
-          <!-- The actual video element — preload="none" so nothing loads until explicitly triggered -->
+          <!-- The actual video element - preload="none" so nothing loads until explicitly triggered -->
           <video
             id="${videoId}"
             class="video-player"
@@ -1751,7 +1773,7 @@
 
       videoEl.load();
       videoEl.play().catch(() => {
-        // Autoplay blocked — just show the player controls
+        // Autoplay blocked - just show the player controls
         showQCVideoPlayer(videoId, wrapperId);
       });
     }

@@ -5,8 +5,8 @@
   <meta name="google" content="notranslate">
   <title>My Case - Memorio Family Portal</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  <!-- Preload Dosis font -->
-  <link rel="preload" href="/fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <!-- Memorio design system fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="/css/normalize.css" rel="stylesheet" type="text/css">
   <link href="/css/webflow.css" rel="stylesheet" type="text/css">
   <link href="/css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
@@ -17,6 +17,24 @@
   <script src="../js/i18n.js"></script>
   
   <style>
+    :root {
+      --paper: #fffbf7;
+      --cream: #fff3e9;
+      --sand: #f4e8de;
+      --ink: #32343a;
+      --ink-soft: #565a63;
+      --slate: #436481;
+      --slate-deep: #38536b;
+      --slate-dark: #2c4459;
+      --sky: #6ca7d3;
+    }
+
+    body, body.body {
+      background-color: var(--paper);
+      font-family: 'Public Sans', Arial, sans-serif;
+      color: var(--ink);
+    }
+
     /* Language Toggle Styling */
     .lang-toggle {
       display: inline-flex;
@@ -25,10 +43,11 @@
       padding: 6px 12px 6px 9px;
       font-size: 12px;
       font-weight: 700;
-      color: #436481;
+      font-family: 'Public Sans', Arial, sans-serif;
+      color: var(--slate);
       background: rgba(255, 255, 255, 0.88);
       border: 1px solid rgba(67, 100, 129, 0.22);
-      border-radius: 100px;
+      border-radius: 999px;
       cursor: pointer;
       transition: background 0.15s ease, border-color 0.15s ease;
       letter-spacing: 0.5px;
@@ -63,36 +82,39 @@
     }
     
     .dashboard-title {
-      color: #32343a;
-      font-size: 32px;
-      font-weight: 600;
+      color: var(--ink);
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 34px;
+      font-weight: 500;
       margin: 0;
     }
     
     .btn-logout {
       padding: 10px 24px;
-      background-color: #436481;
+      background-color: var(--slate);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 999px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      transition: background-color 0.2s;
+      font-family: 'Public Sans', Arial, sans-serif;
+      transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
     
     .btn-logout:hover {
-      background-color: #1e3a52;
+      background-color: var(--slate-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -10px rgba(44, 68, 89, 0.45);
     }
     
     .case-card {
-      background-color: #fff3e9;
-      border: 3px solid #436481;
-      border-radius: 20px;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 12px;
       padding: 32px;
       margin-bottom: 24px;
-      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 30px -18px rgba(44, 68, 89, 0.25);
     }
     
     .case-card-header {
@@ -105,43 +127,52 @@
     }
     
     .case-name {
-      color: #32343a;
-      font-size: 24px;
-      font-weight: 600;
+      color: var(--ink);
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 26px;
+      font-weight: 500;
       margin: 0;
     }
     
     .status-badge {
       padding: 8px 16px;
-      border-radius: 20px;
+      border-radius: 999px;
       font-size: 14px;
       font-weight: 600;
       text-transform: capitalize;
+      background-color: #edf2f7;
+      color: #436481;
+      border: 1px solid rgba(67, 100, 129, 0.25);
     }
     
     .status-created {
-      background-color: #e3f2fd;
-      color: #1565c0;
+      background-color: #edf2f7;
+      color: #436481;
+      border-color: rgba(67, 100, 129, 0.25);
     }
     
     .status-waiting_on_family {
-      background-color: #fff3e0;
-      color: #e65100;
+      background-color: #fdf0dd;
+      color: #9a5b00;
+      border-color: rgba(154, 91, 0, 0.25);
     }
     
     .status-submitted {
-      background-color: #e8f5e9;
-      color: #2e7d32;
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border-color: rgba(29, 107, 69, 0.25);
     }
     
     .status-in_production {
-      background-color: #f3e5f5;
-      color: #6a1b9a;
+      background-color: #edf2f7;
+      color: #436481;
+      border-color: rgba(67, 100, 129, 0.25);
     }
     
     .status-delivered {
-      background-color: #e8f5e9;
-      color: #1b5e20;
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border-color: rgba(29, 107, 69, 0.25);
     }
     
     .case-info {
@@ -176,41 +207,45 @@
     
     .btn-primary {
       padding: 12px 24px;
-      background-color: #436481;
+      background-color: var(--slate);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 999px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      transition: background-color 0.2s;
+      font-family: 'Public Sans', Arial, sans-serif;
+      transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
       text-decoration: none;
       display: inline-block;
     }
     
     .btn-primary:hover {
-      background-color: #1e3a52;
+      background-color: var(--slate-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -10px rgba(44, 68, 89, 0.45);
     }
     
     .btn-secondary {
       padding: 12px 24px;
       background-color: transparent;
-      color: #436481;
-      border: 2px solid #436481;
-      border-radius: 8px;
+      color: var(--slate);
+      border: 1px solid var(--slate);
+      border-radius: 999px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      transition: all 0.2s;
+      font-family: 'Public Sans', Arial, sans-serif;
+      transition: all 0.2s ease;
       text-decoration: none;
       display: inline-block;
     }
     
     .btn-secondary:hover {
-      background-color: #436481;
+      background-color: var(--slate);
       color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -10px rgba(44, 68, 89, 0.35);
     }
     
     .empty-state {
@@ -225,8 +260,10 @@
     }
     
     .empty-state-title {
-      font-size: 24px;
-      color: #32343a;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--ink);
       margin-bottom: 8px;
     }
     
@@ -250,17 +287,18 @@
     }
     
     .dashboard-section {
-      background-color: #fff3e9;
-      border: 3px solid #436481;
-      border-radius: 20px;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 12px;
       padding: 24px;
-      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 30px -18px rgba(44, 68, 89, 0.25);
     }
     
     .section-title {
-      color: #32343a;
-      font-size: 20px;
-      font-weight: 600;
+      color: var(--ink);
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 22px;
+      font-weight: 500;
       margin: 0 0 16px 0;
       display: flex;
       align-items: center;
@@ -268,8 +306,8 @@
     }
     
     .obituary-preview {
-      background-color: #f8f9fa;
-      border: 1px solid #e9ecef;
+      background-color: var(--paper);
+      border: 1px solid rgba(67, 100, 129, 0.18);
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 16px;
@@ -278,9 +316,10 @@
     }
     
     .obituary-content {
-      color: #32343a;
-      line-height: 1.6;
-      font-size: 16px;
+      color: var(--ink);
+      font-family: 'Newsreader', Georgia, serif;
+      line-height: 1.7;
+      font-size: 17px;
     }
     
     .assets-grid {
@@ -373,18 +412,18 @@
     }
     
     .upload-area {
-      border: 2px dashed #436481;
+      border: 1px dashed rgba(67, 100, 129, 0.45);
       border-radius: 12px;
       padding: 24px;
       text-align: center;
-      background-color: #f8f9fa;
+      background-color: var(--paper);
       cursor: pointer;
       transition: all 0.2s;
     }
     
     .upload-area:hover {
-      background-color: #e9ecef;
-      border-color: #1e3a52;
+      background-color: var(--sand);
+      border-color: var(--slate);
     }
     
     .upload-icon {
@@ -400,17 +439,18 @@
     
     /* Upload Timer Banner */
     #upload-timer-banner {
-      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+      background: #edf2f7;
+      border: 1px solid rgba(67, 100, 129, 0.25);
       border-radius: 12px;
       padding: 16px 20px;
       margin-bottom: 16px;
-      color: white;
-      box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+      color: #38536b;
     }
     
     #upload-timer-banner.expired {
-      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+      background: #fdf0dd;
+      border-color: rgba(154, 91, 0, 0.25);
+      color: #9a5b00;
     }
     
     .timer-title {
@@ -463,11 +503,11 @@
     }
     
     .notification-item {
-      background-color: #f8f9fa;
-      border-left: 4px solid #436481;
+      background-color: var(--paper);
+      border: 1px solid rgba(67, 100, 129, 0.18);
       padding: 12px 16px;
       margin-bottom: 8px;
-      border-radius: 0 8px 8px 0;
+      border-radius: 8px;
     }
     
     .notification-title {
@@ -491,25 +531,26 @@
     
     /* Completed Memorial Section */
     .completed-memorial-card {
-      background: linear-gradient(135deg, #fff3e9 0%, #f4e8de 100%);
-      border: 3px solid #436481;
-      border-radius: 20px;
+      background: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 12px;
       padding: 40px;
       margin-bottom: 24px;
-      box-shadow: 0 4px 16px rgba(67, 100, 129, 0.15);
+      box-shadow: 0 10px 30px -18px rgba(44, 68, 89, 0.25);
     }
     
     .memorial-header {
       text-align: center;
       margin-bottom: 32px;
       padding-bottom: 24px;
-      border-bottom: 2px solid #436481;
+      border-bottom: 1px solid rgba(67, 100, 129, 0.18);
     }
     
     .memorial-title {
-      font-size: 32px;
-      font-weight: 600;
-      color: #32343a;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 34px;
+      font-weight: 500;
+      color: var(--ink);
       margin: 0 0 12px 0;
     }
     
@@ -527,15 +568,16 @@
     
     .memorial-video-section {
       background-color: white;
-      border: 2px solid #436481;
-      border-radius: 16px;
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 12px;
       padding: 24px;
     }
     
     .memorial-section-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #32343a;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--ink);
       margin: 0 0 16px 0;
       display: flex;
       align-items: center;
@@ -558,7 +600,7 @@
       width: 100%;
       max-height: 450px;
       border-radius: 12px;
-      border: 2px solid #436481;
+      border: 1px solid rgba(67, 100, 129, 0.18);
       background-color: black;
       object-fit: contain;
       display: block;
@@ -583,7 +625,7 @@
     }
     
     .memorial-video-overlay.revision-complete {
-      background-color: rgba(40, 167, 69, 0.9); /* Green for completed revision */
+      background-color: rgba(29, 107, 69, 0.9); /* Green for completed revision */
     }
     
     .memorial-video-overlay.hidden {
@@ -603,19 +645,21 @@
     
     .memorial-obituary-section {
       background-color: white;
-      border: 2px solid #436481;
-      border-radius: 16px;
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 12px;
       padding: 24px;
     }
     
     .memorial-obituary-content {
-      line-height: 1.8;
-      color: #32343a;
-      font-size: 16px;
+      font-family: 'Newsreader', Georgia, serif;
+      line-height: 1.7;
+      color: var(--ink);
+      font-size: 17px;
       max-height: 500px;
       overflow-y: auto;
       padding: 16px;
-      background-color: #f8f9fa;
+      background-color: var(--paper);
+      border: 1px solid rgba(67, 100, 129, 0.12);
       border-radius: 8px;
     }
     
@@ -629,14 +673,14 @@
     
     .btn-download-video {
       padding: 14px 32px;
-      background-color: #28a745;
+      background-color: var(--slate);
       color: white;
       border: none;
-      border-radius: 60px;
+      border-radius: 999px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       transition: all 0.2s;
       display: inline-flex;
       align-items: center;
@@ -644,21 +688,21 @@
     }
     
     .btn-download-video:hover {
-      background-color: #218838;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+      background-color: var(--slate-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -10px rgba(44, 68, 89, 0.45);
     }
     
     .btn-download-obituary {
       padding: 14px 32px;
-      background-color: #436481;
+      background-color: var(--slate);
       color: white;
       border: none;
-      border-radius: 60px;
+      border-radius: 999px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       transition: all 0.2s;
       display: inline-flex;
       align-items: center;
@@ -666,22 +710,22 @@
     }
     
     .btn-download-obituary:hover {
-      background-color: #1e3a52;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.3);
+      background-color: var(--slate-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -10px rgba(44, 68, 89, 0.45);
     }
     
     /* Revision Request Button */
     .btn-request-revision {
       padding: 14px 32px;
-      background-color: #ff9800;
-      color: white;
-      border: none;
-      border-radius: 60px;
+      background-color: transparent;
+      color: var(--slate);
+      border: 1px solid var(--slate);
+      border-radius: 999px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       transition: all 0.2s;
       display: inline-flex;
       align-items: center;
@@ -689,15 +733,18 @@
     }
     
     .btn-request-revision:hover:not(:disabled) {
-      background-color: #f57c00;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+      background-color: var(--slate);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -10px rgba(44, 68, 89, 0.35);
     }
     
     .btn-request-revision:disabled {
-      background-color: #ccc;
+      background-color: transparent;
+      color: #9ca3af;
+      border-color: #d1d5db;
       cursor: not-allowed;
-      opacity: 0.6;
+      opacity: 0.8;
     }
     
     
@@ -718,7 +765,7 @@
     
     .revision-modal-content {
       background-color: white;
-      border-radius: 16px;
+      border-radius: 12px;
       max-width: 600px;
       width: 100%;
       max-height: 90vh;
@@ -728,16 +775,17 @@
     
     .revision-modal-header {
       padding: 24px;
-      border-bottom: 2px solid #eee;
+      border-bottom: 1px solid var(--sand);
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     
     .revision-modal-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #32343a;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--ink);
       margin: 0;
     }
     
@@ -765,8 +813,8 @@
     }
     
     .revision-warning {
-      background-color: #fff3cd;
-      border-left: 4px solid #ff9800;
+      background-color: #fdf0dd;
+      border: 1px solid rgba(154, 91, 0, 0.25);
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 24px;
@@ -776,20 +824,20 @@
     }
     
     .revision-warning svg {
-      color: #ff9800;
+      color: #9a5b00;
       flex-shrink: 0;
       margin-top: 2px;
     }
     
     .revision-warning strong {
       display: block;
-      color: #856404;
+      color: #9a5b00;
       margin-bottom: 6px;
       font-size: 15px;
     }
     
     .revision-warning p {
-      color: #856404;
+      color: #9a5b00;
       margin: 0;
       font-size: 14px;
       line-height: 1.5;
@@ -804,17 +852,17 @@
     }
     
     .revision-label .required {
-      color: #dc3545;
+      color: #a33b2e;
       margin-left: 4px;
     }
     
     .revision-textarea {
       width: 100%;
       padding: 14px;
-      border: 2px solid #ddd;
+      border: 1px solid rgba(67, 100, 129, 0.35);
       border-radius: 8px;
       font-size: 15px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       resize: vertical;
       min-height: 150px;
       transition: border-color 0.2s;
@@ -822,7 +870,7 @@
     
     .revision-textarea:focus {
       outline: none;
-      border-color: #ff9800;
+      border-color: var(--slate);
     }
     
     .revision-char-count {
@@ -839,7 +887,7 @@
     
     .revision-modal-footer {
       padding: 20px 24px;
-      border-top: 2px solid #eee;
+      border-top: 1px solid var(--sand);
       display: flex;
       gap: 12px;
       justify-content: flex-end;
@@ -847,37 +895,37 @@
     
     .btn-cancel {
       padding: 12px 24px;
-      background-color: #f8f9fa;
-      color: #333;
-      border: 2px solid #ddd;
-      border-radius: 8px;
+      background-color: transparent;
+      color: var(--slate);
+      border: 1px solid rgba(67, 100, 129, 0.35);
+      border-radius: 999px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       transition: all 0.2s;
     }
     
     .btn-cancel:hover {
-      background-color: #e9ecef;
-      border-color: #ccc;
+      background-color: rgba(67, 100, 129, 0.08);
+      border-color: var(--slate);
     }
     
     .btn-submit-revision {
       padding: 12px 24px;
-      background-color: #ff9800;
+      background-color: var(--slate);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 999px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       transition: all 0.2s;
     }
     
     .btn-submit-revision:hover:not(:disabled) {
-      background-color: #f57c00;
+      background-color: var(--slate-deep);
     }
     
     .btn-submit-revision:disabled {
@@ -889,9 +937,10 @@
     .memorial-badge {
       display: inline-block;
       padding: 8px 16px;
-      background-color: #28a745;
-      color: white;
-      border-radius: 20px;
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border: 1px solid rgba(29, 107, 69, 0.25);
+      border-radius: 999px;
       font-size: 14px;
       font-weight: 600;
     }
@@ -1008,11 +1057,12 @@
       position: fixed;
       top: 20px;
       right: 20px;
-      background-color: #28a745;
-      color: white;
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border: 1px solid rgba(29, 107, 69, 0.3);
       padding: 12px 20px;
-      border-radius: 5px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(50, 52, 58, 0.12);
       z-index: 2000;
       font-size: 14px;
       font-weight: 500;
@@ -1027,7 +1077,9 @@
     }
     
     .toast.error {
-      background-color: #dc3545;
+      background-color: #fbe9e6;
+      color: #a33b2e;
+      border-color: rgba(163, 59, 46, 0.35);
     }
     
     /* Security: Hide content until auth verified (prevents page flash) */
@@ -1086,16 +1138,16 @@
         <div class="case-info">
           <div class="info-item">
             <div class="info-label" data-i18n="family.caseID">Case ID</div>
-            <div class="info-value" id="caseId">—</div>
+            <div class="info-value" id="caseId">-</div>
             <button class="copy-btn" onclick="copyToClipboard('caseId')" style="margin-top: 5px; font-size: 12px;" data-i18n="common.copy">Copy</button>
           </div>
           <div class="info-item">
             <div class="info-label" data-i18n="family.created">Created</div>
-            <div class="info-value" id="caseCreated">—</div>
+            <div class="info-value" id="caseCreated">-</div>
           </div>
           <div class="info-item">
             <div class="info-label" data-i18n="family.lastUpdated">Last Updated</div>
-            <div class="info-value" id="caseUpdated">—</div>
+            <div class="info-value" id="caseUpdated">-</div>
           </div>
         </div>
         
@@ -1155,7 +1207,7 @@
           <div id="family-gallery-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.96); z-index: 99999; overflow-y: auto;" onclick="handleFamilyGalleryBackdrop(event)">
             <div style="position: relative; min-height: 100vh; padding: 64px 20px 40px;">
               <button onclick="closeFamilyGallery()" type="button" style="position: fixed; top: 16px; right: 16px; background: rgba(255,255,255,0.15); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-size: 26px; line-height: 1; z-index: 100000;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">&times;</button>
-              <h3 id="family-gallery-title" style="color: white; text-align: center; margin: 0 0 28px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 22px; font-weight: 600;"></h3>
+              <h3 id="family-gallery-title" style="color: white; text-align: center; margin: 0 0 28px; font-family: 'Newsreader', Georgia, serif; font-size: 24px; font-weight: 500;"></h3>
               <div id="family-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; max-width: 1400px; margin: 0 auto;"></div>
             </div>
           </div>
@@ -1187,28 +1239,28 @@
             <div style="display: flex; justify-content: center;">
               <div class="memorial-video-container" style="background: #000; border-radius: 12px; overflow: hidden; min-height: 220px;">
 
-                <!-- Click-to-load overlay (z-index 15 — covers everything until user clicks) -->
+                <!-- Click-to-load overlay (z-index 15 - covers everything until user clicks) -->
                 <div id="familyVideoClickOverlay"
                   onclick="loadFamilyVideo()"
-                  style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%); z-index: 15; border-radius: 12px;">
+                  style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: #2c4459; z-index: 15; border-radius: 12px;">
                   <div style="width: 72px; height: 72px; background: rgba(255,255,255,0.15); border: 2.5px solid rgba(255,255,255,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; transition: background 0.2s;"
                     onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="white" style="margin-left: 3px;">
                       <polygon points="5 3 19 12 5 21 5 3"></polygon>
                     </svg>
                   </div>
-                  <p style="color: rgba(255,255,255,0.9); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 6px;">Click to load video</p>
-                  <p style="color: rgba(255,255,255,0.5); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 12px; margin: 0;">Streams in chunks — no full download required</p>
+                  <p style="color: #f2ede7; font-family: 'Public Sans', Arial, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 6px;">Click to load video</p>
+                  <p style="color: rgba(242,237,231,0.65); font-family: 'Public Sans', Arial, sans-serif; font-size: 12px; margin: 0;">Streams in chunks - no full download required</p>
                 </div>
 
                 <!-- Loading spinner (shown while video buffers after click) -->
                 <div id="familyVideoLoading"
                   style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: #000; z-index: 15; border-radius: 12px;">
                   <div style="width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;"></div>
-                  <p style="color: rgba(255,255,255,0.7); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 14px; margin: 0;">Loading video...</p>
+                  <p style="color: rgba(242,237,231,0.75); font-family: 'Public Sans', Arial, sans-serif; font-size: 14px; margin: 0;">Loading video...</p>
                 </div>
 
-                <!-- Video — preload="none" so nothing loads until user clicks play -->
+                <!-- Video - preload="none" so nothing loads until user clicks play -->
                 <video id="memorialVideo" class="memorial-video-player" controls preload="none"
                   style="display: none;"
                   oncanplay="showFamilyVideoPlayer()"
@@ -1234,7 +1286,7 @@
           <!-- Obituary Section -->
           <div id="memorialObituarySection" class="memorial-obituary-section" style="display: none;">
             <h3 class="memorial-section-title">
-              📝 <span data-i18n="family.obituarySection">Obituary</span>
+              <span data-i18n="family.obituarySection">Obituary</span>
             </h3>
             <div id="memorialObituaryContent" class="memorial-obituary-content">
               <!-- Obituary content will be loaded here -->
@@ -1382,7 +1434,6 @@
     </div>
     
     <div id="emptyState" class="empty-state" style="display: none;">
-      <div class="empty-state-icon">📋</div>
       <h2 class="empty-state-title" data-i18n="family.noCaseFound">No Case Found</h2>
       <p class="empty-state-text" data-i18n="family.noCaseAssigned">
         No case has been assigned to your account yet.<br>
@@ -1516,7 +1567,7 @@
         timerBanner.className = 'expired';
         timerBanner.innerHTML = `
           <div class="timer-title">
-            🔒 ${i18n.t('family.upload.windowClosed')}
+            ${i18n.t('family.upload.windowClosed')}
           </div>
           <div class="timer-message">
             ${i18n.t('family.upload.windowClosedDesc')}
@@ -1540,7 +1591,7 @@
         timerBanner.className = '';
         timerBanner.innerHTML = `
           <div class="timer-title">
-            ⏱️ ${i18n.t('family.upload.windowActive')}
+            ${i18n.t('family.upload.windowActive')}
           </div>
           <div class="timer-countdown">${timeString}</div>
           <div class="timer-message">
@@ -1559,7 +1610,7 @@
       const uploadText = document.getElementById('upload-text');
       
       uploadArea.classList.add('locked');
-      uploadText.textContent = `🔒 ${i18n.t('family.upload.windowClosed')}`;
+      uploadText.textContent = i18n.t('family.upload.windowClosed');
     }
     
     /**
@@ -1707,7 +1758,7 @@
             // Form is submitted, allow access to dashboard
             sessionStorage.removeItem(REDIRECT_LOCK_KEY); // Clear lock on success
           } else {
-            // Form not yet submitted — send them to complete it, not back to the homepage.
+            // Form not yet submitted - send them to complete it, not back to the homepage.
             // Previously this redirected to '/' which caused a dead-end for returning users
             // with an active session who hadn't finished their form yet.
             console.log('⚠️ Form not submitted yet, redirecting to family form...');
@@ -1900,7 +1951,7 @@
       actionsContainer.innerHTML = actionButtons;
     }
     
-    // ---------- translation helper (MyMemory free API — no key required) ----------
+    // ---------- translation helper (MyMemory free API - no key required) ----------
     // storedLang: the language the obituary is currently saved in ('en' or 'es')
     async function translateObituaryIfNeeded(text, storedLang = 'en') {
       const uiLang = localStorage.getItem('memorio_language') || 'en';
@@ -1941,11 +1992,6 @@
       if (currentForm && currentForm.submitted_json) {
         // Show submitted obituary
         const obituaryData = currentForm.submitted_json;
-        console.log('Obituary data keys:', Object.keys(obituaryData));
-        console.log('obituary_name:', obituaryData.obituary_name);
-        console.log('obituary_content:', obituaryData.obituary_content);
-        console.log('loved_ones_name:', obituaryData.loved_ones_name);
-        console.log('Full obituaryData:', obituaryData);
         
         // Check for generated obituary content first, then fall back to original form data
         const obituaryName = obituaryData.obituary_name || obituaryData.loved_ones_name || obituaryData.name || 'Obituary';
@@ -2003,7 +2049,7 @@
     let familyGalleryPhotos = [];
 
     function displayAssets() {
-      console.log('📸 displayAssets — images:', currentAssets?.length);
+      console.log('📸 displayAssets - images:', currentAssets?.length);
 
       const preview  = document.getElementById('family-photo-preview');
       const images   = (currentAssets || []).filter(a => a.mime_type?.startsWith('image/'));
@@ -2025,8 +2071,8 @@
               ${extra > 0 ? `<div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.75); color: white; padding: 5px 10px; border-radius: 20px; font-size: 13px; font-weight: 700;">+${extra}</div>` : ''}
             </div>
             <div>
-              <span style="font-size: 13px; font-weight: 700; color: #436481; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">${images.length} photo${images.length !== 1 ? 's' : ''} uploaded</span><br>
-              <span style="font-size: 12px; color: #999; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Click to view all</span>
+              <span style="font-size: 13px; font-weight: 700; color: #436481; font-family: 'Public Sans', Arial, sans-serif;">${images.length} photo${images.length !== 1 ? 's' : ''} uploaded</span><br>
+              <span style="font-size: 12px; color: #999; font-family: 'Public Sans', Arial, sans-serif;">Click to view all</span>
             </div>
           </div>
         `;
@@ -2328,7 +2374,10 @@
     function downloadObituary() {
       if (currentForm && currentForm.submitted_json) {
         const obituaryData = currentForm.submitted_json;
-        const content = `${obituaryData.name}\n\n${obituaryData.content}`;
+        const obituaryName = obituaryData.obituary_name || obituaryData.loved_ones_name || obituaryData.name || currentCase.deceased_name || 'Obituary';
+        const obituaryText = obituaryData.obituary_content || obituaryData.content || '';
+        if (!obituaryText) { showToast(i18n.t('family.noObituaryYet') || 'No obituary available yet.', true); return; }
+        const content = `${obituaryName}\n\n${obituaryText}`;
         
         const blob = new Blob([content], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
@@ -2375,7 +2424,7 @@
         if (btn) {
           const originalText = btn.textContent;
           btn.textContent = 'Copied!';
-          btn.style.backgroundColor = '#28a745';
+          btn.style.backgroundColor = '#1d6b45';
           btn.style.color = 'white';
           setTimeout(() => {
             btn.textContent = originalText;
@@ -2449,7 +2498,7 @@
         document.getElementById('completedMemorialSection').style.display = 'block';
         document.getElementById('memorialDeceasedName').textContent = caseData.deceased_name;
         
-        // Set up video player — click-to-load so the page shows instantly,
+        // Set up video player - click-to-load so the page shows instantly,
         // video only fetches bytes when the user explicitly clicks play.
         const videoElement = document.getElementById('memorialVideo');
         const videoSource  = document.getElementById('memorialVideoSource');
@@ -2463,7 +2512,7 @@
 
         const videoUrl = videoSubmission.video_url || '';
         if (videoUrl.startsWith('cf-stream:')) {
-          // Cloudflare Stream — replace container with an adaptive-bitrate iframe
+          // Cloudflare Stream - replace container with an adaptive-bitrate iframe
           const uid = videoUrl.replace('cf-stream:', '').trim();
           const container = videoElement.closest('.memorial-video-container');
           if (container) {
@@ -2477,7 +2526,7 @@
               </div>`;
           }
         } else {
-          // Supabase Storage — set src but defer loading until user clicks
+          // Supabase Storage - set src but defer loading until user clicks
           videoSource.src  = videoUrl;
           videoSource.type = videoSubmission.mime_type || 'video/mp4';
         }
@@ -2589,12 +2638,12 @@
 
       videoEl.load();
       videoEl.play().catch(() => {
-        // Autoplay blocked by browser policy — just surface the controls
+        // Autoplay blocked by browser policy - just surface the controls
         showFamilyVideoPlayer();
       });
     }
 
-    // Called by oncanplay — hide spinner, show the video element
+    // Called by oncanplay - hide spinner, show the video element
     function showFamilyVideoPlayer() {
       const loadingEl = document.getElementById('familyVideoLoading');
       const videoEl   = document.getElementById('memorialVideo');
@@ -2630,7 +2679,7 @@
         // Cleanup
         URL.revokeObjectURL(url);
         
-        showToast('✓ Video download started!');
+        showToast('Video download started!');
         
       } catch (error) {
         console.error('Error downloading video:', error);
@@ -2735,7 +2784,7 @@
         // Save the PDF
         doc.save(fileName);
         
-        showToast('✓ Obituary PDF downloaded!');
+        showToast('Obituary PDF downloaded!');
         
       } catch (error) {
         console.error('Error generating PDF:', error);
@@ -2896,7 +2945,7 @@
           });
         
         // Success!
-        showToast('✓ Revision request submitted successfully!');
+        showToast('Revision request submitted successfully!');
         closeRevisionRequestModal();
         
         // Reload case data to update UI
@@ -3073,7 +3122,7 @@
   <div id="obituaryEditorModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
     <div style="background-color: white; border-radius: 12px; padding: 32px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <h2 id="obituaryEditorTitle" style="margin: 0; color: #32343a; font-size: 24px;">Edit Obituary</h2>
+        <h2 id="obituaryEditorTitle" style="margin: 0; color: #32343a; font-family: 'Newsreader', Georgia, serif; font-size: 26px; font-weight: 500;">Edit Obituary</h2>
         <button onclick="closeObituaryEditor()" style="background: none; border: none; font-size: 28px; color: #666; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</button>
       </div>
       
@@ -3083,7 +3132,7 @@
           type="text" 
           id="editObituaryName" 
           placeholder="e.g., In Loving Memory of John Smith" 
-          style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;"
+          style="width: 100%; padding: 12px; border: 1px solid rgba(67, 100, 129, 0.35); border-radius: 8px; font-size: 16px; box-sizing: border-box;"
         />
       </div>
       
@@ -3093,14 +3142,14 @@
           id="editObituaryContent" 
           rows="15" 
           placeholder="Write the obituary content here..."
-          style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; line-height: 1.6; font-family: inherit; resize: vertical; box-sizing: border-box;"
+          style="width: 100%; padding: 12px; border: 1px solid rgba(67, 100, 129, 0.35); border-radius: 8px; font-size: 17px; line-height: 1.7; font-family: 'Newsreader', Georgia, serif; resize: vertical; box-sizing: border-box;"
         ></textarea>
         <p id="obituaryEditorHint" style="margin-top: 8px; font-size: 14px; color: #666;">Feel free to make any changes to honor your loved one's memory.</p>
       </div>
       
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
-        <button id="obituaryEditorCancelBtn" onclick="closeObituaryEditor()" style="padding: 12px 24px; border: 1px solid #ddd; background: white; color: #32343a; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 500;">Cancel</button>
-        <button id="saveObituaryBtn" onclick="saveObituaryChanges()" style="padding: 12px 24px; border: none; background: #4f46e5; color: white; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 500;">Save Changes</button>
+        <button id="obituaryEditorCancelBtn" onclick="closeObituaryEditor()" style="padding: 12px 24px; border: 1px solid rgba(67, 100, 129, 0.35); background: white; color: #436481; border-radius: 999px; font-size: 16px; cursor: pointer; font-weight: 500;">Cancel</button>
+        <button id="saveObituaryBtn" onclick="saveObituaryChanges()" style="padding: 12px 24px; border: none; background: #436481; color: white; border-radius: 999px; font-size: 16px; cursor: pointer; font-weight: 500;">Save Changes</button>
       </div>
     </div>
   </div>

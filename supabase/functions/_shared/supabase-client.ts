@@ -34,21 +34,30 @@ export const verifyAuth = async (authHeader: string | null) => {
   return { user, error: null };
 };
 
-export const generatePassword = (length: number = 12): string => {
-  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
-  let password = '';
-  
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * charset.length);
-    password += charset[randomIndex];
-  }
-  
-  // Ensure it has at least one uppercase, lowercase, number, and special char
-  if (!/[A-Z]/.test(password)) password = 'A' + password.slice(1);
-  if (!/[a-z]/.test(password)) password = password.slice(0, -1) + 'z';
-  if (!/[0-9]/.test(password)) password = password.slice(0, -2) + '1' + password.slice(-1);
-  if (!/[!@#$%^&*]/.test(password)) password = password.slice(0, -3) + '!' + password.slice(-2);
-  
-  return password;
-};
+export const generatePassword = (length: number = 14): string => {
+  // Cryptographically secure generation (previously Math.random, which is predictable)
+  const lower = 'abcdefghijkmnopqrstuvwxyz';
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const digits = '23456789';
+  const special = '!@#$%^&*';
+  const all = lower + upper + digits + special;
 
+  const pick = (charset: string, n: number): string => {
+    const out: string[] = [];
+    const buf = new Uint32Array(n);
+    crypto.getRandomValues(buf);
+    for (let i = 0; i < n; i++) out.push(charset[buf[i] % charset.length]);
+    return out.join('');
+  };
+
+  // Guarantee one of each class, fill the rest from the full set, then shuffle securely
+  const base = pick(lower, 1) + pick(upper, 1) + pick(digits, 1) + pick(special, 1) + pick(all, Math.max(length - 4, 0));
+  const arr = base.split('');
+  const rnd = new Uint32Array(arr.length);
+  crypto.getRandomValues(rnd);
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = rnd[i] % (i + 1);
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.join('');
+};

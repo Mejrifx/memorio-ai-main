@@ -5,8 +5,7 @@
   <meta name="google" content="notranslate">
   <title>Editor Dashboard - Memorio</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  <!-- Preload Dosis font -->
-  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="../css/normalize.css" rel="stylesheet" type="text/css">
   <link href="../css/webflow.css" rel="stylesheet" type="text/css">
   <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
@@ -17,6 +16,24 @@
   <script src="../js/i18n.js"></script>
   
   <style>
+    :root {
+      --paper: #fffbf7;
+      --cream: #fff3e9;
+      --sand: #f4e8de;
+      --ink: #32343a;
+      --ink-soft: #565a63;
+      --slate: #436481;
+      --slate-deep: #38536b;
+      --slate-dark: #2c4459;
+      --sky: #6ca7d3;
+    }
+
+    body.body {
+      background-color: var(--paper);
+      font-family: 'Public Sans', Arial, sans-serif;
+      color: var(--ink);
+    }
+
     .dashboard-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -32,7 +49,8 @@
     
     .dashboard-title {
       color: #32343a;
-      font-size: 32px;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 34px;
       font-weight: 600;
       margin: 0;
     }
@@ -44,10 +62,10 @@
     }
     
     .logout-btn {
-      color: #32343a;
+      color: var(--slate);
       background-color: transparent;
-      border: 1.35px solid #32343a;
-      border-radius: 60px;
+      border: 1px solid var(--slate);
+      border-radius: 999px;
       padding: 11px 18px;
       text-transform: uppercase;
       letter-spacing: 2px;
@@ -57,15 +75,17 @@
     }
     
     .logout-btn:hover {
-      background-color: #32343a;
-      color: #f2eadd;
+      background-color: var(--slate);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -10px rgba(44, 68, 89, 0.45);
     }
     
     .refresh-btn {
-      color: #436481;
+      color: var(--slate);
       background-color: transparent;
-      border: 1.35px solid #436481;
-      border-radius: 60px;
+      border: 1px solid var(--slate);
+      border-radius: 999px;
       padding: 11px 18px;
       text-transform: uppercase;
       letter-spacing: 2px;
@@ -76,8 +96,10 @@
     }
     
     .refresh-btn:hover {
-      background-color: #436481;
-      color: #f2eadd;
+      background-color: var(--slate);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -10px rgba(44, 68, 89, 0.45);
     }
     
     .refresh-btn:disabled {
@@ -99,11 +121,12 @@
     }
     
     .stat-card {
-      background-color: #fff3e9;
-      border: 3px solid #436481;
-      border-radius: 15px;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 12px;
       padding: 30px;
       text-align: center;
+      box-shadow: 0 6px 18px -12px rgba(44, 68, 89, 0.25);
     }
     
     .stat-number {
@@ -123,7 +146,8 @@
     
     .section-title {
       color: #32343a;
-      font-size: 24px;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 26px;
       font-weight: 600;
       margin-bottom: 20px;
     }
@@ -136,13 +160,14 @@
     }
     
     .case-card {
-      background-color: #f4e8de;
-      border-radius: 10px;
+      background-color: var(--cream);
+      border-radius: 12px;
       padding: 20px;
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
-      border: 1.5px solid rgba(67, 100, 129, 0.2);
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      box-shadow: 0 6px 18px -14px rgba(44, 68, 89, 0.3);
     }
     
     .case-card:hover {
@@ -209,39 +234,39 @@
     }
     
     .status-assigned {
-      background-color: #e3f2fd;
-      color: #1976d2;
+      background-color: #edf2f7;
+      color: #436481;
     }
     
     .status-submitted {
-      background-color: #fff3cd;
-      color: #856404;
+      background-color: #fdf0dd;
+      color: #9a5b00;
     }
     
     .status-in {
-      background-color: #d1ecf1;
-      color: #0c5460;
+      background-color: #edf2f7;
+      color: #38536b;
     }
     
     .status-revision {
-      background-color: #ffe0b2;
-      color: #e65100;
+      background-color: #fdf0dd;
+      color: #9a5b00;
       font-weight: 700;
     }
     
     .status-awaiting {
-      background-color: #cce5ff;
-      color: #004085;
+      background-color: #edf2f7;
+      color: #436481;
     }
     
     .status-delivered {
-      background-color: #d4edda;
-      color: #155724;
+      background-color: #e7f3ec;
+      color: #1d6b45;
     }
     
     .status-completed {
-      background-color: #c8e6c9;
-      color: #2e7d32;
+      background-color: #e7f3ec;
+      color: #1d6b45;
     }
     
     .empty-state {
@@ -256,11 +281,11 @@
     }
     
     .error-box {
-      background-color: #ffebee;
-      border: 2px solid #ef5350;
-      border-radius: 10px;
+      background-color: #fbe9e6;
+      border: 1px solid rgba(163, 59, 46, 0.35);
+      border-radius: 12px;
       padding: 15px;
-      color: #c62828;
+      color: #a33b2e;
       margin-bottom: 20px;
       display: none;
     }
@@ -283,7 +308,7 @@
     
     .modal-content {
       background-color: white;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 0;
       max-width: 900px;
       width: 100%;
@@ -293,9 +318,9 @@
     }
     
     .modal-header {
-      background-color: #f4e8de;
+      background-color: var(--sand);
       padding: 20px;
-      border-radius: 10px 10px 0 0;
+      border-radius: 12px 12px 0 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -306,6 +331,7 @@
     
     .modal-title {
       color: #32343a;
+      font-family: 'Newsreader', Georgia, serif;
       font-size: 24px;
       font-weight: 600;
       margin: 0;
@@ -347,12 +373,13 @@
     
     /* Photo Access Timer Banner (12-hour window) */
     #photo-timer-banner {
-      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      background: #fbe9e6;
+      border: 1px solid rgba(163, 59, 46, 0.35);
       border-radius: 12px;
       padding: 24px;
       margin: 20px;
-      color: white;
-      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+      color: #a33b2e;
+      box-shadow: 0 6px 18px -14px rgba(163, 59, 46, 0.35);
       text-align: center;
     }
     
@@ -407,7 +434,8 @@
     }
     
     .quote-text {
-      font-size: 18px;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 19px;
       font-style: italic;
       color: #32343a;
       line-height: 1.6;
@@ -476,21 +504,21 @@
     }
     
     .revision-notice {
-      background-color: #fff3e0;
-      border: 2px solid #ff9800;
-      border-radius: 10px;
+      background-color: #fdf0dd;
+      border: 1px solid rgba(154, 91, 0, 0.35);
+      border-radius: 12px;
       padding: 20px;
       margin: 15px 0;
     }
     
     /* Family Revision Notice (distinct styling) */
     .revision-notice.family-revision {
-      background-color: #e8f5e9;
-      border: 2px solid #4caf50;
+      background-color: #e7f3ec;
+      border: 1px solid rgba(29, 107, 69, 0.35);
     }
     
     .revision-notice-title {
-      color: #e65100;
+      color: #9a5b00;
       font-weight: 700;
       font-size: 16px;
       margin-bottom: 10px;
@@ -500,7 +528,7 @@
     }
     
     .revision-notice.family-revision .revision-notice-title {
-      color: #2e7d32;
+      color: #1d6b45;
     }
     
     .revision-notice-text {
@@ -513,24 +541,24 @@
     .revision-source-badge {
       display: inline-block;
       padding: 4px 12px;
-      background-color: #4caf50;
+      background-color: #1d6b45;
       color: white;
-      border-radius: 12px;
+      border-radius: 999px;
       font-size: 13px;
       font-weight: 600;
       margin-left: 8px;
     }
     
     .video-upload-section {
-      background-color: #f9f9f9;
-      border-radius: 10px;
+      background-color: var(--sand);
+      border-radius: 12px;
       padding: 20px;
       margin-top: 15px;
     }
     
     .upload-area {
-      border: 2px dashed #436481;
-      border-radius: 10px;
+      border: 2px dashed rgba(67, 100, 129, 0.5);
+      border-radius: 12px;
       padding: 30px;
       text-align: center;
       cursor: pointer;
@@ -538,13 +566,13 @@
     }
     
     .upload-area:hover {
-      background-color: #f0f7ff;
-      border-color: #1976d2;
+      background-color: #edf2f7;
+      border-color: var(--slate);
     }
     
     .upload-area.dragover {
-      background-color: #e3f2fd;
-      border-color: #1976d2;
+      background-color: #edf2f7;
+      border-color: var(--slate);
     }
     
     .file-input-hidden {
@@ -559,10 +587,10 @@
     
     .version-badge {
       display: inline-block;
-      background-color: #e3f2fd;
-      color: #1976d2;
+      background-color: #edf2f7;
+      color: #436481;
       padding: 4px 12px;
-      border-radius: 12px;
+      border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
       margin-left: 10px;
@@ -570,8 +598,8 @@
     
     .modal-actions {
       padding: 20px;
-      background-color: #f9f9f9;
-      border-radius: 0 0 10px 10px;
+      background-color: var(--sand);
+      border-radius: 0 0 12px 12px;
       display: flex;
       gap: 10px;
       justify-content: flex-end;
@@ -580,51 +608,57 @@
     }
     
     .btn-primary {
-      background-color: #436481;
+      background-color: var(--slate);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 999px;
       padding: 12px 24px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
     
     .btn-primary:hover {
-      background-color: #35506a;
+      background-color: var(--slate-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -10px rgba(44, 68, 89, 0.45);
     }
     
     .btn-secondary {
-      background-color: #6c757d;
-      color: white;
-      border: none;
-      border-radius: 5px;
+      background-color: transparent;
+      color: var(--slate);
+      border: 1px solid var(--slate);
+      border-radius: 999px;
       padding: 12px 24px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
     
     .btn-secondary:hover {
-      background-color: #5a6268;
+      background-color: rgba(67, 100, 129, 0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -10px rgba(44, 68, 89, 0.25);
     }
     
     .btn-success {
-      background-color: #28a745;
+      background-color: #1d6b45;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 999px;
       padding: 12px 24px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
     
     .btn-success:hover {
-      background-color: #218838;
+      background-color: #165636;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -10px rgba(29, 107, 69, 0.4);
     }
     
     /* Toast Notification */
@@ -632,10 +666,10 @@
       position: fixed;
       top: 20px;
       right: 20px;
-      background-color: #28a745;
+      background-color: #1d6b45;
       color: white;
       padding: 12px 20px;
-      border-radius: 5px;
+      border-radius: 999px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       z-index: 2000;
       font-size: 14px;
@@ -651,7 +685,7 @@
     }
     
     .toast.error {
-      background-color: #dc3545;
+      background-color: #a33b2e;
     }
     
     /* ============================================================================
@@ -660,7 +694,7 @@
     .sla-badge {
       display: inline-block;
       padding: 6px 12px;
-      border-radius: 20px;
+      border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
       margin-top: 8px;
@@ -668,34 +702,34 @@
     }
     
     .sla-badge.green {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-      border: 1px solid #66bb6a;
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border: 1px solid rgba(29, 107, 69, 0.4);
     }
     
     .sla-badge.orange {
-      background-color: #fff3e0;
-      color: #e65100;
-      border: 1px solid #ff9800;
+      background-color: #fdf0dd;
+      color: #9a5b00;
+      border: 1px solid rgba(154, 91, 0, 0.4);
     }
     
     .sla-badge.red {
-      background-color: #ffebee;
-      color: #c62828;
-      border: 1px solid #ef5350;
+      background-color: #fbe9e6;
+      color: #a33b2e;
+      border: 1px solid rgba(163, 59, 46, 0.4);
     }
     
     .sla-badge.black {
-      background-color: #212121;
-      color: #ffffff;
-      border: 1px solid #000000;
+      background-color: #e8e8ea;
+      color: #32343a;
+      border: 1px solid rgba(50, 52, 58, 0.45);
       font-weight: 700;
     }
     
     .sla-badge.waiting {
-      background-color: #f5f5f5;
-      color: #757575;
-      border: 1px solid #e0e0e0;
+      background-color: #f4e8de;
+      color: #565a63;
+      border: 1px solid rgba(86, 90, 99, 0.25);
     }
     
     .photos-grid {
@@ -718,8 +752,8 @@
     
     .photo-item:hover {
       transform: scale(1.05);
-      border-color: #007bff;
-      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+      border-color: #436481;
+      box-shadow: 0 4px 12px rgba(67, 100, 129, 0.3);
     }
     
     .photo-item img {
@@ -865,18 +899,18 @@
         </svg>
         Edit History
       </h2>
-      <div style="background-color: #f4e8de; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+      <div style="background-color: #f4e8de; border: 1px solid rgba(67, 100, 129, 0.18); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
           <div style="text-align: center;">
             <div style="font-size: 36px; font-weight: 700; color: #436481;" id="total-completed-count">0</div>
             <div style="color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Total Completed</div>
           </div>
           <div style="text-align: center;">
-            <div style="font-size: 36px; font-weight: 700; color: #28a745;" id="approved-count">0</div>
+            <div style="font-size: 36px; font-weight: 700; color: #1d6b45;" id="approved-count">0</div>
             <div style="color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Approved</div>
           </div>
           <div style="text-align: center;">
-            <div style="font-size: 36px; font-weight: 700; color: #ffc107;" id="revision-count">0</div>
+            <div style="font-size: 36px; font-weight: 700; color: #9a5b00;" id="revision-count">0</div>
             <div style="color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Revisions Requested</div>
           </div>
         </div>
@@ -962,7 +996,7 @@
       <div id="editor-gallery-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.96); z-index: 99999; overflow-y: auto;" onclick="handleEditorGalleryBackdrop(event)">
         <div style="position: relative; min-height: 100vh; padding: 64px 20px 40px;">
           <button onclick="closeEditorGallery()" type="button" style="position: fixed; top: 16px; right: 16px; background: rgba(255,255,255,0.15); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-size: 26px; line-height: 1; z-index: 100000; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">&times;</button>
-          <h3 id="editor-gallery-title" style="color: white; text-align: center; margin: 0 0 28px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 22px; font-weight: 600;"></h3>
+          <h3 id="editor-gallery-title" style="color: white; text-align: center; margin: 0 0 28px; font-family: 'Public Sans', Arial, sans-serif; font-size: 22px; font-weight: 600;"></h3>
           <div id="editor-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; max-width: 1400px; margin: 0 auto;"></div>
         </div>
       </div>
@@ -974,7 +1008,7 @@
         </p>
         <div id="download-section">
           <button class="btn-primary" onclick="downloadAllPhotos()" id="download-all-btn">
-            📥 Download All Photos
+            Download All Photos
           </button>
           <p style="color: #666; font-size: 14px; margin-top: 10px;">
             This will download all photos as a ZIP file for video creation.
@@ -1007,10 +1041,10 @@
               id="video-file-input" 
               accept="video/mp4,video/quicktime,video/x-msvideo"
               onchange="handleVideoFileSelected(this)"
-              style="display: block; width: 100%; padding: 12px; border: 1.5px solid #436481; border-radius: 8px; background-color: white; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+              style="display: block; width: 100%; padding: 12px; border: 1px solid rgba(67,100,129,0.35); border-radius: 8px; background-color: white; font-family: 'Public Sans', Arial, sans-serif;">
 
             <!-- File info card (shown after file selected) -->
-            <div id="video-file-info" style="display: none; margin-top: 10px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px 16px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+            <div id="video-file-info" style="display: none; margin-top: 10px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 12px 16px; font-family: 'Public Sans', Arial, sans-serif;">
               <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                 <div>
                   <span id="video-file-name" style="font-weight: 600; color: #32343a; font-size: 14px;"></span>
@@ -1018,8 +1052,8 @@
                 </div>
                 <span id="video-upload-estimate" style="font-size: 12px; color: #436481; font-weight: 500; background: rgba(67,100,129,0.1); padding: 3px 10px; border-radius: 20px;"></span>
               </div>
-              <div id="video-size-warning" style="display: none; margin-top: 8px; color: #856404; font-size: 12px; background: rgba(255,193,7,0.15); padding: 6px 10px; border-radius: 6px;">
-                ⚠️ Large file detected. Upload may take several minutes — please keep this tab open.
+              <div id="video-size-warning" style="display: none; margin-top: 8px; color: #9a5b00; font-size: 12px; background: #fdf0dd; padding: 6px 10px; border-radius: 6px;">
+                Large file detected. Upload may take several minutes, please keep this tab open.
               </div>
             </div>
           </div>
@@ -1031,29 +1065,29 @@
             <textarea 
               id="editor-notes-input" 
               placeholder="Add any notes or context for the QC reviewer..."
-              style="width: 100%; min-height: 80px; padding: 12px; border: 1.5px solid #436481; border-radius: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; resize: vertical;"></textarea>
+              style="width: 100%; min-height: 80px; padding: 12px; border: 1px solid rgba(67,100,129,0.35); border-radius: 8px; font-family: 'Public Sans', Arial, sans-serif; resize: vertical;"></textarea>
           </div>
           
           <!-- Stage 1: Upload progress (auto-starts when file is selected) -->
-          <div id="upload-progress" style="display: none; margin-bottom: 16px; background: #f8fffe; border: 1.5px solid #c3e6cb; border-radius: 10px; padding: 16px;">
+          <div id="upload-progress" style="display: none; margin-bottom: 16px; background: #edf2f7; border: 1px solid rgba(67,100,129,0.18); border-radius: 12px; padding: 16px;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
               <div id="upload-spinner" style="width: 20px; height: 20px; border: 3px solid #dee2e6; border-top-color: #436481; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0;"></div>
-              <p id="upload-status" style="color: #155724; font-size: 14px; font-weight: 600; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></p>
+              <p id="upload-status" style="color: #1d6b45; font-size: 14px; font-weight: 600; margin: 0; font-family: 'Public Sans', Arial, sans-serif;"></p>
             </div>
             <div style="background: #dee2e6; border-radius: 6px; overflow: hidden; height: 10px; margin-bottom: 8px;">
-              <div id="progress-bar" style="background: linear-gradient(90deg, #436481, #5a82a0); height: 100%; width: 0%; transition: width 0.35s ease; border-radius: 6px;"></div>
+              <div id="progress-bar" style="background: #436481; height: 100%; width: 0%; transition: width 0.35s ease; border-radius: 6px;"></div>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <p id="upload-percent" style="color: #436481; font-size: 13px; font-weight: 700; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">0%</p>
-              <p id="upload-eta" style="color: #666; font-size: 12px; margin: 0; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></p>
+              <p id="upload-percent" style="color: #436481; font-size: 13px; font-weight: 700; margin: 0; font-family: 'Public Sans', Arial, sans-serif;">0%</p>
+              <p id="upload-eta" style="color: #666; font-size: 12px; margin: 0; font-family: 'Public Sans', Arial, sans-serif;"></p>
             </div>
-            <p style="margin: 8px 0 0; font-size: 11px; color: #888; text-align: center; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+            <p style="margin: 8px 0 0; font-size: 11px; color: #888; text-align: center; font-family: 'Public Sans', Arial, sans-serif;">
               Please keep this tab open until the upload completes
             </p>
           </div>
 
           <!-- Stage 1 success: video uploaded, ready to submit to QC -->
-          <div id="upload-ready-card" style="display: none; margin-bottom: 16px; background: #e8f4fd; border: 1.5px solid #436481; border-radius: 10px; padding: 16px;">
+          <div id="upload-ready-card" style="display: none; margin-bottom: 16px; background: #edf2f7; border: 1px solid rgba(67,100,129,0.35); border-radius: 12px; padding: 16px;">
             <div style="display: flex; align-items: flex-start; gap: 12px;">
               <div style="width: 36px; height: 36px; background: #436481; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -1061,25 +1095,25 @@
                 </svg>
               </div>
               <div>
-                <p style="margin: 0 0 3px; font-weight: 700; color: #2c3e50; font-size: 15px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Video uploaded successfully!</p>
-                <p id="upload-ready-file-info" style="margin: 0 0 6px; color: #436481; font-size: 13px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></p>
-                <p style="margin: 0; font-size: 12px; color: #555; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Add your notes below and click <strong>Submit to Quality Control</strong> when ready.</p>
+                <p style="margin: 0 0 3px; font-weight: 700; color: #32343a; font-size: 15px; font-family: 'Public Sans', Arial, sans-serif;">Video uploaded successfully!</p>
+                <p id="upload-ready-file-info" style="margin: 0 0 6px; color: #436481; font-size: 13px; font-family: 'Public Sans', Arial, sans-serif;"></p>
+                <p style="margin: 0; font-size: 12px; color: #555; font-family: 'Public Sans', Arial, sans-serif;">Add your notes below and click <strong>Submit to Quality Control</strong> when ready.</p>
               </div>
             </div>
           </div>
 
           <!-- Stage 2 success: submitted to QC -->
-          <div id="upload-success-card" style="display: none; margin-bottom: 16px; background: #d4edda; border: 1.5px solid #28a745; border-radius: 10px; padding: 18px;">
+          <div id="upload-success-card" style="display: none; margin-bottom: 16px; background: #e7f3ec; border: 1px solid rgba(29,107,69,0.35); border-radius: 12px; padding: 18px;">
             <div style="display: flex; align-items: flex-start; gap: 12px;">
-              <div style="width: 36px; height: 36px; background: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <div style="width: 36px; height: 36px; background: #1d6b45; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </div>
               <div>
-                <p style="margin: 0 0 4px; font-weight: 700; color: #155724; font-size: 15px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Video submitted to Quality Control!</p>
-                <p id="success-file-info" style="margin: 0 0 6px; color: #1d643b; font-size: 13px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></p>
-                <p style="margin: 0; font-size: 12px; color: #2e7d45; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Status: <strong>Pending QC Review</strong></p>
+                <p style="margin: 0 0 4px; font-weight: 700; color: #1d6b45; font-size: 15px; font-family: 'Public Sans', Arial, sans-serif;">Video submitted to Quality Control!</p>
+                <p id="success-file-info" style="margin: 0 0 6px; color: #1d6b45; font-size: 13px; font-family: 'Public Sans', Arial, sans-serif;"></p>
+                <p style="margin: 0; font-size: 12px; color: #1d6b45; font-family: 'Public Sans', Arial, sans-serif;">Status: <strong>Pending QC Review</strong></p>
               </div>
             </div>
           </div>
@@ -2061,7 +2095,7 @@
         // INITIALIZE PHOTO ACCESS TIMER (12-hour window check)
         initializePhotoAccessTimer(formSubmittedAt);
         
-        // DISPLAY PHOTOS — compact thumbnail with gallery modal
+        // DISPLAY PHOTOS - compact thumbnail with gallery modal
         const photosContent = document.getElementById('photos-content');
         const photos = caseData.assets?.filter(a => a.mime_type?.startsWith('image/')) || [];
         renderEditorPhotoPreview(photos, photosContent);
@@ -2070,10 +2104,10 @@
         const downloadBtn = document.getElementById('download-all-btn');
         if (photos.length > 0) {
           downloadBtn.disabled = false;
-          downloadBtn.textContent = `📥 Download All Photos as ZIP (${photos.length})`;
+          downloadBtn.textContent = `Download All Photos as ZIP (${photos.length})`;
         } else {
           downloadBtn.disabled = true;
-          downloadBtn.textContent = '📥 No Photos Available';
+          downloadBtn.textContent = 'No Photos Available';
         }
         
         // Display case metadata
@@ -2097,7 +2131,7 @@
           </div>
           <div class="modal-detail-item">
             <div class="modal-detail-label">Music Selection:</div>
-            <div class="modal-detail-value" style="font-weight: 600; color: #436481;">♪ ${musicSelection}</div>
+            <div class="modal-detail-value" style="font-weight: 600; color: #436481;">${musicSelection}</div>
           </div>
           ${latestSubmission ? `
           <div class="modal-detail-item">
@@ -2166,8 +2200,8 @@
             </div>
           </div>
           <div style="padding-left: 2px;">
-            <span style="font-size: 13px; font-weight: 700; color: #436481; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">${photos.length} photo${photos.length !== 1 ? 's' : ''} uploaded</span><br>
-            <span style="font-size: 12px; color: #999; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Click to view all</span>
+            <span style="font-size: 13px; font-weight: 700; color: #436481; font-family: 'Public Sans', Arial, sans-serif;">${photos.length} photo${photos.length !== 1 ? 's' : ''} uploaded</span><br>
+            <span style="font-size: 12px; color: #999; font-family: 'Public Sans', Arial, sans-serif;">Click to view all</span>
           </div>
         </div>
       `;
@@ -2186,9 +2220,9 @@
           <div style="position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #1a1a1a; group">
             <img src="${url}" alt="Photo ${i + 1}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
             <div style="position: absolute; top: 0; right: 0; opacity: 0; transition: opacity 0.2s; padding: 6px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
-              <button type="button" onclick="downloadPhoto('${url}', ${i + 1})" style="background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 13px;" title="Download">⬇</button>
+              <button type="button" onclick="downloadPhoto('${url}', ${i + 1})" style="background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 13px;" title="Download">Save</button>
             </div>
-            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.55)); padding: 18px 8px 6px; opacity: 0; transition: opacity 0.2s;" onmouseover="this.parentElement.querySelector('div:last-child').style.opacity=1" onmouseout="this.parentElement.querySelector('div:last-child').style.opacity=0">
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.45); padding: 18px 8px 6px; opacity: 0; transition: opacity 0.2s;" onmouseover="this.parentElement.querySelector('div:last-child').style.opacity=1" onmouseout="this.parentElement.querySelector('div:last-child').style.opacity=0">
               <span style="color: rgba(255,255,255,0.8); font-size: 11px;">${i + 1} / ${editorGalleryPhotos.length}</span>
             </div>
           </div>
@@ -2322,7 +2356,7 @@
         // Clean up blob URL
         URL.revokeObjectURL(link.href);
         
-        showToast(`✅ Downloaded ${photos.length} photos as ZIP file!`);
+        showToast(`Downloaded ${photos.length} photos as ZIP file!`);
         console.log(`✅ ZIP file downloaded: ${zipFilename}`);
         
       } catch (error) {
@@ -2352,7 +2386,7 @@
         if (submission) {
           displaySubmissionStatus(submission);
         } else {
-          // No submission yet — form visible, but submit stays disabled until a video is uploaded
+          // No submission yet - form visible, but submit stays disabled until a video is uploaded
           statusDisplay.style.display = 'none';
           const uploadForm = document.getElementById('upload-form-section');
           if (uploadForm) { uploadForm.style.display = 'block'; uploadForm.style.opacity = '1'; uploadForm.style.pointerEvents = 'auto'; }
@@ -2370,34 +2404,34 @@
       const uploadForm = document.getElementById('upload-form-section');
       const submitBtn = document.getElementById('submit-video-btn');
       
-      let statusColor = '#ffc107';
+      let statusColor = '#9a5b00';
       let statusText = 'Pending Review';
       let showForm = false;
       let disableSubmit = false;
       
       switch (submission.qc_status) {
         case 'pending':
-          statusColor = '#ffc107';
+          statusColor = '#9a5b00';
           statusText = 'Pending QC Review';
           disableSubmit = true;
           break;
         case 'in_review':
-          statusColor = '#17a2b8';
+          statusColor = '#436481';
           statusText = 'Currently Being Reviewed';
           disableSubmit = true;
           break;
         case 'approved':
-          statusColor = '#28a745';
+          statusColor = '#1d6b45';
           statusText = '✓ Approved & Delivered';
           disableSubmit = true;
           break;
         case 'revision_requested':
-          statusColor = '#dc3545';
+          statusColor = '#a33b2e';
           statusText = 'Revision Requested';
           showForm = true;
           break;
         case 'rejected':
-          statusColor = '#dc3545';
+          statusColor = '#a33b2e';
           statusText = 'Rejected - Contact Admin';
           disableSubmit = true;
           break;
@@ -2426,20 +2460,20 @@
       `;
       statusDisplay.style.display = 'block';
 
-      // Always keep the upload form visible — only control interactivity via button state
+      // Always keep the upload form visible - only control interactivity via button state
       uploadForm.style.display = 'block';
 
       if (disableSubmit && submitBtn) {
         submitBtn.disabled = true;
-        const label = submission.qc_status === 'pending'   ? '⏳ Pending QC Review'
-          : submission.qc_status === 'in_review'           ? '🔍 Currently Being Reviewed'
+        const label = submission.qc_status === 'pending'   ? 'Pending QC Review'
+          : submission.qc_status === 'in_review'           ? 'Currently Being Reviewed'
           : '✓ Submitted for Review';
         submitBtn.textContent = label;
-        submitBtn.style.backgroundColor = '#6c757d';
-        submitBtn.style.borderColor     = '#6c757d';
+        submitBtn.style.backgroundColor = '#565a63';
+        submitBtn.style.borderColor     = '#565a63';
         submitBtn.style.cursor          = 'not-allowed';
       } else if (!disableSubmit && submitBtn) {
-        // Revision requested — editor must upload a new video first
+        // Revision requested - editor must upload a new video first
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>Select a revised video to upload first`;
         submitBtn.style.backgroundColor = '#adb5bd';
@@ -2536,7 +2570,7 @@
       let beforeUnloadHandler = null;
 
       function updateProgress(loaded, total) {
-        // Cap at 99% — the final 1% is reserved for the server-side write phase.
+        // Cap at 99% - the final 1% is reserved for the server-side write phase.
         // xhr.upload.onprogress fires when bytes are sent from the browser, but
         // the server still needs to write the file and return its HTTP response.
         // For large files this can take 30-120s, making the ETA read "0s" while
@@ -2554,9 +2588,9 @@
           const remaining = Math.ceil((total - loaded) / bps);
 
           if (rawPct >= 99.5) {
-            // All bytes sent — waiting for server to confirm receipt
+            // All bytes sent - waiting for server to confirm receipt
             statusText.textContent = 'Server is saving your video...';
-            etaEl.textContent      = 'Almost done — please wait';
+            etaEl.textContent      = 'Almost done - please wait';
           } else {
             const speed = formatBytes(bps) + '/s';
             const eta   = remaining < 60 ? `${remaining}s` : `${Math.ceil(remaining / 60)}min`;
@@ -2634,12 +2668,12 @@
 
         uploadedVideoFile = file;
 
-        // ── Show success: video is ready — jump bar to 100% ──
+        // ── Show success: video is ready - jump bar to 100% ──
         progressBar.style.width = '100%';
         if (percentEl) percentEl.textContent = '100%';
         if (etaEl) etaEl.textContent = '';
         statusText.textContent = 'Upload complete!';
-        progressBar.style.background = 'linear-gradient(90deg, #28a745, #34c759)';
+        progressBar.style.background = '#1d6b45';
 
         setTimeout(() => {
           progressDiv.style.display = 'none';
@@ -2651,8 +2685,8 @@
 
           // Enable submit button
           submitBtn.disabled = false;
-          submitBtn.style.backgroundColor = '#28a745';
-          submitBtn.style.borderColor     = '#28a745';
+          submitBtn.style.backgroundColor = '#1d6b45';
+          submitBtn.style.borderColor     = '#1d6b45';
           submitBtn.style.cursor          = 'pointer';
           submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>Submit to Quality Control`;
 
@@ -2687,7 +2721,7 @@
       return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
     }
 
-    // ─── Stage 2: Submit to QC — DB record only (video already uploaded) ─────
+    // ─── Stage 2: Submit to QC - DB record only (video already uploaded) ─────
     async function submitVideoToQC() {
       if (!currentCase) return;
 
@@ -2808,8 +2842,8 @@
         uploadedVideoFile = null;
 
         submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:6px;"><polyline points="20 6 9 17 4 12"></polyline></svg>Submitted for Review`;
-        submitBtn.style.backgroundColor = '#6c757d';
-        submitBtn.style.borderColor     = '#6c757d';
+        submitBtn.style.backgroundColor = '#565a63';
+        submitBtn.style.borderColor     = '#565a63';
         submitBtn.style.cursor          = 'not-allowed';
 
         // Refresh case list in background
@@ -2831,8 +2865,8 @@
         // Re-enable submit so they can retry
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>Submit to Quality Control`;
-        submitBtn.style.backgroundColor = '#28a745';
-        submitBtn.style.borderColor     = '#28a745';
+        submitBtn.style.backgroundColor = '#1d6b45';
+        submitBtn.style.borderColor     = '#1d6b45';
         submitBtn.style.cursor          = 'pointer';
       }
     }

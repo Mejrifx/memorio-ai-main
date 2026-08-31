@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <title>Case Detail - Memorio Admin</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  <!-- Preload Dosis font -->
-  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <!-- Memorio design system fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="../css/normalize.css" rel="stylesheet" type="text/css">
   <link href="../css/webflow.css" rel="stylesheet" type="text/css">
   <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
@@ -14,192 +14,218 @@
   
   <style>
     /* ============================================================================
-       MEMORIO ADMIN CASE DETAIL PAGE
+       MEMORIO ADMIN CASE DETAIL PAGE - MEMORIO DESIGN SYSTEM
        ============================================================================ */
-    
+
+    :root {
+      --paper: #fffbf7;
+      --cream: #fff3e9;
+      --sand: #f4e8de;
+      --ink: #32343a;
+      --ink-soft: #565a63;
+      --slate: #436481;
+      --slate-deep: #38536b;
+      --slate-dark: #2c4459;
+      --sky: #6ca7d3;
+      --card-border: rgba(67,100,129,.18);
+      --card-shadow: 0 4px 16px rgba(50,52,58,.07);
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      background-color: #f4e8de;
+      font-family: 'Public Sans', Arial, sans-serif;
+      background-color: var(--paper);
+      color: var(--ink);
       min-height: 100vh;
     }
-    
+
     /* ============================================================================
        SIDEBAR - Matches admin dashboard
        ============================================================================ */
-    
+
     .sidebar {
       position: fixed;
       left: 0;
       top: 0;
       width: 280px;
       height: 100vh;
-      background-color: #fff3e9;
-      border-right: 3px solid #436481;
-      box-shadow: 4px 0 15px rgba(67, 100, 129, 0.1);
+      background-color: var(--slate-dark);
+      border-right: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
       z-index: 1000;
       display: flex;
       flex-direction: column;
     }
-    
+
     .sidebar-logo {
       height: 70px;
       padding: 0;
-      border-bottom: 2px solid #436481;
+      background-color: var(--cream);
+      border-bottom: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    
+
     .sidebar-logo img {
       width: 140px;
       height: auto;
       max-height: 60px;
       object-fit: contain;
     }
-    
+
     .sidebar-nav {
       flex: 1;
       padding: 20px 0;
       overflow-y: auto;
     }
-    
+
     .sidebar-nav-item {
       display: flex;
       align-items: center;
       gap: 14px;
       padding: 14px 24px;
       margin: 4px 12px;
-      color: #32343a;
+      color: #f2ede7;
       text-decoration: none;
       font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
       border-radius: 8px;
-      border: 1.5px solid transparent;
+      border: 1px solid transparent;
     }
-    
+
+    .sidebar-nav-item .nav-icon {
+      display: inline-flex;
+      align-items: center;
+      opacity: 0.85;
+    }
+
     .sidebar-nav-item:hover {
-      background-color: #f4e8de;
-      border-color: #6ca7d3;
-      color: #436481;
+      background-color: rgba(242,237,231,.08);
+      color: #ffffff;
     }
-    
+
     .sidebar-nav-item.active {
-      background-color: #f4e8de;
-      border-color: #436481;
-      color: #436481;
+      background-color: rgba(242,237,231,.14);
+      border-color: rgba(242,237,231,.25);
+      color: #ffffff;
     }
-    
+
     /* ============================================================================
        TOP NAVBAR
        ============================================================================ */
-    
+
     .topbar {
       position: fixed;
       top: 0;
       left: 280px;
       right: 0;
       height: 70px;
-      background-color: #fff3e9;
-      border-bottom: 2px solid #436481;
-      box-shadow: 0 2px 8px rgba(67, 100, 129, 0.1);
+      background-color: var(--cream);
+      border-bottom: 1px solid var(--card-border);
+      box-shadow: 0 2px 8px rgba(50,52,58,.05);
       z-index: 999;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 32px;
     }
-    
+
     .topbar-left {
       display: flex;
       align-items: center;
       gap: 24px;
     }
-    
+
     .topbar-back-btn {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 10px 18px;
-      background-color: #f4e8de;
-      border: 1.5px solid #436481;
-      border-radius: 60px;
-      color: #436481;
+      background-color: transparent;
+      border: 1px solid var(--slate);
+      border-radius: 999px;
+      color: var(--slate);
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
       transition: all 0.2s ease;
     }
-    
+
     .topbar-back-btn:hover {
-      background-color: #436481;
-      color: #fff3e9;
+      background-color: var(--slate);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(50,52,58,.15);
     }
-    
+
     .topbar-title {
-      color: #32343a;
-      font-size: 22px;
-      font-weight: 600;
+      color: var(--ink);
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 24px;
+      font-weight: 500;
     }
-    
+
     .topbar-right {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    
+
     .topbar-user {
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 8px 16px;
-      background-color: #f4e8de;
-      border: 1.5px solid #436481;
-      border-radius: 60px;
+      background-color: var(--sand);
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
     }
-    
+
     .topbar-user-email {
       font-size: 14px;
-      color: #32343a;
+      color: var(--ink);
       font-weight: 500;
     }
-    
+
     .logout-btn {
       padding: 10px 20px;
-      background-color: #436481;
-      color: #fff3e9;
+      background-color: var(--slate);
+      color: #ffffff;
       border: none;
-      border-radius: 60px;
+      border-radius: 999px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
     }
-    
+
     .logout-btn:hover {
-      background-color: #32343a;
+      background-color: var(--slate-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(50,52,58,.15);
     }
-    
+
     /* ============================================================================
        MAIN CONTENT
        ============================================================================ */
-    
+
     .main-content {
       margin-left: 280px;
       margin-top: 70px;
       padding: 32px;
       min-height: calc(100vh - 70px);
     }
-    
+
     .case-detail-container {
       display: grid;
       grid-template-columns: 1fr 350px;
@@ -207,179 +233,183 @@
       max-width: 1600px;
       margin: 0 auto;
     }
-    
+
     /* ============================================================================
        CASE HEADER
        ============================================================================ */
-    
+
     .case-header {
-      background-color: #fff3e9;
-      border: 2px solid #436481;
+      background-color: var(--cream);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
+      box-shadow: var(--card-shadow);
       padding: 24px 32px;
       margin-bottom: 24px;
     }
-    
+
     .case-header-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 20px;
     }
-    
+
     .case-header-title {
+      font-family: 'Newsreader', Georgia, serif;
       font-size: 32px;
-      font-weight: 700;
-      color: #32343a;
+      font-weight: 500;
+      color: var(--ink);
     }
-    
+
     .case-header-sla {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    
+
     .sla-badge {
-      padding: 10px 20px;
-      border-radius: 60px;
-      font-size: 16px;
-      font-weight: 700;
-      border: 2px solid;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid;
     }
-    
+
     .sla-badge.green {
-      background-color: #d4f4dd;
-      color: #2d7738;
-      border-color: #2d7738;
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border-color: #1d6b45;
     }
-    
+
     .sla-badge.yellow {
-      background-color: #fff3cd;
-      color: #856404;
-      border-color: #856404;
+      background-color: #fdf6e9;
+      color: #9a5b00;
+      border-color: rgba(154,91,0,.5);
     }
-    
+
     .sla-badge.orange {
-      background-color: #ffe5cc;
-      color: #cc5500;
-      border-color: #cc5500;
+      background-color: #fdf0dd;
+      color: #9a5b00;
+      border-color: #9a5b00;
     }
-    
+
     .sla-badge.red {
-      background-color: #f8d7da;
-      color: #721c24;
-      border-color: #721c24;
+      background-color: #fbe9e6;
+      color: #a33b2e;
+      border-color: #a33b2e;
     }
-    
+
     .case-header-meta {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 16px;
     }
-    
+
     .meta-item {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
-    
+
     .meta-label {
       font-size: 13px;
-      color: rgba(50, 52, 58, 0.6);
+      color: var(--ink-soft);
       font-weight: 500;
     }
-    
+
     .meta-value {
       font-size: 16px;
-      color: #32343a;
+      color: var(--ink);
       font-weight: 600;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    
+
     .reassign-btn {
       padding: 4px 12px;
-      background-color: #f4e8de;
-      border: 1.5px solid #436481;
-      border-radius: 60px;
+      background-color: transparent;
+      border: 1px solid var(--slate);
+      border-radius: 999px;
       font-size: 12px;
-      color: #436481;
+      color: var(--slate);
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       font-weight: 600;
     }
-    
+
     .reassign-btn:hover {
-      background-color: #436481;
-      color: #fff3e9;
+      background-color: var(--slate);
+      color: #ffffff;
     }
-    
+
     /* ============================================================================
        TABS
        ============================================================================ */
-    
+
     .tabs {
-      background-color: #fff3e9;
-      border: 2px solid #436481;
+      background-color: var(--cream);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
+      box-shadow: var(--card-shadow);
       overflow: hidden;
     }
-    
+
     .tab-nav {
       display: flex;
-      border-bottom: 2px solid #436481;
-      background-color: #f4e8de;
+      border-bottom: 1px solid var(--card-border);
+      background-color: var(--sand);
     }
-    
+
     .tab-btn {
       flex: 1;
       padding: 16px 24px;
       background-color: transparent;
       border: none;
-      border-right: 1.5px solid #436481;
-      color: #32343a;
+      border-right: 1px solid var(--card-border);
+      color: var(--ink-soft);
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
     }
-    
+
     .tab-btn:last-child {
       border-right: none;
     }
-    
+
     .tab-btn:hover {
-      background-color: #fff3e9;
+      background-color: var(--cream);
+      color: var(--slate);
     }
-    
+
     .tab-btn.active {
-      background-color: #fff3e9;
-      color: #436481;
+      background-color: var(--cream);
+      color: var(--slate);
     }
-    
+
     .tab-content {
       display: none;
       padding: 24px;
       max-height: 600px;
       overflow-y: auto;
     }
-    
+
     .tab-content.active {
       display: block;
     }
-    
+
     /* ============================================================================
        TIMELINE
        ============================================================================ */
-    
+
     .timeline {
       position: relative;
       padding-left: 32px;
     }
-    
+
     .timeline::before {
       content: '';
       position: absolute;
@@ -387,15 +417,15 @@
       top: 0;
       bottom: 0;
       width: 2px;
-      background-color: #436481;
+      background-color: rgba(67,100,129,.25);
     }
-    
+
     .timeline-item {
       position: relative;
       margin-bottom: 24px;
       padding-left: 24px;
     }
-    
+
     .timeline-item::before {
       content: '';
       position: absolute;
@@ -403,27 +433,27 @@
       top: 4px;
       width: 12px;
       height: 12px;
-      background-color: #436481;
-      border: 2px solid #fff3e9;
+      background-color: var(--slate);
+      border: 2px solid var(--cream);
       border-radius: 50%;
     }
-    
+
     .timeline-time {
       font-size: 13px;
-      color: rgba(50, 52, 58, 0.6);
+      color: var(--ink-soft);
       margin-bottom: 4px;
     }
-    
+
     .timeline-event {
       font-size: 15px;
-      color: #32343a;
+      color: var(--ink);
       font-weight: 600;
       line-height: 1.5;
     }
-    
+
     .timeline-actor {
       font-size: 14px;
-      color: #436481;
+      color: var(--slate);
       font-weight: 500;
       margin-top: 6px;
       display: flex;
@@ -431,289 +461,296 @@
       gap: 8px;
       flex-wrap: wrap;
     }
-    
+
     .timeline-actor strong {
       font-weight: 600;
-      color: #32343a;
+      color: var(--ink);
     }
-    
+
     .role-badge {
       display: inline-block;
       padding: 3px 10px;
-      background-color: #f4e8de;
-      border: 1px solid #436481;
-      border-radius: 12px;
+      background-color: #edf2f7;
+      border: 1px solid rgba(67,100,129,.35);
+      border-radius: 999px;
       font-size: 11px;
       font-weight: 600;
-      color: #436481;
+      color: var(--slate);
       white-space: nowrap;
     }
-    
+
     /* ============================================================================
        ASSETS & FORMS
        ============================================================================ */
-    
+
     .assets-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 16px;
       margin-bottom: 24px;
     }
-    
+
     .asset-item {
       aspect-ratio: 1;
       border-radius: 8px;
       overflow: hidden;
-      border: 2px solid #436481;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
       cursor: pointer;
       transition: transform 0.2s ease;
     }
-    
+
     .asset-item:hover {
       transform: scale(1.05);
     }
-    
+
     .asset-item img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     .form-data-section {
       margin-bottom: 24px;
     }
-    
+
     .form-data-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #32343a;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 19px;
+      font-weight: 500;
+      color: var(--ink);
       margin-bottom: 12px;
       padding-bottom: 8px;
-      border-bottom: 2px solid #436481;
+      border-bottom: 1px solid var(--card-border);
     }
-    
+
     .form-data-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 16px;
     }
-    
+
     .form-data-item {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
-    
+
     .form-data-label {
       font-size: 13px;
-      color: rgba(50, 52, 58, 0.6);
+      color: var(--ink-soft);
       font-weight: 500;
     }
-    
+
     .form-data-value {
       font-size: 15px;
-      color: #32343a;
+      color: var(--ink);
       font-weight: 500;
     }
-    
+
     /* ============================================================================
        NOTES
        ============================================================================ */
-    
+
     .notes-container {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
-    
+
     .add-note-section {
-      background-color: #f4e8de;
+      background-color: var(--sand);
       padding: 16px;
-      border-radius: 8px;
-      border: 1.5px solid #436481;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
     }
-    
+
     .note-type-select {
       width: 100%;
       padding: 10px 16px;
-      border: 1.5px solid #436481;
+      border: 1px solid rgba(67,100,129,.35);
       border-radius: 8px;
       font-size: 14px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      background-color: #fff3e9;
-      color: #32343a;
+      font-family: 'Public Sans', Arial, sans-serif;
+      background-color: #ffffff;
+      color: var(--ink);
       margin-bottom: 12px;
     }
-    
+
     .note-textarea {
       width: 100%;
       min-height: 100px;
       padding: 12px 16px;
-      border: 1.5px solid #436481;
+      border: 1px solid rgba(67,100,129,.35);
       border-radius: 8px;
       font-size: 14px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      background-color: #fff3e9;
-      color: #32343a;
+      font-family: 'Public Sans', Arial, sans-serif;
+      background-color: #ffffff;
+      color: var(--ink);
       resize: vertical;
       margin-bottom: 12px;
     }
-    
+
     .add-note-btn {
       padding: 10px 24px;
-      background-color: #436481;
-      color: #fff3e9;
+      background-color: var(--slate);
+      color: #ffffff;
       border: none;
-      border-radius: 60px;
+      border-radius: 999px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
     }
-    
+
     .add-note-btn:hover {
-      background-color: #32343a;
+      background-color: var(--slate-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(50,52,58,.15);
     }
-    
+
     .notes-list {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-    
+
     .note-item {
-      background-color: #f4e8de;
+      background-color: var(--sand);
       padding: 16px;
-      border-radius: 8px;
-      border: 1.5px solid #436481;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
     }
-    
+
     .note-item.pinned {
-      border-color: #cc5500;
-      border-width: 2px;
+      border-color: #9a5b00;
     }
-    
+
     .note-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
     }
-    
+
     .note-author {
       font-size: 14px;
       font-weight: 600;
-      color: #436481;
+      color: var(--slate);
     }
-    
+
     .note-type-badge {
       padding: 4px 12px;
-      border-radius: 60px;
+      border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
-      background-color: #fff3e9;
-      border: 1px solid #436481;
-      color: #436481;
+      background-color: #edf2f7;
+      border: 1px solid rgba(67,100,129,.35);
+      color: var(--slate);
     }
-    
+
     .note-content {
       font-size: 14px;
-      color: #32343a;
+      color: var(--ink);
       margin-bottom: 8px;
       white-space: pre-wrap;
     }
-    
+
     .note-time {
       font-size: 12px;
-      color: rgba(50, 52, 58, 0.6);
+      color: var(--ink-soft);
     }
-    
+
     /* ============================================================================
        SUPPORT ACTIONS PANEL
        ============================================================================ */
-    
+
     .support-panel {
-      background-color: #fff3e9;
-      border: 2px solid #436481;
+      background-color: var(--cream);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
+      box-shadow: var(--card-shadow);
       padding: 24px;
       height: fit-content;
       position: sticky;
       top: 102px;
     }
-    
+
     .support-panel-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #32343a;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--ink);
       margin-bottom: 20px;
       padding-bottom: 12px;
-      border-bottom: 2px solid #436481;
+      border-bottom: 1px solid var(--card-border);
     }
-    
+
     .support-actions {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-    
+
     .support-action-btn {
       width: 100%;
       padding: 14px 20px;
-      background-color: #f4e8de;
-      border: 1.5px solid #436481;
-      border-radius: 8px;
-      color: #436481;
+      background-color: transparent;
+      border: 1px solid var(--slate);
+      border-radius: 999px;
+      color: var(--slate);
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       text-align: left;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    
+
     .support-action-btn:hover {
-      background-color: #436481;
-      color: #fff3e9;
+      background-color: var(--slate);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(50,52,58,.15);
     }
-    
+
     .support-action-btn.danger {
-      border-color: #d9534f;
-      color: #d9534f;
+      border-color: #a33b2e;
+      color: #a33b2e;
     }
-    
+
     .support-action-btn.danger:hover {
-      background-color: #d9534f;
-      color: #fff3e9;
+      background-color: #a33b2e;
+      color: #ffffff;
     }
-    
+
     /* ============================================================================
        LOADING & EMPTY STATES
        ============================================================================ */
-    
+
     .loading {
       text-align: center;
       padding: 48px;
-      color: #436481;
+      color: var(--slate);
       font-size: 18px;
       font-weight: 600;
     }
-    
+
     .empty-state {
       text-align: center;
       padding: 48px;
-      color: rgba(50, 52, 58, 0.5);
+      color: var(--ink-soft);
       font-size: 16px;
     }
-    
+
     /* ============================================================================
        MODAL
        ============================================================================ */
-    
+
     .modal {
       display: none;
       position: fixed;
@@ -721,115 +758,119 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(50, 52, 58, 0.5);
       z-index: 9999;
       align-items: center;
       justify-content: center;
     }
-    
+
     .modal.active {
       display: flex;
     }
-    
+
     .modal-content {
-      background-color: #fff3e9;
-      border: 2px solid #436481;
+      background-color: var(--cream);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(50,52,58,.18);
       padding: 32px;
       max-width: 500px;
       width: 90%;
       max-height: 80vh;
       overflow-y: auto;
     }
-    
+
     .modal-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #32343a;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--ink);
       margin-bottom: 20px;
     }
-    
+
     .modal-form {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
-    
+
     .modal-label {
       font-size: 14px;
-      color: #32343a;
+      color: var(--ink);
       font-weight: 600;
       margin-bottom: 6px;
     }
-    
+
     .modal-input,
     .modal-select,
     .modal-textarea {
       width: 100%;
       padding: 12px 16px;
-      border: 1.5px solid #436481;
+      border: 1px solid rgba(67,100,129,.35);
       border-radius: 8px;
       font-size: 14px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      background-color: #fff3e9;
-      color: #32343a;
+      font-family: 'Public Sans', Arial, sans-serif;
+      background-color: #ffffff;
+      color: var(--ink);
     }
-    
+
     .modal-textarea {
       min-height: 120px;
       resize: vertical;
     }
-    
+
     .modal-actions {
       display: flex;
       gap: 12px;
       margin-top: 20px;
     }
-    
+
     .modal-btn {
       flex: 1;
       padding: 12px 24px;
       border: none;
-      border-radius: 60px;
+      border-radius: 999px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
     }
-    
+
     .modal-btn.primary {
-      background-color: #436481;
-      color: #fff3e9;
+      background-color: var(--slate);
+      color: #ffffff;
     }
-    
+
     .modal-btn.primary:hover {
-      background-color: #32343a;
+      background-color: var(--slate-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(50,52,58,.15);
     }
-    
+
     .modal-btn.secondary {
-      background-color: #f4e8de;
-      color: #436481;
-      border: 1.5px solid #436481;
+      background-color: transparent;
+      color: var(--slate);
+      border: 1px solid var(--slate);
     }
-    
+
     .modal-btn.secondary:hover {
-      background-color: #fff3e9;
+      background-color: var(--sand);
     }
-    
+
     /* ============================================================================
        TOAST NOTIFICATIONS
        ============================================================================ */
-    
+
     .toast {
       position: fixed;
       bottom: 32px;
       right: 32px;
-      background-color: #436481;
-      color: #fff3e9;
+      background-color: var(--slate-dark);
+      color: #f2ede7;
       padding: 16px 24px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(50,52,58,.18);
       z-index: 10000;
       opacity: 0;
       transform: translateY(20px);
@@ -837,16 +878,17 @@
       font-size: 14px;
       font-weight: 600;
     }
-    
+
     .toast.show {
       opacity: 1;
       transform: translateY(0);
     }
-    
+
     .toast.error {
-      background-color: #d9534f;
+      background-color: #a33b2e;
     }
   </style>
+
 </head>
 <body>
   <!-- SIDEBAR -->
@@ -856,15 +898,15 @@
     </div>
     <nav class="sidebar-nav">
       <a href="dashboard.html" class="sidebar-nav-item">
-        <span>🏠</span>
+        <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></span>
         <span>Dashboard</span>
       </a>
-      <a href="cases.html" class="sidebar-nav-item active">
-        <span>📋</span>
+      <a href="dashboard.html" class="sidebar-nav-item active">
+        <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg></span>
         <span>All Cases</span>
       </a>
-      <a href="manage-accounts.html" class="sidebar-nav-item">
-        <span>👥</span>
+      <a href="dashboard.html" class="sidebar-nav-item">
+        <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3.5 3.5 0 0 1 0 6.6M21 20c0-2.6-1.6-4.8-3.9-5.7"/></svg></span>
         <span>Manage Accounts</span>
       </a>
     </nav>
@@ -873,7 +915,7 @@
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
-      <a href="cases.html" class="topbar-back-btn">
+      <a href="dashboard.html" class="topbar-back-btn">
         <span>←</span>
         <span>Back to Cases</span>
       </a>
@@ -953,23 +995,18 @@
           <h2 class="support-panel-title">Support Actions</h2>
           <div class="support-actions">
             <button class="support-action-btn" onclick="openReassignEditorModal()">
-              <span>✏️</span>
               <span>Reassign Editor</span>
             </button>
             <button class="support-action-btn" onclick="openReassignQCModal()">
-              <span>🔍</span>
               <span>Reassign QC</span>
             </button>
             <button class="support-action-btn danger" onclick="pushToRevision()">
-              <span>🔄</span>
               <span>Push to Revision</span>
             </button>
             <button class="support-action-btn" onclick="regenerateFamilyLink()">
-              <span>🔗</span>
               <span>Regenerate Family Link</span>
             </button>
             <button class="support-action-btn" onclick="resendFamilyLink()">
-              <span>📧</span>
               <span>Resend Family Link</span>
             </button>
           </div>
@@ -1114,7 +1151,7 @@
         
         if (!currentCaseId) {
           alert('No case ID provided');
-          window.location.href = 'cases.html';
+          window.location.href = 'dashboard.html';
           return;
         }
         
@@ -1219,7 +1256,7 @@
         const hours = Math.floor(c.sla_hours_elapsed || 0);
         slaContainer.innerHTML = `<div class="sla-badge ${c.sla_state}">${hours}h elapsed</div>`;
       } else {
-        slaContainer.innerHTML = '<div class="sla-badge" style="background-color: #e9ecef; color: #6c757d; border-color: #6c757d;">No SLA</div>';
+        slaContainer.innerHTML = '<div class="sla-badge" style="background-color: #edf2f7; color: #436481; border-color: rgba(67,100,129,.35);">No SLA</div>';
       }
       
       // Meta information
@@ -1254,7 +1291,7 @@
       document.getElementById('caseMeta').innerHTML = `
         <div class="meta-item">
           <span class="meta-label">Funeral Home</span>
-          <span class="meta-value">🏢 ${c.organizations?.name || 'Unknown'}</span>
+          <span class="meta-value">${c.organizations?.name || 'Unknown'}</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Status</span>
@@ -1619,12 +1656,12 @@
     
     function formatRoleBadge(role) {
       const badges = {
-        'admin': '👑 Admin',
-        'director': '👔 Director',
-        'family': '👨‍👩‍👧 Family',
-        'editor': '✏️ Editor',
-        'qc': '🔍 QC',
-        'service_role': '⚙️ System'
+        'admin': 'Admin',
+        'director': 'Director',
+        'family': 'Family',
+        'editor': 'Editor',
+        'qc': 'QC',
+        'service_role': 'System'
       };
       return badges[role] ? `<span class="role-badge">${badges[role]}</span>` : '';
     }
@@ -1686,7 +1723,7 @@
             
             html += `
               <div class="asset-item" onclick="window.open('${imageUrl}', '_blank')">
-                <img src="${imageUrl}" alt="Asset" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'padding: 20px; text-align: center;\\'>❌ Error loading image</div>'">
+                <img src="${imageUrl}" alt="Asset" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'padding: 20px; text-align: center;\\'>Error loading image</div>'">
               </div>
             `;
           });

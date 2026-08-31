@@ -5,7 +5,7 @@
   <meta name="google" content="notranslate">
   <title>QC Portal - Memorio</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="../css/normalize.css" rel="stylesheet" type="text/css">
   <link href="../css/webflow.css" rel="stylesheet" type="text/css">
   <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
@@ -16,6 +16,24 @@
   <script src="../js/i18n.js"></script>
   
   <style>
+    :root {
+      --paper: #fffbf7;
+      --cream: #fff3e9;
+      --sand: #f4e8de;
+      --ink: #32343a;
+      --ink-soft: #565a63;
+      --slate: #436481;
+      --slate-deep: #38536b;
+      --slate-dark: #2c4459;
+      --sky: #6ca7d3;
+    }
+
+    body.body {
+      background-color: var(--paper);
+      font-family: 'Public Sans', Arial, sans-serif;
+      color: var(--ink);
+    }
+
     /* Language Toggle Styling */
     .lang-toggle {
       position: fixed;
@@ -27,10 +45,10 @@
       padding: 7px 13px 7px 10px;
       font-size: 12px;
       font-weight: 700;
-      color: #436481;
+      color: var(--slate);
       background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(67, 100, 129, 0.22);
-      border-radius: 100px;
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 999px;
       cursor: pointer;
       transition: background 0.15s ease, border-color 0.15s ease;
       letter-spacing: 0.5px;
@@ -39,6 +57,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      font-family: 'Public Sans', Arial, sans-serif;
     }
     .lang-toggle:hover {
       background: rgba(67, 100, 129, 0.1);
@@ -46,7 +65,7 @@
     }
     .lang-toggle svg { opacity: 0.55; flex-shrink: 0; }
     .lang-toggle:hover svg { opacity: 0.85; }
-    
+
     .login-container {
       min-height: 100vh;
       display: flex;
@@ -56,106 +75,112 @@
     }
 
     .login-box {
-      background-color: #fff3e9;
-      border: 3px solid #436481;
-      border-radius: 20px;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 12px;
       padding: 48px;
       max-width: 500px;
       width: 100%;
-      box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 24px -12px rgba(44, 68, 89, 0.18);
     }
-    
+
     .login-title {
-      color: #32343a;
+      color: var(--ink);
       text-align: center;
-      font-size: 32px;
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 34px;
       font-weight: 600;
       margin-bottom: 10px;
     }
-    
+
     .login-subtitle {
-      color: #32343a;
+      color: var(--ink-soft);
       text-align: center;
       font-size: 16px;
       margin-bottom: 30px;
     }
-    
+
     .error-message {
-      background-color: #ffebee;
-      border: 1px solid #ef5350;
-      color: #c62828;
+      background-color: #fbe9e6;
+      border: 1px solid rgba(163, 59, 46, 0.35);
+      color: #a33b2e;
       padding: 12px;
       border-radius: 8px;
       margin-bottom: 20px;
       font-size: 14px;
       display: none;
     }
-    
+
     .success-message {
-      background-color: #e8f5e9;
-      border: 1px solid #66bb6a;
-      color: #2e7d32;
+      background-color: #e7f3ec;
+      border: 1px solid rgba(29, 107, 69, 0.35);
+      color: #1d6b45;
       padding: 12px;
       border-radius: 8px;
       margin-bottom: 20px;
       font-size: 14px;
       display: none;
     }
-    
+
     .form-group {
       margin-bottom: 20px;
     }
-    
+
     .form-label {
       display: block;
-      color: #32343a;
+      color: var(--ink);
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 8px;
     }
-    
+
     .form-input {
       width: 100%;
       padding: 12px;
-      border: 2px solid #436481;
+      border: 1px solid rgba(67, 100, 129, 0.35);
       border-radius: 8px;
       font-size: 16px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       background-color: #ffffff;
       box-sizing: border-box;
     }
-    
+
     .form-input:focus {
       outline: none;
-      border-color: #1e3a52;
+      border-color: var(--slate);
+      box-shadow: 0 0 0 3px rgba(108, 167, 211, 0.25);
     }
-    
+
     .btn-login {
       width: 100%;
       padding: 14px;
-      background-color: #436481;
+      background-color: var(--slate);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 999px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
-      transition: background-color 0.2s;
+      font-family: 'Public Sans', Arial, sans-serif;
+      transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
-    
+
     .btn-login:hover {
-      background-color: #1e3a52;
+      background-color: var(--slate-deep);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -10px rgba(44, 68, 89, 0.45);
     }
-    
+
     .btn-login:disabled {
       background-color: #9ca3af;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
-    
+
     .help-text {
       text-align: center;
-      color: #666;
+      color: var(--ink-soft);
       font-size: 14px;
       margin-top: 20px;
     }
@@ -334,7 +359,7 @@
       // Check rate limiting
       const rateCheck = checkRateLimit(email);
       if (!rateCheck.allowed) {
-        errorMessage.textContent = '🔒 ' + rateCheck.message;
+        errorMessage.textContent = rateCheck.message;
         errorMessage.style.display = 'block';
         return;
       }

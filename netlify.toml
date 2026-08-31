@@ -100,7 +100,7 @@
 
 [[redirects]]
   from = "/admin/cases"
-  to = "/m-admin-3k5a/cases.html"
+  to = "/m-admin-3k5a/dashboard.html"
   status = 200
 
 [[redirects]]
@@ -110,7 +110,7 @@
 
 [[redirects]]
   from = "/admin/accounts"
-  to = "/m-admin-3k5a/manage-accounts.html"
+  to = "/m-admin-3k5a/dashboard.html"
   status = 200
 
 [[redirects]]

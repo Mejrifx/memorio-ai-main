@@ -5,8 +5,8 @@
   <meta name="google" content="notranslate">
   <title>Director Dashboard - Memorio</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  <!-- Preload Dosis font -->
-  <link rel="preload" href="../fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <!-- Memorio design system fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="../css/normalize.css" rel="stylesheet" type="text/css">
   <link href="../css/webflow.css" rel="stylesheet" type="text/css">
   <link href="../css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
@@ -22,17 +22,28 @@
        Apple-inspired, shadcn aesthetic
        ============================================================================ */
     :root {
+      /* Memorio design system tokens */
+      --paper: #fffbf7;
+      --cream: #fff3e9;
+      --sand: #f4e8de;
+      --ink: #32343a;
+      --ink-soft: #565a63;
+      --slate: #436481;
+      --slate-deep: #38536b;
+      --slate-dark: #2c4459;
+      --sky: #6ca7d3;
+      
       /* Colors - Memorio Brand Palette */
-      --color-primary: #436481;
-      --color-primary-hover: #1e3a52;
-      --color-primary-light: #6ca7d3;
-      --color-background: #f2eadd;
-      --color-surface: #fff3e9;
-      --color-surface-hover: #f4e8de;
-      --color-text: #32343a;
-      --color-text-muted: rgba(50, 52, 58, 0.6);
-      --color-border: #436481;
-      --color-border-light: rgba(67, 100, 129, 0.2);
+      --color-primary: var(--slate);
+      --color-primary-hover: var(--slate-deep);
+      --color-primary-light: var(--sky);
+      --color-background: var(--paper);
+      --color-surface: var(--cream);
+      --color-surface-hover: var(--sand);
+      --color-text: var(--ink);
+      --color-text-muted: var(--ink-soft);
+      --color-border: var(--slate);
+      --color-border-light: rgba(67, 100, 129, 0.18);
       
       /* Spacing System (4px base) */
       --space-1: 0.25rem;  /* 4px */
@@ -49,8 +60,8 @@
       /* Border Radius */
       --radius-sm: 6px;
       --radius-md: 10px;
-      --radius-lg: 16px;
-      --radius-xl: 24px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
       --radius-full: 9999px;
       
       /* Shadows (Apple-style subtle) */
@@ -60,7 +71,8 @@
       --shadow-xl: 0 20px 25px -5px rgba(67, 100, 129, 0.1), 0 10px 10px -5px rgba(67, 100, 129, 0.04);
       
       /* Typography (Apple System Fonts) */
-      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+      --font-sans: 'Public Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+      --font-serif: 'Newsreader', Georgia, "Times New Roman", serif;
       --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
       
       /* Transitions */
@@ -163,7 +175,7 @@
       transition: all var(--transition-fast);
       cursor: pointer;
       background: transparent;
-      border: 1.5px solid transparent;
+      border: 1px solid transparent;
     }
     
     .topbar-nav-item:hover {
@@ -262,7 +274,7 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+      background: var(--slate);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -322,7 +334,7 @@
       color: var(--color-text);
       background: rgba(255, 255, 255, 0.88);
       border: 1px solid rgba(67, 100, 129, 0.18);
-      border-radius: 100px;
+      border-radius: 999px;
       cursor: pointer;
       transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
       letter-spacing: 0.5px;
@@ -402,11 +414,12 @@
     }
     
     .page-title {
-      font-size: 32px;
-      font-weight: 600;
+      font-family: var(--font-serif);
+      font-size: 34px;
+      font-weight: 500;
       color: var(--color-text);
       margin: 0 0 var(--space-2) 0;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.2px;
     }
     
     .page-description {
@@ -439,11 +452,12 @@
     }
     
     .card-title {
-      font-size: 18px;
-      font-weight: 600;
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
       color: var(--color-text);
       margin: 0;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.1px;
     }
     
     .card-description {
@@ -475,7 +489,7 @@
       font-weight: 500;
       line-height: 1;
       white-space: nowrap;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-full);
       transition: all var(--transition-fast);
       cursor: pointer;
       border: 1px solid transparent;
@@ -517,14 +531,14 @@
     .btn-primary:hover:not(:disabled) {
       background-color: var(--color-primary-hover);
       border-color: var(--color-primary-hover);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -10px rgba(44, 68, 89, 0.45);
     }
     
     .btn-secondary {
       background-color: transparent;
-      color: var(--color-text);
-      border-color: var(--color-border);
+      color: var(--slate);
+      border-color: var(--slate);
     }
     
     .btn-secondary:hover:not(:disabled) {
@@ -545,16 +559,16 @@
     }
     
     .btn-danger {
-      background-color: #dc2626;
+      background-color: #a33b2e;
       color: white;
-      border-color: #dc2626;
+      border-color: #a33b2e;
     }
     
     .btn-danger:hover:not(:disabled) {
-      background-color: #b91c1c;
-      border-color: #b91c1c;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
+      background-color: #8d3327;
+      border-color: #8d3327;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px -10px rgba(163, 59, 46, 0.4);
     }
     
     /* Badge Component */
@@ -590,27 +604,27 @@
     }
     
     .badge-success {
-      background-color: rgba(34, 197, 94, 0.1);
-      color: #15803d;
-      border: 1px solid rgba(34, 197, 94, 0.2);
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border: 1px solid rgba(29, 107, 69, 0.25);
     }
     
     .badge-warning {
-      background-color: rgba(251, 146, 60, 0.1);
-      color: #c2410c;
-      border: 1px solid rgba(251, 146, 60, 0.2);
+      background-color: #fdf0dd;
+      color: #9a5b00;
+      border: 1px solid rgba(154, 91, 0, 0.25);
     }
     
     .badge-danger {
-      background-color: rgba(239, 68, 68, 0.1);
-      color: #dc2626;
-      border: 1px solid rgba(239, 68, 68, 0.2);
+      background-color: #fbe9e6;
+      color: #a33b2e;
+      border: 1px solid rgba(163, 59, 46, 0.25);
     }
     
     .badge-info {
-      background-color: rgba(59, 130, 246, 0.1);
-      color: #1d4ed8;
-      border: 1px solid rgba(59, 130, 246, 0.2);
+      background-color: #edf2f7;
+      color: #436481;
+      border: 1px solid rgba(67, 100, 129, 0.25);
     }
     
     /* Input Component */
@@ -772,8 +786,8 @@
        SUCCESS/ERROR BOXES - MODERN DESIGN
        ============================================================================ */
     .success-box {
-      background-color: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
+      background-color: #e7f3ec;
+      border: 1px solid rgba(29, 107, 69, 0.3);
       border-radius: var(--radius-lg);
       padding: var(--space-5);
       margin-top: var(--space-5);
@@ -781,7 +795,7 @@
     }
     
     .success-box h3 {
-      color: #15803d;
+      color: #1d6b45;
       margin: 0 0 var(--space-3) 0;
       font-size: 16px;
       font-weight: 600;
@@ -794,14 +808,14 @@
       width: 20px;
       height: 20px;
       display: inline-block;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2315803d'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231d6b45'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
     }
     
     .success-box p {
-      color: #15803d;
+      color: #1d6b45;
       margin: 0 0 var(--space-4) 0;
       font-size: 14px;
     }
@@ -835,7 +849,7 @@
       background-color: var(--color-primary);
       color: white;
       border: none;
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-full);
       padding: var(--space-1) var(--space-3);
       font-size: 11px;
       font-weight: 500;
@@ -851,11 +865,11 @@
     }
     
     .error-box {
-      background-color: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      background-color: #fbe9e6;
+      border: 1px solid rgba(163, 59, 46, 0.3);
       border-radius: var(--radius-lg);
       padding: var(--space-4);
-      color: #dc2626;
+      color: #a33b2e;
       margin-top: var(--space-5);
       display: none;
       font-weight: 500;
@@ -952,8 +966,9 @@
     }
     
     .case-empty-state-title {
-      font-size: 18px;
-      font-weight: 600;
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 500;
       color: var(--color-text);
       margin: 0 0 var(--space-2) 0;
     }
@@ -973,8 +988,8 @@
     }
     
     .case-card {
-      background-color: #f4e8de;
-      border: 2px solid #436481;
+      background-color: var(--cream);
+      border: 1px solid rgba(67, 100, 129, 0.18);
       border-radius: 12px;
       padding: 20px;
       cursor: pointer;
@@ -1006,21 +1021,21 @@
     }
     
     .status-created {
-      background-color: #fff3e0;
-      color: #e65100;
-      border: 1px solid #e65100;
+      background-color: #fdf0dd;
+      color: #9a5b00;
+      border: 1px solid rgba(154, 91, 0, 0.35);
     }
     
     .status-waiting {
-      background-color: #e3f2fd;
-      color: #01579b;
-      border: 1px solid #01579b;
+      background-color: #edf2f7;
+      color: #436481;
+      border: 1px solid rgba(67, 100, 129, 0.35);
     }
     
     .status-submitted {
-      background-color: #e8f5e9;
-      color: #1b5e20;
-      border: 1px solid #1b5e20;
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border: 1px solid rgba(29, 107, 69, 0.35);
     }
     
     .case-meta {
@@ -1044,34 +1059,34 @@
     }
     
     .sla-badge.green {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-      border: 1px solid #66bb6a;
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border: 1px solid rgba(29, 107, 69, 0.35);
     }
     
     .sla-badge.orange {
-      background-color: #fff3e0;
-      color: #e65100;
-      border: 1px solid #ff9800;
+      background-color: #fdf0dd;
+      color: #9a5b00;
+      border: 1px solid rgba(154, 91, 0, 0.35);
     }
     
     .sla-badge.red {
-      background-color: #ffebee;
-      color: #c62828;
-      border: 1px solid #ef5350;
+      background-color: #fbe9e6;
+      color: #a33b2e;
+      border: 1px solid rgba(163, 59, 46, 0.35);
     }
     
     .sla-badge.black {
-      background-color: #212121;
-      color: #ffffff;
-      border: 1px solid #000000;
+      background-color: #2c4459;
+      color: #f2ede7;
+      border: 1px solid #2c4459;
       font-weight: 700;
     }
     
     .sla-badge.waiting {
-      background-color: #f5f5f5;
-      color: #757575;
-      border: 1px solid #e0e0e0;
+      background-color: #edf2f7;
+      color: #565a63;
+      border: 1px solid rgba(67, 100, 129, 0.25);
     }
     
     /* ============================================================================
@@ -1128,10 +1143,11 @@
     
     .modal-title {
       color: var(--color-text);
-      font-size: 20px;
-      font-weight: 600;
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 500;
       margin: 0;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.1px;
     }
     
     .modal-close {
@@ -1203,8 +1219,9 @@
     
     .modal-section-title {
       color: var(--color-text);
-      font-size: 16px;
-      font-weight: 600;
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 500;
       margin-bottom: var(--space-4);
       display: flex;
       align-items: center;
@@ -1278,7 +1295,7 @@
       background-color: var(--color-primary);
       color: white;
       border: none;
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius-full);
       padding: var(--space-2) var(--space-3);
       font-size: 12px;
       font-weight: 500;
@@ -1305,9 +1322,6 @@
       border-radius: var(--radius-md);
       padding: var(--space-3);
     }
-      border-radius: 8px;
-      padding: 12px;
-    }
     
     .credential-value.blurred {
       filter: blur(8px);
@@ -1321,11 +1335,12 @@
       position: fixed;
       top: 90px;
       right: 20px;
-      background-color: #28a745;
-      color: white;
+      background-color: #e7f3ec;
+      color: #1d6b45;
+      border: 1px solid rgba(29, 107, 69, 0.3);
       padding: 14px 24px;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 12px rgba(50, 52, 58, 0.12);
       z-index: 3000;
       font-size: 14px;
       font-weight: 600;
@@ -1340,7 +1355,9 @@
     }
     
     .toast.error {
-      background-color: #dc3545;
+      background-color: #fbe9e6;
+      color: #a33b2e;
+      border-color: rgba(163, 59, 46, 0.35);
     }
     
     /* ============================================================================
@@ -1750,7 +1767,7 @@
        ============================================================================ -->
   <div id="password-change-modal" class="modal-overlay" style="display: none; z-index: 9999;">
     <div class="modal-content" style="max-width: 500px;">
-      <div class="modal-header" style="border-bottom: 2px solid #436481;">
+      <div class="modal-header" style="border-bottom: 1px solid rgba(67, 100, 129, 0.18);">
         <h2 class="modal-title" data-i18n="director.changePassword">Change Your Password</h2>
       </div>
       
@@ -1902,16 +1919,17 @@
           <span data-i18n="director.obituaryDraft">Obituary Draft</span>
         </h3>
         <div style="
-          background-color: #f4e8de;
-          border: 1.5px solid #436481;
+          background-color: #fffbf7;
+          border: 1px solid rgba(67, 100, 129, 0.18);
           border-radius: 8px;
           padding: 20px;
           max-height: 400px;
           overflow-y: auto;
         ">
           <div id="obituary-content" style="
-            font-size: 15px;
-            line-height: 1.8;
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: 16px;
+            line-height: 1.7;
             color: #32343a;
           ">
             <!-- Obituary HTML will be inserted here -->
@@ -1941,11 +1959,11 @@
         <!-- Upload Area -->
         <div id="director-upload-area" style="margin-bottom: 20px;">
           <div style="
-            border: 2px dashed #436481;
+            border: 1px dashed rgba(67, 100, 129, 0.45);
             border-radius: 8px;
             padding: 24px;
             text-align: center;
-            background-color: #f4e8de;
+            background-color: #fffbf7;
           ">
             <input type="file" id="director-photo-input" accept="image/*" multiple style="display: none;">
             <button class="btn btn-primary" onclick="document.getElementById('director-photo-input').click()" id="director-upload-btn">
@@ -1971,7 +1989,7 @@
         <div id="director-gallery-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.96); z-index: 99999; overflow-y: auto;" onclick="handleDirectorGalleryBackdrop(event)">
           <div style="position: relative; min-height: 100vh; padding: 64px 20px 40px;">
             <button onclick="closeDirectorGallery()" type="button" style="position: fixed; top: 16px; right: 16px; background: rgba(255,255,255,0.15); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-size: 26px; line-height: 1; z-index: 100000;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">&times;</button>
-            <h3 id="director-gallery-title" style="color: white; text-align: center; margin: 0 0 28px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 22px; font-weight: 600;"></h3>
+            <h3 id="director-gallery-title" style="color: white; text-align: center; margin: 0 0 28px; font-family: 'Newsreader', Georgia, serif; font-size: 24px; font-weight: 500;"></h3>
             <div id="director-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; max-width: 1400px; margin: 0 auto;"></div>
           </div>
         </div>
@@ -1980,14 +1998,14 @@
       <!-- Delivered Banner (Only shown when case is delivered) -->
       <div id="delivered-banner" style="display: none; margin-bottom: 24px;">
         <div style="
-          background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+          background: #e7f3ec;
+          border: 1px solid rgba(29, 107, 69, 0.3);
           border-radius: 12px;
           padding: 24px;
           text-align: center;
-          color: white;
-          box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+          color: #1d6b45;
         ">
-          <h3 style="font-size: 22px; font-weight: 700; margin: 0 0 8px 0;" data-i18n="director.memorialComplete">
+          <h3 style="font-family: 'Newsreader', Georgia, serif; font-size: 24px; font-weight: 500; margin: 0 0 8px 0;" data-i18n="director.memorialComplete">
             Memorial Complete
           </h3>
           <p style="font-size: 16px; margin: 0; opacity: 0.95;" data-i18n="director.memorialDelivered">
@@ -2041,14 +2059,14 @@
     <div class="modal-content" style="max-width: 460px;">
       <div class="modal-header" style="border-bottom: 1px solid var(--color-border); padding: 24px 28px 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 40px; height: 40px; border-radius: 50%; background: #fee2e2; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: #fbe9e6; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a33b2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
               <line x1="12" y1="9" x2="12" y2="13"/>
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
           </div>
-          <h2 class="modal-title" id="confirm-modal-title" style="font-size: 17px; font-weight: 600; margin: 0;">Confirm Action</h2>
+          <h2 class="modal-title" id="confirm-modal-title" style="font-size: 19px; font-weight: 500; margin: 0;">Confirm Action</h2>
         </div>
       </div>
       
@@ -2489,7 +2507,7 @@
         if (btn) {
           const originalText = btn.textContent;
           btn.textContent = 'Copied!';
-          btn.style.backgroundColor = '#28a745';
+          btn.style.backgroundColor = '#1d6b45';
           setTimeout(() => {
             btn.textContent = originalText;
             btn.style.backgroundColor = '';
@@ -2717,8 +2735,8 @@
               ${extra > 0 ? `<div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.75); color: white; padding: 5px 10px; border-radius: 20px; font-size: 13px; font-weight: 700;">+${extra}</div>` : ''}
             </div>
             <div>
-              <span style="font-size: 13px; font-weight: 700; color: #436481; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">${images.length} photo${images.length !== 1 ? 's' : ''} uploaded</span><br>
-              <span style="font-size: 12px; color: #999; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Click to view all</span>
+              <span style="font-size: 13px; font-weight: 700; color: #436481; font-family: 'Public Sans', Arial, sans-serif;">${images.length} photo${images.length !== 1 ? 's' : ''} uploaded</span><br>
+              <span style="font-size: 12px; color: #999; font-family: 'Public Sans', Arial, sans-serif;">Click to view all</span>
             </div>
           </div>
         `;
@@ -2775,8 +2793,8 @@
           // Window expired
           directorPhotosAccessLocked = true;
           timerBanner.innerHTML = `
-            <div style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 16px; border-radius: 8px; text-align: center;">
-              <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">⏰ Upload Window Closed</div>
+            <div style="background: #fdf0dd; border: 1px solid rgba(154, 91, 0, 0.25); color: #9a5b00; padding: 16px; border-radius: 8px; text-align: center;">
+              <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">Upload Window Closed</div>
               <div style="font-size: 14px;">The 12-hour upload window has expired</div>
             </div>
           `;
@@ -2797,8 +2815,8 @@
           const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
           
           timerBanner.innerHTML = `
-            <div style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; padding: 16px; border-radius: 8px; text-align: center;">
-              <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">⏰ Upload Window Active</div>
+            <div style="background: #edf2f7; border: 1px solid rgba(67, 100, 129, 0.25); color: #38536b; padding: 16px; border-radius: 8px; text-align: center;">
+              <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">Upload Window Active</div>
               <div style="font-size: 24px; font-weight: 700; font-family: 'Courier New', monospace; margin: 8px 0;">
                 ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}
               </div>
@@ -3379,7 +3397,7 @@
       if (['created', 'waiting_on_family', 'intake_in_progress'].includes(status)) {
         return {
           label: 'Waiting on Family',
-          color: '#6b7280', // Grey
+          color: '#565a63', // Neutral grey
           icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>'
         };
       }
@@ -3388,7 +3406,7 @@
       if (['submitted', 'in_production'].includes(status)) {
         return {
           label: 'In Progress',
-          color: '#2196f3', // Blue
+          color: '#436481', // Slate
           icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline></svg>'
         };
       }
@@ -3397,7 +3415,7 @@
       if (status === 'awaiting_review' && cooldownMap[caseId]) {
         return {
           label: 'Delivery In Progress',
-          color: '#0ea5e9', // Sky blue
+          color: '#436481', // Slate
           icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><rect x="1" y="3" width="15" height="13" rx="1"></rect><path d="M16 8h4l3 5v3h-7V8z"></path><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>'
         };
       }
@@ -3406,7 +3424,7 @@
       if (['awaiting_review', 'revision_requested'].includes(status)) {
         return {
           label: 'Awaiting Review',
-          color: '#9c27b0', // Purple
+          color: '#436481', // Slate
           icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
         };
       }
@@ -3415,7 +3433,7 @@
       if (['delivered', 'closed'].includes(status)) {
         return {
           label: 'Complete',
-          color: '#4caf50', // Green
+          color: '#1d6b45', // Green
           icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="20,6 9,17 4,12"></polyline></svg>'
         };
       }
@@ -3423,7 +3441,7 @@
       // Fallback
       return {
         label: status.replace(/_/g, ' '),
-        color: '#9e9e9e', // Grey
+        color: '#565a63', // Neutral grey
         icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
       };
     }
@@ -3432,22 +3450,22 @@
       const statusConfig = {
         'in_production': { 
           text: 'Editor Working', 
-          color: '#9c27b0',
+          color: '#436481',
           icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline></svg>'
         },
         'awaiting_review': { 
           text: 'Pending QC', 
-          color: '#ff9800',
+          color: '#9a5b00',
           icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12,6 12,12 16,14"></polyline></svg>'
         },
         'revision_requested': { 
           text: 'Revision Needed', 
-          color: '#f44336',
+          color: '#a33b2e',
           icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="23,4 23,10 17,10"></polyline><polyline points="1,20 1,14 7,14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>'
         },
         'delivered': { 
           text: 'Delivered', 
-          color: '#4caf50',
+          color: '#1d6b45',
           icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="20,6 9,17 4,12"></polyline></svg>'
         }
       };
@@ -3458,7 +3476,7 @@
       return `
         <div style="
           background-color: ${config.color}15;
-          border: 1.5px solid ${config.color};
+          border: 1px solid ${config.color};
           color: ${config.color};
           padding: 6px 12px;
           border-radius: 20px;
@@ -3528,7 +3546,7 @@
     function getSLABadge(caseData) {
       // If case is delivered or closed, show completion badge
       if (caseData.status === 'delivered' || caseData.status === 'closed') {
-        return '<span class="badge badge-success"><span class="badge-dot" style="background-color: #15803d;"></span>Delivered</span>';
+        return '<span class="badge badge-success"><span class="badge-dot" style="background-color: #1d6b45;"></span>Delivered</span>';
       }
       
       // If no submission yet (waiting on family), show waiting badge
@@ -3549,22 +3567,22 @@
         // Success: < 24 hours
         badgeVariant = 'success';
         badgeText = `${hours} Hour(s)`;
-        dotColor = '#15803d';
+        dotColor = '#1d6b45';
       } else if (hoursElapsed < 36) {
         // Warning: 24-36 hours
         badgeVariant = 'warning';
         badgeText = `${hours} Hour(s)`;
-        dotColor = '#c2410c';
+        dotColor = '#9a5b00';
       } else if (hoursElapsed < 48) {
         // Danger: 36-48 hours
         badgeVariant = 'danger';
         badgeText = `${hours} Hour(s)`;
-        dotColor = '#dc2626';
+        dotColor = '#a33b2e';
       } else {
         // Danger: 48+ hours (BREACH)
         badgeVariant = 'danger';
         badgeText = `${hours} Hour(s) • BREACH`;
-        dotColor = '#dc2626';
+        dotColor = '#a33b2e';
       }
       
       return `<span class="badge badge-${badgeVariant}"><span class="badge-dot" style="background-color: ${dotColor};"></span>${badgeText}</span>`;

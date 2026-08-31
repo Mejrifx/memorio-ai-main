@@ -2,6 +2,7 @@
 // Sends emails using Resend API (fallback to SMTP if configured)
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createSupabaseClient, verifyAuth } from '../_shared/supabase-client.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,6 +22,29 @@ serve(async (req) => {
   }
 
   try {
+    // SECURITY: this function previously accepted unauthenticated requests, making it an
+    // open relay from support@memorio.ai. It now requires a signed-in staff user.
+    const authHeader = req.headers.get('Authorization');
+    const { user, error: authError } = await verifyAuth(authHeader);
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const adminClient = createSupabaseClient();
+    const { data: caller } = await adminClient
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (!caller || !['admin', 'director'].includes(caller.role)) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Forbidden: staff only' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { to, subject, html, from } = await req.json() as EmailRequest;
 
     if (!to || !subject || !html) {

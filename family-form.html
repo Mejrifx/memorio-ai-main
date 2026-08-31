@@ -5,8 +5,7 @@
   <meta name="google" content="notranslate">
   <title>MEMORIO FORMS</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
-  <!-- Preload Dosis font to prevent FOUC -->
-  <link rel="preload" href="/fonts/Dosis-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="/css/normalize.css" rel="stylesheet" type="text/css">
   <link href="/css/webflow.css" rel="stylesheet" type="text/css">
   <link href="/css/memorio-forms.webflow.css" rel="stylesheet" type="text/css">
@@ -25,6 +24,14 @@
   
   <!-- Hide form content initially to prevent flashing -->
   <style>
+    body {
+      font-family: 'Public Sans', Arial, sans-serif;
+    }
+
+    h1, h2 {
+      font-family: 'Newsreader', Georgia, serif;
+    }
+
     .form-container, .form-wrapper, .w-form {
       display: none !important;
     }
@@ -109,8 +116,8 @@
     
     .modal-content {
       background-color: #fff3e9;
-      border: 3px solid #436481;
-      border-radius: 20px;
+      border: 1px solid rgba(67, 100, 129, 0.18);
+      border-radius: 12px;
       padding: 32px;
       max-width: 600px;
       width: 90%;
@@ -124,7 +131,7 @@
       align-items: center;
       margin-bottom: 24px;
       padding-bottom: 16px;
-      border-bottom: 2px solid #436481;
+      border-bottom: 1px solid rgba(67, 100, 129, 0.18);
     }
     
     .modal-title {
@@ -132,7 +139,7 @@
       font-size: 24px;
       font-weight: 600;
       margin: 0;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Newsreader', Georgia, serif;
     }
     
     .form-group {
@@ -148,14 +155,14 @@
       margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
     }
     
     .form-input {
       padding: 12px 16px;
-      border: 1.5px solid #436481;
+      border: 1px solid rgba(67, 100, 129, 0.35);
       border-radius: 8px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       font-size: 15px;
       background-color: #f2eadd;
       color: #32343a;
@@ -174,12 +181,12 @@
     }
     
     .btn-primary {
-      background-color: #32343a;
-      color: #f2eadd;
-      border: 1.5px solid #32343a;
-      border-radius: 60px;
+      background-color: #436481;
+      color: #ffffff;
+      border: 1px solid #436481;
+      border-radius: 999px;
       padding: 14px 32px;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
       font-size: 14px;
       font-weight: 600;
       text-transform: uppercase;
@@ -189,10 +196,10 @@
     }
     
     .btn-primary:hover {
-      background-color: #6ca7d3;
-      border-color: #6ca7d3;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(108, 167, 211, 0.3);
+      background-color: #38536b;
+      border-color: #38536b;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -10px rgba(44, 68, 89, 0.45);
     }
     
     .btn-primary:disabled {
@@ -202,15 +209,15 @@
     }
     
     .error-box {
-      background-color: #ffebee;
-      border: 2px solid #ef5350;
+      background-color: #fbe9e6;
+      border: 1px solid rgba(163, 59, 46, 0.35);
       border-radius: 12px;
       padding: 15px;
-      color: #c62828;
+      color: #a33b2e;
       margin-bottom: 16px;
       display: none;
       font-weight: 500;
-      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+      font-family: 'Public Sans', Arial, sans-serif;
     }
     
     @keyframes modalFadeIn {
@@ -226,7 +233,7 @@
     
     /* Password change success modal button hover effect */
     #passwordChangeProceedBtn:hover {
-      background-color: #355a6f !important;
+      background-color: #38536b !important;
     }
     
     #passwordChangeProceedBtn:active {
@@ -259,38 +266,38 @@
   <!-- Login Modal -->
   <div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
     <div style="background-color: #fff3e9; border: 3px solid #436481; border-radius: 20px; padding: 48px; max-width: 500px; width: 90%; box-shadow: 0 2px 8px -2px rgba(0,0,0,0.2);">
-      <h1 style="color: #32343a; text-align: center; font-size: 32px; font-weight: 600; margin-bottom: 10px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Family Portal</h1>
-      <p style="color: #32343a; text-align: center; font-size: 16px; margin-bottom: 30px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Sign in to complete your obituary form</p>
+      <h1 style="color: #32343a; text-align: center; font-size: 32px; font-weight: 600; margin-bottom: 10px; font-family: 'Newsreader', Georgia, serif;">Family Portal</h1>
+      <p style="color: #32343a; text-align: center; font-size: 16px; margin-bottom: 30px; font-family: 'Public Sans', Arial, sans-serif;">Sign in to complete your obituary form</p>
       
-      <div id="loginError" style="display: none; background-color: #ffebee; border: 1px solid #ef5350; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;"></div>
+      <div id="loginError" style="display: none; background-color: #ffebee; border: 1px solid #ef5350; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-family: 'Public Sans', Arial, sans-serif;"></div>
       
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div style="margin-bottom: 20px;">
-          <label style="display: block; color: #32343a; font-size: 14px; font-weight: 600; margin-bottom: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Email Address</label>
+          <label style="display: block; color: #32343a; font-size: 14px; font-weight: 600; margin-bottom: 8px; font-family: 'Public Sans', Arial, sans-serif;">Email Address</label>
           <input type="email" 
                  id="loginEmail" 
-                 style="width: 100%; padding: 12px; border: 2px solid #436481; border-radius: 8px; font-size: 16px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; background-color: #ffffff; box-sizing: border-box;"
+                 style="width: 100%; padding: 12px; border: 2px solid #436481; border-radius: 8px; font-size: 16px; font-family: 'Public Sans', Arial, sans-serif; background-color: #ffffff; box-sizing: border-box;"
                  placeholder="Enter your email"
                  required>
         </div>
         
         <div style="margin-bottom: 20px;">
-          <label style="display: block; color: #32343a; font-size: 14px; font-weight: 600; margin-bottom: 8px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">Password</label>
+          <label style="display: block; color: #32343a; font-size: 14px; font-weight: 600; margin-bottom: 8px; font-family: 'Public Sans', Arial, sans-serif;">Password</label>
           <input type="password" 
                  id="loginPassword" 
-                 style="width: 100%; padding: 12px; border: 2px solid #436481; border-radius: 8px; font-size: 16px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; background-color: #ffffff; box-sizing: border-box;"
+                 style="width: 100%; padding: 12px; border: 2px solid #436481; border-radius: 8px; font-size: 16px; font-family: 'Public Sans', Arial, sans-serif; background-color: #ffffff; box-sizing: border-box;"
                  placeholder="Enter your password"
                  required>
         </div>
         
         <button type="submit" 
                 id="loginBtn"
-                style="width: 100%; padding: 14px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; transition: background-color 0.2s;">
+                style="width: 100%; padding: 14px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Public Sans', Arial, sans-serif; transition: background-color 0.2s;">
           Sign In
         </button>
       </form>
       
-      <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
+      <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px; font-family: 'Public Sans', Arial, sans-serif;">
         Don't have login credentials?<br>
         Contact your funeral director for access.
       </p>
@@ -303,11 +310,11 @@
   <div id="passwordChangeModal" class="modal-overlay" style="display: none;">
     <div class="modal-content" style="max-width: 500px;">
       <div class="modal-header">
-        <h2 class="modal-title" data-i18n="family.changePasswordTitle">🔒 Change Your Password</h2>
+        <h2 class="modal-title" data-i18n="family.changePasswordTitle">Change Your Password</h2>
       </div>
       
       <div style="padding: 0 8px;">
-        <p style="margin-bottom: 20px; color: #32343a; font-size: 15px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;" data-i18n="family.changePasswordDesc">
+        <p style="margin-bottom: 20px; color: #32343a; font-size: 15px; font-family: 'Public Sans', Arial, sans-serif;" data-i18n="family.changePasswordDesc">
           For security reasons, you must change your temporary password before accessing your account.
         </p>
         
@@ -322,7 +329,7 @@
               placeholder="Enter new password" 
               minlength="8"
               required>
-            <small style="color: rgba(50, 52, 58, 0.6); font-size: 12px; display: block; margin-top: 4px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;" data-i18n="family.passwordMinLength">
+            <small style="color: rgba(50, 52, 58, 0.6); font-size: 12px; display: block; margin-top: 4px; font-family: 'Public Sans', Arial, sans-serif;" data-i18n="family.passwordMinLength">
               Must be at least 8 characters
             </small>
           </div>
@@ -359,14 +366,14 @@
         </svg>
       </div>
       
-      <h1 style="color: #32343a; text-align: center; font-size: 32px; font-weight: 600; margin-bottom: 10px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;" data-i18n="family.passwordUpdated">Password Updated!</h1>
-      <p style="color: #32343a; text-align: center; font-size: 16px; margin-bottom: 30px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;" data-i18n="family.passwordUpdatedDesc">Your password has been successfully changed. You can now proceed with the form.</p>
+      <h1 style="color: #32343a; text-align: center; font-size: 32px; font-weight: 600; margin-bottom: 10px; font-family: 'Newsreader', Georgia, serif;" data-i18n="family.passwordUpdated">Password Updated!</h1>
+      <p style="color: #32343a; text-align: center; font-size: 16px; margin-bottom: 30px; font-family: 'Public Sans', Arial, sans-serif;" data-i18n="family.passwordUpdatedDesc">Your password has been successfully changed. You can now proceed with the form.</p>
       
       <button type="button" 
               id="passwordChangeProceedBtn"
               onclick="hidePasswordChangeSuccessModal()"
               data-i18n="family.proceed"
-              style="width: 100%; padding: 14px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; transition: background-color 0.2s;">
+              style="width: 100%; padding: 14px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Public Sans', Arial, sans-serif; transition: background-color 0.2s;">
         Proceed
       </button>
     </div>
@@ -374,7 +381,7 @@
 
   <div class="nav" style="position: relative; padding: 0 20px;">
     <div class="logo-wrapper"><img src="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" loading="lazy" width="166" sizes="166px" alt="The Memorio Logo" srcset="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w"></div>
-    <button id="signOutBtn" onclick="handleSignOut()" title="Sign Out" data-i18n="form.signOut" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); padding: 10px 24px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; transition: background-color 0.2s; display: none;" onmouseover="this.style.backgroundColor='#1e3a52'" onmouseout="this.style.backgroundColor='#436481'">Sign Out</button>
+    <button id="signOutBtn" onclick="handleSignOut()" title="Sign Out" data-i18n="form.signOut" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); padding: 10px 24px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Public Sans', Arial, sans-serif; transition: background-color 0.2s; display: none;" onmouseover="this.style.backgroundColor='#1e3a52'" onmouseout="this.style.backgroundColor='#436481'">Sign Out</button>
   </div>
   <div class="form-slider-padding">
     <div class="w-form">
@@ -469,7 +476,7 @@
                       font-size: 16px;
                       font-weight: 600;
                       cursor: pointer;
-                      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+                      font-family: 'Public Sans', Arial, sans-serif;
                       transition: all 0.3s ease;
                       box-shadow: 0 4px 12px rgba(67, 100, 129, 0.2);
                       display: inline-flex;
@@ -493,7 +500,7 @@
                     padding: 12px 16px;
                     border-radius: 8px;
                     margin-bottom: 15px;
-                    font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+                    font-family: 'Public Sans', Arial, sans-serif;
                   ">
                     <p style="
                       margin: 0;
@@ -501,7 +508,7 @@
                       color: #856404;
                       line-height: 1.6;
                     ">
-                      <strong style="font-weight: 600;">⚠️ Important:</strong> When uploading photos, please do not refresh or close this page. Large photo uploads may take several minutes to process.
+                      <strong style="font-weight: 600;">Important:</strong> When uploading photos, please do not refresh or close this page. Large photo uploads may take several minutes to process.
                     </p>
                   </div>
                   
@@ -515,7 +522,7 @@
                       <button id="gallery-close-btn" type="button" style="position: fixed; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.2); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 24px; line-height: 1; z-index: 10001; transition: background 0.3s;">&times;</button>
                       
                       <!-- Gallery title -->
-                      <h3 id="gallery-title" style="color: white; text-align: center; margin-bottom: 30px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 24px; font-weight: 600;"></h3>
+                      <h3 id="gallery-title" style="color: white; text-align: center; margin-bottom: 30px; font-family: 'Public Sans', Arial, sans-serif; font-size: 24px; font-weight: 600;"></h3>
                       
                       <!-- Photo grid -->
                       <div id="photo-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; max-width: 1400px; margin: 0 auto;"></div>
@@ -526,24 +533,24 @@
                   <div id="photo-upload-progress" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #1e2d3d; color: white; padding: 14px 20px; z-index: 99999; box-shadow: 0 -4px 20px rgba(0,0,0,0.4);">
                     <div style="max-width: 800px; margin: 0 auto;">
                       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span id="upload-progress-title" style="font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-weight: 600; font-size: 15px;">📤 Uploading Photos...</span>
-                        <span id="upload-progress-count" style="font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 13px; opacity: 0.85; font-weight: 600;"></span>
+                        <span id="upload-progress-title" style="font-family: 'Public Sans', Arial, sans-serif; font-weight: 600; font-size: 15px;">Uploading Photos...</span>
+                        <span id="upload-progress-count" style="font-family: 'Public Sans', Arial, sans-serif; font-size: 13px; opacity: 0.85; font-weight: 600;"></span>
                       </div>
                       <div style="background: rgba(255,255,255,0.2); border-radius: 4px; height: 8px; overflow: hidden;">
                         <div id="upload-progress-bar" style="background: linear-gradient(90deg, #4caf50, #66bb6a); height: 100%; width: 0%; transition: width 0.4s ease; border-radius: 4px;"></div>
                       </div>
                       <div style="display: flex; justify-content: space-between; margin-top: 6px; align-items: center;">
-                        <span id="upload-progress-status" style="font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 11px; opacity: 0.7;">Preparing...</span>
-                        <span id="upload-progress-eta" style="font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 11px; opacity: 0.7;"></span>
+                        <span id="upload-progress-status" style="font-family: 'Public Sans', Arial, sans-serif; font-size: 11px; opacity: 0.7;">Preparing...</span>
+                        <span id="upload-progress-eta" style="font-family: 'Public Sans', Arial, sans-serif; font-size: 11px; opacity: 0.7;"></span>
                       </div>
                     </div>
                   </div>
 
                   <!-- Interrupted Upload Recovery Banner (hidden by default) -->
-                  <div id="resume-upload-banner" style="display: none; background: #fff3e9; border: 2px solid #436481; border-radius: 12px; padding: 16px 20px; margin-top: 15px; font-family: 'Dosis Variablefont Wght', Arial, sans-serif;">
-                    <p style="margin: 0 0 8px; font-weight: 600; color: #436481; font-size: 15px;">📷 Previous upload was interrupted</p>
+                  <div id="resume-upload-banner" style="display: none; background: #fff3e9; border: 2px solid #436481; border-radius: 12px; padding: 16px 20px; margin-top: 15px; font-family: 'Public Sans', Arial, sans-serif;">
+                    <p style="margin: 0 0 8px; font-weight: 600; color: #436481; font-size: 15px;">Previous upload was interrupted</p>
                     <p id="resume-upload-message" style="margin: 0 0 12px; font-size: 13px; color: #32343a; line-height: 1.5;"></p>
-                    <button id="dismiss-resume-btn" type="button" onclick="document.getElementById('resume-upload-banner').style.display='none'" style="background: #436481; color: white; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-family: 'Dosis Variablefont Wght', Arial, sans-serif; font-size: 13px; font-weight: 600;">Got it</button>
+                    <button id="dismiss-resume-btn" type="button" onclick="document.getElementById('resume-upload-banner').style.display='none'" style="background: #436481; color: white; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-family: 'Public Sans', Arial, sans-serif; font-size: 13px; font-weight: 600;">Got it</button>
                   </div>
 
                   <!-- Responsive CSS for photo modal -->
@@ -581,7 +588,7 @@
                       font-size: 16px;
                       font-weight: 600;
                       cursor: pointer;
-                      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+                      font-family: 'Public Sans', Arial, sans-serif;
                       transition: all 0.3s ease;
                       box-shadow: 0 2px 8px rgba(67, 100, 129, 0.1);">
                     Piano
@@ -600,7 +607,7 @@
                       font-size: 16px;
                       font-weight: 600;
                       cursor: pointer;
-                      font-family: 'Dosis Variablefont Wght', Arial, sans-serif;
+                      font-family: 'Public Sans', Arial, sans-serif;
                       transition: all 0.3s ease;
                       box-shadow: 0 2px 8px rgba(67, 100, 129, 0.1);">
                     Guitar
@@ -740,8 +747,8 @@
   <style id="memorio-styles">
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Dosis', sans-serif;
-            background-color: #f4e8de;
+            font-family: 'Public Sans', Arial, sans-serif;
+            background-color: #fffbf7;
             color: #32343a;
             line-height: 1.6;
             min-height: 100vh;
@@ -752,7 +759,7 @@
         .header { display: none !important; }
         .writing-status {
             background-color: #fff3e9;
-            border-radius: 20px;
+            border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
             text-align: center;
@@ -771,7 +778,7 @@
         @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
         .obituary-card { 
             background-color:#fff3e9; 
-            border-radius:20px; 
+            border-radius:12px; 
             padding:25px; 
             margin-bottom:30px; 
             box-shadow:0 2px 8px -2px rgba(0,0,0,.2); 
@@ -792,35 +799,44 @@
             opacity: 0.9; 
         }
         .obituary-content {
-            font-size: 18px; line-height: 1.8; color: #32343a; min-height: 200px; cursor: text;
-            background-color: #fff3e9; border-radius: 20px; padding: 25px; box-shadow: 0 2px 8px -2px rgba(0,0,0,.2);
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: 19px; line-height: 1.8; color: #32343a; min-height: 200px; cursor: text;
+            background-color: #fff3e9; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px -2px rgba(0,0,0,.2);
             border: none; outline: none; margin-top: 15px; font-weight: 400; word-wrap: break-word; white-space: pre-wrap;
         }
         .obituary-content:focus { outline:none; border:none; box-shadow:0 2px 8px -2px rgba(0,0,0,.2); }
         .obituary-content::selection { background-color: rgba(67,100,129,.2); }
-        .obituary-content p { margin-bottom:20px; font-size:18px; line-height:1.8; color:#32343a; font-weight:400; }
+        .obituary-content p { margin-bottom:20px; font-family:'Newsreader', Georgia, serif; font-size:19px; line-height:1.8; color:#32343a; font-weight:400; }
         .obituary-content p:last-child { margin-bottom:0; }
         .obituary-content[contenteditable="true"] { box-shadow: 0 2px 8px -2px rgba(67,100,129,.3); }
         .typewriter-cursor { display:inline-block; width:2px; height:22px; background:#32343a; animation: blink 1s infinite; vertical-align:text-top; margin-left:2px; }
         @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
         .action-buttons { display:flex; justify-content:center; margin-top:30px; }
-        .btn { background:#32343a; color:#fff; border:none; padding:15px 30px; font-size:16px; border-radius:60px; cursor:pointer; transition: all .3s ease; font-weight:500; }
-        .btn:hover { background:#436481; transform: translateY(-2px); }
+        .btn { background:#436481; color:#fff; border:none; padding:15px 30px; font-size:16px; border-radius:999px; cursor:pointer; transition: all .3s ease; font-weight:500; }
+        .btn:hover { background:#38536b; transform: translateY(-2px); box-shadow: 0 8px 18px -10px rgba(44, 68, 89, 0.45); }
         .btn:disabled { background:#9ca3af; cursor: not-allowed; transform: none; }
         .hidden { display: none; }
         .fade-in { animation: fadeIn .5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to { opacity:1; transform: translateY(0);} }
-        .memorial-info { background:#fff3e9; border-radius:20px; padding:25px; margin-bottom:20px; font-size:16px; color:#32343a; text-align:center; box-shadow:0 2px 8px -2px rgba(0,0,0,.2); }
+        .memorial-info { background:#fff3e9; border-radius:12px; padding:25px; margin-bottom:20px; font-size:16px; color:#32343a; text-align:center; box-shadow:0 2px 8px -2px rgba(0,0,0,.2); }
         .memorio-container { max-width: 800px; margin: 0 auto; }
     </style>
             <script>
         // Production endpoints - will work when deployed to memorio.ai domain
-        const ENDPOINT = "https://memorioo.app.n8n.cloud/webhook/memorio-intake";
-        const EMAIL_ENDPOINT = "https://memorioo.app.n8n.cloud/webhook/send-email";
+        // ==================================================================
+        // OBITUARY GENERATION ENDPOINT
+        // Current: n8n webhook (live). To retire n8n: deploy the
+        // generate-obituary Supabase edge function (needs ANTHROPIC_API_KEY
+        // secret), then flip USE_SUPABASE_OBITUARY to true. Nothing else
+        // changes: the function returns the same { name, content } shape.
+        // ==================================================================
+        const USE_SUPABASE_OBITUARY = false;
+        const ENDPOINT = USE_SUPABASE_OBITUARY
+            ? "https://gkabtvqwwuvigcdubwyv.supabase.co/functions/v1/generate-obituary"
+            : "https://memorioo.app.n8n.cloud/webhook/memorio-intake";
         
         // For local development, uncomment these lines and comment out the above:
         // const ENDPOINT = "http://localhost:3001/webhook/memorio-intake";
-        // const EMAIL_ENDPOINT = "http://localhost:3001/webhook/send-email";
         
         // ============================================================================
         // SUPABASE CONFIGURATION
@@ -1090,11 +1106,8 @@
                     .select('role, status, metadata')
                     .eq('id', data.user.id)
                     .single();
-                
-                console.log('===== FAMILY LOGIN DEBUG START =====');
                 console.log('✅ Login successful:', data.user.email);
                 console.log('🔐 Raw database user data:', JSON.stringify(userData, null, 2));
-                console.log('🔐 Metadata object:', JSON.stringify(userData?.metadata, null, 2));
                 console.log('🔑 Password change flag check:', {
                     hasUserData: !!userData,
                     hasMetadata: !!userData?.metadata,
@@ -1104,7 +1117,6 @@
                     strictCheck: userData?.metadata?.requires_password_change === true,
                     looseCheck: userData?.metadata?.requires_password_change == true
                 });
-                console.log('===== FAMILY LOGIN DEBUG END =====');
                 
                 if (userError || !userData || userData.role !== 'family') {
                     throw new Error('Access denied: This form is only for family members.');
@@ -1221,8 +1233,6 @@
         const obituaryData = { name: "", content: "" };
         let originalObituaryData = {};
         let originalFormPayload = {};
-        // 🔑 holds the Wait node's per-execution resume URL (from n8n)
-        let MEMORIO_RESUME_URL = "";
         
         // ============================================================================
         // AUTHENTICATION & CASE LOADING
@@ -1254,7 +1264,6 @@
                 console.log('===== CHECK AUTHENTICATION DEBUG START =====');
                 console.log('✅ User authenticated:', session.user.email);
                 console.log('🔐 Raw database user data:', JSON.stringify(userData, null, 2));
-                console.log('🔐 Metadata object:', JSON.stringify(userData?.metadata, null, 2));
                 console.log('🔑 Password change flag check:', {
                     hasUserData: !!userData,
                     hasMetadata: !!userData?.metadata,
@@ -1544,7 +1553,7 @@
                 
                 // Show loading indicator
                 const tempLoading = document.createElement('div');
-                tempLoading.style.cssText = 'padding: 12px; text-align: center; color: #436481; font-family: "Dosis Variablefont Wght", Arial, sans-serif;';
+                tempLoading.style.cssText = 'padding: 12px; text-align: center; color: #436481; font-family: "Public Sans", Arial, sans-serif;';
                 tempLoading.textContent = `Processing ${files.length} photo${files.length !== 1 ? 's' : ''}...`;
                 preview.appendChild(tempLoading);
                 
@@ -1624,7 +1633,7 @@
             // "+X" badge if more than 1 photo
             if (selectedPhotos.length > 1) {
                 const badge = document.createElement('div');
-                badge.style.cssText = 'position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.8); color: white; padding: 8px 12px; border-radius: 20px; font-family: "Dosis Variablefont Wght", Arial, sans-serif; font-size: 14px; font-weight: 600; backdrop-filter: blur(4px);';
+                badge.style.cssText = 'position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.8); color: white; padding: 8px 12px; border-radius: 20px; font-family: "Public Sans", Arial, sans-serif; font-size: 14px; font-weight: 600; backdrop-filter: blur(4px);';
                 badge.textContent = `+${selectedPhotos.length - 1}`;
                 thumbnail.appendChild(badge);
             }
@@ -1633,7 +1642,7 @@
             
             // Info text below thumbnail
             const infoText = document.createElement('div');
-            infoText.style.cssText = 'margin-top: 12px; text-align: center; font-family: "Dosis Variablefont Wght", Arial, sans-serif; font-size: 14px; color: #436481;';
+            infoText.style.cssText = 'margin-top: 12px; text-align: center; font-family: "Public Sans", Arial, sans-serif; font-size: 14px; color: #436481;';
             infoText.innerHTML = `<strong>${selectedPhotos.length}</strong> photo${selectedPhotos.length !== 1 ? 's' : ''} selected<br><span style="font-size: 12px; color: #666;">Click to view all</span>`;
             compactContainer.appendChild(infoText);
             
@@ -1840,7 +1849,7 @@
             const writing   = document.getElementById('writingStatus');
             if (card) card.style.display = 'block';
             if (connector) connector.style.display = 'block';
-            // Push the writing status down — it'll animate in after photos are done
+            // Push the writing status down - it'll animate in after photos are done
             if (writing) {
                 writing.style.opacity = '0.35';
                 writing.style.filter  = 'grayscale(1)';
@@ -1851,7 +1860,7 @@
         }
 
         /**
-         * Update the progress bar values — both the fixed bottom bar and the in-page card.
+         * Update the progress bar values - both the fixed bottom bar and the in-page card.
          */
         function updatePhotoUploadProgress(completed, total, failed, startTime) {
             const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -1866,11 +1875,11 @@
             if (countEl) countEl.textContent = `${completed} / ${total} photos`;
             if (barEl)   barEl.style.width   = `${pct}%`;
             if (failed > 0 && statusEl) {
-                statusEl.textContent = `${failed} photo${failed !== 1 ? 's' : ''} failed — continuing...`;
+                statusEl.textContent = `${failed} photo${failed !== 1 ? 's' : ''} failed, continuing...`;
             } else if (statusEl) {
-                statusEl.textContent = pct < 100 ? 'Uploading — please keep this page open' : 'Finalising...';
+                statusEl.textContent = pct < 100 ? 'Uploading, please keep this page open' : 'Finalising...';
             }
-            if (titleEl && pct === 100) titleEl.textContent = '✅ Upload complete!';
+            if (titleEl && pct === 100) titleEl.textContent = 'Upload complete!';
 
             // ── In-page card ──
             const cardBar    = document.getElementById('photo-phase-bar');
@@ -1916,13 +1925,13 @@
             const cardEta   = document.getElementById('photo-phase-eta');
             const cardIcon  = document.getElementById('photo-phase-icon');
 
-            if (cardBar)   { cardBar.style.width = '100%'; cardBar.style.background = 'linear-gradient(90deg, #28a745, #34c759)'; }
+            if (cardBar)   { cardBar.style.width = '100%'; cardBar.style.background = '#1d6b45'; }
             if (cardTitle) cardTitle.textContent = `${totalUploaded || ''} photo${totalUploaded !== 1 ? 's' : ''} uploaded successfully!`;
-            if (cardBadge) { cardBadge.textContent = 'Complete'; cardBadge.style.background = 'rgba(40,167,69,0.12)'; cardBadge.style.color = '#28a745'; }
-            if (cardCount) cardCount.style.color = '#28a745';
+            if (cardBadge) { cardBadge.textContent = 'Complete'; cardBadge.style.background = '#e7f3ec'; cardBadge.style.color = '#1d6b45'; }
+            if (cardCount) cardCount.style.color = '#1d6b45';
             if (cardEta)   cardEta.textContent = '';
-            if (cardIcon)  { cardIcon.style.background = 'linear-gradient(135deg, #28a745, #34c759)'; cardIcon.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'; }
-            if (card)      card.style.border = '2px solid #28a745';
+            if (cardIcon)  { cardIcon.style.background = '#1d6b45'; cardIcon.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'; }
+            if (card)      card.style.border = '1px solid rgba(29,107,69,0.45)';
 
             // Restore the writing status section (obituary generation phase)
             const writing = document.getElementById('writingStatus');
@@ -1953,7 +1962,7 @@
                         `Please re-select any photos that were not yet uploaded to complete your submission.`;
                     banner.style.display = 'block';
                 }
-                // Clear state — user has been notified
+                // Clear state - user has been notified
                 localStorage.removeItem(stateKey);
             } catch (e) {
                 localStorage.removeItem(`${UPLOAD_STATE_KEY}_${caseId}`);
@@ -1971,7 +1980,7 @@
             }
 
             if (!selectedPhotos || selectedPhotos.length === 0) {
-                console.log('📷 No photos selected — skipping photo upload phase');
+                console.log('📷 No photos selected - skipping photo upload phase');
                 // No photos: hide the phase card and connector so obituary generation
                 // is the only thing visible on the success screen
                 const card      = document.getElementById('photo-phase-card');
@@ -2012,7 +2021,7 @@
                     const batch = selectedPhotos.slice(batchStart, batchStart + UPLOAD_BATCH_SIZE);
                     const assetRecords = [];
 
-                    console.log(`📦 Batch ${batchIdx + 1}/${totalBatches} — photos ${batchStart + 1}–${batchStart + batch.length}`);
+                    console.log(`📦 Batch ${batchIdx + 1}/${totalBatches} - photos ${batchStart + 1}-${batchStart + batch.length}`);
 
                     // Upload within each batch in parallel chunks of UPLOAD_PARALLEL
                     for (let chunkStart = 0; chunkStart < batch.length; chunkStart += UPLOAD_PARALLEL) {
@@ -2051,9 +2060,9 @@
                 }
 
                 const successCount = completedCount - failedCount;
-                console.log(`✅ Upload complete — ${successCount}/${totalPhotos} photos uploaded${failedCount > 0 ? `, ${failedCount} failed` : ''}`);
+                console.log(`✅ Upload complete - ${successCount}/${totalPhotos} photos uploaded${failedCount > 0 ? `, ${failedCount} failed` : ''}`);
 
-                // Clear recovery state — upload finished successfully
+                // Clear recovery state - upload finished successfully
                 localStorage.removeItem(stateKey);
 
             } catch (err) {
@@ -2157,35 +2166,35 @@
             const style = document.createElement('style');
             style.id = styleId;
             style.textContent = `
-                .writing-status{background:#fff3e9;border-radius:20px;padding:25px;margin-bottom:30px;text-align:center;box-shadow:0 2px 8px -2px rgba(0,0,0,.2);font-family:'Dosis',sans-serif;opacity:1;transition:opacity 0.5s ease-out}
+                .writing-status{background:#fff3e9;border-radius:12px;padding:25px;margin-bottom:30px;text-align:center;box-shadow:0 2px 8px -2px rgba(0,0,0,.2);font-family:'Public Sans',Arial,sans-serif;opacity:1;transition:opacity 0.5s ease-out}
                 .writing-status.fade-out{opacity:0}
-                .status-text{font-size:18px;margin-bottom:15px;color:#436481;font-family:'Dosis',sans-serif}
+                .status-text{font-size:18px;margin-bottom:15px;color:#436481;font-family:'Public Sans',Arial,sans-serif}
                 .loading-dots{display:inline-flex;gap:5px}
                 .dot{width:8px;height:8px;background:#436481;border-radius:50%;animation:pulse 1.5s infinite}
                 .dot:nth-child(2){animation-delay:.3s}
                 .dot:nth-child(3){animation-delay:.6s}
                 @keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
-                .obituary-card{background:#fff3e9;border-radius:20px;padding:25px;margin-bottom:30px;box-shadow:0 2px 8px -2px rgba(0,0,0,.2);font-family:'Dosis',sans-serif}
-                .obituary-title{font-size:18px;color:#436481;margin-bottom:20px;font-weight:500;border:none;font-family:'Dosis',sans-serif}
-                .edit-hint{font-size:13px;color:#7a8592;text-align:center;margin-top:15px;margin-bottom:15px;font-style:italic;opacity:0.7;transition:opacity 0.3s ease;font-family:'Dosis',sans-serif;cursor:default}
+                .obituary-card{background:#fff3e9;border-radius:12px;padding:25px;margin-bottom:30px;box-shadow:0 2px 8px -2px rgba(0,0,0,.2);font-family:'Public Sans',Arial,sans-serif}
+                .obituary-title{font-size:18px;color:#436481;margin-bottom:20px;font-weight:500;border:none;font-family:'Public Sans',Arial,sans-serif}
+                .edit-hint{font-size:13px;color:#7a8592;text-align:center;margin-top:15px;margin-bottom:15px;font-style:italic;opacity:0.7;transition:opacity 0.3s ease;font-family:'Public Sans',Arial,sans-serif;cursor:default}
                 .edit-hint:hover{opacity:0.9}
-                .obituary-content{font-size:18px;line-height:1.8;color:#32343a;min-height:200px;cursor:text;background:#fff3e9;border-radius:20px;padding:25px;box-shadow:0 2px 8px -2px rgba(0,0,0,.2);border:none;outline:none;font-family:'Dosis',sans-serif;margin-top:15px;font-weight:400;word-wrap:break-word;white-space:pre-wrap}
+                .obituary-content{font-size:19px;line-height:1.8;color:#32343a;min-height:200px;cursor:text;background:#fff3e9;border-radius:12px;padding:25px;box-shadow:0 2px 8px -2px rgba(0,0,0,.2);border:none;outline:none;font-family:'Newsreader',Georgia,serif;margin-top:15px;font-weight:400;word-wrap:break-word;white-space:pre-wrap}
                 .obituary-content:focus{outline:none;border:none;box-shadow:0 2px 8px -2px rgba(0,0,0,.2)}
                 .obituary-content::selection{background-color:rgba(67,100,129,.2)}
-                .obituary-content p{margin-bottom:20px;font-size:18px;line-height:1.8;color:#32343a;font-family:'Dosis',sans-serif;font-weight:400}
+                .obituary-content p{margin-bottom:20px;font-size:19px;line-height:1.8;color:#32343a;font-family:'Newsreader',Georgia,serif;font-weight:400}
                 .obituary-content p:last-child{margin-bottom:0}
                 .obituary-content[contenteditable="true"]{box-shadow:0 2px 8px -2px rgba(67,100,129,.3)}
                 .typewriter-cursor{display:inline-block;width:2px;height:22px;background:#32343a;animation:blink 1s infinite;vertical-align:text-top;margin-left:2px}
                 @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
                 .action-buttons{display:flex;justify-content:center;margin-top:30px}
-                .btn{background:#32343a;color:#fff;border:none;padding:15px 30px;font-size:16px;font-family:'Dosis',sans-serif;border-radius:60px;cursor:pointer;transition:all .3s ease;font-weight:500}
-                .btn:hover{background:#436481;transform:translateY(-2px)}
+                .btn{background:#436481;color:#fff;border:none;padding:15px 30px;font-size:16px;font-family:'Public Sans',Arial,sans-serif;border-radius:999px;cursor:pointer;transition:all .3s ease;font-weight:500}
+                .btn:hover{background:#38536b;transform:translateY(-2px)}
                 .btn:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
                 .hidden{display:none}
                 .fade-in{animation:fadeIn .5s ease-in}
                 @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-                .memorial-info{background:#fff3e9;border-radius:20px;padding:25px;margin-bottom:20px;font-size:16px;color:#32343a;text-align:center;font-family:'Dosis',sans-serif;box-shadow:0 2px 8px -2px rgba(0,0,0,.2)}
-                .memorio-container{max-width:800px;margin:0 auto;font-family:'Dosis',sans-serif}
+                .memorial-info{background:#fff3e9;border-radius:12px;padding:25px;margin-bottom:20px;font-size:16px;color:#32343a;text-align:center;font-family:'Public Sans',Arial,sans-serif;box-shadow:0 2px 8px -2px rgba(0,0,0,.2)}
+                .memorio-container{max-width:800px;margin:0 auto;font-family:'Public Sans',Arial,sans-serif}
                 
                 /* Date input group styling */
                 .date-input-group{display:flex;gap:10px;margin-bottom:15px}
@@ -2226,7 +2235,7 @@
                     <div class="memorio-container">
 
                         <!-- ── Phase 1: Photo upload progress card ── -->
-                        <div id="photo-phase-card" style="background: white; border: 2px solid #436481; border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(67,100,129,0.12); font-family: 'Dosis Variablefont Wght', Arial, sans-serif; display: none;">
+                        <div id="photo-phase-card" style="background: white; border: 2px solid #436481; border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(67,100,129,0.12); font-family: 'Public Sans', Arial, sans-serif; display: none;">
                             <div style="display: flex; align-items: flex-start; gap: 16px;">
                                 <div id="photo-phase-icon" style="width: 46px; height: 46px; background: linear-gradient(135deg, #436481, #5a82a0); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -2355,131 +2364,7 @@
         //     el.contentEditable = true;
         //     el.addEventListener('click', function(){ this.focus(); }, { once: true });
         // }
-        // 🔧 Modified to include resumeUrl in payload sent to Email Webhook
-        async function publishObituary() {
-            const el = document.getElementById('obituaryContent');
-            const btn = document.querySelector('.btn');
-            // Capture final content with proper formatting
-            let finalContent = el.textContent || el.innerText || '';
-            finalContent = finalContent.replace(/\n\s*\n/g, '\n\n').trim();
-            const finalData = { 
-                name: obituaryData.name, 
-                content: finalContent,
-                originalFormData: originalFormPayload,
-                timestamp: new Date().toISOString(),
-                // ⬇️ Send the Wait node resume URL so the Email Webhook branch can resume the flow
-                resumeUrl: MEMORIO_RESUME_URL || ""
-            };
-            console.log('Submitting final obituary data:', finalData);
-            // Disable button and show loading state
-            btn.disabled = true;
-            btn.textContent = 'Sending...';
-            
-            try {
-                // First, update the database with the final obituary content
-                if (currentCase && currentCase.id) {
-                    const { data: existingForms, error: formQueryError } = await supabaseClient
-                        .from('forms')
-                        .select('id')
-                        .eq('case_id', currentCase.id)
-                        .single();
-                    
-                    if (!formQueryError && existingForms) {
-                        // Update existing form with final obituary content
-                        const { error: updateError } = await supabaseClient
-                            .from('forms')
-                            .update({
-                                submitted_json: {
-                                    ...originalFormPayload,
-                                    obituary_name: obituaryData.name,
-                                    obituary_content: finalContent,
-                                    obituary_language: localStorage.getItem('memorio_language') || 'en',
-                                    generated_at: new Date().toISOString()
-                                },
-                                updated_at: new Date().toISOString()
-                            })
-                            .eq('id', existingForms.id);
-                        
-                        if (updateError) {
-                            console.error('❌ Error updating form with obituary:', updateError);
-                        } else {
-                            console.log('✅ Successfully updated form with final obituary content');
-                        }
-                        
-                        // Also save to obituary_content table for director/QC portal access
-                        const { error: obituaryError } = await supabaseClient
-                            .from('obituary_content')
-                            .upsert({
-                                case_id: currentCase.id,
-                                content_html: `<div>${finalContent.split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>`,
-                                content_plain: finalContent,
-                                generated_by: currentUser?.id || 'AI',
-                                updated_at: new Date().toISOString()
-                            }, {
-                                onConflict: 'case_id'  // Update if exists, insert if new
-                            });
-                        
-                        if (obituaryError) {
-                            console.error('❌ Error saving to obituary_content:', obituaryError);
-                        } else {
-                            console.log('✅ Successfully saved obituary to obituary_content table');
-                        }
-                    }
-                }
-                
-                // Then send to email webhook
-                console.log('Sending to email webhook:', EMAIL_ENDPOINT);
-                console.log('Payload:', finalData);
-                const response = await fetch(EMAIL_ENDPOINT, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    mode: 'cors',
-                    body: JSON.stringify(finalData)
-                });
-                console.log('Response status:', 'no-cors mode - status not available');
-                console.log('Request sent successfully');
-                // In no-cors mode, we can't read the response, so assume success
-                btn.textContent = 'Sent!';
-                btn.style.background = '#22c55e';
-                
-                // Add "Access Dashboard" button
-                const actionButtons = document.querySelector('.action-buttons');
-                if (actionButtons && !document.getElementById('dashboardBtn')) {
-                    const dashboardBtn = document.createElement('a');
-                    dashboardBtn.id = 'dashboardBtn';
-                    dashboardBtn.href = '/family/dashboard';
-                    dashboardBtn.className = 'btn';
-                    dashboardBtn.textContent = 'Access Dashboard';
-                    dashboardBtn.style.marginLeft = '15px';
-                    dashboardBtn.style.background = '#436481';
-                    dashboardBtn.style.textDecoration = 'none';
-                    dashboardBtn.style.display = 'inline-block';
-                    actionButtons.appendChild(dashboardBtn);
-                }
-                
-                setTimeout(() => {
-                    alert('Obituary submitted successfully! You will receive an email shortly with your final obituary.');
-                }, 500);
-            } catch (error) {
-                console.error('Detailed error submitting obituary:', error);
-                console.error('Error name:', error.name);
-                console.error('Error message:', error.message);
-                btn.disabled = false;
-                btn.textContent = 'Submit';
-                // More specific error messages
-                if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    alert('Network Error: Cannot reach the email webhook. Check N8N webhook status and CORS settings.');
-                } else if (error.message.includes('HTTP')) {
-                    alert(`Server Error: ${error.message}`);
-                } else {
-                    alert(`Error: ${error.message}`);
-                }
-            }
-        }
-        // ---------- translation helper (MyMemory free API — no key required) ----------
+        // ---------- translation helper (MyMemory free API - no key required) ----------
         async function translateObituaryIfNeeded(text) {
             const lang = localStorage.getItem('memorio_language') || 'en';
             if (lang !== 'es') return text;
@@ -2519,10 +2404,8 @@
                 formPayload.loved_ones_name ||
                 formPayload.customer_name || '';
             obituaryData.content = extractContent(data);
-            // 🔑 Capture resumeUrl from n8n Respond-to-Webhook payload
-            MEMORIO_RESUME_URL = data?.resumeUrl || MEMORIO_RESUME_URL || "";
             if (!obituaryData.content) {
-                alert('No obituary content was generated. Please check the n8n workflow output.');
+                alert('We could not generate the obituary just now. Your answers and photos are saved. Please try again in a moment, or contact your funeral director.');
                 return;
             }
             
@@ -2606,7 +2489,6 @@
             }
         }
         // Expose functions globally
-        window.publishObituary = publishObituary;
         window.displayObituary = displayObituary;
         window.startObituaryTypewriter = function(obituaryContent, userName) { obituaryData.content = obituaryContent; obituaryData.name = userName; startTypewriter(); };
     </script>
@@ -2623,12 +2505,12 @@
         
         // Initialize auto-expand for all textareas
         // ============================================================
-        // FORM TRANSLATION — applies stored language to all form text
+        // FORM TRANSLATION - applies stored language to all form text
         // ============================================================
         function translateFormContent() {
             if (typeof i18n === 'undefined') return;
             const t = (key, fallback) => i18n.t(key) || fallback;
-            const lang = localStorage.getItem('memorio-language') || 'en';
+            const lang = localStorage.getItem('memorio_language') || 'en';
 
             // Helper: set textContent of element(s) by selector
             const setText = (sel, key, fallback) => {
@@ -2645,7 +2527,7 @@
 
             // ── Step 1 ──
             setText('.text-block', 'form.header', 'Memorios Obituary Writer');
-            // welcome-heading is set dynamically by populateDeceasedName — skip here
+            // welcome-heading is set dynamically by populateDeceasedName - skip here
             setText('.form-slider-step-1:not(.upload):not(.finalcheck-step7) .paragraph', 'form.intro',
                 "Take your time, each question helps us gently piece together a heartfelt memory. There's no rush.");
             // "Any other names" label parts
@@ -2663,8 +2545,8 @@
             setText('.text-block-2', 'form.requiredFields', '*Required Fields');
 
             // ── Step 2 ──
-            // visualize-story-heading is set dynamically — skip
-            // upload-images-label is set dynamically — skip
+            // visualize-story-heading is set dynamically - skip
+            // upload-images-label is set dynamically - skip
             document.querySelectorAll('.form-slider-step-1.upload .italic-text').forEach(el => {
                 el.textContent = t('form.photoIntro', "Every life is a collection of beautiful moments. Upload photos to help us honor your loved one's journey.");
             });
@@ -2975,9 +2857,14 @@
                 try {
                     console.log('Starting parallel: n8n fetch + photo upload/DB save');
 
+                    const obituaryHeaders = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+                    if (USE_SUPABASE_OBITUARY) {
+                        const { data: { session: obitSession } } = await supabase.auth.getSession();
+                        if (obitSession) obituaryHeaders['Authorization'] = `Bearer ${obitSession.access_token}`;
+                    }
                     const n8nPromise = fetch(ENDPOINT, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        headers: obituaryHeaders,
                         mode: 'cors',
                         body: JSON.stringify(payload)
                     }).then(res => {
@@ -2987,7 +2874,7 @@
 
                     const dbPromise = saveFormToDatabase(payload);
 
-                    // Wait for both — photos show their own progress in the UI
+                    // Wait for both - photos show their own progress in the UI
                     const [raw] = await Promise.all([n8nPromise, dbPromise]);
                     n8nRaw = raw;
                     console.log('N8N Response:', n8nRaw);
@@ -3000,19 +2887,8 @@
                     console.error('Submit error:', err);
                     n8nError = err;
 
-                    if (err.name === 'TypeError' && err.message.includes('fetch')) {
-                        alert(`Network Error: Cannot reach the webhook. This could be due to:\n1. CORS policy blocking the request\n2. Webhook endpoint is down\n3. Network connectivity issues`);
-                    }
-                    if (confirm('Webhook failed. Would you like to test with sample data instead?')) {
-                        const sampleResponse = {
-                            content: `${payload.loved_ones_name || 'Your loved one'} was a remarkable person who touched the lives of everyone they met. Born with a generous spirit and kind heart, they dedicated their life to family, friends, and community.\n\nThroughout their years, they showed unwavering love and support to those around them. Their wisdom, humor, and compassion will be deeply missed by all who had the privilege of knowing them.\n\nThey leave behind a legacy of love, kindness, and cherished memories that will live on in the hearts of family and friends forever.\n\nA celebration of their life will be held to honor their memory and the profound impact they had on all our lives.`,
-                            resumeUrl: ""
-                        };
-                        displayObituary(sampleResponse, payload);
-                    } else {
-                        success.style.display = 'none';
-                        if (fail) fail.style.display = 'block';
-                    }
+                    success.style.display = 'none';
+                    if (fail) fail.style.display = 'block';
                 }
             });
             
