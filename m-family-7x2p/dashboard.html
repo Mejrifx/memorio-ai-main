@@ -1506,6 +1506,9 @@
      * @returns {object} { expired: boolean, hours: number, minutes: number, seconds: number, totalMs: number }
      */
     function calculateUploadTimeRemaining(submittedAt) {
+      if (currentForm && currentForm.photos_closed_at) {
+        return { expired: true, closedByFamily: true, hours: 0, minutes: 0, seconds: 0, totalMs: 0 };
+      }
       if (!submittedAt) {
         return { expired: false, hours: 12, minutes: 0, seconds: 0, totalMs: 12 * 60 * 60 * 1000 };
       }
@@ -1567,10 +1570,10 @@
         timerBanner.className = 'expired';
         timerBanner.innerHTML = `
           <div class="timer-title">
-            ${i18n.t('family.upload.windowClosed')}
+            ${timeRemaining.closedByFamily ? i18n.t('family.upload.closedByYou') : i18n.t('family.upload.windowClosed')}
           </div>
           <div class="timer-message">
-            ${i18n.t('family.upload.windowClosedDesc')}
+            ${timeRemaining.closedByFamily ? i18n.t('family.upload.closedByYouDesc') : i18n.t('family.upload.windowClosedDesc')}
           </div>
         `;
         timerBanner.style.display = 'block';
@@ -1597,11 +1600,41 @@
           <div class="timer-message">
             ${i18n.t('family.upload.windowActiveDesc')}
           </div>
+          <div style="margin-top:14px;">
+            <button type="button" class="btn-secondary" id="closePhotoWindowBtn" onclick="closePhotoWindow()">${i18n.t('family.upload.doneBtn')}</button>
+          </div>
         `;
         timerBanner.style.display = 'block';
       }
     }
     
+    /**
+     * Family confirms they are finished adding photos: ends the 12-hour window
+     * early so production can start. One-way (a DB trigger prevents reopening).
+     */
+    async function closePhotoWindow() {
+      if (!currentForm || currentForm.photos_closed_at) return;
+      if (!confirm(i18n.t('family.upload.doneConfirm'))) return;
+      const btn = document.getElementById('closePhotoWindowBtn');
+      if (btn) btn.disabled = true;
+      try {
+        const closedAt = new Date().toISOString();
+        const { error } = await supabaseClient
+          .from('forms')
+          .update({ photos_closed_at: closedAt })
+          .eq('id', currentForm.id);
+        if (error) throw error;
+        currentForm.photos_closed_at = closedAt;
+        showToast(i18n.t('family.upload.doneThanks'), false);
+        updateUploadTimerDisplay();
+      } catch (err) {
+        console.error('closePhotoWindow failed:', err);
+        if (btn) btn.disabled = false;
+        showToast(i18n.t('family.upload.doneError'), true);
+      }
+    }
+    window.closePhotoWindow = closePhotoWindow;
+
     /**
      * Lock the upload area (disable uploads)
      */

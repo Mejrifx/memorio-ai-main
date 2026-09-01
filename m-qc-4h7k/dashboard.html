@@ -928,6 +928,7 @@
         // Store session globally
         currentSession = session;
         currentUser = session.user;
+        await loadCooldownSetting();
         
         // Verify QC role
         const role = currentUser.app_metadata?.role;
@@ -1428,13 +1429,21 @@
     }
     
     // Pure JS cooldown check - no RPC needed, uses first_submission_at from already-fetched case data
+    let QC_COOLDOWN_HOURS = 40;
+    async function loadCooldownSetting() {
+      try {
+        const { data } = await supabaseClient.from('app_settings').select('value').eq('key', 'qc_cooldown_hours').single();
+        if (data && data.value !== null && data.value !== undefined) QC_COOLDOWN_HOURS = Number(data.value);
+      } catch (e) { /* setting table absent: keep default */ }
+    }
     function checkCooldown(submission) {
+      if (QC_COOLDOWN_HOURS <= 0) return { active: false };
       const firstSubmissionAt = submission.cases?.first_submission_at;
       if (!firstSubmissionAt) return { active: false };
       const submittedMs = new Date(firstSubmissionAt).getTime();
       const hoursElapsed = (Date.now() - submittedMs) / 3600000;
-      if (hoursElapsed >= 40) return { active: false };
-      const expiresAt = new Date(submittedMs + 40 * 3600000);
+      if (hoursElapsed >= QC_COOLDOWN_HOURS) return { active: false };
+      const expiresAt = new Date(submittedMs + QC_COOLDOWN_HOURS * 3600000);
       const hoursUntil = Math.round((expiresAt - Date.now()) / 3600000);
       return { active: true, expiresAt, hoursUntil };
     }
@@ -1449,7 +1458,7 @@
       if (overrideCooldown && cooldown.active) {
         showConfirmModal(
           'Override Cooldown & Deliver Immediately',
-          'WARNING: You are about to bypass the 40-hour cooldown period.\n\nThe family may still be editing the obituary. Are you absolutely sure you want to deliver the video immediately?\n\nThis action will:\n• Mark the video as approved\n• Deliver the video to the family RIGHT NOW\n• Skip the cooldown timer',
+          `WARNING: You are about to bypass the ${QC_COOLDOWN_HOURS}-hour cooldown period.\n\nThe family may still be editing the obituary. Are you absolutely sure you want to deliver the video immediately?\n\nThis action will:\n• Mark the video as approved\n• Deliver the video to the family RIGHT NOW\n• Skip the cooldown timer`,
           () => performApprove(true)
         );
       } else {
@@ -1466,34 +1475,26 @@
       }
     }
     
-    // Perform the actual approval - direct DB updates, no RPC dependency
+    // Perform the actual approval through the secured server function
+    // (approve_video_with_cooldown: verifies the caller is QC/admin, applies the
+    // configurable cooldown, records the real reviewer). Migrations 058 + 059.
     async function performApprove(overrideCooldown = false) {
       const notes = document.getElementById('qcNotes').value;
       const cooldown = checkCooldown(currentSubmission);
       const shouldApplyCooldown = cooldown.active && !overrideCooldown;
       
       try {
-        const { error: subError } = await supabaseClient
-          .from('video_submissions')
-          .update({
-            qc_status: 'approved',
-            qc_reviewer_id: currentUser.id,
-            qc_notes: notes || null,
-            qc_reviewed_at: new Date().toISOString(),
-            cooldown_expires_at: shouldApplyCooldown ? cooldown.expiresAt.toISOString() : null,
-            cooldown_overridden: overrideCooldown
-          })
-          .eq('id', currentSubmission.id);
-        
-        if (subError) throw subError;
-        
-        // Keep case as awaiting_review during cooldown; deliver immediately otherwise
-        const { error: caseError } = await supabaseClient
-          .from('cases')
-          .update({ status: shouldApplyCooldown ? 'awaiting_review' : 'delivered' })
-          .eq('id', currentSubmission.case_id);
-        
-        if (caseError) throw caseError;
+        const { data: rpcRows, error: rpcError } = await supabaseClient.rpc('approve_video_with_cooldown', {
+          p_submission_id: currentSubmission.id,
+          p_qc_user_id: currentUser.id,
+          p_qc_notes: notes || null,
+          p_override_cooldown: overrideCooldown
+        });
+        if (rpcError) throw rpcError;
+        const result = Array.isArray(rpcRows) ? rpcRows[0] : rpcRows;
+        if (!result || result.success === false) {
+          throw new Error((result && result.message) || 'Approval was not accepted by the server');
+        }
         
         let successMessage;
         if (shouldApplyCooldown) {
