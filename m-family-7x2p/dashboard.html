@@ -1464,6 +1464,9 @@
         storageKey: 'memorio-family-auth', // Unique key per portal
       }
     });
+
+    // Escape user-controlled strings before interpolating into HTML
+    function esc(v){ if (v === null || v === undefined) return ''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     
     // Global auth state
     let isAuthenticated = false;
@@ -2038,8 +2041,8 @@
         console.log('=== END OBITUARY DEBUG ===\n');
 
         obituaryContent.innerHTML = `
-          <h4 style="margin-top: 0; color: #32343a;">${obituaryName}</h4>
-          <div id="obituaryTextBody" style="white-space: pre-wrap; line-height: 1.6;">${rawObituaryText}</div>
+          <h4 style="margin-top: 0; color: #32343a;">${esc(obituaryName)}</h4>
+          <div id="obituaryTextBody" style="white-space: pre-wrap; line-height: 1.6;">${esc(rawObituaryText)}</div>
         `;
 
         // Translate async in the correct direction (en→es or es→en as needed)
@@ -2151,7 +2154,7 @@
         icon: 'icon-check',
         title: i18n.t('family.timeline.caseCreated'),
         date: new Date(caseData.created_at).toLocaleDateString(),
-        description: i18n.t('family.timeline.caseCreatedDesc').replace('{name}', caseData.deceased_name)
+        description: i18n.t('family.timeline.caseCreatedDesc').replace('{name}', esc(caseData.deceased_name))
       });
       
       // Form submitted
@@ -2580,7 +2583,7 @@
         // Display obituary if available
         if (!obituaryError && obituary) {
           document.getElementById('memorialObituarySection').style.display = 'block';
-          document.getElementById('memorialObituaryContent').innerHTML = obituary.content_html || obituary.content_plain;
+          document.getElementById('memorialObituaryContent').innerHTML = obituary.content_html || esc(obituary.content_plain);
         }
         
         // Handle revision request UI
@@ -3061,7 +3064,7 @@
           .from('obituary_content')
           .upsert({
             case_id: currentCase.id,
-            content_html: `<div>${content.split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>`,
+            content_html: `<div>${content.split('\n\n').map(p => `<p>${esc(p)}</p>`).join('')}</div>`,
             content_plain: content,
             generated_by: currentUser?.id || 'AI',
             updated_at: new Date().toISOString()

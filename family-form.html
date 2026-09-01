@@ -855,6 +855,9 @@
                 storageKey: 'memorio-family-auth', // Must match dashboard storage key
             }
         });
+
+        // Escape user-controlled strings before interpolating into HTML
+        function esc(v){ if (v === null || v === undefined) return ''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
         
         // Global variables for authenticated user and case
         let currentUser = null;
@@ -2272,11 +2275,11 @@
 
                         <!-- ── Phase 2: Obituary generation status ── -->
                         <div id="writingStatus" class="writing-status">
-                            <div class="status-text">${craftingText}</div>
+                            <div class="status-text">${esc(craftingText)}</div>
                             <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
                         </div>
                         <div id="memorialInfo" class="memorial-info hidden">
-                            ${memorialInfoText}
+                            ${esc(memorialInfoText)}
                         </div>
                         <div id="obituaryCard" class="obituary-card hidden">
                             <div id="obituaryTitle" class="obituary-title">${i18n.t('form.updatedObituaryTitle')}</div>
@@ -2471,7 +2474,7 @@
                     .from('obituary_content')
                     .upsert({
                         case_id: currentCase.id,
-                        content_html: `<div>${obituaryContent.split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>`,
+                        content_html: `<div>${obituaryContent.split('\n\n').map(p => `<p>${esc(p)}</p>`).join('')}</div>`,
                         content_plain: obituaryContent,
                         generated_by: currentUser?.id || 'AI',
                         updated_at: new Date().toISOString()
@@ -2534,7 +2537,7 @@
             document.querySelectorAll('.field-label.loved-ones-name.other-names').forEach(el => {
                 const span = el.querySelector('#deceased-name-display');
                 const name = span ? span.textContent : '';
-                el.innerHTML = `<span>${t('form.otherNamesPrefix', 'Any other names you\'d like to include for ')}</span><span id="deceased-name-display">${name}</span><span>${t('form.otherNamesSuffix', '?')}</span>`;
+                el.innerHTML = `<span>${t('form.otherNamesPrefix', 'Any other names you\'d like to include for ')}</span><span id="deceased-name-display">${esc(name)}</span><span>${t('form.otherNamesSuffix', '?')}</span>`;
             });
             setPlaceholder('loved_ones_salutation', 'form.salutationPlaceholder', 'Salutation');
             setPlaceholder('loved_ones_middle_name', 'form.middleNamePlaceholder', 'Middle Name');

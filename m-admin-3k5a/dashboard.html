@@ -3662,6 +3662,9 @@
         storageKey: 'memorio-admin-auth',  // Unique key per portal
       }
     });
+
+    // Escape user-controlled strings before interpolating into HTML
+    function esc(v){ if (v === null || v === undefined) return ''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     
     // Global auth state
     let isAuthenticated = false;
@@ -4377,9 +4380,9 @@
         // Display case list
         listElement.innerHTML = cases.map(c => `
           <div style="padding: 12px; background: white; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #9a5b00;">
-            <strong>${c.deceased_name}</strong><br>
+            <strong>${esc(c.deceased_name)}</strong><br>
             <small style="color: #666;">
-              ${c.organizations?.name || 'Unknown Org'} • 
+              ${esc(c.organizations?.name || 'Unknown Org')} • 
               Submitted ${new Date(c.created_at).toLocaleDateString()}
             </small>
           </div>
@@ -4483,7 +4486,7 @@
         const timeAgo = getTimeAgo(new Date(notif.created_at));
         
         return `
-          <div class="notification-item ${isUnread ? 'unread' : ''}" onclick="handleNotificationClick('${notif.id}', '${notif.case_id}')">
+          <div class="notification-item ${isUnread ? 'unread' : ''}" onclick="handleNotificationClick('${esc(notif.id)}', '${esc(notif.case_id)}')">
             <div class="notification-icon error">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
@@ -4492,7 +4495,7 @@
             <div class="notification-content">
               <div class="notification-title">No Editors Available</div>
               <div class="notification-text">
-                Case <strong>${caseName}</strong> from ${orgName} needs an editor assignment
+                Case <strong>${esc(caseName)}</strong> from ${esc(orgName)} needs an editor assignment
               </div>
               <div class="notification-time">${timeAgo}</div>
             </div>
@@ -4679,19 +4682,19 @@
         }
         
         orgsList.innerHTML = orgs.map(org => `
-          <div class="org-card" onclick="openOrgModal('${org.id}')" style="cursor: pointer;">
-            <div class="org-card-name">${org.name}</div>
-            <div class="org-card-detail">${org.contact_email}</div>
-            ${org.contact_phone ? `<div class="org-card-detail">${org.contact_phone}</div>` : ''}
-            ${org.region ? `<div class="org-card-detail">${org.region}</div>` : ''}
+          <div class="org-card" onclick="openOrgModal('${esc(org.id)}')" style="cursor: pointer;">
+            <div class="org-card-name">${esc(org.name)}</div>
+            <div class="org-card-detail">${esc(org.contact_email)}</div>
+            ${org.contact_phone ? `<div class="org-card-detail">${esc(org.contact_phone)}</div>` : ''}
+            ${org.region ? `<div class="org-card-detail">${esc(org.region)}</div>` : ''}
             <div class="org-card-detail" style="margin-top: 10px;">Created: ${new Date(org.created_at).toLocaleDateString()}</div>
             <div class="org-card-id">
               <div class="credential-label">Organization ID (copy this when inviting Directors)</div>
-              <div class="credential-value" id="org-${org.id}" style="margin-top: 5px;">${org.id}</div>
-              <button class="copy-btn" onclick="event.stopPropagation(); copyOrgId('org-${org.id}')">Copy ID</button>
+              <div class="credential-value" id="org-${esc(org.id)}" style="margin-top: 5px;">${esc(org.id)}</div>
+              <button class="copy-btn" onclick="event.stopPropagation(); copyOrgId('org-${esc(org.id)}')">Copy ID</button>
             </div>
             <div style="display: flex; gap: 8px; margin-top: 12px;">
-              <button class="btn-secondary" onclick="event.stopPropagation(); deleteOrganization('${org.id}', '${org.name}')" style="padding: 6px 12px; font-size: 12px;">
+              <button class="btn-secondary" onclick="event.stopPropagation(); deleteOrganization('${esc(org.id)}', '${esc((org.name || '').replace(/'/g, "\\'"))}')" style="padding: 6px 12px; font-size: 12px;">
                 Delete Organization
               </button>
             </div>
@@ -4775,7 +4778,7 @@
       
       showConfirmationModal(
         'Delete Organization',
-        `Are you sure you want to delete the organization "${orgName}"?`,
+        `Are you sure you want to delete the organization "${esc(orgName)}"?`,
         `This action cannot be undone and will permanently remove:\n• Organization details\n• ${userCount} user account${userCount !== 1 ? 's' : ''} (Directors, Families)\n• All authentication credentials\n• All associated cases\n• All form submissions\n• All uploaded assets\n• All related data\n\nAll users will be immediately logged out and unable to log in.\n\nThis should only be done if the funeral home is leaving Memorio permanently.`,
         async () => {
           try {
@@ -5403,27 +5406,27 @@
           white-space: nowrap;
         ">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="1"></rect><path d="M16 8h4l3 5v3h-7V8z"></path><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-          <span id="admin-cooldown-timer-${caseData.id}">${cooldownInitialText}</span>
+          <span id="admin-cooldown-timer-${esc(caseData.id)}">${cooldownInitialText}</span>
         </span>` : '';
       
       return `
-        <div class="case-card" onclick="openCaseDetailModal('${caseData.id}')">
+        <div class="case-card" onclick="openCaseDetailModal('${esc(caseData.id)}')">
           <div class="case-card-header">
-            <div class="case-card-name">${caseData.deceased_name}</div>
+            <div class="case-card-name">${esc(caseData.deceased_name)}</div>
             <div style="display:flex; align-items:center; gap:6px;">
               ${cooldownBadge}
               ${slaBadge}
             </div>
           </div>
-          <div class="case-card-org">${orgName}</div>
+          <div class="case-card-org">${esc(orgName)}</div>
           <div class="case-card-meta">
             <div class="case-card-meta-row">
               <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
-              <span>Family: ${familyName}</span>
+              <span>Family: ${esc(familyName)}</span>
             </div>
             <div class="case-card-meta-row">
               <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
-              <span>Editor: ${editorName}</span>
+              <span>Editor: ${esc(editorName)}</span>
             </div>
             <div class="case-card-meta-row">
               <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
@@ -5665,23 +5668,23 @@
       }
       
       return `
-        <div class="account-card" style="cursor: pointer;" onclick="openAccountDetailsModal('${account.user_id}')">
+        <div class="account-card" style="cursor: pointer;" onclick="openAccountDetailsModal('${esc(account.user_id)}')">
           <div class="account-card-header">
             <div>
-              <div class="account-name">${name}</div>
-              <div class="account-email">${account.email}</div>
+              <div class="account-name">${esc(name)}</div>
+              <div class="account-email">${esc(account.email)}</div>
             </div>
-            <span class="account-role-badge ${account.role}">${account.role.toUpperCase()}</span>
+            <span class="account-role-badge ${esc(account.role)}">${esc(account.role.toUpperCase())}</span>
           </div>
           
           <div style="margin: 12px 0;">
-            <span class="account-status-badge ${account.status}">${account.status}</span>
+            <span class="account-status-badge ${esc(account.status)}">${esc(account.status)}</span>
           </div>
           
           <div class="account-info">
             <div class="account-info-row">
               <span class="account-info-label">Organization:</span>
-              <span>${orgName}</span>
+              <span>${esc(orgName)}</span>
             </div>
             <div class="account-info-row">
               <span class="account-info-label">Created:</span>
@@ -5699,7 +5702,7 @@
             <button 
               class="btn-danger" 
               style="width: 100%; padding: 10px; font-size: 14px;"
-              onclick="event.stopPropagation(); openDeleteAccountModal('${account.user_id}', '${account.email.replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}', '${account.role}')">
+              onclick="event.stopPropagation(); openDeleteAccountModal('${esc(account.user_id)}', '${esc(account.email.replace(/'/g, "\\'"))}', '${esc(name.replace(/'/g, "\\'"))}', '${esc(account.role)}')">
               Delete Account
             </button>
           </div>
@@ -5748,8 +5751,8 @@
         document.getElementById('modal-account-title').textContent = `${account.role.toUpperCase()} Account Details`;
         document.getElementById('modal-account-name').textContent = accountName;
         document.getElementById('modal-account-email').textContent = account.email;
-        document.getElementById('modal-account-role').innerHTML = `<span class="account-role-badge ${account.role}">${account.role.toUpperCase()}</span>`;
-        document.getElementById('modal-account-status').innerHTML = `<span class="account-status-badge ${account.status}">${account.status}</span>`;
+        document.getElementById('modal-account-role').innerHTML = `<span class="account-role-badge ${esc(account.role)}">${esc(account.role.toUpperCase())}</span>`;
+        document.getElementById('modal-account-status').innerHTML = `<span class="account-status-badge ${esc(account.status)}">${esc(account.status)}</span>`;
         document.getElementById('modal-account-org').textContent = account.org_name || 'Global Access';
         
         // Activity data
@@ -5845,7 +5848,7 @@
       
       showConfirmationModal(
         `Delete ${role.toUpperCase()} Account?`,
-        `Are you sure you want to permanently delete the account for <strong>${name}</strong> (${email})?`,
+        `Are you sure you want to permanently delete the account for <strong>${esc(name)}</strong> (${esc(email)})?`,
         `This action cannot be undone. This will:<br><br>• Remove the user from Supabase authentication<br>• Delete all user data from the database<br>• Revoke all access immediately`,
         () => confirmDeleteAccount()
       );
@@ -6047,8 +6050,8 @@
             }
             html += `
               <div class="modal-form-data-item">
-                <span class="modal-form-data-label">${formatFieldName(key)}</span>
-                <span class="modal-form-data-value">${value || 'N/A'}</span>
+                <span class="modal-form-data-label">${esc(formatFieldName(key))}</span>
+                <span class="modal-form-data-value">${esc(value || 'N/A')}</span>
               </div>
             `;
           });
@@ -6181,13 +6184,13 @@
         'case_created': 'Case created',
         'status_changed': 'Status changed',
         'form_submitted': 'Intake form completed and submitted',
-        'AUTO_ASSIGN_EDITOR': editorEmail ? `Editor automatically assigned: ${editorEmail}` : 'Editor automatically assigned',
+        'AUTO_ASSIGN_EDITOR': editorEmail ? `Editor automatically assigned: ${esc(editorEmail)}` : 'Editor automatically assigned',
         'editor_assigned': 'Editor assigned',
         'editor_reassigned': 'Editor reassigned',
-        'video_submitted': editorEmail ? `Video submitted to QC by ${editorEmail}${revisionNum ? ` (Revision #${revisionNum})` : ''}` : 'Video submitted to QC',
-        'qc_approved': qcEmail ? `QC approved - delivered to family by ${qcEmail}` : 'QC approved - delivered to family',
-        'qc_revision': qcEmail ? `QC requested revision by ${qcEmail}` : 'QC requested revision',
-        'qc_rejected': qcEmail ? `QC rejected by ${qcEmail}` : 'QC rejected',
+        'video_submitted': editorEmail ? `Video submitted to QC by ${esc(editorEmail)}${revisionNum ? ` (Revision #${esc(revisionNum)})` : ''}` : 'Video submitted to QC',
+        'qc_approved': qcEmail ? `QC approved - delivered to family by ${esc(qcEmail)}` : 'QC approved - delivered to family',
+        'qc_revision': qcEmail ? `QC requested revision by ${esc(qcEmail)}` : 'QC requested revision',
+        'qc_rejected': qcEmail ? `QC rejected by ${esc(qcEmail)}` : 'QC rejected',
         'qc_reassigned': 'QC reviewer reassigned',
         'pushed_to_revision': 'Case pushed to revision',
         'link_regenerated': 'Family login link regenerated',
@@ -6195,7 +6198,7 @@
         'note_added': 'Note added to case'
       };
       
-      return actionMap[action] || action.replace(/_/g, ' ');
+      return actionMap[action] || esc(action.replace(/_/g, ' '));
     }
     
     function formatActorDisplay(event) {
@@ -6209,7 +6212,7 @@
         'service_role': 'System'
       };
       
-      const badge = roleBadges[role] || role || 'System';
+      const badge = roleBadges[role] || esc(role) || 'System';
       return `By: ${badge}`;
     }
     
@@ -6320,7 +6323,7 @@
       let displayName = '';
       if (userId && userDetailsMap[userId]) {
         const user = userDetailsMap[userId];
-        displayName = user.name || user.email;
+        displayName = esc(user.name || user.email);
       } else if (role && role !== 'service_role') {
         // Use role as fallback
         const roleMap = {
@@ -6330,7 +6333,7 @@
           'editor': 'Editor',
           'qc': 'QC Reviewer'
         };
-        displayName = roleMap[role] || role;
+        displayName = roleMap[role] || esc(role);
       } else {
         displayName = 'System';
       }
@@ -6392,11 +6395,11 @@
             }
           }
           
-          const notesDisplay = notes ? `<br><small style="color: var(--text-tertiary);">QC Notes: ${notes}</small>` : '';
+          const notesDisplay = notes ? `<br><small style="color: var(--text-tertiary);">QC Notes: ${esc(notes)}</small>` : '';
           return `<strong>QC Requested Revision</strong>${notesDisplay}`;
         }
         
-        return `<strong>Status Changed:</strong> ${statusMap[oldStatus] || oldStatus} → ${statusMap[newStatus] || newStatus}`;
+        return `<strong>Status Changed:</strong> ${statusMap[oldStatus] || esc(oldStatus)} → ${statusMap[newStatus] || esc(newStatus)}`;
       }
       
       // Handle case updates specifically
@@ -6407,10 +6410,10 @@
         
         // Check for specific field changes
         if (old.deceased_name !== newData.deceased_name) {
-          changes.push(`Name: "${old.deceased_name}" → "${newData.deceased_name}"`);
+          changes.push(`Name: "${esc(old.deceased_name)}" → "${esc(newData.deceased_name)}"`);
         }
         if (old.status !== newData.status) {
-          changes.push(`Status: ${old.status} → ${newData.status}`);
+          changes.push(`Status: ${esc(old.status)} → ${esc(newData.status)}`);
         }
         if (old.assigned_family_user_id !== newData.assigned_family_user_id) {
           changes.push('Family assignment updated');
@@ -6432,32 +6435,32 @@
         'form_updated': '<strong>Form Updated</strong> after submission',
         
         'AUTO_ASSIGN_EDITOR': editorEmail 
-          ? `<strong>Editor Auto-Assigned:</strong> ${editorEmail}` 
+          ? `<strong>Editor Auto-Assigned:</strong> ${esc(editorEmail)}` 
           : '<strong>Editor Auto-Assigned</strong> by system',
         
         'editor_assigned': editorEmail 
-          ? `<strong>Editor Assigned:</strong> ${editorEmail}` 
+          ? `<strong>Editor Assigned:</strong> ${esc(editorEmail)}` 
           : '<strong>Editor Assigned</strong> to case',
         
         'editor_reassigned': payload?.new_editor_email 
-          ? `<strong>Editor Reassigned</strong><br><small style="color: var(--text-tertiary);">From: ${payload.old_editor_email || 'Unassigned'} → To: ${payload.new_editor_email}</small>`
+          ? `<strong>Editor Reassigned</strong><br><small style="color: var(--text-tertiary);">From: ${esc(payload.old_editor_email || 'Unassigned')} → To: ${esc(payload.new_editor_email)}</small>`
           : '<strong>Editor Reassigned</strong> to different editor',
         'editor_unassigned': '<strong>Editor Unassigned</strong> from case',
         
         'video_submitted': editorEmail 
-          ? `<strong>Video Submitted to QC</strong> by ${editorEmail}${revisionNum ? ` (Revision #${revisionNum})` : ''}${editorNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${editorNotes}</small>` : ''}`
-          : `<strong>Video Submitted to QC</strong>${revisionNum ? ` (Revision #${revisionNum})` : ''}`,
+          ? `<strong>Video Submitted to QC</strong> by ${esc(editorEmail)}${revisionNum ? ` (Revision #${esc(revisionNum)})` : ''}${editorNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${esc(editorNotes)}</small>` : ''}`
+          : `<strong>Video Submitted to QC</strong>${revisionNum ? ` (Revision #${esc(revisionNum)})` : ''}`,
         
         'qc_approved': qcEmail 
-          ? `<strong>QC Approved - Delivered to Family</strong> by ${qcEmail}${qcNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${qcNotes}</small>` : ''}`
+          ? `<strong>QC Approved - Delivered to Family</strong> by ${esc(qcEmail)}${qcNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${esc(qcNotes)}</small>` : ''}`
           : '<strong>QC Approved - Delivered to Family</strong>',
         
         'qc_revision': qcEmail 
-          ? `<strong>QC Requested Revision</strong> by ${qcEmail}${qcNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${qcNotes}</small>` : ''}`
+          ? `<strong>QC Requested Revision</strong> by ${esc(qcEmail)}${qcNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${esc(qcNotes)}</small>` : ''}`
           : '<strong>QC Requested Revision</strong>',
         
         'qc_rejected': qcEmail 
-          ? `<strong>QC Rejected</strong> by ${qcEmail}${qcNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${qcNotes}</small>` : ''}`
+          ? `<strong>QC Rejected</strong> by ${esc(qcEmail)}${qcNotes ? `<br><small style="color: var(--text-tertiary);">Notes: ${esc(qcNotes)}</small>` : ''}`
           : '<strong>QC Rejected</strong>',
         
         'qc_reassigned': '<strong>QC Reviewer Reassigned</strong>',
@@ -6475,7 +6478,7 @@
       }
       
       // Fallback: Clean up action type
-      return `<strong>${actionType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</strong>`;
+      return `<strong>${esc(actionType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))}</strong>`;
     }
     
     function switchModalTab(tabName) {

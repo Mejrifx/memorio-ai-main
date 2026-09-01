@@ -871,6 +871,9 @@
         storageKey: 'memorio-qc-auth',     // Unique key per portal
       }
     });
+
+    // Escape user-controlled strings before interpolating into HTML
+    function esc(v){ if (v === null || v === undefined) return ''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     
     // Global auth state
     let isAuthenticated = false;
@@ -1104,12 +1107,12 @@
                   font-size: 20px;
                   font-weight: 600;
                   margin: 0 0 6px 0;
-                ">${review.cases.deceased_name}</h3>
+                ">${esc(review.cases.deceased_name)}</h3>
                 <div style="
                   font-size: 14px;
                   color: #757575;
                   font-weight: 500;
-                ">v${review.revision_number}</div>
+                ">v${esc(review.revision_number)}</div>
               </div>
               <div style="
                 background-color: ${statusBgColor};
@@ -1149,7 +1152,7 @@
                   color: #32343a;
                   font-size: 15px;
                   font-weight: 500;
-                ">${review.cases.organizations?.name || 'Unknown'}</div>
+                ">${esc(review.cases.organizations?.name || 'Unknown')}</div>
               </div>
               
               <div style="
@@ -1170,7 +1173,7 @@
                   color: #32343a;
                   font-size: 15px;
                   font-weight: 500;
-                ">${review.users?.metadata?.name || review.users?.email || 'Unknown'}</div>
+                ">${esc(review.users?.metadata?.name || review.users?.email || 'Unknown')}</div>
               </div>
             </div>
             
@@ -1211,7 +1214,7 @@
                 font-size: 15px;
                 line-height: 1.7;
                 white-space: pre-wrap;
-              ">${review.qc_notes}</div>
+              ">${esc(review.qc_notes)}</div>
             </div>
             ` : ''}
           </div>
@@ -1243,14 +1246,14 @@
       }
       
       listContainer.innerHTML = allSubmissions.map(sub => `
-        <div class="review-list-item" data-id="${sub.id}" onclick="selectSubmission('${sub.id}')">
-          <div class="review-item-name">${sub.cases.deceased_name}</div>
+        <div class="review-list-item" data-id="${esc(sub.id)}" onclick="selectSubmission('${esc(sub.id)}')">
+          <div class="review-item-name">${esc(sub.cases.deceased_name)}</div>
           <div class="review-item-date" style="font-size: 13px; color: #436481;">
-            ${sub.cases.organizations?.name || 'Unknown Organization'}
+            ${esc(sub.cases.organizations?.name || 'Unknown Organization')}
           </div>
-          <div class="review-item-status status-${sub.qc_status.replace('_', '-')}">${formatStatus(sub.qc_status)}</div>
+          <div class="review-item-status status-${esc(sub.qc_status.replace('_', '-'))}">${esc(formatStatus(sub.qc_status))}</div>
           <div class="review-item-date">Submitted: ${formatDate(sub.submitted_at)}</div>
-          ${sub.revision_number > 1 ? `<div class="review-item-date">Revision #${sub.revision_number}</div>` : ''}
+          ${sub.revision_number > 1 ? `<div class="review-item-date">Revision #${esc(sub.revision_number)}</div>` : ''}
         </div>
       `).join('');
     }
@@ -1323,12 +1326,12 @@
       
       content.innerHTML = `
         <div class="review-content-header">
-          <h2 class="review-content-title">${submission.cases.deceased_name}</h2>
+          <h2 class="review-content-title">${esc(submission.cases.deceased_name)}</h2>
           <div class="review-content-meta">
-            <span>Editor: ${editorName}</span>
+            <span>Editor: ${esc(editorName)}</span>
             <span>•</span>
             <span>Submitted: ${formatDate(submission.submitted_at)}</span>
-            ${submission.revision_number > 1 ? `<span>• Revision #${submission.revision_number}</span>` : ''}
+            ${submission.revision_number > 1 ? `<span>• Revision #${esc(submission.revision_number)}</span>` : ''}
           </div>
         </div>
         
@@ -1372,7 +1375,7 @@
               <div class="obituary-section">
                 <h3 class="section-title">Obituary Content</h3>
                 <div class="obituary-content">
-                  ${obituary.content_html || obituary.content_plain}
+                  ${obituary.content_html || esc(obituary.content_plain)}
                 </div>
               </div>
             ` : ''}
@@ -1380,7 +1383,7 @@
             ${submission.editor_notes ? `
               <div class="editor-notes" style="margin-top: 16px;">
                 <strong style="color: #32343a; font-size: 14px;">Editor's Notes:</strong>
-                <p style="margin-top: 6px; color: #32343a; font-size: 13px;">${submission.editor_notes}</p>
+                <p style="margin-top: 6px; color: #32343a; font-size: 13px;">${esc(submission.editor_notes)}</p>
               </div>
             ` : ''}
             
@@ -1390,7 +1393,7 @@
                   <strong style="color: #1d6b45; font-size: 14px;">Family Revision</strong>
                   <span class="family-revision-badge">From Family</span>
                 </div>
-                <p style="margin-top: 8px; color: #333; line-height: 1.5; font-size: 13px;">${familyRevisionNotes}</p>
+                <p style="margin-top: 8px; color: #333; line-height: 1.5; font-size: 13px;">${esc(familyRevisionNotes)}</p>
                 <p style="margin-top: 6px; font-size: 11px; color: #666; font-style: italic;">
                   Verify all changes before approving.
                 </p>
@@ -1721,7 +1724,7 @@
 
           <!-- Click-to-load overlay (hidden once video starts loading) -->
           <div id="${wrapperId}-overlay"
-            onclick="loadQCVideo('${videoId}','${wrapperId}','${url.replace(/'/g, "\\'")}','${submission.mime_type || 'video/mp4'}')"
+            onclick="loadQCVideo('${videoId}','${wrapperId}','${esc(url.replace(/'/g, "\\'"))}','${esc((submission.mime_type || 'video/mp4').replace(/'/g, "\\'"))}')"
             style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; background: #2c4459; z-index: 2;">
             <div style="width: 72px; height: 72px; background: rgba(255,255,255,0.15); border: 2.5px solid rgba(255,255,255,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; transition: background 0.2s;"
               onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
@@ -1750,7 +1753,7 @@
             oncanplay="showQCVideoPlayer('${videoId}','${wrapperId}')"
             onwaiting="document.getElementById('${wrapperId}-loading').style.display='flex'"
             onplaying="document.getElementById('${wrapperId}-loading').style.display='none'">
-            <source src="${url}" type="${submission.mime_type || 'video/mp4'}">
+            <source src="${url}" type="${esc(submission.mime_type || 'video/mp4')}">
             Your browser does not support the video tag.
           </video>
         </div>`;

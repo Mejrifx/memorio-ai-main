@@ -72,3 +72,12 @@ Thumbs.db
 # Local development files
 mock-server.js
 *.log
+
+# never commit secrets or local env
+.env
+.env.*
+*.pem
+*.key
+credentials.md
+supabase/.temp/
+supabase/diagnostics/

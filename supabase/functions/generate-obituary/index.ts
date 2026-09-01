@@ -145,9 +145,10 @@ ${language === 'es'
 
     // Persist server-side (upsert keyed on case_id; schema from migration 018:
     // content_html + content_plain are NOT NULL)
+    const escapeHtml = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const contentHtml = content
       .split(/\n\n+/)
-      .map((p) => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+      .map((p) => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
       .join('\n');
     const { error: saveError } = await supabase
       .from('obituary_content')

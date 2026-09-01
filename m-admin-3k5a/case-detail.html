@@ -1085,6 +1085,9 @@
       }
     });
 
+    // Escape user-controlled strings before interpolating into HTML
+    function esc(v){ if (v === null || v === undefined) return ''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
     // ============================================================================
     // GLOBAL STATE
     // ============================================================================
@@ -1254,7 +1257,7 @@
       const slaContainer = document.getElementById('caseSLA');
       if (c.sla_state) {
         const hours = Math.floor(c.sla_hours_elapsed || 0);
-        slaContainer.innerHTML = `<div class="sla-badge ${c.sla_state}">${hours}h elapsed</div>`;
+        slaContainer.innerHTML = `<div class="sla-badge ${esc(c.sla_state)}">${hours}h elapsed</div>`;
       } else {
         slaContainer.innerHTML = '<div class="sla-badge" style="background-color: #edf2f7; color: #436481; border-color: rgba(67,100,129,.35);">No SLA</div>';
       }
@@ -1291,29 +1294,29 @@
       document.getElementById('caseMeta').innerHTML = `
         <div class="meta-item">
           <span class="meta-label">Funeral Home</span>
-          <span class="meta-value">${c.organizations?.name || 'Unknown'}</span>
+          <span class="meta-value">${esc(c.organizations?.name || 'Unknown')}</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Status</span>
-          <span class="meta-value">${c.status.replace(/_/g, ' ')}</span>
+          <span class="meta-value">${esc(c.status.replace(/_/g, ' '))}</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Assigned Editor</span>
           <span class="meta-value">
-            ${editorName}
+            ${esc(editorName)}
             <button class="reassign-btn" onclick="openReassignEditorModal()">Change</button>
           </span>
         </div>
         <div class="meta-item">
           <span class="meta-label">QC Reviewer</span>
           <span class="meta-value">
-            ${qcName}
+            ${esc(qcName)}
             <button class="reassign-btn" onclick="openReassignQCModal()">Change</button>
           </span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Family Contact</span>
-          <span class="meta-value">${c.family_user?.email || 'N/A'}</span>
+          <span class="meta-value">${esc(c.family_user?.email || 'N/A')}</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">Created</span>
@@ -1450,12 +1453,12 @@
       switch(action) {
         case 'cases_created':
         case 'CREATE_CASE':
-          return `<strong>Case created</strong> for ${newData.deceased_name || 'deceased'}`;
+          return `<strong>Case created</strong> for ${esc(newData.deceased_name || 'deceased')}`;
         
         case 'status_changed':
           const fromStatus = (changes.from || oldData.status || '').replace(/_/g, ' ');
           const toStatus = (changes.to || newData.status || '').replace(/_/g, ' ');
-          return `<strong>Status changed</strong> from "<em>${fromStatus}</em>" to "<em>${toStatus}</em>"`;
+          return `<strong>Status changed</strong> from "<em>${esc(fromStatus)}</em>" to "<em>${esc(toStatus)}</em>"`;
         
         case 'case_updated':
         case 'UPDATE':
@@ -1463,7 +1466,7 @@
           if (oldData.status !== newData.status) {
             const from = (oldData.status || '').replace(/_/g, ' ');
             const to = (newData.status || '').replace(/_/g, ' ');
-            return `<strong>Status changed</strong> from "<em>${from}</em>" to "<em>${to}</em>"`;
+            return `<strong>Status changed</strong> from "<em>${esc(from)}</em>" to "<em>${esc(to)}</em>"`;
           }
           return '<strong>Case updated</strong>';
         
@@ -1479,7 +1482,7 @@
           const editorName = payload.editor_name || editorEmail;
           
           if (editorName) {
-            return `<strong>Editor automatically assigned:</strong> ${editorName}`;
+            return `<strong>Editor automatically assigned:</strong> ${esc(editorName)}`;
           }
           
           // Fallback: Look up editor from assignments
@@ -1494,7 +1497,7 @@
             
             if (assignments) {
               const name = assignments.editor_metadata?.name || assignments.editor_email;
-              return `<strong>Editor automatically assigned:</strong> ${name}`;
+              return `<strong>Editor automatically assigned:</strong> ${esc(name)}`;
             }
           } catch (err) {
             console.log('Could not fetch editor details:', err);
@@ -1514,7 +1517,7 @@
               
               if (editor) {
                 const editorName = editor.metadata?.name || editor.email;
-                return `<strong>Editor assigned:</strong> ${editorName}`;
+                return `<strong>Editor assigned:</strong> ${esc(editorName)}`;
               }
             } catch (err) {
               console.log('Could not fetch editor details:', err);
@@ -1534,7 +1537,7 @@
               
               if (editor) {
                 const editorName = editor.metadata?.name || editor.email;
-                return `<strong>Editor reassigned to:</strong> ${editorName}`;
+                return `<strong>Editor reassigned to:</strong> ${esc(editorName)}`;
               }
             } catch (err) {
               console.log('Could not fetch editor details:', err);
@@ -1554,7 +1557,7 @@
               
               if (qc) {
                 const qcName = qc.metadata?.name || qc.email;
-                return `<strong>QC reviewer reassigned to:</strong> ${qcName}`;
+                return `<strong>QC reviewer reassigned to:</strong> ${esc(qcName)}`;
               }
             } catch (err) {
               console.log('Could not fetch QC details:', err);
@@ -1565,19 +1568,19 @@
         case 'video_submitted':
           const editorEmailSub = payload.editor_email || 'Editor';
           const revisionNum = payload.revision_number || 1;
-          return `<strong>Video submitted to QC</strong> by ${editorEmailSub} (Revision #${revisionNum})`;
+          return `<strong>Video submitted to QC</strong> by ${esc(editorEmailSub)} (Revision #${esc(revisionNum)})`;
         
         case 'qc_approved':
           const qcEmailApp = payload.qc_reviewer_email || 'QC Reviewer';
-          return `<strong>QC approved video - delivered to family</strong> by ${qcEmailApp}`;
+          return `<strong>QC approved video - delivered to family</strong> by ${esc(qcEmailApp)}`;
         
         case 'qc_revision':
           const qcEmailRev = payload.qc_reviewer_email || 'QC Reviewer';
-          return `<strong>QC requested revision</strong> - returned to editor by ${qcEmailRev}`;
+          return `<strong>QC requested revision</strong> - returned to editor by ${esc(qcEmailRev)}`;
         
         case 'qc_rejected':
           const qcEmailRej = payload.qc_reviewer_email || 'QC Reviewer';
-          return `<strong>QC rejected video</strong> - escalated to admin by ${qcEmailRej}`;
+          return `<strong>QC rejected video</strong> - escalated to admin by ${esc(qcEmailRej)}`;
         
         case 'pushed_to_revision':
           return '<strong>Case pushed to revision</strong> by admin';
@@ -1595,7 +1598,7 @@
           return '<strong>Family member assigned</strong> to case';
         
         default:
-          return action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          return esc(action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
       }
     }
     
@@ -1638,7 +1641,7 @@
       
       const roleBadge = formatRoleBadge(role);
       
-      return `By: <strong>${displayName}</strong> ${roleBadge ? `<span class="role-badge">${roleBadge}</span>` : ''}`;
+      return `By: <strong>${esc(displayName)}</strong> ${roleBadge ? `<span class="role-badge">${roleBadge}</span>` : ''}`;
     }
     
     function formatRoleDisplay(role) {
@@ -1745,8 +1748,8 @@
             }
             html += `
               <div class="form-data-item">
-                <span class="form-data-label">${formatFieldName(key)}</span>
-                <span class="form-data-value">${value || 'N/A'}</span>
+                <span class="form-data-label">${esc(formatFieldName(key))}</span>
+                <span class="form-data-value">${esc(value || 'N/A')}</span>
               </div>
             `;
           });
@@ -1797,10 +1800,10 @@
         notesContainer.innerHTML = notes.map(note => `
           <div class="note-item ${note.is_pinned ? 'pinned' : ''}">
             <div class="note-header">
-              <span class="note-author">${note.users?.metadata?.name || note.users?.email || 'Unknown'}</span>
-              <span class="note-type-badge">${note.note_type}</span>
+              <span class="note-author">${esc(note.users?.metadata?.name || note.users?.email || 'Unknown')}</span>
+              <span class="note-type-badge">${esc(note.note_type)}</span>
             </div>
-            <div class="note-content">${note.content}</div>
+            <div class="note-content">${esc(note.content)}</div>
             <div class="note-time">${new Date(note.created_at).toLocaleString()}</div>
           </div>
         `).join('');
@@ -1884,12 +1887,12 @@
           <div class="timeline-item">
             <div class="timeline-time">${new Date(e.timestamp).toLocaleString()}</div>
             <div class="timeline-event">
-              <strong>${e.action_type}</strong>
-              ${e.payload ? `<br><small>${JSON.stringify(e.payload).substring(0, 100)}...</small>` : ''}
+              <strong>${esc(e.action_type)}</strong>
+              ${e.payload ? `<br><small>${esc(JSON.stringify(e.payload).substring(0, 100))}...</small>` : ''}
             </div>
             <div class="timeline-actor">
-              Actor: ${e.actor_role || 'System'} 
-              ${e.actor_user_id ? `(ID: ${e.actor_user_id.substring(0, 8)})` : ''}
+              Actor: ${esc(e.actor_role || 'System')} 
+              ${e.actor_user_id ? `(ID: ${esc(e.actor_user_id.substring(0, 8))})` : ''}
             </div>
           </div>
         `).join('');
@@ -1932,7 +1935,7 @@
         
         const select = document.getElementById('editorSelect');
         select.innerHTML = '<option value="">Select an editor...</option>' + 
-          editors.map(e => `<option value="${e.id}">${e.metadata?.name || e.email}</option>`).join('');
+          editors.map(e => `<option value="${esc(e.id)}">${esc(e.metadata?.name || e.email)}</option>`).join('');
         
         // Show modal
         document.getElementById('reassignEditorModal').classList.add('active');
@@ -2036,7 +2039,7 @@
         
         const select = document.getElementById('qcSelect');
         select.innerHTML = '<option value="">Select a QC reviewer...</option>' + 
-          qcUsers.map(q => `<option value="${q.id}">${q.metadata?.name || q.email}</option>`).join('');
+          qcUsers.map(q => `<option value="${esc(q.id)}">${esc(q.metadata?.name || q.email)}</option>`).join('');
         
         // Show modal
         document.getElementById('reassignQCModal').classList.add('active');

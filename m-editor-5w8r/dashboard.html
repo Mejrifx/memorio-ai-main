@@ -1181,6 +1181,9 @@
         storageKey: 'memorio-editor-auth', // Unique key per portal
       }
     });
+
+    // Escape user-controlled strings before interpolating into HTML
+    function esc(v){ if (v === null || v === undefined) return ''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     
     // Global auth state
     let isAuthenticated = false;
@@ -1710,7 +1713,7 @@
           }
           
           const versionBadge = c.latest_submission && c.latest_submission.revision_number > 1 
-            ? `<span class="version-badge">v${c.latest_submission.revision_number}</span>` 
+            ? `<span class="version-badge">v${esc(c.latest_submission.revision_number)}</span>` 
             : '';
           
           // Get SLA badge positioned in top-right corner
@@ -1732,21 +1735,21 @@
                    <circle cx="6" cy="18" r="3"></circle>
                    <circle cx="18" cy="16" r="3"></circle>
                  </svg>
-                 <span>${musicSelection}</span>
+                 <span>${esc(musicSelection)}</span>
                </div>`
             : '';
           
           return `
-            <div class="case-card" onclick="openCaseModal('${c.id}')">
+            <div class="case-card" onclick="openCaseModal('${esc(c.id)}')">
               ${slaBadge}
-              <div class="case-name">${c.deceased_name} ${versionBadge}</div>
-              <div class="case-id">ID: ${c.id.substring(0, 8)}...</div>
+              <div class="case-name">${esc(c.deceased_name)} ${versionBadge}</div>
+              <div class="case-id">ID: ${esc(c.id.substring(0, 8))}...</div>
               <div class="case-org">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                ${c.organizations?.name || 'Unknown'}
+                ${esc(c.organizations?.name || 'Unknown')}
               </div>
               <div class="case-meta">
                 <div class="case-meta-item">
@@ -1755,7 +1758,7 @@
                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
                     <polyline points="21 15 16 10 5 21"></polyline>
                   </svg>
-                  <span>${c.photo_count} photo${c.photo_count !== 1 ? 's' : ''}</span>
+                  <span>${esc(c.photo_count)} photo${c.photo_count !== 1 ? 's' : ''}</span>
                 </div>
                 <div class="case-meta-item">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle;">
@@ -1872,19 +1875,19 @@
           }
           
           const versionBadge = sub.revision_number > 1 
-            ? `<span style="background: #436481; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">v${sub.revision_number}</span>`
+            ? `<span style="background: #436481; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">v${esc(sub.revision_number)}</span>`
             : '';
           
           return `
             <div class="case-card" style="cursor: default;">
-              <div class="case-name">${caseName} ${versionBadge}</div>
-              <div class="case-id">ID: ${sub.case_id.substring(0, 8)}...</div>
+              <div class="case-name">${esc(caseName)} ${versionBadge}</div>
+              <div class="case-id">ID: ${esc(sub.case_id.substring(0, 8))}...</div>
               <div class="case-org">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                ${orgName}
+                ${esc(orgName)}
               </div>
               <div class="case-meta">
                 <div class="case-meta-item">
@@ -1903,14 +1906,14 @@
                   <span>${(sub.file_size_bytes / (1024 * 1024)).toFixed(1)} MB</span>
                 </div>
               </div>
-              <div class="case-status ${statusClass}">${statusBadge}</div>
+              <div class="case-status ${statusClass}">${esc(statusBadge)}</div>
             </div>
           `;
         }).join('');
         
       } catch (error) {
         console.error('Error loading edit history:', error);
-        completedList.innerHTML = `<p style="color: #e74c3c;">Error loading edit history: ${error.message}</p>`;
+        completedList.innerHTML = `<p style="color: #e74c3c;">Error loading edit history: ${esc(error.message)}</p>`;
       }
     }
     
@@ -2035,7 +2038,7 @@
         if (familyQuote) {
           quoteSection.innerHTML = `
             <div class="quote-label">FAMILY'S MESSAGE / SHORT MEMORY</div>
-            <p class="quote-text">"${familyQuote}"</p>
+            <p class="quote-text">"${esc(familyQuote)}"</p>
           `;
           quoteSection.style.display = 'block';
         } else {
@@ -2061,9 +2064,9 @@
               </svg>
               FAMILY REVISION REQUEST
               <span class="revision-source-badge">From Family</span>
-              <span class="version-badge">v${latestSubmission.revision_number + 1} needed</span>
+              <span class="version-badge">v${esc(latestSubmission.revision_number + 1)} needed</span>
             </div>
-            <div class="revision-notice-text">${latestSubmission.family_revision_notes}</div>
+            <div class="revision-notice-text">${esc(latestSubmission.family_revision_notes)}</div>
           `;
           revisionNotice.style.display = 'block';
         } 
@@ -2079,9 +2082,9 @@
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
               </svg>
               QC REVISION REQUESTED
-              <span class="version-badge">v${latestSubmission.revision_number + 1} needed</span>
+              <span class="version-badge">v${esc(latestSubmission.revision_number + 1)} needed</span>
             </div>
-            <div class="revision-notice-text">${latestSubmission.qc_notes || 'Please make revisions and resubmit.'}</div>
+            <div class="revision-notice-text">${esc(latestSubmission.qc_notes || 'Please make revisions and resubmit.')}</div>
           `;
           revisionNotice.style.display = 'block';
         } 
@@ -2112,11 +2115,11 @@
         const metadataHtml = `
           <div class="modal-detail-item">
             <div class="modal-detail-label">Case ID:</div>
-            <div class="modal-detail-value">${caseData.id}</div>
+            <div class="modal-detail-value">${esc(caseData.id)}</div>
           </div>
           <div class="modal-detail-item">
             <div class="modal-detail-label">Funeral Home:</div>
-            <div class="modal-detail-value">${caseData.organizations?.name || 'Unknown'}</div>
+            <div class="modal-detail-value">${esc(caseData.organizations?.name || 'Unknown')}</div>
           </div>
           <div class="modal-detail-item">
             <div class="modal-detail-label">Assignment Date:</div>
@@ -2128,12 +2131,12 @@
           </div>
           <div class="modal-detail-item">
             <div class="modal-detail-label">Music Selection:</div>
-            <div class="modal-detail-value" style="font-weight: 600; color: #436481;">${musicSelection}</div>
+            <div class="modal-detail-value" style="font-weight: 600; color: #436481;">${esc(musicSelection)}</div>
           </div>
           ${latestSubmission ? `
           <div class="modal-detail-item">
             <div class="modal-detail-label">Current Version:</div>
-            <div class="modal-detail-value">v${latestSubmission.revision_number}</div>
+            <div class="modal-detail-value">v${esc(latestSubmission.revision_number)}</div>
           </div>
           <div class="modal-detail-item">
             <div class="modal-detail-label">Last Submission:</div>
@@ -2141,7 +2144,7 @@
           </div>
           <div class="modal-detail-item">
             <div class="modal-detail-label">QC Status:</div>
-            <div class="modal-detail-value">${latestSubmission.qc_status.replace(/_/g, ' ').toUpperCase()}</div>
+            <div class="modal-detail-value">${esc(latestSubmission.qc_status.replace(/_/g, ' ').toUpperCase())}</div>
           </div>
           ` : ''}
         `;
@@ -2444,12 +2447,12 @@
               ${submission.qc_notes ? `
                 <div style="color: #32343a; margin-top: 8px;">
                   <strong>QC Feedback:</strong>
-                  <p style="margin-top: 6px; color: #666;">${submission.qc_notes}</p>
+                  <p style="margin-top: 6px; color: #666;">${esc(submission.qc_notes)}</p>
                 </div>
               ` : ''}
               <div style="color: #666; font-size: 13px; margin-top: 8px;">
                 Submitted: ${new Date(submission.submitted_at).toLocaleString()}
-                ${submission.revision_number > 1 ? ` • Revision #${submission.revision_number}` : ''}
+                ${submission.revision_number > 1 ? ` • Revision #${esc(submission.revision_number)}` : ''}
               </div>
             </div>
           </div>

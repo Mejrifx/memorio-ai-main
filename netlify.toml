@@ -124,13 +124,7 @@
   to = "/index.html"
   status = 200
 
-# Security headers
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
+# Security headers live in _headers (single source of truth)
 
 # Cache static assets for better performance (but not i18n.js which needs to update)
 [[headers]]
