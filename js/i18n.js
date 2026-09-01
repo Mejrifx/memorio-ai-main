@@ -1719,3 +1719,6 @@ Object.assign(i18n.translations.es, {
   "mk.sv.closeP": "El primero es gratis, sin nada que instalar y sin mínimos que comprometer. Envíe a una familia por la entrega y vea lo que recibe.",
   "mk.sv.closeMail": "Escribir al fundador"
 });
+
+Object.assign(i18n.translations.en, {"mk.hero.fam1": "Here for someone you love? ", "mk.hero.fam2": "Family sign-in"});
+Object.assign(i18n.translations.es, {"mk.hero.fam1": "¿Está aquí por un ser querido? ", "mk.hero.fam2": "Acceso para familias"});

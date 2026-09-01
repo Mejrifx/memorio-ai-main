@@ -121,6 +121,8 @@
 
     /* Hero: full-width editorial, no artifact */
     .svc-hero{padding:calc(var(--nav-h) + 72px) 0 84px;}
+    .svc-hero-inner{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:64px;align-items:center;}
+    .svc-hero-media img{display:block;width:100%;height:auto;aspect-ratio:4/5;max-height:460px;object-fit:cover;object-position:center;border-radius:var(--radius-card);}
     .svc-hero h1{font-size:clamp(2.2rem,4.4vw,3.3rem);max-width:19ch;margin-bottom:22px;}
     .svc-hero .lede{font-size:1.15rem;color:var(--ink-soft);max-width:62ch;}
     .svc-hero .hero-ctas{margin-top:32px;display:flex;flex-wrap:wrap;gap:14px;}
@@ -140,6 +142,7 @@
     .receive-inner{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:60px;align-items:start;}
     .receive h2{font-size:clamp(1.9rem,3.4vw,2.6rem);margin-bottom:18px;}
     .receive .receive-note{color:var(--ink-soft);}
+    .receive-photo{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:var(--radius-card);margin-top:32px;}
     .deliverable{background:var(--cream);border-radius:var(--radius-card);padding:30px 34px;box-shadow:0 8px 26px rgba(50,52,58,.08);}
     .deliverable + .deliverable{margin-top:22px;}
     .deliverable h3{font-size:1.3rem;margin-bottom:8px;}
@@ -178,13 +181,17 @@
 
     @media (max-width:1024px){
       .receive-inner{grid-template-columns:1fr;gap:40px;}
+      .svc-hero-inner{grid-template-columns:1fr;gap:36px;}
+      .svc-hero-media img{max-height:360px;aspect-ratio:16/9;object-position:center 60%;}
     }
     @media (max-width:768px){
       html{scroll-padding-top:calc(var(--nav-h-sm) + 20px);}
       .site-nav{height:var(--nav-h-sm);}
       .nav-links,.nav-family,.nav-cta,.lang-toggle.nav-desktop-lang{display:none;}
       .hamburger{display:block;}
-      .svc-hero{padding:calc(var(--nav-h-sm) + 36px) 0 60px;}
+      .svc-hero{padding:calc(var(--nav-h-sm) + 36px) 0 52px;}
+      .svc-hero-media{display:none;}
+      .receive-photo{aspect-ratio:16/9;margin-top:22px;}
       .pipeline{padding:68px 0;}
       .stage{grid-template-columns:64px minmax(0,1fr);gap:18px;padding:28px 0;}
       .stage-num{font-size:2.1rem;}
@@ -247,12 +254,17 @@
   <main id="main" tabindex="-1">
 
     <section class="svc-hero">
-      <div class="container">
+      <div class="container svc-hero-inner">
+        <div>
         <h1><span data-i18n="mk.sv.t1">How the handoff works, </span><em class="hl" data-i18n="mk.sv.h1">in detail</em></h1>
         <p class="lede" data-i18n="mk.sv.lede">For the director who wants to see the whole pipeline before trusting it with a family. This page walks through every stage of a Memorio tribute, what your team touches, what we handle, and how family information is protected.</p>
         <div class="hero-ctas">
           <a href="index.html#contact" class="btn btn-primary" data-i18n="mk.sv.cta1">Start with a free tribute</a>
           <a href="index.html#offer" class="btn btn-ghost" data-i18n="mk.sv.cta2">See pricing</a>
+        </div>
+        </div>
+        <div class="svc-hero-media">
+          <img src="images/editorial-window.jpg" alt="An empty wooden chair beside a tall window with a sheer curtain, morning light on the floor" width="1200" height="1489">
         </div>
       </div>
     </section>
@@ -314,6 +326,7 @@
           <div>
             <h2><span data-i18n="mk.sv.recT1">What comes </span><em class="hl" data-i18n="mk.sv.recH1">back</em></h2>
             <p class="receive-note" data-i18n="mk.sv.recNote">Every delivered tribute meets the same professional standard, whatever your week looks like. Nothing to assemble, nothing to fix, nothing waiting on a staff member's spare hour.</p>
+            <img class="receive-photo" src="images/editorial-flowers.jpg" alt="A modest arrangement of white flowers in a plain ceramic vase by a window" width="1400" height="939" loading="lazy">
           </div>
           <div>
             <div class="deliverable">

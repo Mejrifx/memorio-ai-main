@@ -180,6 +180,8 @@
     .hero-sub{font-size:1.15rem;color:var(--ink-soft);margin-bottom:34px;}
     .hero-ctas{display:flex;flex-wrap:wrap;gap:14px;}
     .hero-note{margin-top:18px;font-size:.9rem;color:var(--ink-soft);}
+    .hero-family{margin-top:10px;font-size:.95rem;font-family:var(--serif);color:var(--ink);}
+    .hero-family a{color:var(--slate);text-decoration:underline;text-underline-offset:3px;}
 
     /* Timeline artifact: bleeds to the right viewport edge on desktop */
     .artifact-wrap{justify-self:end;width:100%;}
@@ -207,6 +209,7 @@
       .hero-sub{animation-delay:.15s;}
       .hero-ctas{animation-delay:.25s;}
       .hero-note{animation-delay:.3s;}
+      .hero-family{animation-delay:.32s;}
       .artifact{animation-delay:.35s;}
       @keyframes rise{to{opacity:1;transform:translateY(0);}}
     }
@@ -239,13 +242,15 @@
 
     /* ---------- Proof (weighted, not a grid) ---------- */
     .proof{padding:110px 0 90px;position:relative;}
-    .proof-main{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:60px;align-items:start;margin-bottom:84px;}
+    .proof-main{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:72px;align-items:center;margin-bottom:96px;}
     .proof-main h2{font-size:clamp(1.9rem,3.4vw,2.6rem);margin-bottom:20px;}
     .proof-main p{color:var(--ink-soft);}
-    .pull-quote{background:var(--cream);border-radius:var(--radius-card);padding:38px 40px;box-shadow:0 10px 30px rgba(50,52,58,.09);margin-bottom:-150px;position:relative;z-index:2;}
-    .pull-quote blockquote{font-family:var(--serif);font-size:1.5rem;line-height:1.4;font-style:italic;color:var(--ink);}
-    .pull-quote cite{display:block;margin-top:16px;font-style:normal;font-size:.9rem;color:var(--ink-soft);}
-    .proof-rows{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:0;padding-top:60px;}
+    .proof-media{position:relative;padding-bottom:64px;padding-right:48px;}
+    .proof-media img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:var(--radius-card);}
+    .pull-quote{position:absolute;right:0;bottom:0;width:min(78%,360px);background:var(--cream);border-radius:var(--radius-card);padding:28px 30px;box-shadow:0 12px 32px rgba(50,52,58,.12);z-index:2;}
+    .pull-quote blockquote{font-family:var(--serif);font-size:1.25rem;line-height:1.4;font-style:italic;color:var(--ink);}
+    .pull-quote cite{display:block;margin-top:14px;font-style:normal;font-size:.85rem;color:var(--ink-soft);}
+    .proof-rows{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:0;}
     .proof-row{position:relative;padding-top:8px;}
     .proof-row h3{font-size:1.45rem;margin-bottom:12px;}
     .proof-row p{color:var(--ink-soft);font-size:1rem;}
@@ -323,8 +328,10 @@
       .artifact{border-radius:var(--radius-card);margin-right:0;}
       .handoff-cols{grid-template-columns:1fr;gap:48px;}
       .proof-main{grid-template-columns:1fr;gap:36px;}
-      .pull-quote{margin-bottom:0;}
-      .proof-rows{padding-top:56px;grid-template-columns:1fr 1fr;}
+      .proof-media{padding-right:0;padding-bottom:0;}
+      .proof-media img{aspect-ratio:3/2;object-position:center 70%;}
+      .pull-quote{position:relative;width:auto;margin:-36px 20px 0;}
+      .proof-rows{grid-template-columns:1fr 1fr;}
       .offer-inner{grid-template-columns:1fr;gap:40px;}
       .contact-cols{grid-template-columns:1fr;gap:48px;}
     }
@@ -345,8 +352,13 @@
       .handoff-intro{margin-bottom:38px;}
       .handoff-cols{gap:38px;}
       .proof{padding:64px 0 56px;}
-      .proof-main{gap:30px;margin-bottom:0;}
-      .proof-rows{grid-template-columns:1fr;gap:38px;padding-top:48px;}
+      .proof-main{gap:26px;margin-bottom:48px;}
+      .proof-media img{aspect-ratio:21/9;}
+      .tl li.tl-mobile-hide{display:none;}
+      .artifact-note{display:none;}
+      .pull-quote{margin:-28px 14px 0;padding:22px 22px;}
+      .pull-quote blockquote{font-size:1.1rem;}
+      .proof-rows{grid-template-columns:1fr;gap:38px;}
       .ghost-num{font-size:8rem;top:-52px;}
       .offer{padding:64px 0;}
       .offer-price .price{font-size:4.2rem;}
@@ -421,6 +433,7 @@
             <a href="#handoff" class="btn btn-ghost" data-i18n="mk.hero.cta2">See what your staff does</a>
           </div>
           <p class="hero-note" data-i18n="mk.hero.note">No setup fees. No minimums. $150 flat per delivered tribute.</p>
+          <p class="hero-family"><span data-i18n="mk.hero.fam1">Here for someone you love? </span><a href="/family/login" data-i18n="mk.hero.fam2">Family sign-in</a></p>
         </div>
         <div class="artifact-wrap">
           <div class="artifact" aria-label="Example delivery timeline">
@@ -431,7 +444,7 @@
                 <span class="tl-dotcol"><span class="tl-dot"></span></span>
                 <span class="tl-text"><span data-i18n="mk.tl.s1">Your staff enters the basics and opens a new tribute</span><small data-i18n="mk.tl.s1b">about two minutes, then back to the family</small></span>
               </li>
-              <li>
+              <li class="tl-mobile-hide">
                 <span class="tl-time" data-i18n="mk.tl.t2">Tue 2:16 PM</span>
                 <span class="tl-dotcol"><span class="tl-dot"></span></span>
                 <span class="tl-text" data-i18n="mk.tl.s2">The family receives their secure link</span>
@@ -441,7 +454,7 @@
                 <span class="tl-dotcol"><span class="tl-dot"></span></span>
                 <span class="tl-text" data-i18n="mk.tl.s3">At home, the family shares photos and memories, guided gently, in English or Spanish</span>
               </li>
-              <li>
+              <li class="tl-mobile-hide">
                 <span class="tl-time" data-i18n="mk.tl.t4">Tue 8:43 PM</span>
                 <span class="tl-dotcol"><span class="tl-dot"></span></span>
                 <span class="tl-text" data-i18n="mk.tl.s4">The obituary is drafted the moment their form is complete</span>
@@ -505,7 +518,14 @@
     <section class="proof" id="proof">
       <div class="container">
         <div class="proof-main">
-          <div>
+          <div class="proof-media">
+            <img src="images/editorial-photographs.jpg" alt="A small stack of old family photographs on a linen tablecloth beside a cup, in soft window light" width="1200" height="1489" loading="lazy">
+            <figure class="pull-quote">
+              <blockquote data-i18n="mk.proof.quote">"This is not 'content' to us. It is someone's life story, and it is treated with the dignity it deserves."</blockquote>
+              <figcaption><cite data-i18n="mk.proof.quoteBy">The promise every Memorio tribute is held to</cite></figcaption>
+            </figure>
+          </div>
+          <div class="proof-copy">
             <h2><span data-i18n="mk.proof.t1">A person reviews </span><em class="hl" data-i18n="mk.proof.h1">every tribute</em><span data-i18n="mk.proof.t2"> before it leaves</span></h2>
             <p data-i18n="mk.proof.p1">Software alone should never have the last word on someone's life story. At Memorio, the obituary begins as a careful draft built from the family's own memories, and the video is edited for pacing and feeling. Then a person reads every word and watches every frame before delivery.</p>
             <dl class="qa">
@@ -513,10 +533,6 @@
               <dd data-i18n="mk.proof.a1">Memorio drafts the obituary from what the family shares, then assembles the tribute video from their photos, memories, and music preferences. Every tribute passes through human quality review before final delivery.</dd>
             </dl>
           </div>
-          <figure class="pull-quote">
-            <blockquote data-i18n="mk.proof.quote">"This is not 'content' to us. It is someone's life story, and it is treated with the dignity it deserves."</blockquote>
-            <figcaption><cite data-i18n="mk.proof.quoteBy">The promise every Memorio tribute is held to</cite></figcaption>
-          </figure>
         </div>
         <div class="proof-rows">
           <div class="proof-row">
