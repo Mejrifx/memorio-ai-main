@@ -5,8 +5,9 @@
 [build]
   # Publish the current directory (no build step needed for static site)
   publish = "."
-  # Simple command since this is a static site
-  command = "echo 'Static site deployment - no build required'"
+  # Deploy gate: the same security brief that runs pre-commit and in CI.
+  # A secret, forbidden file, or credential log anywhere in the repo fails the deploy.
+  command = "python3 scripts/security-check.py"
 
 # Environment variables for production
 [build.environment]
@@ -53,22 +54,6 @@
 [[redirects]]
   from = "/director"
   to = "/m-director-9m6z/login.html"
-  status = 200
-
-# Editor Portal
-[[redirects]]
-  from = "/editor/login"
-  to = "/m-editor-5w8r/login.html"
-  status = 200
-
-[[redirects]]
-  from = "/editor/dashboard"
-  to = "/m-editor-5w8r/dashboard.html"
-  status = 200
-
-[[redirects]]
-  from = "/editor"
-  to = "/m-editor-5w8r/login.html"
   status = 200
 
 # QC Portal

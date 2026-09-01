@@ -1,0 +1,6 @@
+#!/bin/sh
+# Memorio security brief: blocks any commit containing secrets, forbidden files, or credential logging.
+# One-time setup on each machine:  git config core.hooksPath .githooks
+STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+[ -z "$STAGED" ] && exit 0
+python3 scripts/security-check.py $STAGED

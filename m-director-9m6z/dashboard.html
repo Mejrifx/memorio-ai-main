@@ -3405,7 +3405,7 @@
         };
       }
       
-      // In Progress: Family submitted, editor working
+      // In Progress: Family submitted, video in automated production
       if (['submitted', 'in_production'].includes(status)) {
         return {
           label: 'In Progress',
@@ -3452,7 +3452,7 @@
     function getVideoStatusBadge(status) {
       const statusConfig = {
         'in_production': { 
-          text: 'Editor Working', 
+          text: 'In Production', 
           color: '#436481',
           icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline></svg>'
         },

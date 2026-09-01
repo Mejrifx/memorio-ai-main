@@ -994,9 +994,6 @@
         <div class="support-panel">
           <h2 class="support-panel-title">Support Actions</h2>
           <div class="support-actions">
-            <button class="support-action-btn" onclick="openReassignEditorModal()">
-              <span>Reassign Editor</span>
-            </button>
             <button class="support-action-btn" onclick="openReassignQCModal()">
               <span>Reassign QC</span>
             </button>
@@ -1011,29 +1008,6 @@
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- REASSIGN EDITOR MODAL -->
-  <div id="reassignEditorModal" class="modal">
-    <div class="modal-content">
-      <h2 class="modal-title">Reassign Editor</h2>
-      <div class="modal-form">
-        <div>
-          <label class="modal-label">Select Editor</label>
-          <select id="editorSelect" class="modal-select">
-            <option value="">Loading editors...</option>
-          </select>
-        </div>
-        <div>
-          <label class="modal-label">Reason (optional)</label>
-          <textarea id="reassignEditorReason" class="modal-textarea" placeholder="Why are you reassigning this editor?"></textarea>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button class="modal-btn secondary" onclick="closeModal('reassignEditorModal')">Cancel</button>
-        <button class="modal-btn primary" onclick="confirmReassignEditor()">Reassign</button>
       </div>
     </div>
   </div>
@@ -1174,17 +1148,6 @@
         
         if (caseError) throw caseError;
         
-        // Load editor assignments separately using the view (bypasses RLS)
-        const { data: editorAssignments, error: assignError } = await supabaseClient
-          .from('admin_editor_assignments_view')
-          .select('*')
-          .eq('case_id', currentCaseId)
-          .order('assigned_at', { ascending: false });
-        
-        if (assignError) {
-          console.error('Error loading editor assignments:', assignError);
-        }
-        
         // Load video submissions separately (without joins - RLS issue)
         const { data: videoSubmissions, error: videoError } = await supabaseClient
           .from('video_submissions')
@@ -1216,7 +1179,6 @@
         // Combine the data
         currentCaseData = {
           ...caseData,
-          editor_assignments: editorAssignments || [],
           video_submissions: videoSubmissions || []
         };
         
@@ -1224,7 +1186,6 @@
         console.log('📊 Case Data Loaded:', {
           case_id: caseData.id,
           deceased_name: caseData.deceased_name,
-          editor_assignments: caseData.editor_assignments,
           video_submissions: caseData.video_submissions
         });
         
@@ -1263,20 +1224,6 @@
       }
       
       // Meta information
-      // Editor assignment from admin_editor_assignments_view
-      const editorAssignment = c.editor_assignments?.find(ea => !ea.unassigned_at);
-      const editorName = editorAssignment?.editor_metadata?.name 
-        || editorAssignment?.editor_email 
-        || 'Unassigned';
-      const editorId = editorAssignment?.editor_user_id;
-      
-      console.log('👤 Editor Assignment:', {
-        allAssignments: c.editor_assignments,
-        activeAssignment: editorAssignment,
-        editorName,
-        editorId
-      });
-      
       // Get the most recent video submission with QC reviewer
       const qcSubmission = c.video_submissions?.sort((a, b) => 
         new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0)
@@ -1301,11 +1248,8 @@
           <span class="meta-value">${esc(c.status.replace(/_/g, ' '))}</span>
         </div>
         <div class="meta-item">
-          <span class="meta-label">Assigned Editor</span>
-          <span class="meta-value">
-            ${esc(editorName)}
-            <button class="reassign-btn" onclick="openReassignEditorModal()">Change</button>
-          </span>
+          <span class="meta-label">Production</span>
+          <span class="meta-value">Automated</span>
         </div>
         <div class="meta-item">
           <span class="meta-label">QC Reviewer</span>
@@ -1918,110 +1862,6 @@
     }
 
     // ============================================================================
-    // SUPPORT ACTIONS - REASSIGN EDITOR
-    // ============================================================================
-    
-    async function openReassignEditorModal() {
-      try {
-        // Load all editors
-        const { data: editors, error } = await supabaseClient
-          .from('admin_users_view')  // Use view to bypass RLS
-          .select('id, email, metadata')
-          .eq('role', 'editor')
-          .eq('status', 'active')
-          .order('email');
-        
-        if (error) throw error;
-        
-        const select = document.getElementById('editorSelect');
-        select.innerHTML = '<option value="">Select an editor...</option>' + 
-          editors.map(e => `<option value="${esc(e.id)}">${esc(e.metadata?.name || e.email)}</option>`).join('');
-        
-        // Show modal
-        document.getElementById('reassignEditorModal').classList.add('active');
-        
-      } catch (error) {
-        console.error('Error loading editors:', error);
-        showToast('Error loading editors', true);
-      }
-    }
-    
-    async function confirmReassignEditor() {
-      try {
-        const newEditorId = document.getElementById('editorSelect').value;
-        const reason = document.getElementById('reassignEditorReason').value;
-        
-        if (!newEditorId) {
-          alert('Please select an editor');
-          return;
-        }
-        
-        const session = await getValidSession();
-        if (!session) return;
-        
-        // Unassign current editor
-        const currentAssignment = currentCaseData.editor_assignments?.[0];
-        if (currentAssignment) {
-          await supabaseClient
-            .from('editor_assignments')
-            .update({ unassigned_at: new Date().toISOString() })
-            .eq('id', currentAssignment.id);
-        }
-        
-        // Assign new editor
-        const { error: assignError } = await supabaseClient
-          .from('editor_assignments')
-          .insert({
-            case_id: currentCaseId,
-            editor_user_id: newEditorId,
-            assigned_by: session.user.id
-          });
-        
-        if (assignError) throw assignError;
-        
-        // Update case status to 'in_production' when editor is (re)assigned
-        const { error: statusError } = await supabaseClient
-          .from('cases')
-          .update({ 
-            status: 'in_production',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', currentCaseId);
-        
-        if (statusError) {
-          console.warn('⚠️ Failed to update case status:', statusError);
-          // Don't throw - assignment was successful
-        }
-        
-        // Log to audit
-        await supabaseClient
-          .from('events')
-          .insert({
-            actor_user_id: session.user.id,
-            actor_role: 'admin',
-            action_type: 'editor_reassigned',
-            target_type: 'case',
-            target_id: currentCaseId,
-            payload: { 
-              old_editor: currentAssignment?.editor_user_id,
-              new_editor: newEditorId,
-              reason: reason
-            }
-          });
-        
-        closeModal('reassignEditorModal');
-        showToast('Editor reassigned successfully');
-        
-        // Reload case data
-        await loadCaseData();
-        
-      } catch (error) {
-        console.error('Error reassigning editor:', error);
-        showToast('Error reassigning editor', true);
-      }
-    }
-
-    // ============================================================================
     // SUPPORT ACTIONS - REASSIGN QC
     // ============================================================================
     
@@ -2120,7 +1960,7 @@
     // ============================================================================
     
     async function pushToRevision() {
-      if (!confirm('Push this case to revision? The editor will be notified.')) {
+      if (!confirm('Push this case to revision?')) {
         return;
       }
       

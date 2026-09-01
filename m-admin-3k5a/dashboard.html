@@ -2241,29 +2241,6 @@
       align-items: flex-start;
     }
     
-    /* Simple Modal (for Reassign Editor) */
-    .simple-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.7);
-      z-index: 20000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    
-    .simple-modal-content {
-      background-color: white;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-      width: 100%;
-    }
-    
     .case-detail-content {
       background-color: var(--bg-secondary);
       border: 1px solid var(--border-primary);
@@ -2738,13 +2715,6 @@
         <span>Invite Director</span>
       </div>
 
-      <div class="sidebar-nav-item" onclick="switchTab('invite-editor')">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M12 15c1.66 0 2.99-1.34 2.99-3L15 6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 15 6.7 12H5c0 3.41 2.72 6.23 6 6.72V22h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-        </svg>
-        <span>Invite Editor</span>
-      </div>
-
       <div class="sidebar-nav-item" onclick="switchTab('invite-qc')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -2752,12 +2722,6 @@
         <span>Invite QC User</span>
       </div>
 
-      <div class="sidebar-nav-item" onclick="switchTab('assign-editor')">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/>
-        </svg>
-        <span>Assign Editor</span>
-      </div>
     </div>
   </div>
 
@@ -2843,8 +2807,6 @@
       <div class="tab-container" style="display: none;">
         <button class="tab-btn active" onclick="switchTab('organizations')">Organizations</button>
         <button class="tab-btn" onclick="switchTab('invite-director')">Invite Director</button>
-        <button class="tab-btn" onclick="switchTab('invite-editor')">Invite Editor</button>
-        <button class="tab-btn" onclick="switchTab('assign-editor')">Assign Editor</button>
       </div>
 
     <!-- All Cases Tab -->
@@ -2939,14 +2901,6 @@
         <!-- Stats Cards -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 32px;">
           <div class="invite-section" style="padding: 24px; margin-bottom: 0;">
-            <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Total Editors</div>
-            <div style="font-size: 32px; font-weight: 700; color: var(--accent-secondary);" id="totalEditors">0</div>
-          </div>
-          <div class="invite-section" style="padding: 24px; margin-bottom: 0;">
-            <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Active Editors</div>
-            <div style="font-size: 32px; font-weight: 700; color: var(--success);" id="activeEditors">0</div>
-          </div>
-          <div class="invite-section" style="padding: 24px; margin-bottom: 0;">
             <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Total QC Users</div>
             <div style="font-size: 32px; font-weight: 700; color: var(--accent-secondary);" id="totalQC">0</div>
           </div>
@@ -2962,7 +2916,6 @@
             <h2 class="section-title" style="margin: 0;">All Accounts</h2>
             <div style="display: flex; gap: 12px;">
               <button class="btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="filterManageAccounts('all')">All</button>
-              <button class="btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="filterManageAccounts('editor')">Editors</button>
               <button class="btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="filterManageAccounts('qc')">QC Users</button>
               <button class="btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="filterManageAccounts('active')">Active Only</button>
             </div>
@@ -2987,23 +2940,6 @@
 
     <!-- Organizations Tab -->
     <div id="organizations-tab" class="tab-content active">
-      <!-- Unassigned Cases Notification -->
-      <div id="unassigned-cases-alert" class="error-box" style="display: none; margin-bottom: 24px; background-color: #fdf0dd; border-color: #9a5b00; color: #9a5b00;">
-        <h3 style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 24px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg></span>
-          <span id="unassigned-count">0</span> Cases Need Editor Assignment
-        </h3>
-        <p style="margin-bottom: 12px;">The following cases were submitted by families but could not be auto-assigned because no editors were available.</p>
-        <div id="unassigned-cases-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 12px;"></div>
-        <button onclick="switchTab('all-cases')" class="button-primary w-button" style="display: inline-block; margin-top: 8px; cursor: pointer;">
-          Go to All Cases to Assign
-        </button>
-      </div>
-      
       <div class="invite-section">
         <h2 class="section-title">Create New Organization</h2>
         <p class="paragraph">Add a new funeral home to the Memorio platform. Each organization can have multiple Directors and manage their own cases.</p>
@@ -3179,82 +3115,6 @@
     </div>
     </div>
 
-    <!-- Invite Editor Tab -->
-    <div id="invite-editor-tab" class="tab-content">
-      <div class="invite-section">
-        <h2 class="section-title">Invite Video Editor</h2>
-        <p class="paragraph">Create a new Video Editor account. Editors create memorial tribute slideshow videos using family photos.</p>
-        
-        <form id="invite-editor-form">
-          <div class="form-row">
-            <div>
-              <label for="editor-email" class="field-label">Email Address*</label>
-              <input 
-                class="text-field w-input" 
-                type="email" 
-                id="editor-email" 
-                placeholder="editor@memorio.ai" 
-                required>
-            </div>
-            
-            <div>
-              <label for="editor-name" class="field-label">Full Name*</label>
-              <input 
-                class="text-field w-input" 
-                type="text" 
-                id="editor-name" 
-                placeholder="Jane Editor" 
-                required>
-            </div>
-          </div>
-          
-          <div class="form-row-single">
-            <div>
-              <label for="editor-phone" class="field-label">Phone Number</label>
-              <input 
-                class="text-field w-input" 
-                type="tel" 
-                id="editor-phone" 
-                placeholder="+1-555-0123">
-            </div>
-          </div>
-          
-          <div class="form-button" style="margin-top: 20px;">
-            <button type="submit" class="button-primary w-button" id="invite-editor-btn">
-              Create Editor Account
-            </button>
-          </div>
-        </form>
-        
-        <!-- Success Box -->
-        <div id="editor-success-box" class="success-box">
-          <h3><span class="success-icon"></span>Editor Account Created Successfully!</h3>
-          <p>Share these credentials with the Editor securely. They should change their password after first login.</p>
-          
-          <div class="credential-box">
-            <div class="credential-label">Email Address</div>
-            <div class="credential-value" id="created-editor-email"></div>
-            <button class="copy-btn" onclick="copyToClipboard('created-editor-email')">Copy</button>
-          </div>
-          
-          <div class="credential-box">
-            <div class="credential-label">Temporary Password</div>
-            <div class="credential-value" id="created-editor-password"></div>
-            <button class="copy-btn" onclick="copyToClipboard('created-editor-password')">Copy</button>
-          </div>
-          
-          <div class="credential-box">
-            <div class="credential-label">Login URL</div>
-            <div class="credential-value">https://memorio.ai/m-editor-5w8r/login.html</div>
-            <button class="copy-btn" onclick="copyToClipboard('editor-login-url')">Copy</button>
-          </div>
-        </div>
-        
-        <!-- Error Box -->
-        <div id="editor-error-box" class="error-box"></div>
-      </div>
-    </div>
-
     <!-- Invite QC Tab -->
     <div id="invite-qc-tab" class="tab-content">
       <div class="invite-section">
@@ -3347,49 +3207,6 @@
       </div>
     </div>
 
-    <!-- Assign Editor Tab -->
-    <div id="assign-editor-tab" class="tab-content">
-      <div class="invite-section">
-        <h2 class="section-title">Assign Editor to Case</h2>
-        <p class="paragraph">Assign a Video Editor to work on a specific case. The editor will be able to download photos and create a memorial tribute video.</p>
-        
-        <form id="assign-editor-form">
-          <div class="form-row">
-            <div>
-              <label for="assign-case-id" class="field-label">Case ID*</label>
-              <input 
-                class="text-field w-input" 
-                type="text" 
-                id="assign-case-id" 
-                placeholder="00000000-0000-0000-0000-000000000001" 
-                required>
-            </div>
-            
-            <div>
-              <label for="assign-editor-id" class="field-label">Editor Email*</label>
-              <select class="text-field w-input" id="assign-editor-id" required>
-                <option value="">Select an Editor...</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="form-button" style="margin-top: 20px;">
-            <button type="submit" class="button-primary w-button" id="assign-editor-btn">
-              Assign Editor to Case
-            </button>
-          </div>
-        </form>
-        
-        <!-- Success Box -->
-        <div id="assign-success-box" class="success-box">
-          <h3><span class="success-icon"></span>Editor Assigned Successfully!</h3>
-          <p>The editor has been assigned to the case and can now access the photos to create a memorial tribute video.</p>
-        </div>
-        
-        <!-- Error Box -->
-        <div id="assign-error-box" class="error-box"></div>
-      </div>
-    </div>
   </div>
 
   <!-- Custom Confirmation Modal -->
@@ -3778,7 +3595,6 @@
       if (authSuccess) {
         // Only load data after successful authentication
         console.log('🚀 Loading organizations and notifications...');
-        await loadUnassignedCasesNotifications();
         await loadNotifications(); // Load notification dropdown data
         await loadOrganizations();
         console.log('✅ App initialization complete');
@@ -3922,65 +3738,6 @@
       }
     });
     
-    // Handle invite editor form submission
-    document.getElementById('invite-editor-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById('editor-email').value;
-      const name = document.getElementById('editor-name').value;
-      const phone = document.getElementById('editor-phone').value;
-      
-      const inviteBtn = document.getElementById('invite-editor-btn');
-      const successBox = document.getElementById('editor-success-box');
-      const errorBox = document.getElementById('editor-error-box');
-      const section = e.target.closest('.invite-section');
-      
-      // Hide previous messages
-      successBox.style.display = 'none';
-      errorBox.style.display = 'none';
-      
-      // Disable form during submission
-      section.classList.add('loading');
-      inviteBtn.disabled = true;
-      inviteBtn.textContent = 'Creating editor account...';
-      
-      try {
-        // Get valid session (will auto-refresh if needed)
-        const session = await getValidSession();
-        
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-editor`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`
-          },
-          body: JSON.stringify({ email, name, phone })
-        });
-        
-        const result = await response.json();
-        
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to create editor account');
-        }
-        
-        // Display success with credentials
-        document.getElementById('created-editor-email').textContent = result.data.email;
-        document.getElementById('created-editor-password').textContent = result.data.temp_password;
-        successBox.style.display = 'block';
-        
-        // Reset form
-        document.getElementById('invite-editor-form').reset();
-        
-      } catch (error) {
-        errorBox.textContent = `Error: ${error.message}`;
-        errorBox.style.display = 'block';
-      } finally {
-        section.classList.remove('loading');
-        inviteBtn.disabled = false;
-        inviteBtn.textContent = 'Create Editor Account';
-      }
-    });
-    
     // Handle invite QC form submission
     document.getElementById('invite-qc-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -4040,117 +3797,6 @@
       }
     });
     
-    // Handle assign editor form submission
-    document.getElementById('assign-editor-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const caseId = document.getElementById('assign-case-id').value;
-      const editorEmail = document.getElementById('assign-editor-id').value;
-      
-      const assignBtn = document.getElementById('assign-editor-btn');
-      const successBox = document.getElementById('assign-success-box');
-      const errorBox = document.getElementById('assign-error-box');
-      const section = e.target.closest('.invite-section');
-      
-      // Hide previous messages
-      successBox.style.display = 'none';
-      errorBox.style.display = 'none';
-      
-      // Disable form during submission
-      section.classList.add('loading');
-      assignBtn.disabled = true;
-      assignBtn.textContent = 'Assigning editor...';
-      
-      try {
-        // Get editor user ID from email
-        const { data: editorData, error: editorError } = await supabaseClient
-          .from('admin_users_view')  // Use view to bypass RLS
-          .select('id')
-          .eq('email', editorEmail)
-          .eq('role', 'editor')
-          .single();
-        
-        if (editorError || !editorData) {
-          throw new Error('Editor not found');
-        }
-        
-        // Get current admin user ID for assigned_by field
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        const adminUserId = session.user.id;
-        
-        // Create editor assignment
-        const { error: assignError } = await supabaseClient
-          .from('editor_assignments')
-          .insert({
-            case_id: caseId,
-            editor_user_id: editorData.id,
-            assigned_by: adminUserId,
-            assigned_at: new Date().toISOString()
-          });
-        
-        if (assignError) {
-          throw new Error(`Failed to assign editor: ${assignError.message}`);
-        }
-        
-        // Update case status to 'in_production' when editor is assigned
-        const { error: statusError } = await supabaseClient
-          .from('cases')
-          .update({ 
-            status: 'in_production',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', caseId);
-        
-        if (statusError) {
-          console.warn('⚠️ Failed to update case status:', statusError);
-          // Don't throw - assignment was successful, just log the warning
-        } else {
-          console.log('✅ Case status updated to in_production');
-        }
-        
-        // Display success
-        successBox.style.display = 'block';
-        
-        // Reset form
-        document.getElementById('assign-editor-form').reset();
-        
-      } catch (error) {
-        errorBox.textContent = `Error: ${error.message}`;
-        errorBox.style.display = 'block';
-      } finally {
-        section.classList.remove('loading');
-        assignBtn.disabled = false;
-        assignBtn.textContent = 'Assign Editor to Case';
-      }
-    });
-    
-    // Load editors for assignment dropdown
-    async function loadEditors() {
-      try {
-        const { data: editors, error } = await supabaseClient
-          .from('admin_users_view')  // Use view to bypass RLS
-          .select('email, metadata')
-          .eq('role', 'editor')
-          .in('status', ['active', 'invited']); // Include both active and invited editors
-        
-        if (error) throw error;
-        
-        const select = document.getElementById('assign-editor-id');
-        select.innerHTML = '<option value="">Select an Editor...</option>';
-        
-        editors.forEach(editor => {
-          const option = document.createElement('option');
-          option.value = editor.email;
-          option.textContent = `${editor.metadata?.name || editor.email}`;
-          select.appendChild(option);
-        });
-        
-      } catch (error) {
-        console.error('Error loading editors:', error);
-      }
-    }
-    
-    // Load editors when assign editor tab is opened
     function switchTab(tabName) {
       // Hide all tabs
       document.querySelectorAll('.tab-content').forEach(tab => {
@@ -4176,9 +3822,7 @@
         'manage-accounts': 'Manage Accounts',
         'organizations': 'Organizations',
         'invite-director': 'Invite Director',
-        'invite-editor': 'Invite Editor',
-        'invite-qc': 'Invite QC User',
-        'assign-editor': 'Assign Editor'
+        'invite-qc': 'Invite QC User'
       };
       document.getElementById('topbar-page-title').textContent = titles[tabName] || 'Dashboard';
       
@@ -4203,10 +3847,7 @@
       
       // Load data based on tab
       if (tabName === 'organizations') {
-        loadUnassignedCasesNotifications();
         loadOrganizations();
-      } else if (tabName === 'assign-editor') {
-        loadEditors();
       } else if (tabName === 'invite-qc') {
         loadQCOrgDropdown();
       } else if (tabName === 'all-cases') {
@@ -4327,71 +3968,6 @@
         createBtn.textContent = 'Create Organization';
       }
     });
-    
-    // Load unassigned cases notifications
-    async function loadUnassignedCasesNotifications() {
-      try {
-        const { data: notifications, error } = await supabaseClient
-          .from('notifications')
-          .select('case_id, created_at')
-          .eq('event_type', 'no_editors_available')
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false });
-        
-        if (error) {
-          console.error('Error loading notifications:', error);
-          return;
-        }
-        
-        const count = notifications?.length || 0;
-        
-        // Update badge on "All Cases" nav link
-        const navLink = document.getElementById('allCasesNavLink');
-        if (navLink) {
-          navLink.setAttribute('data-count', count);
-        }
-        
-        // Show/hide alert box
-        const alertBox = document.getElementById('unassigned-cases-alert');
-        const countElement = document.getElementById('unassigned-count');
-        const listElement = document.getElementById('unassigned-cases-list');
-        
-        if (count === 0 || !notifications) {
-          alertBox.style.display = 'none';
-          return;
-        }
-        
-        alertBox.style.display = 'block';
-        countElement.textContent = count;
-        
-        // Load case details for each notification
-        const caseIds = notifications.map(n => n.case_id);
-        const { data: cases, error: casesError } = await supabaseClient
-          .from('cases')
-          .select('id, deceased_name, created_at, org_id, organizations(name)')
-          .in('id', caseIds);
-        
-        if (casesError) {
-          console.error('Error loading case details:', casesError);
-          listElement.innerHTML = '<p style="color: #666;">Unable to load case details.</p>';
-          return;
-        }
-        
-        // Display case list
-        listElement.innerHTML = cases.map(c => `
-          <div style="padding: 12px; background: white; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #9a5b00;">
-            <strong>${esc(c.deceased_name)}</strong><br>
-            <small style="color: #666;">
-              ${esc(c.organizations?.name || 'Unknown Org')} • 
-              Submitted ${new Date(c.created_at).toLocaleDateString()}
-            </small>
-          </div>
-        `).join('');
-        
-      } catch (error) {
-        console.error('Error in loadUnassignedCasesNotifications:', error);
-      }
-    }
     
     // ============================================================================
     // NOTIFICATION DROPDOWN SYSTEM
@@ -5117,16 +4693,6 @@
         
         console.log(`✅ Loaded ${cases?.length || 0} cases`);
         
-        // Get editor assignments
-        const { data: assignments, error: assignmentsError } = await supabaseClient
-          .from('admin_editor_assignments_view')
-          .select('*')
-          .is('unassigned_at', null);
-        
-        if (assignmentsError) {
-          console.warn('⚠️ Error loading editor assignments:', assignmentsError);
-        }
-        
         // Get video submissions with QC reviewer info from view (bypasses RLS)
         const { data: submissions, error: submissionsError } = await supabaseClient
           .from('admin_video_submissions_view')
@@ -5139,9 +4705,6 @@
         
         // Combine data
         allCasesData = (cases || []).map(c => {
-          // Find editor assignments for this case
-          const caseAssignments = (assignments || []).filter(a => a.case_id === c.id);
-          
           // Find video submission for this case
           const caseSubmissions = (submissions || []).filter(s => s.case_id === c.id);
           const latestSubmission = caseSubmissions[0]; // Already ordered by created_at DESC
@@ -5156,7 +4719,6 @@
             ...c,
             cooldown_expires_at: latestSubmission?.cooldown_expires_at || null,
             organizations: c.org_name ? { name: c.org_name } : null,
-            editor_assignments: caseAssignments,
             video_submissions: latestSubmission ? [{
               ...latestSubmission,
               qc_reviewer: qcReviewer
@@ -5367,9 +4929,6 @@
     
     function createCaseCard(caseData) {
       const orgName = caseData.organizations?.name || caseData.org_name || 'Unknown Org';
-      // Show editor name from metadata, fallback to email
-      const editorAssignment = caseData.editor_assignments?.[0];
-      const editorName = editorAssignment?.editor_metadata?.name || editorAssignment?.editor_email || 'Unassigned';
       // Show family member name from metadata, fallback to email
       const familyName = caseData.family_metadata?.name || caseData.family_email || 'Unassigned';
       const createdDate = new Date(caseData.created_at).toLocaleDateString();
@@ -5425,10 +4984,6 @@
               <span>Family: ${esc(familyName)}</span>
             </div>
             <div class="case-card-meta-row">
-              <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
-              <span>Editor: ${esc(editorName)}</span>
-            </div>
-            <div class="case-card-meta-row">
               <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
               <span>Created ${createdDate}</span>
             </div>
@@ -5469,7 +5024,7 @@
         const { data: accounts, error } = await supabaseClient
           .from('user_analytics_combined')
           .select('*')
-          .in('role', ['editor', 'qc'])
+          .eq('role', 'qc')
           .order('created_at', { ascending: false });
         
         if (error) {
@@ -5507,13 +5062,9 @@
     }
     
     function updateAccountsStats() {
-      const totalEditors = allAccountsData.filter(a => a.role === 'editor').length;
-      const activeEditors = allAccountsData.filter(a => a.role === 'editor' && a.status === 'active').length;
       const totalQC = allAccountsData.filter(a => a.role === 'qc').length;
       const activeQC = allAccountsData.filter(a => a.role === 'qc' && a.status === 'active').length;
       
-      document.getElementById('totalEditors').textContent = totalEditors;
-      document.getElementById('activeEditors').textContent = activeEditors;
       document.getElementById('totalQC').textContent = totalQC;
       document.getElementById('activeQC').textContent = activeQC;
     }
@@ -5532,8 +5083,6 @@
       // Filter data
       if (filterType === 'all') {
         filteredAccountsData = allAccountsData;
-      } else if (filterType === 'editor') {
-        filteredAccountsData = allAccountsData.filter(a => a.role === 'editor');
       } else if (filterType === 'qc') {
         filteredAccountsData = allAccountsData.filter(a => a.role === 'qc');
       } else if (filterType === 'active') {
@@ -5569,7 +5118,7 @@
     function createAccountCard(account) {
       const name = account.name || 'No name';
       
-      const orgName = account.org_name || 'Global Access'; // Editors & QC have global access
+      const orgName = account.org_name || 'Global Access'; // QC users have global access
       const createdDate = new Date(account.created_at).toLocaleDateString('en-US', { 
         timeZone: 'America/New_York',
         year: 'numeric',
@@ -5591,44 +5140,7 @@
       // Build analytics section based on role
       let analyticsSection = '';
       
-      if (account.role === 'editor') {
-        const totalVideos = account.editor_total_videos || 0;
-        const approved = account.editor_approved || 0;
-        const revisions = account.editor_revisions || 0;
-        const pending = account.editor_pending || 0;
-        
-        analyticsSection = `
-          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-primary);">
-            <div style="font-weight: 600; font-size: 13px; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 3v18h18" />
-                <path d="M18 17V9" />
-                <path d="M13 17V5" />
-                <path d="M8 17v-3" />
-              </svg>
-              Editor Statistics
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
-              <div style="background: rgba(67, 100, 129, 0.1); padding: 8px; border-radius: 6px;">
-                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Total Edited</div>
-                <div style="font-size: 20px; font-weight: 700; color: #436481;">${totalVideos}</div>
-              </div>
-              <div style="background: rgba(29, 107, 69, 0.1); padding: 8px; border-radius: 6px;">
-                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Approved</div>
-                <div style="font-size: 20px; font-weight: 700; color: #1d6b45;">${approved}</div>
-              </div>
-              <div style="background: rgba(255, 193, 7, 0.1); padding: 8px; border-radius: 6px;">
-                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Revisions</div>
-                <div style="font-size: 20px; font-weight: 700; color: #9a5b00;">${revisions}</div>
-              </div>
-              <div style="background: rgba(108, 117, 125, 0.1); padding: 8px; border-radius: 6px;">
-                <div style="color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Pending</div>
-                <div style="font-size: 20px; font-weight: 700; color: #6c757d;">${pending}</div>
-              </div>
-            </div>
-          </div>
-        `;
-      } else if (account.role === 'qc') {
+      if (account.role === 'qc') {
         const passed = account.qc_passed || 0;
         const rejected = account.qc_rejected || 0;
         const totalReviewed = account.qc_total_reviewed || 0;
@@ -5782,7 +5294,6 @@
         
         // Set login URL based on role
         const loginUrls = {
-          'editor': 'https://memorio.ai/m-editor-5w8r/login.html',
           'qc': 'https://memorio.ai/m-qc-4h7k/login.html'
         };
         document.getElementById('modal-account-login-url').textContent = loginUrls[account.role] || 'N/A';
@@ -5945,11 +5456,6 @@
       
       // Meta grid in header
       document.getElementById('case-modal-org-name').textContent = caseData.organizations?.name || caseData.org_name || 'Unknown Org';
-      
-      // Show editor name from metadata, fallback to email
-      const editorAssignment = caseData.editor_assignments?.[0];
-      const editorName = editorAssignment?.editor_metadata?.name || editorAssignment?.editor_email || 'Unassigned';
-      document.getElementById('case-modal-editor').textContent = editorName;
       
       // Show QC reviewer name from metadata, fallback to email
       const qcReviewerData = caseData.video_submissions?.[0]?.qc_reviewer;
@@ -6526,192 +6032,16 @@
         .replace(/\b\w/g, l => l.toUpperCase());
     }
     
-    // Support Actions from Modal
-    let currentEditorAssignment = null;
-    
-    async function openReassignEditorFromModal() {
-      try {
-        if (!currentCaseDetailId) {
-          showToast('No case selected', true);
-          return;
-        }
-        
-        // Find active editor assignment using view (bypasses RLS issues)
-        const { data: assignments, error: assignError } = await supabaseClient
-          .from('admin_editor_assignments_view')
-          .select('*')
-          .eq('case_id', currentCaseDetailId)
-          .is('unassigned_at', null)
-          .order('assigned_at', { ascending: false })
-          .limit(1);
-        
-        if (assignError) {
-          console.error('Error loading editor assignment:', assignError);
-          throw assignError;
-        }
-        
-        currentEditorAssignment = assignments && assignments.length > 0 ? assignments[0] : null;
-        
-        console.log('Current editor assignment:', currentEditorAssignment);
-        
-        // Display current editor
-        const currentEditorDiv = document.getElementById('current-editor-name');
-        if (currentEditorAssignment) {
-          // Use data from admin_editor_assignments_view which includes editor_email and editor_metadata
-          const editorName = currentEditorAssignment.editor_metadata?.name || currentEditorAssignment.editor_email || 'Unknown Editor';
-          currentEditorDiv.textContent = editorName;
-        } else {
-          currentEditorDiv.textContent = 'No editor currently assigned';
-        }
-        
-        // Load all active editors
-        const { data: editors, error: editorsError } = await supabaseClient
-          .from('admin_users_view')
-          .select('id, email, metadata')
-          .eq('role', 'editor')
-          .eq('status', 'active')
-          .order('email');
-        
-        if (editorsError) throw editorsError;
-        
-        // Filter out current editor and populate dropdown
-        const select = document.getElementById('new-editor-select');
-        select.innerHTML = '<option value="">-- Select Editor --</option>';
-        
-        editors.forEach(editor => {
-          // Skip current editor
-          if (currentEditorAssignment && editor.id === currentEditorAssignment.editor_user_id) {
-            return;
-          }
-          
-          const editorName = editor.metadata?.name || editor.email;
-          const option = document.createElement('option');
-          option.value = editor.id;
-          option.textContent = editorName;
-          select.appendChild(option);
-        });
-        
-        // Show modal
-        document.getElementById('reassign-editor-modal').style.display = 'flex';
-        
-      } catch (error) {
-        console.error('Error opening reassign editor modal:', error);
-        showToast('Error loading editors: ' + error.message, true);
-      }
-    }
-    
-    function closeReassignEditorModal() {
-      document.getElementById('reassign-editor-modal').style.display = 'none';
-      document.getElementById('new-editor-select').value = '';
-      currentEditorAssignment = null;
-    }
-    
-    async function confirmReassignEditor() {
-      try {
-        const newEditorId = document.getElementById('new-editor-select').value;
-        
-        if (!newEditorId) {
-          showToast('Please select an editor', true);
-          return;
-        }
-        
-        const session = await getValidSession();
-        if (!session) {
-          showToast('Session expired. Please log in again.', true);
-          return;
-        }
-        
-        // Get new editor name for audit log
-        const { data: newEditor } = await supabaseClient
-          .from('admin_users_view')
-          .select('email, metadata')
-          .eq('id', newEditorId)
-          .single();
-        
-        // 1. Unassign current editor (if exists)
-        if (currentEditorAssignment) {
-          const { error: unassignError } = await supabaseClient
-            .from('editor_assignments')
-            .update({ unassigned_at: new Date().toISOString() })
-            .eq('id', currentEditorAssignment.id);
-          
-          if (unassignError) {
-            console.error('Error unassigning editor:', unassignError);
-            throw unassignError;
-          }
-        }
-        
-        // 2. Assign new editor
-        const { error: assignError } = await supabaseClient
-          .from('editor_assignments')
-          .insert({
-            case_id: currentCaseDetailId,
-            editor_user_id: newEditorId,
-            assigned_by: session.user.id
-          });
-        
-        if (assignError) {
-          console.error('Error assigning new editor:', assignError);
-          throw assignError;
-        }
-        
-        // 3. Log to audit trail
-        const { error: auditError } = await supabaseClient
-          .from('events')
-          .insert({
-            actor_user_id: session.user.id,
-            actor_role: 'admin',
-            action_type: 'editor_reassigned',
-            target_type: 'case',
-            target_id: currentCaseDetailId,
-            payload: { 
-              old_editor: currentEditorAssignment?.editor_user_id || null,
-              old_editor_email: currentEditorAssignment?.editor_email || null,
-              new_editor: newEditorId,
-              new_editor_email: newEditor?.email || null
-            }
-          });
-        
-        if (auditError) {
-          console.error('❌ Error logging to audit trail:', auditError);
-          // Don't throw - reassignment was successful, just audit log failed
-        } else {
-          console.log('✅ Audit trail updated successfully');
-        }
-        
-        // Close modal and show success
-        closeReassignEditorModal();
-        showSuccessModal('Editor Reassigned Successfully!\n\nThe case has been reassigned to the new editor. The change is now reflected in the case details and audit trail.');
-        
-        // Reload all cases data to get updated assignments
-        await loadAllCases();
-        
-        // Refresh the case detail modal header with updated data
-        const updatedCaseData = allCasesData.find(c => c.id === currentCaseDetailId);
-        if (updatedCaseData) {
-          currentModalCaseData = updatedCaseData;
-          populateModalHeader(updatedCaseData);
-        }
-        
-        // Reload audit trail to show the reassignment event
-        await loadModalAudit(currentCaseDetailId);
-        
-      } catch (error) {
-        console.error('Error reassigning editor:', error);
-        showToast('Error reassigning editor: ' + error.message, true);
-      }
-    }
-    
     async function pushToRevisionFromModal() {
       // Prompt for revision notes from admin
-      const revisionNotes = prompt('Enter revision notes for the editor (required):');
+      const revisionNotes = prompt('Enter revision notes (required):');
       
       if (!revisionNotes || revisionNotes.trim() === '') {
         alert('Revision notes are required.');
         return;
       }
       
-      if (!confirm('Push this video to revision? The editor will be notified.')) {
+      if (!confirm('Push this video to revision?')) {
         return;
       }
       
@@ -6775,7 +6105,7 @@
           });
         
         // Show success modal instead of alert
-        showSuccessModal('Video pushed to revision successfully! The editor has been notified.');
+        showSuccessModal('Video pushed to revision successfully!');
         closeCaseDetailModal();
 
         // Reload cases to reflect updated status
@@ -6814,7 +6144,7 @@
           .single();
 
         if (submissionError || !latestSubmission) {
-          throw new Error('No video submission found for this case. The editor must upload a video first.');
+          throw new Error('No video submission found for this case. A video must be uploaded first.');
         }
 
         const previousStatus = latestSubmission.qc_status;
@@ -6891,9 +6221,6 @@
     window.openCaseDetailModal = openCaseDetailModal;
     window.closeCaseDetailModal = closeCaseDetailModal;
     window.switchModalTab = switchModalTab;
-    window.openReassignEditorFromModal = openReassignEditorFromModal;
-    window.closeReassignEditorModal = closeReassignEditorModal;
-    window.confirmReassignEditor = confirmReassignEditor;
     window.pushToRevisionFromModal = pushToRevisionFromModal;
     window.showCaseIdInfo = showCaseIdInfo;
     
@@ -6918,10 +6245,6 @@
           <div class="case-detail-meta-item">
             <span class="case-detail-meta-label">Funeral Home</span>
             <span class="case-detail-meta-value" id="case-modal-org-name">-</span>
-          </div>
-          <div class="case-detail-meta-item">
-            <span class="case-detail-meta-label">Assigned Editor</span>
-            <span class="case-detail-meta-value" id="case-modal-editor">-</span>
           </div>
           <div class="case-detail-meta-item">
             <span class="case-detail-meta-label">QC Reviewer</span>
@@ -7004,9 +6327,6 @@
         <div class="case-detail-sidebar">
           <h3 class="support-actions-title">Support Actions</h3>
           <div class="support-actions">
-            <button class="support-action-btn" onclick="openReassignEditorFromModal()">
-              <span>Reassign Editor</span>
-            </button>
             <button class="support-action-btn danger" onclick="pushToRevisionFromModal()">
               <span>Push to Revision</span>
             </button>
@@ -7018,36 +6338,6 @@
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Reassign Editor Modal -->
-  <div id="reassign-editor-modal" class="simple-modal" style="display: none;">
-    <div class="simple-modal-content" style="max-width: 500px;">
-      <h2 style="margin-bottom: 20px; color: #32343a;">Reassign Editor</h2>
-      
-      <div style="margin-bottom: 20px; padding: 12px; background-color: #edf2f7; border-left: 4px solid #436481; border-radius: 4px;">
-        <strong style="color: #436481;">Currently Assigned:</strong>
-        <div id="current-editor-name" style="margin-top: 5px; color: #32343a;"></div>
-      </div>
-      
-      <div style="margin-bottom: 20px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #32343a;">
-          Select New Editor:
-        </label>
-        <select id="new-editor-select" style="width: 100%; padding: 10px; border: 1px solid rgba(67,100,129,.35); border-radius: 8px; font-size: 14px;">
-          <option value="">-- Select Editor --</option>
-        </select>
-      </div>
-      
-      <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <button onclick="closeReassignEditorModal()" style="padding: 10px 20px; background-color: #ccc; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-          Cancel
-        </button>
-        <button onclick="confirmReassignEditor()" style="padding: 10px 20px; background-color: #436481; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-          Reassign Editor
-        </button>
       </div>
     </div>
   </div>
