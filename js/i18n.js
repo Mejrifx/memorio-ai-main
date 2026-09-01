@@ -1722,3 +1722,20 @@ Object.assign(i18n.translations.es, {
 
 Object.assign(i18n.translations.en, {"mk.hero.fam1": "Here for someone you love? ", "mk.hero.fam2": "Family sign-in"});
 Object.assign(i18n.translations.es, {"mk.hero.fam1": "¿Está aquí por un ser querido? ", "mk.hero.fam2": "Acceso para familias"});
+// ===== Case-flow additions (2026-09-01): early photo-window close =====
+Object.assign(i18n.translations.en, {
+  "family.upload.doneBtn": "I'm finished adding photos",
+  "family.upload.doneConfirm": "Finished adding photos? Once you confirm, our editors begin the tribute video and no more photos can be added.",
+  "family.upload.doneThanks": "Thank you. Your tribute video is now in production.",
+  "family.upload.doneError": "We could not save that just now. Please try again in a moment.",
+  "family.upload.closedByYou": "Photos complete",
+  "family.upload.closedByYouDesc": "You let us know the photos are complete. Your tribute video is in production. You can still view all your photos below."
+});
+Object.assign(i18n.translations.es, {
+  "family.upload.doneBtn": "Terminé de agregar fotos",
+  "family.upload.doneConfirm": "¿Terminó de agregar fotos? Al confirmar, nuestros editores comienzan el video tributo y ya no se podrán agregar más fotos.",
+  "family.upload.doneThanks": "Gracias. Su video tributo ya está en producción.",
+  "family.upload.doneError": "No pudimos guardar eso ahora. Por favor intente de nuevo en un momento.",
+  "family.upload.closedByYou": "Fotos completas",
+  "family.upload.closedByYouDesc": "Nos indicó que las fotos están completas. Su video tributo está en producción. Aún puede ver todas sus fotos abajo."
+});

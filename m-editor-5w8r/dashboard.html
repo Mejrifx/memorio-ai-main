@@ -1217,7 +1217,11 @@
      * @param {string} submittedAt - ISO timestamp from forms.submitted_at
      * @returns {object} { expired: boolean, hours: number, minutes: number, seconds: number, totalMs: number }
      */
+    let currentCasePhotosClosedAt = null;
     function calculatePhotoAccessTimeRemaining(submittedAt) {
+      if (currentCasePhotosClosedAt) {
+        return { expired: true, hours: 0, minutes: 0, seconds: 0, totalMs: 0 };
+      }
       if (!submittedAt) {
         return { expired: false, hours: 12, minutes: 0, seconds: 0, totalMs: 12 * 60 * 60 * 1000 };
       }
@@ -1953,7 +1957,7 @@
           .select(`
             *,
             organizations (name),
-            forms (submitted_json, submitted_at),
+            forms (submitted_json, submitted_at, photos_closed_at),
             assets (id, file_key, mime_type, metadata)
           `)
           .eq('id', caseId)
@@ -2008,27 +2012,20 @@
         // Extract form data - handle both array and object formats from Supabase
         let formData = {};
         let formSubmittedAt = null;
+        let formPhotosClosedAt = null;
         if (Array.isArray(caseData.forms) && caseData.forms.length > 0) {
           // Forms returned as array
           formData = caseData.forms[0]?.submitted_json || {};
           formSubmittedAt = caseData.forms[0]?.submitted_at;
+          formPhotosClosedAt = caseData.forms[0]?.photos_closed_at || null;
         } else if (caseData.forms && typeof caseData.forms === 'object') {
           // Forms returned as single object (typical for one-to-many with single result)
           formData = caseData.forms.submitted_json || {};
           formSubmittedAt = caseData.forms.submitted_at;
+          formPhotosClosedAt = caseData.forms.photos_closed_at || null;
         }
-        
-        // 🔍 DEBUG: Log form data to diagnose tribute_quote issue
-        console.log('🔍 EDITOR DEBUG - Full caseData.forms:', caseData.forms);
-        console.log('🔍 EDITOR DEBUG - Extracted formData:', formData);
-        console.log('🔍 EDITOR DEBUG - tribute_quote value:', formData.tribute_quote);
-        console.log('🔍 EDITOR DEBUG - music_selection value:', formData.music_selection);
-        console.log('🔍 EDITOR DEBUG - All quote fields:', {
-          tribute_quote: formData.tribute_quote,
-          loved_ones_quote: formData.loved_ones_quote,
-          favorite_memory: formData.favorite_memory,
-          loved_ones_description: formData.loved_ones_description
-        });
+        // Family closed the photo window early: treat the 12-hour window as over
+        currentCasePhotosClosedAt = formPhotosClosedAt;
         
         // DISPLAY QUOTE/MEMORY PROMINENTLY (Top Priority for Editors)
         const quoteSection = document.getElementById('quote-section');
