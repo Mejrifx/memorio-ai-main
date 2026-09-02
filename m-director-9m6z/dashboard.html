@@ -925,6 +925,23 @@
       color: var(--color-text-muted);
     }
     
+    .case-row-status-line {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--color-text);
+      margin: 0;
+      line-height: 1.4;
+    }
+    
+    .case-row-meta .case-row-stage-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 1px solid currentColor;
+      background-color: rgba(255, 255, 255, 0.6);
+    }
+    
     .case-row-meta-item {
       display: flex;
       align-items: center;
@@ -3310,7 +3327,7 @@
         }
         
         console.log('✅ Case created successfully:', result.data.case_id);
-        document.getElementById('created-case-id').textContent = result.data.case_id;
+        document.getElementById('created-case-id').textContent = result.data.case_number || result.data.case_id;
 
         // One action: invite the family for this tribute right away
         const famBlock = document.getElementById('created-family-block');
@@ -3556,6 +3573,26 @@
       `;
     }
     
+    // One plain-language sentence per status for the My Tributes list.
+    // Keys live in js/i18n.js (director.status.*); English strings here are the fallback.
+    function getStatusSentence(status) {
+      const map = {
+        'created': ['director.status.waitingOnFamily', 'Waiting on the family to add photos and memories'],
+        'waiting_on_family': ['director.status.waitingOnFamily', 'Waiting on the family to add photos and memories'],
+        'intake_in_progress': ['director.status.waitingOnFamily', 'Waiting on the family to add photos and memories'],
+        'submitted': ['director.status.inProduction', 'In production'],
+        'in_production': ['director.status.inProduction', 'In production'],
+        'awaiting_review': ['director.status.beingReviewed', 'Being reviewed'],
+        'revision_requested': ['director.status.changesInProgress', 'Changes in progress'],
+        'family_revision_requested': ['director.status.changesInProgress', 'Changes in progress'],
+        'delivered': ['director.status.delivered', 'Delivered to the family'],
+        'closed': ['director.status.complete', 'Complete']
+      };
+      const entry = map[status];
+      if (!entry) return '';
+      return (typeof i18n !== 'undefined' && i18n.t) ? i18n.t(entry[0], entry[1]) : entry[1];
+    }
+    
     // Map of case_id -> cooldown_expires_at for QC-reviewed cases pending delivery
     let cooldownMap = {};
     
@@ -3679,6 +3716,7 @@
       casesList.innerHTML = cases.map(c => {
         const stage = getCaseStage(c.status, c.id);
         const slaBadge = getSLABadge(c);
+        const statusSentence = getStatusSentence(c.status);
         const serviceDate = c.case_metadata?.service_date 
           ? new Date(c.case_metadata.service_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
           : null;
@@ -3686,8 +3724,9 @@
           <div class="case-row" onclick="openCaseModal('${esc(c.id)}')">
             <div class="case-row-left">
               <h4 class="case-row-name">${esc(c.deceased_name)}</h4>
+              ${statusSentence ? `<p class="case-row-status-line">${esc(statusSentence)}</p>` : ''}
               <div class="case-row-meta">
-                <div class="case-row-meta-item" style="color: ${stage.color};">
+                <div class="case-row-meta-item case-row-stage-badge" style="color: ${stage.color};">
                   ${stage.icon} <span>${esc(stage.label)}</span>
                 </div>
                 ${serviceDate ? `
@@ -3733,6 +3772,13 @@
     document.getElementById('search-input').addEventListener('input', (e) => {
       filterCases(e.target.value);
     });
+    
+    // Re-render the list when the language toggles so the status sentences follow
+    window.translateDashboardContent = function() {
+      if (!Array.isArray(allCases) || allCases.length === 0) return;
+      const searchInput = document.getElementById('search-input');
+      filterCases(searchInput ? searchInput.value : '');
+    };
   </script>
 </body>
 </html>

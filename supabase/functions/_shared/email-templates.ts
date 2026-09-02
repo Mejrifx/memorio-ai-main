@@ -128,7 +128,7 @@ export const directorInviteTemplate = (email: string, tempPassword: string, orgN
 </html>
 `;
 
-export const familyInviteTemplate = (name: string, deceasedName: string, email: string, tempPassword: string, funeralHomeName: string) => `
+export const familyInviteTemplate = (name: string, deceasedName: string, email: string, tempPassword: string, funeralHomeName: string, signInLink?: string) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -250,18 +250,18 @@ export const familyInviteTemplate = (name: string, deceasedName: string, email: 
         <p style="font-size: 24px; color: #436481; font-weight: 700; margin: 10px 0;">${deceasedName}</p>
       </div>
       
-      <p>Take your time—each question helps us gently piece together a heartfelt memory. There's no rush.</p>
-      
-      <div class="credentials">
-        <p><strong>Your Login Credentials:</strong></p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Temporary Password:</strong> ${tempPassword}</p>
+      <p>Take your time. Each question helps us gently piece together a heartfelt memory. There is no rush, and everything you enter is saved as you go.</p>
+
+      <div style="text-align: center; margin: 30px 0 22px;">
+        <a href="${signInLink || 'https://memorio.ai/family/login'}" class="button">Open your tribute</a>
+        <p style="font-size: 13px; color: #565a63; margin-top: 10px;">${signInLink ? 'This link signs you in on its own. It is personal to you, so please do not forward it.' : ''}</p>
       </div>
-      
-      <p style="color: #6ca7d3; font-weight: bold;">🔒 You'll be asked to change your password after first login for security.</p>
-      
-      <div style="text-align: center; margin-top: 30px;">
-        <a href="https://memorio.ai/family/login" class="button">Start Creating Tribute</a>
+
+      <div class="credentials">
+        <p><strong>If you ever need to sign in another way:</strong></p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Password:</strong> ${tempPassword}</p>
+        <p style="font-size: 13px; color: #565a63;">Or visit memorio.ai/family and choose "Email me a sign-in link".</p>
       </div>
     </div>
     

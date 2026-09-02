@@ -1764,3 +1764,85 @@ Object.assign(i18n.translations.es, {
 
 Object.assign(i18n.translations.en, {"family.orLine":"or, no password needed","family.emailLink":"Email me a sign-in link","family.enterEmailFirst":"Enter your email above first.","family.linkError":"We could not send a link to that address.","family.linkSent":"Check your email. The sign-in link is on its way."});
 Object.assign(i18n.translations.es, {"family.orLine":"o, sin contraseña","family.emailLink":"Envíenme un enlace para entrar","family.enterEmailFirst":"Primero escriba su correo arriba.","family.linkError":"No pudimos enviar un enlace a esa dirección.","family.linkSent":"Revise su correo. El enlace para entrar va en camino."});
+
+// ===== Family intake form rebuild (2026-09-02): single calm page =====
+Object.assign(i18n.translations.en, {
+  "family.intake.welcomeFallback": "Let's begin.",
+  "family.intake.welcomeName": "Let's remember {name} together.",
+  "family.intake.noRush": "There is no rush. Everything you write here saves as you go, so you can leave and come back whenever you need.",
+  "family.intake.photosTitle": "Photos",
+  "family.intake.photosLead": "Choose photos of your loved one from your phone or computer.",
+  "family.intake.photosLeadName": "Choose photos of {name} from your phone or computer.",
+  "family.intake.choosePhotos": "Choose photos",
+  "family.intake.tapHere": "Tap here to pick from your device.",
+  "family.intake.dragHint": "You can also drag photos in.",
+  "family.intake.photosNote": "Any number is fine. You can add more later from your dashboard.",
+  "family.intake.resumeTitle": "Previous upload was interrupted",
+  "family.intake.resumeDismiss": "Got it",
+  "family.intake.aboutTitle": "Tell us about them",
+  "family.intake.aboutLead": "Write as much or as little as you like, in your own words. Skip anything that does not apply.",
+  "family.intake.quoteLabel": "A saying they loved, if there was one",
+  "family.intake.optional": "(optional)",
+  "family.intake.guitar": "Guitar (acoustic)",
+  "family.intake.piano": "Piano (classical)",
+  "family.intake.anythingElse": "Anything else?",
+  "family.intake.anythingElseHint": "Service details, or anything we have not asked about.",
+  "family.intake.detailsTitle": "A few details",
+  "family.intake.detailsLead": "Your funeral home already gave us the essentials. Open this if you would like to add other names.",
+  "family.intake.suffixLabel": "Suffix",
+  "family.intake.consent": "By finishing, you confirm you have the right to share these photos and details. Keep this page open afterwards while your photos upload.",
+  "family.intake.finish": "I'm finished",
+  "family.intake.failTitle": "Something went wrong",
+  "family.intake.failBody": "We could not send your answers just now. Nothing you wrote was lost. Please try again in a moment.",
+  "family.intake.failPhotosSaved": "Your photos were already received, so they will not be uploaded again.",
+  "family.intake.tryAgain": "Try again"
+});
+Object.assign(i18n.translations.es, {
+  "family.intake.welcomeFallback": "Comencemos.",
+  "family.intake.welcomeName": "Recordemos a {name} juntos.",
+  "family.intake.noRush": "No hay prisa. Todo lo que escriba aquí se guarda a medida que avanza, así que puede salir y volver cuando lo necesite.",
+  "family.intake.photosTitle": "Fotos",
+  "family.intake.photosLead": "Elija fotos de su ser querido desde su teléfono o computadora.",
+  "family.intake.photosLeadName": "Elija fotos de {name} desde su teléfono o computadora.",
+  "family.intake.choosePhotos": "Elegir fotos",
+  "family.intake.tapHere": "Toque aquí para elegir desde su dispositivo.",
+  "family.intake.dragHint": "También puede arrastrar fotos aquí.",
+  "family.intake.photosNote": "Cualquier cantidad está bien. Puede agregar más después desde su panel.",
+  "family.intake.resumeTitle": "La carga anterior se interrumpió",
+  "family.intake.resumeDismiss": "Entendido",
+  "family.intake.aboutTitle": "Cuéntenos sobre su ser querido",
+  "family.intake.aboutLead": "Escriba tanto o tan poco como quiera, con sus propias palabras. Omita lo que no aplique.",
+  "family.intake.quoteLabel": "Una frase que le gustaba, si la había",
+  "family.intake.optional": "(opcional)",
+  "family.intake.guitar": "Guitarra (acústica)",
+  "family.intake.piano": "Piano (clásico)",
+  "family.intake.anythingElse": "¿Algo más?",
+  "family.intake.anythingElseHint": "Detalles del servicio, o cualquier cosa que no hayamos preguntado.",
+  "family.intake.detailsTitle": "Algunos detalles",
+  "family.intake.detailsLead": "Su funeraria ya nos dio lo esencial. Abra esto si desea agregar otros nombres.",
+  "family.intake.suffixLabel": "Sufijo",
+  "family.intake.consent": "Al terminar, confirma que tiene derecho a compartir estas fotos y detalles. Después, mantenga esta página abierta mientras se suben sus fotos.",
+  "family.intake.finish": "He terminado",
+  "family.intake.failTitle": "Algo salió mal",
+  "family.intake.failBody": "No pudimos enviar sus respuestas en este momento. No se perdió nada de lo que escribió. Intente de nuevo en un momento.",
+  "family.intake.failPhotosSaved": "Sus fotos ya fueron recibidas, así que no se subirán de nuevo.",
+  "family.intake.tryAgain": "Intentar de nuevo"
+});
+
+// ===== Director portal: plain-language status line on My Tributes (2026-09-02) =====
+Object.assign(i18n.translations.en, {
+  "director.status.waitingOnFamily": "Waiting on the family to add photos and memories",
+  "director.status.inProduction": "In production",
+  "director.status.beingReviewed": "Being reviewed",
+  "director.status.changesInProgress": "Changes in progress",
+  "director.status.delivered": "Delivered to the family",
+  "director.status.complete": "Complete"
+});
+Object.assign(i18n.translations.es, {
+  "director.status.waitingOnFamily": "Esperando a que la familia agregue fotos y recuerdos",
+  "director.status.inProduction": "En producción",
+  "director.status.beingReviewed": "En revisión",
+  "director.status.changesInProgress": "Cambios en proceso",
+  "director.status.delivered": "Entregado a la familia",
+  "director.status.complete": "Completo"
+});

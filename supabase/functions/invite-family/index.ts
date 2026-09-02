@@ -181,8 +181,23 @@ serve(async (req) => {
         }
       });
 
-    // Send email with credentials
-    const emailHtml = familyInviteTemplate(name, caseData.deceased_name, email, tempPassword, funeralHomeName);
+    // Personal sign-in link (magic link) so the family never has to type a password.
+    // The password still works as a fallback and is included in the email.
+    let signInLink: string | undefined;
+    try {
+      const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email,
+        options: { redirectTo: 'https://memorio.ai/family/login' },
+      });
+      if (!linkError && linkData?.properties?.action_link) signInLink = linkData.properties.action_link;
+      else console.warn('magic link not generated:', linkError?.message);
+    } catch (e) {
+      console.warn('magic link generation failed:', e);
+    }
+
+    // Send email with the sign-in link + credentials fallback
+    const emailHtml = familyInviteTemplate(name, caseData.deceased_name, email, tempPassword, funeralHomeName, signInLink);
     const emailSent = await sendEmail(
       email,
       `Invitation to Create Memorial Tribute for ${caseData.deceased_name}`,

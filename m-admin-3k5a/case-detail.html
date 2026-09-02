@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Case Detail - Memorio Admin</title>
+  <title>Tribute - Memorio Admin</title>
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <!-- Memorio design system fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -903,7 +903,7 @@
       </a>
       <a href="dashboard.html" class="sidebar-nav-item active">
         <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg></span>
-        <span>All Cases</span>
+        <span>All Tributes</span>
       </a>
       <a href="dashboard.html" class="sidebar-nav-item">
         <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3.5 3.5 0 0 1 0 6.6M21 20c0-2.6-1.6-4.8-3.9-5.7"/></svg></span>
@@ -917,9 +917,9 @@
     <div class="topbar-left">
       <a href="dashboard.html" class="topbar-back-btn">
         <span>←</span>
-        <span>Back to Cases</span>
+        <span>Back to Tributes</span>
       </a>
-      <h1 class="topbar-title">Case Detail</h1>
+      <h1 class="topbar-title">Tribute</h1>
     </div>
     <div class="topbar-right">
       <div class="topbar-user">
@@ -931,7 +931,7 @@
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
-    <div id="loadingState" class="loading">Loading case details...</div>
+    <div id="loadingState" class="loading">Loading tribute...</div>
     
     <div id="caseContent" style="display: none;">
       <!-- CASE HEADER -->
@@ -1127,7 +1127,7 @@
         currentCaseId = urlParams.get('case_id');
         
         if (!currentCaseId) {
-          alert('No case ID provided');
+          alert('No tribute reference provided');
           window.location.href = 'dashboard.html';
           return;
         }
@@ -1204,7 +1204,7 @@
         
       } catch (error) {
         console.error('Error loading case:', error);
-        alert('Failed to load case: ' + error.message);
+        alert('Failed to load tribute: ' + error.message);
       }
     }
     
@@ -1239,6 +1239,11 @@
       });
       
       document.getElementById('caseMeta').innerHTML = `
+        ${c.case_number ? `
+        <div class="meta-item">
+          <span class="meta-label">Reference</span>
+          <span class="meta-value">${esc(c.case_number)}</span>
+        </div>` : ''}
         <div class="meta-item">
           <span class="meta-label">Funeral Home</span>
           <span class="meta-value">${esc(c.organizations?.name || 'Unknown')}</span>
@@ -1397,7 +1402,7 @@
       switch(action) {
         case 'cases_created':
         case 'CREATE_CASE':
-          return `<strong>Case created</strong> for ${esc(newData.deceased_name || 'deceased')}`;
+          return `<strong>Tribute created</strong> for ${esc(newData.deceased_name || 'deceased')}`;
         
         case 'status_changed':
           const fromStatus = (changes.from || oldData.status || '').replace(/_/g, ' ');
@@ -1412,7 +1417,7 @@
             const to = (newData.status || '').replace(/_/g, ' ');
             return `<strong>Status changed</strong> from "<em>${esc(from)}</em>" to "<em>${esc(to)}</em>"`;
           }
-          return '<strong>Case updated</strong>';
+          return '<strong>Tribute updated</strong>';
         
         case 'form_submitted':
           return '<strong>Intake form completed and submitted</strong> by family';
@@ -1527,7 +1532,7 @@
           return `<strong>QC rejected video</strong> - escalated to admin by ${esc(qcEmailRej)}`;
         
         case 'pushed_to_revision':
-          return '<strong>Case pushed to revision</strong> by admin';
+          return '<strong>Tribute pushed to revision</strong> by admin';
         
         case 'link_regenerated':
           return '<strong>Family login link regenerated</strong>';
@@ -1536,10 +1541,10 @@
           return '<strong>Family login link resent</strong> via email';
         
         case 'note_added':
-          return '<strong>Note added</strong> to case';
+          return '<strong>Note added</strong> to tribute';
         
         case 'family_assigned':
-          return '<strong>Family member assigned</strong> to case';
+          return '<strong>Family member assigned</strong> to tribute';
         
         default:
           return esc(action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
@@ -1946,7 +1951,7 @@
           // Reload case data
           await loadCaseData();
         } else {
-          throw new Error('No video submission found for this case');
+          throw new Error('No video submission found for this tribute');
         }
         
       } catch (error) {
@@ -1960,7 +1965,7 @@
     // ============================================================================
     
     async function pushToRevision() {
-      if (!confirm('Push this case to revision?')) {
+      if (!confirm('Push this tribute to revision?')) {
         return;
       }
       
@@ -1995,10 +2000,10 @@
             case_id: currentCaseId,
             author_user_id: session.user.id,
             note_type: 'support',
-            content: 'Case pushed to revision by admin support'
+            content: 'Tribute pushed to revision by admin support'
           });
         
-        showToast('Case pushed to revision');
+        showToast('Tribute pushed to revision');
         await loadCaseData();
         
       } catch (error) {
@@ -2023,7 +2028,7 @@
         // Get family user
         const familyUserId = currentCaseData.assigned_family_user_id;
         if (!familyUserId) {
-          throw new Error('No family user assigned to this case');
+          throw new Error('No family user assigned to this tribute');
         }
         
         // Call create-case edge function to regenerate link

@@ -568,6 +568,56 @@
       padding-bottom: 8px;
     }
     
+    /* Structured change request (Request Revision) */
+    .qc-change-request {
+      margin-top: 8px;
+      padding: 18px 20px 8px;
+      border: 1px solid rgba(154, 91, 0, 0.3);
+      border-radius: 12px;
+      background-color: #fffaf3;
+    }
+    
+    .qc-change-request .section-title {
+      margin-bottom: 4px;
+    }
+    
+    .qc-change-hint {
+      font-size: 13px;
+      color: #565a63;
+      margin: 0 0 12px;
+    }
+    
+    .qc-change-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px 16px;
+    }
+    
+    .qc-change-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #32343a;
+      cursor: pointer;
+      padding: 6px 0;
+    }
+    
+    .qc-change-option input {
+      width: 16px;
+      height: 16px;
+      accent-color: #9a5b00;
+      cursor: pointer;
+    }
+    
+    .qc-change-notes-wrap {
+      margin-top: 12px;
+    }
+    
+    .qc-change-notes-wrap .qc-textarea {
+      min-height: 64px;
+    }
+    
     .btn {
       padding: 10px 24px;
       border: none;
@@ -1208,13 +1258,13 @@
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
                 margin-bottom: 10px;
-              ">Your Review Notes</div>
+              ">${review.qc_status === 'revision_requested' ? 'Changes Requested' : 'Your Review Notes'}</div>
               <div style="
                 color: #32343a;
                 font-size: 15px;
                 line-height: 1.7;
                 white-space: pre-wrap;
-              ">${esc(review.qc_notes)}</div>
+              ">${formatQcNotes(review.qc_notes)}</div>
             </div>
             ` : ''}
           </div>
@@ -1407,7 +1457,7 @@
           <textarea 
             id="qcNotes" 
             class="qc-textarea" 
-            placeholder="Add notes or feedback for the editor..."
+            placeholder="Optional notes to record with your approval..."
           ></textarea>
           
           <div class="qc-actions">
@@ -1423,12 +1473,76 @@
                 Override & Deliver Now
               </button>
             ` : ''}
+          </div>
+        </div>
+        
+        <div class="qc-change-request">
+          <h3 class="section-title">Request changes</h3>
+          <p class="qc-change-hint">Tick what the editor needs to change. The editor will be notified and will resubmit the video.</p>
+          <div class="qc-change-grid">
+            <label class="qc-change-option"><input type="checkbox" name="qcChangeType" value="reorder" onchange="updateChangeNotesVisibility()"> Reorder photos</label>
+            <label class="qc-change-option"><input type="checkbox" name="qcChangeType" value="remove_photos" onchange="updateChangeNotesVisibility()"> Remove specific photos</label>
+            <label class="qc-change-option"><input type="checkbox" name="qcChangeType" value="song" onchange="updateChangeNotesVisibility()"> Different song (guitar / piano)</label>
+            <label class="qc-change-option"><input type="checkbox" name="qcChangeType" value="title" onchange="updateChangeNotesVisibility()"> Fix name or dates on the title card</label>
+            <label class="qc-change-option"><input type="checkbox" name="qcChangeType" value="other" onchange="updateChangeNotesVisibility()"> Other</label>
+          </div>
+          <div class="qc-change-notes-wrap" id="qcChangeNotesWrap" style="display: none;">
+            <textarea id="qcChangeNotes" class="qc-textarea" placeholder="Which photos should be removed? Describe them so the editor can find them."></textarea>
+          </div>
+          <div class="qc-actions">
             <button class="btn btn-revision" onclick="handleRevision()">
-              ⟳ Request Revision
+              Request Revision
             </button>
           </div>
         </div>
       `;
+    }
+    
+    // Structured change request helpers
+    const QC_CHANGE_TYPE_LABELS = {
+      reorder: 'Reorder photos',
+      remove_photos: 'Remove specific photos',
+      song: 'Different song (guitar / piano)',
+      title: 'Fix name or dates on the title card',
+      other: 'Other'
+    };
+    
+    function getSelectedChangeTypes() {
+      return Array.from(document.querySelectorAll('input[name="qcChangeType"]:checked')).map(el => el.value);
+    }
+    
+    // Notes box only appears when "Other" or "Remove specific photos" is ticked
+    function updateChangeNotesVisibility() {
+      const types = getSelectedChangeTypes();
+      const wrap = document.getElementById('qcChangeNotesWrap');
+      const box = document.getElementById('qcChangeNotes');
+      if (!wrap || !box) return;
+      const needsPhotos = types.includes('remove_photos');
+      const needsOther = types.includes('other');
+      if (needsPhotos && needsOther) {
+        box.placeholder = 'Which photos should be removed, and what else needs to change?';
+      } else if (needsPhotos) {
+        box.placeholder = 'Which photos should be removed? Describe them so the editor can find them.';
+      } else if (needsOther) {
+        box.placeholder = 'Describe the change the editor should make.';
+      }
+      wrap.style.display = (needsPhotos || needsOther) ? 'block' : 'none';
+    }
+    
+    // qc_notes may be free text (legacy) or a JSON payload from the structured
+    // change request: {"types":[...],"notes":"..."}. Returns safe HTML.
+    function formatQcNotes(raw) {
+      if (raw === null || raw === undefined) return '';
+      const str = String(raw);
+      if (str.trim().charAt(0) !== '{') return esc(str);
+      let data;
+      try { data = JSON.parse(str); } catch (e) { return esc(str); }
+      if (!data || typeof data !== 'object') return esc(str);
+      const types = Array.isArray(data.types) ? data.types : [];
+      const items = types.map(t => `<li>${esc(QC_CHANGE_TYPE_LABELS[t] || t)}</li>`).join('');
+      const notes = data.notes ? `<div style="margin-top: 8px; white-space: pre-wrap;">${esc(data.notes)}</div>` : '';
+      if (!items && !notes) return esc(str);
+      return `<ul style="margin: 0 0 0 18px; padding: 0;">${items}</ul>${notes}`;
     }
     
     // Pure JS cooldown check - no RPC needed, uses first_submission_at from already-fetched case data
@@ -1530,17 +1644,30 @@
     async function handleRevision() {
       if (!currentSubmission) return;
       
-      const notes = document.getElementById('qcNotes').value;
+      const types = getSelectedChangeTypes();
+      const notesBox = document.getElementById('qcChangeNotes');
+      const notes = notesBox ? notesBox.value.trim() : '';
       
-      if (!notes || notes.trim() === '') {
-        showToast('Please provide specific feedback for the requested revisions.', true);
+      if (types.length === 0) {
+        showToast('Tick at least one change for the editor.', true);
+        return;
+      }
+      if (types.includes('remove_photos') && !notes) {
+        showToast('Tell the editor which photos to remove.', true);
+        return;
+      }
+      if (types.includes('other') && !notes) {
+        showToast('Describe the other change in the notes box.', true);
         return;
       }
       
+      const payload = JSON.stringify({ types: types, notes: notes });
+      const summary = types.map(t => '\u2022 ' + (QC_CHANGE_TYPE_LABELS[t] || t)).join('\n');
+      
       showConfirmModal(
         'Request Revision',
-        'Are you sure you want to request revisions from the editor?\n\nThe editor will be notified and will need to resubmit the video.',
-        () => performRevision(notes)
+        'Send these changes to the editor?\n\n' + summary + (notes ? '\n\nNotes: ' + notes : '') + '\n\nThe editor will be notified and will need to resubmit the video.',
+        () => performRevision(payload)
       );
     }
     
