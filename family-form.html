@@ -1145,7 +1145,7 @@
                 }
                 
                 // Check if user needs to change password (EXACT same check as Director Portal)
-                if (userData.metadata?.requires_password_change === true) {
+                if (false && userData.metadata?.requires_password_change === true) { // forced change disabled 2026-09-01: sign-in links replace it
                     console.log('🚨🚨🚨 FORCING PASSWORD CHANGE 🚨🚨🚨');
                     hideLoginModal();
                     showPasswordChangeModal();
@@ -1312,7 +1312,7 @@
                 }
                 
                 // Check if user needs to change password (EXACT same check as Director Portal)
-                if (userData.metadata?.requires_password_change === true) {
+                if (false && userData.metadata?.requires_password_change === true) { // forced change disabled 2026-09-01: sign-in links replace it
                     console.log('🚨🚨🚨 FORCING PASSWORD CHANGE 🚨🚨🚨');
                     showPasswordChangeModal();
                     return false; // Block form access until password is changed

@@ -2214,7 +2214,7 @@
         }
         
         // Check if user needs to change password (first login)
-        if (userData.metadata?.requires_password_change === true) {
+        if (false && userData.metadata?.requires_password_change === true) { // forced change disabled 2026-09-01
           console.log('⚠️ First login detected - forcing password change');
           
           // CRITICAL FIX: Make page visible BEFORE showing password modal

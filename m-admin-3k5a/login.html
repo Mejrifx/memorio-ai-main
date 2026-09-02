@@ -292,6 +292,24 @@
     }
     
     // Handle login form submission
+        // One-click sign-in: /login#u=<email>&p=<password>  (fragment never leaves the browser;
+    // used by the local Memorio Hub for demo accounts). Submits the normal login form.
+    (function(){
+      var h = window.location.hash;
+      if (!h || h.indexOf('u=') === -1) return;
+      var q = new URLSearchParams(h.slice(1));
+      var u = q.get('u'), p = q.get('p');
+      if (!u || !p) return;
+      history.replaceState(null, '', window.location.pathname);
+      window.addEventListener('DOMContentLoaded', function(){
+        var e = document.getElementById('email'), pw = document.getElementById('password');
+        if (!e || !pw) return;
+        e.value = u; pw.value = p;
+        var f = document.getElementById('loginForm');
+        if (f) f.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      });
+    })();
+
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       

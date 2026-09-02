@@ -2941,7 +2941,7 @@
     <!-- Organizations Tab -->
     <div id="organizations-tab" class="tab-content active">
       <div class="invite-section">
-        <h2 class="section-title">Create New Organization</h2>
+        <h2 class="section-title">New Funeral Home</h2>
         <p class="paragraph">Add a new funeral home to the Memorio platform. Each organization can have multiple Directors and manage their own cases.</p>
         
         <form id="create-org-form">
@@ -2989,15 +2989,34 @@
           
           <div class="form-button" style="margin-top: 20px;">
             <button type="submit" class="button-primary w-button" id="create-org-btn">
-              Create Organization
+              Create Funeral Home and Invite Director
             </button>
           </div>
-        </form>
+        
+          <div class="card-header" style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(67,100,129,.18);">
+            <h2 class="card-title" style="font-size:1.15rem;">First Director</h2>
+            <p class="card-description">Invited the moment the funeral home is created. Leave blank to add directors later.</p>
+          </div>
+          <div class="form-group">
+            <label for="org-director-name">Director Name</label>
+            <input type="text" id="org-director-name" placeholder="Jay Rodriguez" autocomplete="off">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="org-director-email">Director Email</label>
+              <input type="email" id="org-director-email" placeholder="jay@funeralhome.com" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="org-director-phone">Director Phone <span class="optional">(optional)</span></label>
+              <input type="tel" id="org-director-phone" autocomplete="off">
+            </div>
+          </div>
+</form>
         
         <!-- Success Box -->
         <div id="org-success-box" class="success-box">
-          <h3><span class="success-icon"></span>Organization Created Successfully!</h3>
-          <p>Use this Organization ID when inviting Directors for this funeral home.</p>
+          <h3><span class="success-icon"></span>Funeral home created</h3>
+          <p>The funeral home is ready. If you added a director, their invitation went out in the same step.</p>
           
           <div class="credential-box">
             <div class="credential-label">Organization Name</div>
@@ -3005,8 +3024,20 @@
           </div>
           
           <div class="credential-box">
-            <div class="credential-label">Organization ID (use this when inviting Directors)</div>
+            <div class="credential-label">Organization ID</div>
             <div class="credential-value" id="created-org-id"></div>
+          <div id="org-director-block" style="display:none;">
+            <p style="margin-top:14px;">The first director has been invited. Their sign-in details:</p>
+            <div class="credential-box">
+              <div class="credential-label">Director Email</div>
+              <div class="credential-value" id="org-director-created-email"></div>
+            </div>
+            <div class="credential-box">
+              <div class="credential-label">Temporary Password</div>
+              <div class="credential-value" id="org-director-created-password"></div>
+            </div>
+            <p id="org-director-note" style="margin-top:8px;color:#565a63;font-size:.92rem;"></p>
+          </div>
             <button class="copy-btn" onclick="copyToClipboard('created-org-id')">Copy ID</button>
           </div>
         </div>
@@ -3946,6 +3977,33 @@
         // Display success with organization ID
         document.getElementById('created-org-name').textContent = data.name;
         document.getElementById('created-org-id').textContent = data.id;
+
+        // One action: invite the first director for this funeral home
+        const dBlock = document.getElementById('org-director-block');
+        dBlock.style.display = 'none';
+        const dName = document.getElementById('org-director-name').value.trim();
+        const dEmail = document.getElementById('org-director-email').value.trim();
+        const dPhone = document.getElementById('org-director-phone').value.trim();
+        if (dName && dEmail) {
+          createBtn.textContent = 'Inviting director...';
+          try {
+            const { data: { session: s2 } } = await supabaseClient.auth.getSession();
+            const inv = await fetch(`${SUPABASE_URL}/functions/v1/invite-director`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${s2.access_token}`, 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+              body: JSON.stringify({ email: dEmail, name: dName, phone: dPhone || undefined, org_id: data.id })
+            });
+            const invResult = await inv.json();
+            if (!inv.ok || !invResult.success) throw new Error(invResult.error || 'Director invitation failed');
+            document.getElementById('org-director-created-email').textContent = invResult.data.email;
+            document.getElementById('org-director-created-password').textContent = invResult.data.temp_password || '';
+            document.getElementById('org-director-note').textContent = invResult.data.email_sent ? 'Invitation email delivered.' : 'Email could not be sent; share these details directly.';
+            dBlock.style.display = 'block';
+          } catch (invErr) {
+            document.getElementById('org-director-note').textContent = 'Funeral home created, but the director invitation failed: ' + invErr.message + '. Use Invite Director.';
+            dBlock.style.display = 'block';
+          }
+        }
         successBox.style.display = 'block';
         
         // Auto-scroll to the success box (Organization Details)
@@ -3965,7 +4023,7 @@
       } finally {
         section.classList.remove('loading');
         createBtn.disabled = false;
-        createBtn.textContent = 'Create Organization';
+        createBtn.textContent = 'Create Funeral Home';
       }
     });
     

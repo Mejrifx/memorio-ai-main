@@ -91,24 +91,8 @@ serve(async (req) => {
     // Generate temporary password
     const tempPassword = generatePassword();
 
-    // Check if a soft-deleted user with this email exists and purge them
-    // This happens when an organization was deleted within the last 24 hours
-    try {
-      const { data: existingUsers } = await supabase.auth.admin.listUsers();
-      const softDeleted = existingUsers?.users?.find(u => 
-        u.email === email && u.deleted_at !== null
-      );
-      
-      if (softDeleted) {
-        console.log(`Found soft-deleted user with email ${email}, force deleting...`);
-        await supabase.auth.admin.deleteUser(softDeleted.id, false);
-        // Wait a moment for the deletion to process
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-    } catch (e) {
-      console.warn('Could not check for soft-deleted users:', e);
-      // Continue anyway
-    }
+    // (Removed 2026-09-01: a full auth.admin.listUsers() scan plus a 1s sleep ran on every invite.
+    //  Duplicate emails now surface as a clear createUser error instead.)
 
     // Create Supabase Auth user with password
     const { data: authData, error: createAuthError } = await supabase.auth.admin.createUser({
