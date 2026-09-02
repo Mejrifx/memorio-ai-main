@@ -1846,3 +1846,81 @@ Object.assign(i18n.translations.es, {
   "director.status.delivered": "Entregado a la familia",
   "director.status.complete": "Completo"
 });
+
+// ===== Family intake: six-screen stepper, action bar, two-layer autosave (2026-09-02) =====
+Object.assign(i18n.translations.en, {
+  "family.intake.stepOf": "{current} of {total}",
+  "family.intake.step2Title": "The people in their life",
+  "family.intake.step2Lead": "Write as much or as little as you like, in your own words.",
+  "family.intake.step3Title": "School and work",
+  "family.intake.step3Lead": "Skip anything that does not apply.",
+  "family.intake.step4Title": "How they spent their days",
+  "family.intake.step4Lead": "Only what feels right to share. Each of these is optional.",
+  "family.intake.step5Title": "A saying and the music",
+  "family.intake.step5Lead": "A phrase they loved, and the music for the tribute video.",
+  "family.intake.step6Title": "Almost done",
+  "family.intake.step6Lead": "Your funeral home already gave us the essentials. Add any other names below if you would like.",
+  "family.intake.back": "Back",
+  "family.intake.next": "Next",
+  "family.intake.saving": "Saving..."
+});
+Object.assign(i18n.translations.es, {
+  "family.intake.stepOf": "{current} de {total}",
+  "family.intake.step2Title": "Las personas en su vida",
+  "family.intake.step2Lead": "Escriba tanto o tan poco como quiera, con sus propias palabras.",
+  "family.intake.step3Title": "Estudios y trabajo",
+  "family.intake.step3Lead": "Omita lo que no aplique.",
+  "family.intake.step4Title": "Cómo pasaba sus días",
+  "family.intake.step4Lead": "Solo lo que sienta bien compartir. Cada uno de estos es opcional.",
+  "family.intake.step5Title": "Una frase y la música",
+  "family.intake.step5Lead": "Una frase que le gustaba, y la música para el video tributo.",
+  "family.intake.step6Title": "Casi listo",
+  "family.intake.step6Lead": "Su funeraria ya nos dio lo esencial. Si desea, agregue otros nombres a continuación.",
+  "family.intake.back": "Atrás",
+  "family.intake.next": "Siguiente",
+  "family.intake.saving": "Guardando..."
+});
+
+// ===== Director portal: "tribute" and "Reference" wording, no visible "case" (2026-09-02) =====
+Object.assign(i18n.translations.en, {
+  "director.caseCreatedSuccess": "Tribute opened",
+  "director.caseCreatedDesc": "The family has been emailed their invitation. Their sign-in details are below if they need them read aloud.",
+  "director.caseID": "Reference",
+  "director.caseId": "Reference",
+  "director.familySignInHeading": "Family sign-in details",
+  "director.referencePlaceholder": "Paste the reference here",
+  "director.inviteFamilyDesc": "Send a secure invitation to a family member to complete the tribute form for their loved one.",
+  "director.familyMemberDetailsDesc": "Provide contact information and the tribute reference",
+  "director.myCasesDesc": "View and manage all tributes for your organization.",
+  "director.searchCases": "Search by name or reference...",
+  "director.caseDetails": "Tribute details",
+  "director.caseInformation": "Tribute details",
+  "director.caseInfo": "Tribute details",
+  "director.copyFullId": "Copy",
+  "director.familyInfo": "Family",
+  "director.familyLoginCredentials": "Family sign-in details",
+  "director.noCases": "No tributes yet",
+  "director.noCasesDesc": "Open your first tribute to get started.",
+  "director.deleteCase": "Delete tribute"
+});
+Object.assign(i18n.translations.es, {
+  "director.caseCreatedSuccess": "Tributo abierto",
+  "director.caseCreatedDesc": "La familia ya recibió su invitación por correo. Sus datos de acceso están abajo por si necesitan que se los lean en voz alta.",
+  "director.caseID": "Referencia",
+  "director.caseId": "Referencia",
+  "director.familySignInHeading": "Datos de acceso de la familia",
+  "director.referencePlaceholder": "Pegue la referencia aquí",
+  "director.inviteFamilyDesc": "Envíe una invitación segura a un familiar para completar el formulario del tributo de su ser querido.",
+  "director.familyMemberDetailsDesc": "Proporcione la información de contacto y la referencia del tributo",
+  "director.myCasesDesc": "Vea y gestione todos los tributos de su organización.",
+  "director.searchCases": "Buscar por nombre o referencia...",
+  "director.caseDetails": "Detalles del tributo",
+  "director.caseInformation": "Detalles del tributo",
+  "director.caseInfo": "Detalles del tributo",
+  "director.copyFullId": "Copiar",
+  "director.familyInfo": "Familia",
+  "director.familyLoginCredentials": "Datos de acceso de la familia",
+  "director.noCases": "Aún no hay tributos",
+  "director.noCasesDesc": "Abra su primer tributo para comenzar.",
+  "director.deleteCase": "Eliminar tributo"
+});

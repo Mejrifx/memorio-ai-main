@@ -15,7 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Internationalisation (must load before page scripts) -->
-  <script src="/js/i18n.js"></script>
+  <script src="/js/i18n.js?v=20260902"></script>
 
   <style>
     :root {
@@ -91,15 +91,13 @@
       border-radius: 999px;
     }
     .signout:hover { background: rgba(67, 100, 129, 0.1); }
-    .preview-mode .signout { display: none !important; }
-    .preview-mode { padding-top: 44px; }
 
     /* ---------- page ---------- */
     .intake { max-width: 760px; margin: 0 auto; padding: 4px 20px 48px; }
     .form-wrapper { display: none; }
     .form-wrapper.show { display: block; }
 
-    .welcome { padding: 14px 0 26px; }
+    .welcome { padding: 14px 0 22px; }
     .welcome-greeting { font-size: 17px; color: var(--soft); min-height: 1.6em; }
     .welcome h1 { font-size: 36px; margin: 4px 0 12px; }
     .welcome p { color: var(--soft); max-width: 52ch; }
@@ -226,63 +224,89 @@
     @media (max-width: 560px) { .name-grid { grid-template-columns: 1fr; } }
     .name-grid label { display: block; font-size: 16px; font-weight: 600; margin-bottom: 6px; }
 
-    /* ---------- collapsed details ---------- */
-    details.card { padding: 0; }
-    details.card summary {
-      list-style: none;
-      cursor: pointer;
+    /* ---------- stepper: one small screen at a time ---------- */
+    .stepper { scroll-margin-top: 16px; }
+    .step-progress { margin-bottom: 22px; }
+    .step-count { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; color: var(--soft); margin-bottom: 8px; }
+    .step-bar { height: 4px; background: rgba(67, 100, 129, 0.16); border-radius: 999px; overflow: hidden; }
+    .step-bar-fill { height: 100%; width: 16.67%; background: var(--slate); border-radius: 999px; transition: width 0.35s ease; }
+    .step { display: none; }
+    .step.is-active { display: block; animation: stepIn 0.25s ease; }
+    @keyframes stepIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .step.is-active { animation: none; } html { scroll-behavior: auto; } }
+    .step-title { font-size: 28px; margin-bottom: 6px; outline: none; }
+    .step .lead { color: var(--soft); margin-bottom: 22px; }
+    body.step-later .welcome { display: none; }
+    .consent { font-size: 15px; color: var(--soft); margin-top: 22px; }
+
+    /* ---------- action bar ---------- */
+    .action-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      min-height: 44px;
-      padding: 22px 20px;
-      border-radius: var(--radius);
-    }
-    details.card summary::-webkit-details-marker { display: none; }
-    details.card summary h2 { font-size: 24px; margin-bottom: 4px; }
-    details.card summary p { font-size: 16px; color: var(--soft); }
-    .chev { flex-shrink: 0; color: var(--slate); transition: transform 0.2s ease; }
-    details[open] .chev { transform: rotate(180deg); }
-    .details-body { padding: 0 20px 26px; }
-    .details-body .label { margin-bottom: 14px; }
-
-    /* ---------- footer: consent line in flow, slim sticky bar with the one button ---------- */
-    .consent { font-size: 16px; color: var(--soft); padding: 6px 0 14px; }
-    .footer-bar {
-      position: sticky;
-      bottom: 0;
-      padding: 12px 0 max(12px, env(safe-area-inset-bottom));
-      background: rgba(255, 251, 247, 0.96);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      gap: 12px;
+      margin-top: 28px;
+      padding-top: 18px;
       border-top: 1px solid var(--line);
     }
-    .footer-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .saved {
+    .btn-ghost, .btn-next {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 16px;
-      color: #1d6b45;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 17px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+    }
+    .btn-ghost { background: transparent; color: var(--slate); border: 1px solid var(--line-strong); }
+    .btn-ghost:hover { background: rgba(67, 100, 129, 0.1); }
+    .btn-ghost:disabled { opacity: 0.35; cursor: default; background: transparent; }
+    .btn-next { background: var(--slate); color: #fff; border: 1px solid var(--slate); padding: 12px 30px; }
+    .btn-next:hover { background: var(--slate-dark); border-color: var(--slate-dark); }
+    .btn-next:disabled { opacity: 0.6; cursor: default; }
+    .action-bar .btn-finish { display: none; }
+    .stepper.is-last .action-bar .btn-finish { display: inline-flex; }
+    .stepper.is-last #step-next { display: none; }
+    .save-status {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+      font-size: 14px;
+      color: var(--soft);
       opacity: 0;
       transition: opacity 0.25s ease;
     }
-    .saved.is-visible { opacity: 1; }
-    .btn-finish {
-      min-height: 52px;
-      padding: 14px 34px;
-      background: var(--slate);
-      color: #fff;
-      border: none;
-      border-radius: 999px;
-      font-size: 18px;
-      font-weight: 600;
-      white-space: nowrap;
-      transition: background 0.2s ease, transform 0.2s ease;
+    .save-status .save-status-saved, .save-status .save-status-saving { display: none; align-items: center; justify-content: center; gap: 5px; }
+    .save-status .save-status-saved svg { color: #1d6b45; }
+    .save-status.is-saved, .save-status.is-saving { opacity: 1; }
+    .save-status.is-saved .save-status-saved { display: inline-flex; }
+    .save-status.is-saving .save-status-saving { display: inline-flex; }
+
+    @media (max-width: 719px) {
+      .intake { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
+      .action-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 500;
+        margin: 0;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+        background: rgba(255, 251, 247, 0.97);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-top: 1px solid var(--line);
+        box-shadow: 0 -6px 20px rgba(50, 52, 58, 0.06);
+      }
+      .btn-next { flex: 0 0 auto; min-width: 128px; }
     }
-    .btn-finish:hover { background: var(--slate-dark); transform: translateY(-1px); }
-    .btn-finish:disabled { opacity: 0.6; cursor: default; transform: none; }
+    @media (max-width: 400px) {
+      .btn-ghost { padding: 12px 18px; }
+      .btn-next { padding: 12px 22px; min-width: 0; }
+    }
 
     /* ---------- after submit ---------- */
     .form-done { display: none; padding-top: 12px; }
@@ -355,7 +379,6 @@
     @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     #passwordChangeProceedBtn:hover { background-color: var(--slate-dark) !important; }
     #passwordChangeProceedBtn:active { background-color: #2a4758 !important; transform: scale(0.98); }
-      .preview-mode #signOutBtn, .preview-mode .signout { display: none !important; }
   </style>
 </head>
 <body>
@@ -475,10 +498,6 @@
     </div>
   </div>
 
-  <div class="nav" style="position: relative; padding: 0 20px;">
-    <div class="logo-wrapper"><img src="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" loading="lazy" width="166" sizes="166px" alt="The Memorio Logo" srcset="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w"></div>
-    <button id="signOutBtn" onclick="handleSignOut()" title="Sign Out" data-i18n="form.signOut" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); padding: 10px 24px; background-color: #436481; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Public Sans', Arial, sans-serif; transition: background-color 0.2s; display: none;" onmouseover="this.style.backgroundColor='#1e3a52'" onmouseout="this.style.backgroundColor='#436481'">Sign Out</button>
-
   <header class="header">
     <a class="logo" href="/" aria-label="Memorio"><img src="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png" width="124" alt="The Memorio Logo" srcset="/images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-500.png 500w, /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview-p-800.png 800w, /images/Screenshot_2025-03-29_at_6.43.40_PM-removebg-preview.png 838w" sizes="124px"></a>
     <div class="header-actions">
@@ -517,171 +536,194 @@
         <input type="hidden" id="state_of_passing" name="state_of_passing" value="">
         <input type="hidden" id="country_of_passing" name="country_of_passing" value="United States">
 
-        <!-- Welcome -->
-        <section class="welcome">
+        <!-- Welcome (shown on the first screen only) -->
+        <section class="welcome" id="welcome">
           <p class="welcome-greeting" id="welcome-greeting"></p>
           <h1 id="welcome-heading" data-i18n="family.intake.welcomeFallback">Let's begin.</h1>
           <p data-i18n="family.intake.noRush">There is no rush. Everything you write here saves as you go, so you can leave and come back whenever you need.</p>
         </section>
 
-        <!-- Section A: Photos -->
-        <section class="card" aria-labelledby="photos-title">
-          <h2 id="photos-title" data-i18n="family.intake.photosTitle">Photos</h2>
-          <p class="lead" id="upload-images-label" data-i18n="family.intake.photosLead">Choose photos of your loved one from your phone or computer.</p>
-
-          <input type="file" id="photo_upload" name="photo_upload" accept="image/*" multiple style="display: none;" tabindex="-1" aria-hidden="true">
-          <button type="button" id="photo-upload-btn" class="dropzone" aria-describedby="photo-note">
-            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-            <span class="dropzone-title" data-i18n="family.intake.choosePhotos">Choose photos</span>
-            <span class="dropzone-sub"><span data-i18n="family.intake.tapHere">Tap here to pick from your device.</span> <span class="drag-hint" data-i18n="family.intake.dragHint">You can also drag photos in.</span></span>
-          </button>
-
-          <div id="photo-preview" class="photo-preview"></div>
-
-          <p class="hint photo-note" id="photo-note" data-i18n="family.intake.photosNote">Any number is fine. You can add more later from your dashboard.</p>
-
-          <!-- Interrupted upload recovery banner (engine target) -->
-          <div id="resume-upload-banner" class="resume-banner">
-            <p><strong data-i18n="family.intake.resumeTitle">Previous upload was interrupted</strong></p>
-            <p id="resume-upload-message"></p>
-            <button id="dismiss-resume-btn" type="button" class="btn-small" onclick="document.getElementById('resume-upload-banner').style.display='none'" data-i18n="family.intake.resumeDismiss">Got it</button>
-          </div>
-        </section>
-
-        <!-- Section B: Tell us about them -->
-        <section class="card" aria-labelledby="about-title">
-          <h2 id="about-title" data-i18n="family.intake.aboutTitle">Tell us about them</h2>
-          <p class="lead" data-i18n="family.intake.aboutLead">Write as much or as little as you like, in your own words. Skip anything that does not apply.</p>
-
-          <div class="field">
-            <label for="family_members" data-i18n="form.accordion.familyMembersLabel">Who were the important people in their life?</label>
-            <textarea class="textarea" id="family_members" name="family_members" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.familyMembersPlaceholder" placeholder="Please share the names of parents, siblings, children, close relatives, or dear friends who were important in their life."></textarea>
+        <!-- The stepper: one small screen at a time. Every field stays in this one form so FormData still sees it. -->
+        <div class="card stepper" id="stepper">
+          <div class="step-progress">
+            <p class="step-count" id="step-count" aria-live="polite">1 of 6</p>
+            <div class="step-bar" role="progressbar" id="step-bar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1"><div class="step-bar-fill" id="step-bar-fill"></div></div>
           </div>
 
-          <div class="field">
-            <label for="loved_ones_description" data-i18n="form.accordion.personalDetailsLabel">What were they like?</label>
-            <textarea class="textarea" id="loved_ones_description" name="loved_ones_description" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.personalDetailsPlaceholder" placeholder="Share personality traits, small memories, habits, or things people remember about them."></textarea>
-          </div>
+          <!-- Screen 1: Photos -->
+          <section class="step is-active" data-step="1" aria-labelledby="photos-title">
+            <h2 id="photos-title" class="step-title" tabindex="-1" data-i18n="family.intake.photosTitle">Photos</h2>
+            <p class="lead" id="upload-images-label" data-i18n="family.intake.photosLead">Choose photos of your loved one from your phone or computer.</p>
 
-          <div class="field">
-            <label for="loved_ones_achievements" data-i18n="form.accordion.educationLabel">Where did they go to school?</label>
-            <textarea class="textarea" id="loved_ones_achievements" name="loved_ones_achievements" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.educationPlaceholder" placeholder="Include schools they attended, degrees, training, or programs they were part of. You can also mention subjects they enjoyed or achievements they were proud of."></textarea>
-          </div>
+            <input type="file" id="photo_upload" name="photo_upload" accept="image/*" multiple style="display: none;" tabindex="-1" aria-hidden="true">
+            <button type="button" id="photo-upload-btn" class="dropzone" aria-describedby="photo-note">
+              <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <span class="dropzone-title" data-i18n="family.intake.choosePhotos">Choose photos</span>
+              <span class="dropzone-sub"><span data-i18n="family.intake.tapHere">Tap here to pick from your device.</span> <span class="drag-hint" data-i18n="family.intake.dragHint">You can also drag photos in.</span></span>
+            </button>
 
-          <div class="field">
-            <label for="loved_ones_hobbies" data-i18n="form.accordion.hobbiesLabel">What did they enjoy doing in their free time?</label>
-            <textarea class="textarea" id="loved_ones_hobbies" name="loved_ones_hobbies" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.hobbiesPlaceholder" placeholder="Include hobbies, favorite activities, or things they loved sharing with others."></textarea>
-          </div>
+            <div id="photo-preview" class="photo-preview"></div>
 
-          <div class="field">
-            <label for="loved_ones_career" data-i18n="form.accordion.careerLabel">What kind of work did they do?</label>
-            <textarea class="textarea" id="loved_ones_career" name="loved_ones_career" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.careerPlaceholder" placeholder="Tell us about their career, trade, or work they spent time doing. You can include places they worked, what they were known for at work, or moments they were proud of."></textarea>
-          </div>
+            <p class="hint photo-note" id="photo-note" data-i18n="family.intake.photosNote">Any number is fine. You can add more later from your dashboard.</p>
 
-          <div class="field">
-            <label for="loved_ones_spiritual_beliefs" data-i18n="form.accordion.religionLabel">What role did religion or spirituality have in their life?</label>
-            <textarea class="textarea" id="loved_ones_spiritual_beliefs" name="loved_ones_spiritual_beliefs" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.religionPlaceholder" placeholder="List places of worship, acts of service, faith related travel, or important values your loved one held."></textarea>
-          </div>
-
-          <div class="field">
-            <label for="loved_ones_military_service" data-i18n="form.accordion.militaryLabel">Tell us about their military service</label>
-            <textarea class="textarea" id="loved_ones_military_service" name="loved_ones_military_service" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.militaryPlaceholder" placeholder="If they were a veteran, list the branch, rank, and time served, along with location."></textarea>
-          </div>
-
-          <div class="field">
-            <label for="tribute_quote"><span data-i18n="family.intake.quoteLabel">A saying they loved, if there was one</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
-            <textarea class="textarea" id="tribute_quote" name="tribute_quote" maxlength="5000" rows="2" data-i18n-placeholder="form.tributeQuotePlaceholder" placeholder="Something they always said or something that reminds you of them and captures their spirit."></textarea>
-          </div>
-
-          <fieldset class="field">
-            <legend data-i18n="form.musicQuestion">What music would you like for the tribute video?</legend>
-            <div class="choice-grid">
-              <label class="choice">
-                <input type="radio" name="music_selection" id="music_guitar" value="guitar">
-                <span class="choice-card">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M20 4l-2.5 2.5"></path><path d="M14.5 7.5l2 2"></path>
-                    <path d="M17 6l-6.5 6.5a4.5 4.5 0 1 0 2 2L19 8"></path>
-                    <circle cx="9" cy="15" r="1.5"></circle>
-                  </svg>
-                  <span data-i18n="family.intake.guitar">Guitar (acoustic)</span>
-                </span>
-              </label>
-              <label class="choice">
-                <input type="radio" name="music_selection" id="music_piano" value="piano">
-                <span class="choice-card">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                    <line x1="8" y1="5" x2="8" y2="13"></line><line x1="12" y1="5" x2="12" y2="13"></line><line x1="16" y1="5" x2="16" y2="13"></line>
-                  </svg>
-                  <span data-i18n="family.intake.piano">Piano (classical)</span>
-                </span>
-              </label>
+            <!-- Interrupted upload recovery banner (engine target) -->
+            <div id="resume-upload-banner" class="resume-banner">
+              <p><strong data-i18n="family.intake.resumeTitle">Previous upload was interrupted</strong></p>
+              <p id="resume-upload-message"></p>
+              <button id="dismiss-resume-btn" type="button" class="btn-small" onclick="document.getElementById('resume-upload-banner').style.display='none'" data-i18n="family.intake.resumeDismiss">Got it</button>
             </div>
-          </fieldset>
+          </section>
 
-          <div class="field">
-            <label for="final_details" data-i18n="family.intake.anythingElse">Anything else?</label>
-            <p class="hint" data-i18n="family.intake.anythingElseHint">Service details, or anything we have not asked about.</p>
-            <textarea class="textarea" id="final_details" name="final_details" maxlength="5000" rows="3" data-i18n-placeholder="form.serviceInfoPlaceholder" placeholder="Add info about upcoming services: time, place, dress code, or anything guests should know."></textarea>
-          </div>
-        </section>
+          <!-- Screen 2: The people in their life + what they were like -->
+          <section class="step" data-step="2" aria-labelledby="step2-title">
+            <h2 id="step2-title" class="step-title" tabindex="-1" data-i18n="family.intake.step2Title">The people in their life</h2>
+            <p class="lead" data-i18n="family.intake.step2Lead">Write as much or as little as you like, in your own words.</p>
 
-        <!-- Section C: A few details (collapsed; the funeral home already provided the essentials) -->
-        <details class="card" id="details-card">
-          <summary>
-            <div>
-              <h2 data-i18n="family.intake.detailsTitle">A few details</h2>
-              <p data-i18n="family.intake.detailsLead">Your funeral home already gave us the essentials. Open this if you would like to add other names.</p>
+            <div class="field">
+              <label for="family_members" data-i18n="form.accordion.familyMembersLabel">Who were the important people in their life?</label>
+              <textarea class="textarea" id="family_members" name="family_members" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.familyMembersPlaceholder" placeholder="Please share the names of parents, siblings, children, close relatives, or dear friends who were important in their life."></textarea>
             </div>
-            <svg class="chev" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
-          </summary>
-          <div class="details-body">
-            <p class="label" id="other-names-label"><span>Any other names you'd like to include for </span><span id="deceased-name-display"></span><span>?</span></p>
-            <div class="name-grid">
-              <div>
-                <label for="loved_ones_salutation" data-i18n="form.salutationPlaceholder">Salutation</label>
-                <input class="text-input" type="text" maxlength="256" id="loved_ones_salutation" name="loved_ones_salutation" autocomplete="off">
+
+            <div class="field">
+              <label for="loved_ones_description" data-i18n="form.accordion.personalDetailsLabel">What were they like?</label>
+              <textarea class="textarea" id="loved_ones_description" name="loved_ones_description" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.personalDetailsPlaceholder" placeholder="Share personality traits, small memories, habits, or things people remember about them."></textarea>
+            </div>
+          </section>
+
+          <!-- Screen 3: School and work -->
+          <section class="step" data-step="3" aria-labelledby="step3-title">
+            <h2 id="step3-title" class="step-title" tabindex="-1" data-i18n="family.intake.step3Title">School and work</h2>
+            <p class="lead" data-i18n="family.intake.step3Lead">Skip anything that does not apply.</p>
+
+            <div class="field">
+              <label for="loved_ones_achievements" data-i18n="form.accordion.educationLabel">Where did they go to school?</label>
+              <textarea class="textarea" id="loved_ones_achievements" name="loved_ones_achievements" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.educationPlaceholder" placeholder="Include schools they attended, degrees, training, or programs they were part of. You can also mention subjects they enjoyed or achievements they were proud of."></textarea>
+            </div>
+
+            <div class="field">
+              <label for="loved_ones_career" data-i18n="form.accordion.careerLabel">What kind of work did they do?</label>
+              <textarea class="textarea" id="loved_ones_career" name="loved_ones_career" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.careerPlaceholder" placeholder="Tell us about their career, trade, or work they spent time doing. You can include places they worked, what they were known for at work, or moments they were proud of."></textarea>
+            </div>
+          </section>
+
+          <!-- Screen 4: How they spent their days -->
+          <section class="step" data-step="4" aria-labelledby="step4-title">
+            <h2 id="step4-title" class="step-title" tabindex="-1" data-i18n="family.intake.step4Title">How they spent their days</h2>
+            <p class="lead" data-i18n="family.intake.step4Lead">Only what feels right to share. Each of these is optional.</p>
+
+            <div class="field">
+              <label for="loved_ones_hobbies"><span data-i18n="form.accordion.hobbiesLabel">What did they enjoy doing in their free time?</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
+              <textarea class="textarea" id="loved_ones_hobbies" name="loved_ones_hobbies" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.hobbiesPlaceholder" placeholder="Include hobbies, favorite activities, or things they loved sharing with others."></textarea>
+            </div>
+
+            <div class="field">
+              <label for="loved_ones_spiritual_beliefs"><span data-i18n="form.accordion.religionLabel">What role did religion or spirituality have in their life?</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
+              <textarea class="textarea" id="loved_ones_spiritual_beliefs" name="loved_ones_spiritual_beliefs" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.religionPlaceholder" placeholder="List places of worship, acts of service, faith related travel, or important values your loved one held."></textarea>
+            </div>
+
+            <div class="field">
+              <label for="loved_ones_military_service"><span data-i18n="form.accordion.militaryLabel">Tell us about their military service</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
+              <textarea class="textarea" id="loved_ones_military_service" name="loved_ones_military_service" maxlength="5000" rows="3" data-i18n-placeholder="form.accordion.militaryPlaceholder" placeholder="If they were a veteran, list the branch, rank, and time served, along with location."></textarea>
+            </div>
+          </section>
+
+          <!-- Screen 5: A saying and the music -->
+          <section class="step" data-step="5" aria-labelledby="step5-title">
+            <h2 id="step5-title" class="step-title" tabindex="-1" data-i18n="family.intake.step5Title">A saying and the music</h2>
+            <p class="lead" data-i18n="family.intake.step5Lead">A phrase they loved, and the music for the tribute video.</p>
+
+            <div class="field">
+              <label for="tribute_quote"><span data-i18n="family.intake.quoteLabel">A saying they loved, if there was one</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
+              <textarea class="textarea" id="tribute_quote" name="tribute_quote" maxlength="5000" rows="2" data-i18n-placeholder="form.tributeQuotePlaceholder" placeholder="Something they always said or something that reminds you of them and captures their spirit."></textarea>
+            </div>
+
+            <fieldset class="field">
+              <legend data-i18n="form.musicQuestion">What music would you like for the tribute video?</legend>
+              <div class="choice-grid">
+                <label class="choice">
+                  <input type="radio" name="music_selection" id="music_guitar" value="guitar">
+                  <span class="choice-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M20 4l-2.5 2.5"></path><path d="M14.5 7.5l2 2"></path>
+                      <path d="M17 6l-6.5 6.5a4.5 4.5 0 1 0 2 2L19 8"></path>
+                      <circle cx="9" cy="15" r="1.5"></circle>
+                    </svg>
+                    <span data-i18n="family.intake.guitar">Guitar (acoustic)</span>
+                  </span>
+                </label>
+                <label class="choice">
+                  <input type="radio" name="music_selection" id="music_piano" value="piano">
+                  <span class="choice-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                      <line x1="8" y1="5" x2="8" y2="13"></line><line x1="12" y1="5" x2="12" y2="13"></line><line x1="16" y1="5" x2="16" y2="13"></line>
+                    </svg>
+                    <span data-i18n="family.intake.piano">Piano (classical)</span>
+                  </span>
+                </label>
               </div>
-              <div>
-                <label for="loved_ones_middle_name" data-i18n="form.middleNamePlaceholder">Middle Name</label>
-                <input class="text-input" type="text" maxlength="256" id="loved_ones_middle_name" name="loved_ones_middle_name" autocomplete="off">
-              </div>
-              <div>
-                <label for="loved_ones_nickname" data-i18n="form.nicknamePlaceholder">Nickname</label>
-                <input class="text-input" type="text" maxlength="256" id="loved_ones_nickname" name="loved_ones_nickname" autocomplete="off">
-              </div>
-              <div>
-                <label for="loved_ones_maiden_name" data-i18n="form.maidenNamePlaceholder">Maiden Name</label>
-                <input class="text-input" type="text" maxlength="256" id="loved_ones_maiden_name" name="loved_ones_maiden_name" autocomplete="off">
-              </div>
-              <div>
-                <label for="loved_ones_suffix" data-i18n="family.intake.suffixLabel">Suffix</label>
-                <select class="select" id="loved_ones_suffix" name="loved_ones_suffix">
-                  <option value="" data-i18n="form.suffixOption">Suffix (Jr, Sr, etc.)</option>
-                  <option value="Junior">Jr.</option>
-                  <option value="Senior">Sr.</option>
-                  <option value="The second">II</option>
-                  <option value="The third">III</option>
-                </select>
+            </fieldset>
+
+            <div class="field">
+              <label for="final_details" data-i18n="family.intake.anythingElse">Anything else?</label>
+              <p class="hint" data-i18n="family.intake.anythingElseHint">Service details, or anything we have not asked about.</p>
+              <textarea class="textarea" id="final_details" name="final_details" maxlength="5000" rows="3" data-i18n-placeholder="form.serviceInfoPlaceholder" placeholder="Add info about upcoming services: time, place, dress code, or anything guests should know."></textarea>
+            </div>
+          </section>
+
+          <!-- Screen 6: Almost done (other names, all optional) + consent + Finish -->
+          <section class="step" data-step="6" aria-labelledby="step6-title">
+            <h2 id="step6-title" class="step-title" tabindex="-1" data-i18n="family.intake.step6Title">Almost done</h2>
+            <p class="lead" data-i18n="family.intake.step6Lead">Your funeral home already gave us the essentials. Add any other names below if you would like.</p>
+
+            <div class="field" id="details-card">
+              <p class="label" id="other-names-label"><span>Any other names you'd like to include for </span><span id="deceased-name-display"></span><span>?</span></p>
+              <div class="name-grid">
+                <div>
+                  <label for="loved_ones_salutation"><span data-i18n="form.salutationPlaceholder">Salutation</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
+                  <input class="text-input" type="text" maxlength="256" id="loved_ones_salutation" name="loved_ones_salutation" autocomplete="off" enterkeyhint="next">
+                </div>
+                <div>
+                  <label for="loved_ones_middle_name"><span data-i18n="form.middleNamePlaceholder">Middle Name</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
+                  <input class="text-input" type="text" maxlength="256" id="loved_ones_middle_name" name="loved_ones_middle_name" autocomplete="off" enterkeyhint="next">
+                </div>
+                <div>
+                  <label for="loved_ones_nickname"><span data-i18n="form.nicknamePlaceholder">Nickname</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
+                  <input class="text-input" type="text" maxlength="256" id="loved_ones_nickname" name="loved_ones_nickname" autocomplete="off" enterkeyhint="next">
+                </div>
+                <div>
+                  <label for="loved_ones_maiden_name"><span data-i18n="form.maidenNamePlaceholder">Maiden Name</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
+                  <input class="text-input" type="text" maxlength="256" id="loved_ones_maiden_name" name="loved_ones_maiden_name" autocomplete="off" enterkeyhint="next">
+                </div>
+                <div>
+                  <label for="loved_ones_suffix"><span data-i18n="family.intake.suffixLabel">Suffix</span> <span class="optional" data-i18n="family.intake.optional">(optional)</span></label>
+                  <select class="select" id="loved_ones_suffix" name="loved_ones_suffix">
+                    <option value="" data-i18n="form.suffixOption">Suffix (Jr, Sr, etc.)</option>
+                    <option value="Junior">Jr.</option>
+                    <option value="Senior">Sr.</option>
+                    <option value="The second">II</option>
+                    <option value="The third">III</option>
+                  </select>
+                </div>
               </div>
             </div>
-          </div>
-        </details>
 
-        <!-- Footer: the one decision -->
-        <p class="consent" data-i18n="family.intake.consent">By finishing, you confirm you have the right to share these photos and details. Keep this page open afterwards while your photos upload.</p>
-        <div class="footer-bar">
-          <div class="footer-row">
-            <span id="autosave-indicator" class="saved" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <span data-i18n="form.saved">Saved</span>
+            <p class="consent" data-i18n="family.intake.consent">By finishing, you confirm you have the right to share these photos and details. Keep this page open afterwards while your photos upload.</p>
+          </section>
+
+          <!-- Action bar: fixed to the bottom on phones, part of the card on wider screens -->
+          <div class="action-bar" id="action-bar">
+            <button type="button" id="step-back" class="btn-ghost" data-i18n="family.intake.back">Back</button>
+            <span id="autosave-indicator" class="save-status" role="status" aria-live="polite">
+              <span class="save-status-saved"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg> <span data-i18n="form.saved">Saved</span></span>
+              <span class="save-status-saving" data-i18n="family.intake.saving">Saving...</span>
             </span>
-            <button type="submit" id="submit-btn" class="btn-finish" data-i18n="family.intake.finish">I'm finished</button>
+            <button type="button" id="step-next" class="btn-next" data-i18n="family.intake.next">Next</button>
+            <button type="submit" id="submit-btn" class="btn-next btn-finish" data-i18n="family.intake.finish">I'm finished</button>
           </div>
         </div>
       </form>
@@ -695,7 +737,7 @@
         <h2 data-i18n="family.intake.failTitle">Something went wrong</h2>
         <p data-i18n="family.intake.failBody">We could not send your answers just now. Nothing you wrote was lost. Please try again in a moment.</p>
         <p id="fail-photos-note" class="hint" data-i18n="family.intake.failPhotosSaved">Your photos were already received, so they will not be uploaded again.</p>
-        <button type="button" id="retry-btn" class="btn-finish" onclick="retrySubmit()" data-i18n="family.intake.tryAgain">Try again</button>
+        <button type="button" id="retry-btn" class="btn-next" onclick="retrySubmit()" data-i18n="family.intake.tryAgain">Try again</button>
       </div>
     </div>
   </main>
@@ -1124,7 +1166,8 @@
             try {
                 console.log('🔓 Signing out...');
                 
-                // Autosave removed - no draft save needed
+                // Flush any pending draft so nothing typed in the last seconds is lost
+                if (typeof flushDrafts === 'function') await Promise.race([flushDrafts(), new Promise(r => setTimeout(r, 2500))]);
                 
                 // Sign out
                 await supabaseClient.auth.signOut();
@@ -1154,35 +1197,7 @@
          * If not, redirect to family login page
          * If yes, load their assigned case
          */
-        // Preview mode: /family/form?preview=1 shows the form with sample data and no sign-in.
-        // Nothing can be saved (no session means every write is refused by RLS, and the submit
-        // handler blocks first). For demos, screenshots, and checking copy.
-        const PREVIEW_MODE = new URLSearchParams(window.location.search).get('preview') === '1';
-        function enterPreviewMode() {
-            currentUser = { id: 'preview', email: 'preview@memorio.ai' };
-            currentCase = {
-                id: 'preview', deceased_name: 'Manny Fermin', status: 'waiting_on_family',
-                organizations: { name: 'Preview Funeral Home' },
-                metadata: { gender: 'male', date_of_birth: '1966-03-14', date_of_death: '2022-03-17',
-                    city_of_birth: 'Miami', state_of_birth: 'FL', country_of_birth: 'United States',
-                    city_of_death: 'Miami', state_of_death: 'FL', country_of_death: 'United States', service_date: '2022-03-24' }
-            };
-            document.body.classList.add('preview-mode');
-            hideLoginModal();
-            const formContent = document.getElementById('intake-form-wrap');
-            if (formContent) formContent.classList.add('show');
-            try { initFamilyPortalEnhancements(); } catch (e) { console.warn('preview enhancements skipped', e); }
-            const banner = document.createElement('div');
-            banner.id = 'preview-banner';
-            banner.setAttribute('style', 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#2c4459;color:#f2ede7;font-family:"Public Sans",Arial,sans-serif;font-size:16px;text-align:center;padding:10px 16px;');
-            banner.textContent = 'Preview mode: this is the family intake form with sample details. Nothing you enter here is sent to Memorio.';
-            document.body.prepend(banner);
-            try { populateDeceasedName(); } catch (e) { console.warn('preview populate skipped', e); }
-            return true;
-        }
-
         async function checkAuthentication() {
-            if (PREVIEW_MODE) return enterPreviewMode();
             try {
                 // Get current session
                 const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
@@ -1410,6 +1425,7 @@
                         .from('forms')
                         .update({
                             submitted_json: formPayload,
+                            draft_json: null,
                             submitted_at: new Date().toISOString(),
                             updated_at: new Date().toISOString()
                         })
@@ -1423,6 +1439,7 @@
                             case_id: currentCase.id,
                             json_schema_version: 'v1',
                             submitted_json: formPayload,
+                            draft_json: null,
                             submitted_at: new Date().toISOString()
                         })
                         .select();
@@ -2383,6 +2400,9 @@
                 otherNames.innerHTML = `<span>${t('form.otherNamesPrefix', "Any other names you'd like to include for ")}</span><span id="deceased-name-display">${esc(name)}</span><span>${t('form.otherNamesSuffix', '?')}</span>`;
             }
 
+            // "2 of 6" step line
+            if (typeof renderStep === 'function' && typeof stepperReady !== 'undefined' && stepperReady) renderStep({ scroll: false });
+
             // Lines that carry the family member's or loved one's name
             setWelcomeGreeting();
             if (typeof currentCase !== 'undefined' && currentCase) {
@@ -2433,11 +2453,9 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (PREVIEW_MODE) {
-                    alert('Preview mode: the form is not connected to a real tribute, so nothing was submitted.');
-                    return;
-                }
                 console.log('Form submitted - our handler');
+                clearTimeout(autosaveTimer);
+                clearTimeout(serverDraftTimer);
                 
                 // Swap to success area immediately, then mount loader UI so it shows right away
                 form.style.display = 'none';
@@ -2550,13 +2568,17 @@
             // Populate deceased name throughout form (and the hidden decedent fields)
             populateDeceasedName();
             
-            // Show sign-out button (hidden by CSS in preview mode)
+            // Show the sign-out button in the header row (it is hidden until a case is loaded)
             const signOutBtn = document.getElementById('signOutBtn');
             if (signOutBtn) {
                 signOutBtn.style.display = 'inline-flex';
             }
             
-            // Restore any local draft for this case and keep saving as they type
+            // Stepper: wire Back/Next and return to the screen they were on
+            initStepper();
+            restoreStep();
+            
+            // Restore any draft for this case (local first, then server) and keep saving as they type
             initAutosave();
             
             console.log('✅ Family portal enhancements initialized');
@@ -2613,14 +2635,23 @@
         }
         
         // ============================================================================
-        // AUTOSAVE - local draft per case (memorio_form_draft_<caseId>)
-        // Every input/textarea/select change is written to localStorage, restored
-        // on load, and cleared once the answers are safely in the database.
+        // AUTOSAVE - two layers, per case
+        //   1. Local draft (memorio_form_draft_<caseId>): every input/change is written
+        //      to localStorage after 400ms, restored on load.
+        //   2. Server draft (forms.draft_json): the same object, debounced 1.5s, so a
+        //      family member can continue on another device. Loaded only when there is
+        //      no local draft. Never blocks; failures are logged and retried on the
+        //      next change. Both layers are cleared once the answers are submitted.
         // ============================================================================
         const FORM_DRAFT_PREFIX = 'memorio_form_draft_';
+        const SERVER_DRAFT_DELAY = 1500;
         let autosaveReady = false;
+        let autosaveStopped = false;   // true after a successful submit: no more draft writes
         let autosaveTimer = null;
-        let savedFlashTimer = null;
+        let serverDraftTimer = null;
+        let serverDraftPending = false;
+        let serverDraftInFlight = null;
+        let serverDraftDirty = false;
         
         function formDraftKey() {
             const caseId = (typeof currentCase !== 'undefined' && currentCase && currentCase.id) ? currentCase.id : null;
@@ -2644,31 +2675,28 @@
             return data;
         }
         
+        function buildDraftObject() {
+            const form = document.getElementById('intake-form');
+            if (!form) return null;
+            return { savedAt: new Date().toISOString(), fields: collectDraft(form) };
+        }
+        
         function saveFormDraft() {
             const key = formDraftKey();
-            const form = document.getElementById('intake-form');
-            if (!key || !form) return;
+            if (!key || autosaveStopped) return;
+            const draft = buildDraftObject();
+            if (!draft) return;
             try {
-                localStorage.setItem(key, JSON.stringify({ savedAt: new Date().toISOString(), fields: collectDraft(form) }));
-                flashSaved();
+                localStorage.setItem(key, JSON.stringify(draft));
+                if (!serverDraftPending) setSaveStatus('saved');
             } catch (e) {
                 console.warn('Draft save skipped:', e);
             }
         }
         
-        function restoreFormDraft() {
-            const key = formDraftKey();
+        function applyDraftFields(fields) {
             const form = document.getElementById('intake-form');
-            if (!key || !form) return;
-            let draft = null;
-            try {
-                draft = JSON.parse(localStorage.getItem(key) || 'null');
-            } catch (e) {
-                localStorage.removeItem(key);
-                return;
-            }
-            const fields = draft && draft.fields ? draft.fields : null;
-            if (!fields) return;
+            if (!form || !fields) return 0;
             let restored = 0;
             Object.keys(fields).forEach(name => {
                 const value = fields[name];
@@ -2683,20 +2711,132 @@
                     restored++;
                 });
             });
-            if (restored) console.log(`📝 Draft restored for this case (${restored} fields)`);
+            return restored;
+        }
+        
+        // Returns true when a local draft existed and was applied
+        function restoreFormDraft() {
+            const key = formDraftKey();
+            if (!key) return false;
+            let draft = null;
+            try {
+                draft = JSON.parse(localStorage.getItem(key) || 'null');
+            } catch (e) {
+                localStorage.removeItem(key);
+                return false;
+            }
+            const fields = draft && draft.fields ? draft.fields : null;
+            if (!fields) return false;
+            const restored = applyDraftFields(fields);
+            if (restored) console.log(`Local draft restored for this case (${restored} fields)`);
+            return true;
+        }
+        
+        // No local draft: pull forms.draft_json for this case (saved from another device or session)
+        async function restoreServerDraft() {
+            if (!currentCase || !currentCase.id) return false;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('forms')
+                    .select('draft_json')
+                    .eq('case_id', currentCase.id)
+                    .maybeSingle();
+                if (error || !data || !data.draft_json) return false;
+                const draft = data.draft_json;
+                const fields = draft && draft.fields ? draft.fields : null;
+                if (!fields) return false;
+                const restored = applyDraftFields(fields);
+                if (restored) {
+                    console.log(`Server draft restored for this case (${restored} fields)`);
+                    const key = formDraftKey();
+                    if (key) localStorage.setItem(key, JSON.stringify(draft));
+                    refreshActiveStepTextareas();
+                    setSaveStatus('saved');
+                }
+                return restored > 0;
+            } catch (e) {
+                console.warn('Server draft not loaded:', e);
+                return false;
+            }
+        }
+        
+        function scheduleServerDraft() {
+            if (autosaveStopped || !currentCase || !currentCase.id) return;
+            serverDraftPending = true;
+            serverDraftDirty = true;
+            setSaveStatus('saving');
+            clearTimeout(serverDraftTimer);
+            serverDraftTimer = setTimeout(pushServerDraft, SERVER_DRAFT_DELAY);
+        }
+        
+        async function pushServerDraft() {
+            clearTimeout(serverDraftTimer);
+            if (autosaveStopped || !currentCase || !currentCase.id) { serverDraftPending = false; return; }
+            if (serverDraftInFlight) { serverDraftDirty = true; return serverDraftInFlight; }
+            serverDraftDirty = false;
+            const draft = buildDraftObject();
+            if (!draft) { serverDraftPending = false; return; }
+            serverDraftInFlight = (async () => {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('forms')
+                        .update({ draft_json: draft })
+                        .eq('case_id', currentCase.id)
+                        .select('id');
+                    if (error) throw error;
+                    if (!data || data.length === 0) {
+                        // No form row yet for this case: create it so the draft has somewhere to live
+                        const { error: insertError } = await supabaseClient
+                            .from('forms')
+                            .insert({ case_id: currentCase.id, json_schema_version: 'v1', draft_json: draft });
+                        if (insertError) throw insertError;
+                    }
+                    console.log('Draft saved to server');
+                } catch (e) {
+                    // Never block the family: the local draft is still there, retry on the next change
+                    console.warn('Server draft save failed (local draft kept):', e && e.message ? e.message : e);
+                } finally {
+                    serverDraftInFlight = null;
+                    if (serverDraftDirty && !autosaveStopped) {
+                        serverDraftDirty = false;
+                        serverDraftTimer = setTimeout(pushServerDraft, SERVER_DRAFT_DELAY);
+                    } else {
+                        serverDraftPending = false;
+                        setSaveStatus('saved');
+                    }
+                }
+            })();
+            return serverDraftInFlight;
+        }
+        
+        // Flush anything pending (used before sign out)
+        async function flushDrafts() {
+            try {
+                clearTimeout(autosaveTimer);
+                saveFormDraft();
+                if (serverDraftPending || serverDraftInFlight) await pushServerDraft();
+            } catch (e) {
+                console.warn('Draft flush skipped:', e);
+            }
         }
         
         function clearFormDraft() {
+            autosaveStopped = true;
+            clearTimeout(autosaveTimer);
+            clearTimeout(serverDraftTimer);
+            serverDraftPending = false;
             const key = formDraftKey();
             if (key) localStorage.removeItem(key);
+            const stepKey = stepStorageKey();
+            if (stepKey) localStorage.removeItem(stepKey);
+            setSaveStatus('');
         }
         
-        function flashSaved() {
+        function setSaveStatus(state) {
             const el = document.getElementById('autosave-indicator');
             if (!el) return;
-            el.classList.add('is-visible');
-            clearTimeout(savedFlashTimer);
-            savedFlashTimer = setTimeout(() => el.classList.remove('is-visible'), 1800);
+            el.classList.toggle('is-saving', state === 'saving');
+            el.classList.toggle('is-saved', state === 'saved');
         }
         
         function initAutosave() {
@@ -2704,17 +2844,132 @@
             const form = document.getElementById('intake-form');
             if (!form || !formDraftKey()) return;
             autosaveReady = true;
-            restoreFormDraft();
-            const schedule = () => {
+            const hadLocal = restoreFormDraft();
+            if (hadLocal) {
+                refreshActiveStepTextareas();
+                setSaveStatus('saved');
+            } else {
+                restoreServerDraft();
+            }
+            const scheduleLocal = () => {
                 clearTimeout(autosaveTimer);
                 autosaveTimer = setTimeout(saveFormDraft, 400);
             };
-            form.addEventListener('input', (e) => { if (isDraftField(e.target)) schedule(); });
+            form.addEventListener('input', (e) => {
+                if (!isDraftField(e.target)) return;
+                scheduleLocal();
+                scheduleServerDraft();
+            });
             form.addEventListener('change', (e) => {
                 if (!isDraftField(e.target)) return;
                 clearTimeout(autosaveTimer);
                 saveFormDraft();
+                scheduleServerDraft();
             });
+            window.addEventListener('pagehide', () => {
+                if (serverDraftPending && !serverDraftInFlight) pushServerDraft();
+            });
+        }
+        
+        // ============================================================================
+        // STEPPER - six small screens over the one form. Only visibility changes;
+        // every field stays in the DOM so FormData and the submit path are untouched.
+        // ============================================================================
+        const STEP_PREFIX = 'memorio_form_step_';
+        const STEP_COUNT = 6;
+        let currentStep = 1;
+        let stepperReady = false;
+        
+        function stepStorageKey() {
+            const caseId = (typeof currentCase !== 'undefined' && currentCase && currentCase.id) ? currentCase.id : null;
+            return caseId ? STEP_PREFIX + caseId : null;
+        }
+        
+        function refreshActiveStepTextareas() {
+            document.querySelectorAll('.step.is-active textarea.textarea').forEach(autoExpandTextarea);
+        }
+        
+        function renderStep(options) {
+            const opts = options || {};
+            const stepper = document.getElementById('stepper');
+            if (!stepper) return;
+            const steps = stepper.querySelectorAll('.step');
+            steps.forEach(section => {
+                const n = parseInt(section.dataset.step, 10);
+                section.classList.toggle('is-active', n === currentStep);
+            });
+            stepper.classList.toggle('is-last', currentStep === STEP_COUNT);
+            document.body.classList.toggle('step-later', currentStep > 1);
+            
+            const count = document.getElementById('step-count');
+            if (count) {
+                const tpl = (typeof i18n !== 'undefined') ? i18n.t('family.intake.stepOf', '{current} of {total}') : '{current} of {total}';
+                count.textContent = tpl.replace('{current}', String(currentStep)).replace('{total}', String(STEP_COUNT));
+            }
+            const bar = document.getElementById('step-bar');
+            const fill = document.getElementById('step-bar-fill');
+            if (bar) bar.setAttribute('aria-valuenow', String(currentStep));
+            if (fill) fill.style.width = ((currentStep / STEP_COUNT) * 100).toFixed(2) + '%';
+            
+            const back = document.getElementById('step-back');
+            if (back) back.disabled = currentStep === 1;
+            
+            refreshActiveStepTextareas();
+            
+            if (opts.scroll) {
+                stepper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const heading = stepper.querySelector('.step.is-active .step-title');
+                if (heading) { try { heading.focus({ preventScroll: true }); } catch (e) { heading.focus(); } }
+            }
+        }
+        
+        function goToStep(n, options) {
+            const target = Math.min(STEP_COUNT, Math.max(1, n));
+            currentStep = target;
+            renderStep(options || { scroll: true });
+            const key = stepStorageKey();
+            if (key) { try { localStorage.setItem(key, String(currentStep)); } catch (e) { /* storage full or blocked */ } }
+        }
+        
+        function restoreStep() {
+            const key = stepStorageKey();
+            if (!key) return;
+            const saved = parseInt(localStorage.getItem(key) || '1', 10);
+            if (saved >= 1 && saved <= STEP_COUNT && saved !== currentStep) {
+                currentStep = saved;
+                renderStep({ scroll: false });
+            }
+        }
+        
+        function initStepper() {
+            if (stepperReady) return;
+            const stepper = document.getElementById('stepper');
+            const form = document.getElementById('intake-form');
+            if (!stepper || !form) return;
+            stepperReady = true;
+            
+            const back = document.getElementById('step-back');
+            const next = document.getElementById('step-next');
+            if (back) back.addEventListener('click', () => goToStep(currentStep - 1));
+            if (next) next.addEventListener('click', () => goToStep(currentStep + 1));
+            
+            // Enter in a single-line input moves forward instead of submitting the form
+            form.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter') return;
+                const el = e.target;
+                if (!el || el.tagName === 'TEXTAREA' || el.tagName === 'BUTTON') return;
+                if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
+                    e.preventDefault();
+                    if (currentStep < STEP_COUNT) {
+                        goToStep(currentStep + 1);
+                    } else {
+                        const finish = document.getElementById('submit-btn');
+                        if (finish) finish.focus();
+                    }
+                }
+            });
+            
+            renderStep({ scroll: false });
         }
         
         /**
@@ -2890,6 +3145,10 @@
             
             console.log('✅ Deceased name populated:', deceasedName);
         }
+        
+        // Wire the stepper as soon as the script has loaded (declarations above are now initialised),
+        // so Back/Next work the moment the form is shown; auth then restores the saved screen.
+        initStepper();
     </script>
 </body>
 </html>

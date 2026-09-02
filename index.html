@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-  <script src="js/i18n.js?v=20260831"></script>
+  <script src="js/i18n.js?v=20260902"></script>
 
   <script type="application/ld+json">
   {
@@ -242,11 +242,11 @@
 
     /* ---------- Proof (weighted, not a grid) ---------- */
     .proof{padding:110px 0 90px;position:relative;}
-    .proof-main{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:72px;align-items:center;margin-bottom:96px;}
+    .proof-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;align-items:center;margin-bottom:96px;}
     .proof-main h2{font-size:clamp(1.9rem,3.4vw,2.6rem);margin-bottom:20px;}
     .proof-main p{color:var(--ink-soft);}
     .proof-media{position:relative;padding-bottom:64px;padding-right:48px;}
-    .proof-media img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:var(--radius-card);}
+    .proof-media img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:center 40%;border-radius:var(--radius-card);}
     .pull-quote{position:absolute;right:0;bottom:0;width:min(78%,360px);background:var(--cream);border-radius:var(--radius-card);padding:28px 30px;box-shadow:0 12px 32px rgba(50,52,58,.12);z-index:2;}
     .pull-quote blockquote{font-family:var(--serif);font-size:1.25rem;line-height:1.4;font-style:italic;color:var(--ink);}
     .pull-quote cite{display:block;margin-top:14px;font-style:normal;font-size:.85rem;color:var(--ink-soft);}
@@ -519,7 +519,7 @@
       <div class="container">
         <div class="proof-main">
           <div class="proof-media">
-            <img src="images/editorial-photographs.jpg" alt="A small stack of old family photographs on a linen tablecloth beside a cup, in soft window light" width="1200" height="1489" loading="lazy">
+            <img src="images/people-family-watching.jpg" alt="Three generations of a family on a sofa, watching a tribute video together on a laptop" width="1500" height="1000" loading="lazy">
             <figure class="pull-quote">
               <blockquote data-i18n="mk.proof.quote">"This is not 'content' to us. It is someone's life story, and it is treated with the dignity it deserves."</blockquote>
               <figcaption><cite data-i18n="mk.proof.quoteBy">The promise every Memorio tribute is held to</cite></figcaption>

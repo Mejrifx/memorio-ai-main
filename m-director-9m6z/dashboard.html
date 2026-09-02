@@ -14,7 +14,7 @@
   <link href="../images/webclip.png" rel="apple-touch-icon">
   
   <!-- i18n (Internationalization) Support -->
-  <script src="../js/i18n.js"></script>
+  <script src="../js/i18n.js?v=20260902"></script>
   
   <style>
     /* ============================================================================
@@ -1444,8 +1444,8 @@
       </a>
       
       <nav class="topbar-nav">
-        <button class="topbar-nav-item active" onclick="switchSection('create-case')" data-i18n="director.createCase">Create Case</button>
-        <button class="topbar-nav-item" onclick="switchSection('my-cases')" data-i18n="director.myCases">My Cases</button>
+        <button class="topbar-nav-item active" onclick="switchSection('create-case')" data-i18n="director.createCase">New Tribute</button>
+        <button class="topbar-nav-item" onclick="switchSection('my-cases')" data-i18n="director.myCases">My Tributes</button>
       </nav>
     </div>
     
@@ -1454,7 +1454,7 @@
         <svg class="topbar-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
         </svg>
-        <input type="text" class="topbar-search-input" placeholder="Search cases..." id="search-input">
+        <input type="text" class="topbar-search-input" placeholder="Search by name or reference..." id="search-input" data-i18n-placeholder="director.searchCases">
       </div>
     </div>
     
@@ -1682,16 +1682,16 @@
       
       <!-- Success Message -->
       <div id="case-success-box" class="success-box">
-        <h3><span class="success-icon"></span><span data-i18n="director.caseCreatedSuccess">Case Created Successfully!</span></h3>
-        <p data-i18n="director.caseCreatedDesc">Case ID has been generated. You can now invite the family to complete the tribute form.</p>
+        <h3><span class="success-icon"></span><span data-i18n="director.caseCreatedSuccess">Tribute opened</span></h3>
+        <p data-i18n="director.caseCreatedDesc">The family has been emailed their invitation. Their sign-in details are below if they need them read aloud.</p>
         
         <div class="credential-box">
-          <div class="credential-label" data-i18n="director.caseID">Case ID</div>
+          <div class="credential-label" data-i18n="director.caseID">Reference</div>
           <div class="credential-value" id="created-case-id"></div>
           <button class="copy-btn" onclick="copyToClipboard('created-case-id')" data-i18n="director.copyBtn">Copy</button>
         </div>
         <div id="created-family-block" style="display:none;">
-          <p style="margin-top:18px;">The family has been emailed their invitation. If they need it read to them, these are their sign-in details:</p>
+          <p style="margin-top:18px;" data-i18n="director.familySignInHeading">Family sign-in details</p>
           <div class="credential-box">
             <div class="credential-label">Family Email</div>
             <div class="credential-value" id="created-family-email"></div>
@@ -1714,13 +1714,13 @@
     <div id="invite-family-section" class="content-section">
       <div class="page-header">
         <h1 class="page-title" data-i18n="director.inviteFamilyTitle">Re-send a Family Invite</h1>
-        <p class="page-description" data-i18n="director.inviteFamilyDesc">Send a secure invitation to a family member to complete the tribute form for their case.</p>
+        <p class="page-description" data-i18n="director.inviteFamilyDesc">Send a secure invitation to a family member to complete the tribute form for their loved one.</p>
       </div>
       
       <div class="card">
         <div class="card-header">
           <h3 class="card-title" data-i18n="director.familyMemberDetails">Family Member Details</h3>
-          <p class="card-description" data-i18n="director.familyMemberDetailsDesc">Provide contact information and associate with a case ID</p>
+          <p class="card-description" data-i18n="director.familyMemberDetailsDesc">Provide contact information and the tribute reference</p>
         </div>
         <div class="card-content">
           <form id="invite-family-form">
@@ -1757,12 +1757,13 @@
               </div>
               
               <div class="form-group">
-                <label for="case-id" class="label" data-i18n="director.caseID">Case ID</label>
+                <label for="case-id" class="label" data-i18n="director.caseID">Reference</label>
                 <input 
                   class="input" 
                   type="text" 
                   id="case-id" 
-                  placeholder="Paste Case ID here" 
+                  placeholder="Paste the reference here" 
+                  data-i18n-placeholder="director.referencePlaceholder"
                   required>
               </div>
             </div>
@@ -1801,8 +1802,8 @@
     <!-- MY CASES SECTION -->
     <div id="my-cases-section" class="content-section">
       <div class="page-header">
-        <h1 class="page-title" data-i18n="director.myCases">My Cases</h1>
-        <p class="page-description" data-i18n="director.myCasesDesc">View and manage all memorial tribute cases for your organization.</p>
+        <h1 class="page-title" data-i18n="director.myCases">My Tributes</h1>
+        <p class="page-description" data-i18n="director.myCasesDesc">View and manage all tributes for your organization.</p>
       </div>
       
       <div id="cases-list" class="cases-list">
@@ -1878,18 +1879,18 @@
   <div id="case-details-modal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="modal-title" id="modal-case-name">Case Details</h2>
+        <h2 class="modal-title" id="modal-case-name">Tribute details</h2>
         <button class="modal-close" onclick="closeCaseModal()">&times;</button>
       </div>
       
       <div class="modal-body">
         <div class="modal-section">
-        <h3 class="modal-section-title" data-i18n="director.caseInfo">Case Information</h3>
+        <h3 class="modal-section-title" data-i18n="director.caseInfo">Tribute details</h3>
         <div class="modal-info-grid">
           <div class="modal-info-item">
-            <div class="modal-info-label" data-i18n="director.caseId">Case ID</div>
+            <div class="modal-info-label" data-i18n="director.caseId">Reference</div>
             <div class="modal-info-value" id="modal-case-id" style="font-size: 11px; word-break: break-all;">-</div>
-            <button class="copy-btn" onclick="copyToClipboard('modal-case-id')" data-i18n="director.copyFullId">Copy Full ID</button>
+            <button class="copy-btn" onclick="copyToClipboard('modal-case-id')" data-i18n="director.copyFullId">Copy</button>
           </div>
           <div class="modal-info-item">
             <div class="modal-info-label" data-i18n="director.statusLabel">Status</div>
@@ -1911,7 +1912,7 @@
       </div>
       
       <div class="modal-section">
-        <h3 class="modal-section-title" data-i18n="director.familyInfo">Family Information</h3>
+        <h3 class="modal-section-title" data-i18n="director.familyInfo">Family</h3>
         <div class="modal-info-grid">
           <div class="modal-info-item">
             <div class="modal-info-label" data-i18n="director.familyMember">Family Member</div>
@@ -1925,7 +1926,7 @@
         
         <div class="credentials-section">
           <div class="credentials-header">
-            <h4 class="credentials-title" data-i18n="director.familyLoginCredentials">Family Login Credentials</h4>
+            <h4 class="credentials-title" data-i18n="director.familyLoginCredentials">Family sign-in details</h4>
             <button class="reveal-btn" id="reveal-credentials-btn" onclick="revealCredentials()" data-i18n="director.reveal">Reveal</button>
           </div>
           <div class="credentials-grid">
@@ -2098,8 +2099,8 @@
       
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeCaseModal()" data-i18n="director.close">Close</button>
-        <button class="btn btn-danger" onclick="deleteCase(currentCaseDetails.id, currentCaseDetails.deceased_name)">
-          Delete Case
+        <button class="btn btn-danger" onclick="deleteCase(currentCaseDetails.id, currentCaseDetails.deceased_name)" data-i18n="director.deleteCase">
+          Delete tribute
         </button>
       </div>
     </div>
@@ -2127,7 +2128,7 @@
       
       <div style="display: flex; gap: 10px; justify-content: flex-end; padding: 16px 28px 24px; border-top: 1px solid var(--color-border);">
         <button class="btn btn-secondary" onclick="closeConfirmModal()" data-i18n="director.cancel">Cancel</button>
-        <button id="confirm-modal-action-btn" class="btn btn-danger" data-i18n="director.deleteCase">Delete Case</button>
+        <button id="confirm-modal-action-btn" class="btn btn-danger" data-i18n="director.deleteCase">Delete tribute</button>
       </div>
     </div>
   </div>
@@ -2612,10 +2613,28 @@
         
         const stage = getCaseStage(caseData.status);
         
+        // Reference: prefer the human-readable case_number, fall back to the UUID.
+        // The view may not expose case_number yet, so ask the table directly when it is missing.
+        let referenceNumber = caseData.case_number || null;
+        if (!referenceNumber) {
+          try {
+            const { data: refRow } = await supabaseClient
+              .from('cases')
+              .select('case_number')
+              .eq('id', caseId)
+              .maybeSingle();
+            referenceNumber = refRow?.case_number || null;
+          } catch (refErr) {
+            console.warn('Reference lookup skipped:', refErr);
+          }
+        }
+        if (referenceNumber) currentCaseDetails.case_number = referenceNumber;
+        
         document.getElementById('modal-case-name').textContent = caseData.deceased_name;
-        document.getElementById('modal-case-id').textContent = caseData.id;
+        document.getElementById('modal-case-id').textContent = referenceNumber || caseData.id;
         const statusElement = document.getElementById('modal-case-status');
-        statusElement.innerHTML = `${stage.icon} <span>${esc(stage.label)}</span>`;
+        const statusSentence = getStatusSentence(caseData.status) || stage.label;
+        statusElement.innerHTML = `${stage.icon} <span>${esc(statusSentence)}</span>`;
         statusElement.style.color = stage.color;
         document.getElementById('modal-case-created').textContent = new Date(caseData.created_at).toLocaleDateString();
         
@@ -2711,8 +2730,8 @@
         }
         
       } catch (error) {
-        console.error('Error loading case details:', error);
-        showToast('Error loading case details', true);
+        console.error('Error loading tribute details:', error);
+        showToast('Error loading tribute details', true);
         closeCaseModal();
       }
     }
@@ -2900,7 +2919,7 @@
       if (files.length === 0) return;
       
       if (!currentCaseDetails) {
-        showToast('No case selected', true);
+        showToast('No tribute selected', true);
         return;
       }
       
@@ -2950,7 +2969,7 @@
     // Download video
     async function directorDownloadVideo() {
       if (!currentCaseDetails) {
-        showToast('No case selected', true);
+        showToast('No tribute selected', true);
         return;
       }
       
@@ -2999,7 +3018,7 @@
     // Download obituary as PDF
     async function directorDownloadObituaryPDF() {
       if (!currentCaseDetails) {
-        showToast('No case selected', true);
+        showToast('No tribute selected', true);
         return;
       }
       
@@ -3100,10 +3119,10 @@
     // Delete case function (also deletes associated family user)
     async function deleteCase(caseId, caseName) {
       showConfirmModal(
-        'Delete Case',
-        `Are you sure you want to delete the case for "${caseName}"?\n\nThis will permanently delete the associated family member's account and all related data.\n\nThis action cannot be undone.`,
+        'Delete tribute',
+        `Are you sure you want to delete the tribute for "${caseName}"?\n\nThis will permanently delete the associated family member's account and all related data.\n\nThis action cannot be undone.`,
         () => performDeleteCase(caseId, caseName),
-        'Yes, Delete Case'
+        'Yes, delete tribute'
       );
     }
     
@@ -3143,7 +3162,7 @@
             },
             body: JSON.stringify({
               user_id: familyUserId,
-              reason: 'Case deleted by director'
+              reason: 'Tribute deleted by director'
             })
           });
           
@@ -3152,13 +3171,13 @@
           if (!response.ok || !result.success) {
             console.warn('Failed to delete family user:', result.error);
             // Don't throw error - case is already deleted, this is cleanup
-            showToast(`Case deleted, but failed to delete family account: ${result.error}`, true);
+            showToast(`Tribute deleted, but failed to delete family account: ${result.error}`, true);
           } else {
             console.log('✅ Family user deleted successfully');
-            showToast(`Case and family account for "${caseName}" deleted successfully`);
+            showToast(`Tribute and family account for "${caseName}" deleted successfully`);
           }
         } else {
-          showToast(`Case for "${caseName}" deleted successfully`);
+          showToast(`Tribute for "${caseName}" deleted successfully`);
         }
         
         closeCaseModal();
@@ -3166,7 +3185,7 @@
         
       } catch (error) {
         console.error('Error deleting case:', error);
-        showToast(`Failed to delete case: ${error.message}`, true);
+        showToast(`Failed to delete tribute: ${error.message}`, true);
       }
     }
     
@@ -3323,7 +3342,7 @@
         console.log('Response Result:', result);
         
         if (!response.ok || !result.success) {
-          throw new Error(result.error || 'Failed to create case');
+          throw new Error(result.error || 'Failed to open the tribute');
         }
         
         console.log('✅ Case created successfully:', result.data.case_id);
@@ -3384,7 +3403,7 @@
       const email = document.getElementById('family-email').value;
       const name = document.getElementById('family-name').value;
       const phone = document.getElementById('family-phone').value;
-      const caseId = document.getElementById('case-id').value;
+      let caseId = document.getElementById('case-id').value.trim();
       
       const inviteBtn = document.getElementById('invite-family-btn');
       const successBox = document.getElementById('family-success-box');
@@ -3401,6 +3420,21 @@
       try {
         // Get valid session (will auto-refresh if needed)
         const session = await getValidSession();
+        
+        // The reference shown to directors is the case_number (e.g. MEM-2026-0001).
+        // The invite service needs the UUID, so resolve it when a reference was pasted.
+        const looksLikeUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId);
+        if (!looksLikeUuid) {
+          const { data: refRow, error: refError } = await supabaseClient
+            .from('cases')
+            .select('id')
+            .eq('case_number', caseId.toUpperCase())
+            .maybeSingle();
+          if (refError || !refRow) {
+            throw new Error('No tribute found with that reference. Copy it from the tribute details and try again.');
+          }
+          caseId = refRow.id;
+        }
         
         const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-family`, {
           method: 'POST',
@@ -3601,7 +3635,7 @@
       const errorBox = document.getElementById('cases-error-box');
       
       errorBox.style.display = 'none';
-      casesList.innerHTML = '<p style="color: #32343a; opacity: 0.6;">Loading cases...</p>';
+      casesList.innerHTML = '<p style="color: #32343a; opacity: 0.6;">Loading tributes...</p>';
       
       try {
         const { data: cases, error } = await supabaseClient
@@ -3636,7 +3670,7 @@
         renderCases(allCases);
         
       } catch (error) {
-        errorBox.textContent = `Error loading cases: ${error.message}`;
+        errorBox.textContent = `Error loading tributes: ${error.message}`;
         errorBox.style.display = 'block';
         casesList.innerHTML = '';
       }
@@ -3705,8 +3739,8 @@
                 <polyline points="10,9 9,9 8,9"></polyline>
               </svg>
             </div>
-            <h3 class="case-empty-state-title" data-i18n="director.noCases">No cases found</h3>
-            <p class="case-empty-state-description" data-i18n="director.noCasesDesc">Create your first case to get started!</p>
+            <h3 class="case-empty-state-title" data-i18n="director.noCases">No tributes yet</h3>
+            <p class="case-empty-state-description" data-i18n="director.noCasesDesc">Open your first tribute to get started.</p>
           </div>
         `;
         i18n.translatePage();
@@ -3760,9 +3794,10 @@
       
       const term = searchTerm.toLowerCase().trim();
       const filtered = allCases.filter(c => {
-        const name = c.deceased_name.toLowerCase();
-        const caseId = c.id.toLowerCase();
-        return name.includes(term) || caseId.includes(term);
+        const name = (c.deceased_name || '').toLowerCase();
+        const caseId = (c.id || '').toLowerCase();
+        const reference = (c.case_number || '').toLowerCase();
+        return name.includes(term) || caseId.includes(term) || reference.includes(term);
       });
       
       renderCases(filtered);

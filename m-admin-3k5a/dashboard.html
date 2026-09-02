@@ -2707,14 +2707,6 @@
         <span>Organizations</span>
       </div>
 
-      <div class="sidebar-nav-item" onclick="switchTab('invite-director')">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          <path d="M19 13h-2v-2h-2v2h-2v2h2v2h2v-2h2z" fill="currentColor" opacity="0.7"/>
-        </svg>
-        <span>Invite Director</span>
-      </div>
-
       <div class="sidebar-nav-item" onclick="switchTab('invite-qc')">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -2806,7 +2798,6 @@
       <!-- Tabs (Hidden - controlled by sidebar) -->
       <div class="tab-container" style="display: none;">
         <button class="tab-btn active" onclick="switchTab('organizations')">Organizations</button>
-        <button class="tab-btn" onclick="switchTab('invite-director')">Invite Director</button>
       </div>
 
     <!-- All Cases Tab -->
@@ -2987,36 +2978,36 @@
             </div>
           </div>
           
+          <div class="card-header" style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(67,100,129,.18);">
+            <h2 class="card-title" style="font-size:1.15rem;">First Director</h2>
+            <p class="card-description">The director receives their invitation the moment the funeral home is created.</p>
+          </div>
+          <div class="form-group">
+            <label for="org-director-name" class="field-label">Director Name*</label>
+            <input class="text-field w-input" type="text" id="org-director-name" placeholder="Jay Rodriguez" autocomplete="off" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="org-director-email" class="field-label">Director Email*</label>
+              <input class="text-field w-input" type="email" id="org-director-email" placeholder="jay@funeralhome.com" autocomplete="off" required>
+            </div>
+            <div class="form-group">
+              <label for="org-director-phone" class="field-label">Director Phone <span class="optional">(optional)</span></label>
+              <input class="text-field w-input" type="tel" id="org-director-phone" autocomplete="off">
+            </div>
+          </div>
+        
           <div class="form-button" style="margin-top: 20px;">
             <button type="submit" class="button-primary w-button" id="create-org-btn">
               Create Funeral Home and Invite Director
             </button>
           </div>
-        
-          <div class="card-header" style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(67,100,129,.18);">
-            <h2 class="card-title" style="font-size:1.15rem;">First Director</h2>
-            <p class="card-description">Invited the moment the funeral home is created. Leave blank to add directors later.</p>
-          </div>
-          <div class="form-group">
-            <label for="org-director-name">Director Name</label>
-            <input class="text-field w-input" type="text" id="org-director-name" placeholder="Jay Rodriguez" autocomplete="off">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="org-director-email">Director Email</label>
-              <input class="text-field w-input" type="email" id="org-director-email" placeholder="jay@funeralhome.com" autocomplete="off">
-            </div>
-            <div class="form-group">
-              <label for="org-director-phone">Director Phone <span class="optional">(optional)</span></label>
-              <input class="text-field w-input" type="tel" id="org-director-phone" autocomplete="off">
-            </div>
-          </div>
-</form>
+        </form>
         
         <!-- Success Box -->
         <div id="org-success-box" class="success-box">
-          <h3><span class="success-icon"></span>Funeral home created</h3>
-          <p>The funeral home is ready. If you added a director, their invitation went out in the same step.</p>
+          <h3><span class="success-icon"></span><span id="org-success-title">Funeral home created and director invited</span></h3>
+          <p id="org-success-lead">The funeral home is ready and the director has been emailed their invitation. Their sign-in details are below if they need them read aloud.</p>
           
           <div class="credential-box">
             <div class="credential-label">Organization Name</div>
@@ -3026,19 +3017,24 @@
           <div class="credential-box">
             <div class="credential-label">Funeral home reference</div>
             <div class="credential-value" id="created-org-id"></div>
+            <button class="copy-btn" onclick="copyToClipboard('created-org-id')">Copy</button>
+          </div>
+          
           <div id="org-director-block" style="display:none;">
-            <p style="margin-top:14px;">The first director has been invited. Their sign-in details:</p>
             <div class="credential-box">
               <div class="credential-label">Director Email</div>
               <div class="credential-value" id="org-director-created-email"></div>
+              <button class="copy-btn" onclick="copyToClipboard('org-director-created-email')">Copy</button>
             </div>
             <div class="credential-box">
               <div class="credential-label">Temporary Password</div>
               <div class="credential-value" id="org-director-created-password"></div>
+              <button class="copy-btn" onclick="copyToClipboard('org-director-created-password')">Copy</button>
             </div>
-            <p id="org-director-note" style="margin-top:8px;color:#565a63;font-size:.92rem;"></p>
           </div>
-            <button class="copy-btn" onclick="copyToClipboard('created-org-id')">Copy ID</button>
+          <p id="org-director-note" style="margin-top:8px;color:#565a63;font-size:.92rem;"></p>
+          <div id="org-director-retry" style="display:none;margin-top:10px;">
+            <button type="button" class="button-primary w-button" id="org-director-retry-btn" onclick="retryDirectorInvite()">Retry director invitation</button>
           </div>
         </div>
         
@@ -3057,93 +3053,6 @@
         
         <div id="org-list-error-box" class="error-box"></div>
       </div>
-    </div>
-
-    <!-- Invite Director Tab -->
-    <div id="invite-director-tab" class="tab-content">
-    <!-- Invite Director Section -->
-    <div class="invite-section">
-      <h2 class="section-title">Invite Director</h2>
-      <p class="paragraph">Create a new Director account for a funeral home. The credentials will be displayed below for you to share securely.</p>
-      
-      <form id="invite-form">
-        <div class="form-row">
-          <div>
-            <label for="director-email" class="field-label">Email Address*</label>
-            <input 
-              class="text-field w-input" 
-              type="email" 
-              id="director-email" 
-              placeholder="director@funeralhome.com" 
-              required>
-          </div>
-          
-          <div>
-            <label for="director-name" class="field-label">Full Name*</label>
-            <input 
-              class="text-field w-input" 
-              type="text" 
-              id="director-name" 
-              placeholder="John Director" 
-              required>
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div>
-            <label for="director-phone" class="field-label">Phone Number</label>
-            <input 
-              class="text-field w-input" 
-              type="tel" 
-              id="director-phone" 
-              placeholder="+1-555-0123">
-          </div>
-          
-          <div>
-            <label for="org-id" class="field-label">Funeral home reference*</label>
-            <input 
-              class="text-field w-input" 
-              type="text" 
-              id="org-id" 
-              placeholder="00000000-0000-0000-0000-000000000001" 
-              required>
-          </div>
-        </div>
-        
-        <div class="form-button" style="margin-top: 20px;">
-          <button type="submit" class="button-primary w-button" id="invite-btn">
-            Create Director Account
-          </button>
-        </div>
-      </form>
-      
-      <!-- Success Box -->
-      <div id="success-box" class="success-box">
-        <h3><span class="success-icon"></span>Director Account Created Successfully!</h3>
-        <p>Share these credentials with the Director securely. They should change their password after first login.</p>
-        
-        <div class="credential-box">
-          <div class="credential-label">Email Address</div>
-          <div class="credential-value" id="created-email"></div>
-          <button class="copy-btn" onclick="copyToClipboard('created-email')">Copy</button>
-        </div>
-        
-        <div class="credential-box">
-          <div class="credential-label">Temporary Password</div>
-          <div class="credential-value" id="created-password"></div>
-          <button class="copy-btn" onclick="copyToClipboard('created-password')">Copy</button>
-        </div>
-        
-        <div class="credential-box">
-          <div class="credential-label">Login URL</div>
-          <div class="credential-value">https://memorio.ai/m-director-9m6z/login.html</div>
-          <button class="copy-btn" onclick="copyToClipboard('login-url')">Copy</button>
-        </div>
-      </div>
-      
-      <!-- Error Box -->
-      <div id="error-box" class="error-box"></div>
-    </div>
     </div>
 
     <!-- Invite QC Tab -->
@@ -3702,73 +3611,6 @@
       return currentSession;
     }
     
-    // Handle invite form submission
-    document.getElementById('invite-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById('director-email').value;
-      const name = document.getElementById('director-name').value;
-      const phone = document.getElementById('director-phone').value;
-      const orgId = document.getElementById('org-id').value;
-      
-      const inviteBtn = document.getElementById('invite-btn');
-      const successBox = document.getElementById('success-box');
-      const errorBox = document.getElementById('error-box');
-      const inviteSection = document.querySelector('.invite-section');
-      
-      // Hide previous messages
-      successBox.style.display = 'none';
-      errorBox.style.display = 'none';
-      
-      // Disable form during submission
-      inviteSection.classList.add('loading');
-      inviteBtn.disabled = true;
-      inviteBtn.textContent = 'Creating account...';
-      
-      try {
-        // Get valid session (will auto-refresh if needed)
-        const session = await getValidSession();
-        
-        // Call invite-director Edge Function
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/invite-director`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON_KEY
-          },
-          body: JSON.stringify({
-            email,
-            name,
-            org_id: orgId,
-            phone: phone || undefined
-          })
-        });
-        
-        const result = await response.json();
-        
-        if (!response.ok || !result.success) {
-          throw new Error(result.error || 'Failed to create director account');
-        }
-        
-        // Display success with credentials
-        document.getElementById('created-email').textContent = result.data.email;
-        document.getElementById('created-password').textContent = result.data.temp_password;
-        successBox.style.display = 'block';
-        
-        // Reset form
-        document.getElementById('invite-form').reset();
-        
-      } catch (error) {
-        errorBox.textContent = `Error: ${error.message}`;
-        errorBox.style.display = 'block';
-      } finally {
-        inviteSection.classList.remove('loading');
-        inviteBtn.disabled = false;
-        inviteBtn.textContent = 'Create Director Account';
-      }
-    });
-    
     // Handle invite QC form submission
     document.getElementById('invite-qc-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -3852,7 +3694,6 @@
         'all-cases': 'All Tributes',
         'manage-accounts': 'Manage Accounts',
         'organizations': 'Organizations',
-        'invite-director': 'Invite Director',
         'invite-qc': 'Invite QC User'
       };
       document.getElementById('topbar-page-title').textContent = titles[tabName] || 'Dashboard';
@@ -3915,6 +3756,61 @@
     
     // Make switchTab global
     window.switchTab = switchTab;
+    
+    // The director invitation is part of creating a funeral home. If the invite
+    // step fails after the organization row exists, the admin can retry it here
+    // without creating a duplicate funeral home.
+    let pendingDirectorInvite = null;
+    
+    async function inviteFirstDirector(invite) {
+      const dBlock = document.getElementById('org-director-block');
+      const note = document.getElementById('org-director-note');
+      const retry = document.getElementById('org-director-retry');
+      const title = document.getElementById('org-success-title');
+      const lead = document.getElementById('org-success-lead');
+      dBlock.style.display = 'none';
+      retry.style.display = 'none';
+      note.textContent = '';
+      try {
+        const session = await getValidSession();
+        const inv = await fetch(`${SUPABASE_URL}/functions/v1/invite-director`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+          body: JSON.stringify({ email: invite.email, name: invite.name, phone: invite.phone || undefined, org_id: invite.orgId })
+        });
+        const invResult = await inv.json();
+        if (!inv.ok || !invResult.success) throw new Error(invResult.error || 'Director invitation failed');
+        document.getElementById('org-director-created-email').textContent = invResult.data.email;
+        document.getElementById('org-director-created-password').textContent = invResult.data.temp_password || '';
+        title.textContent = 'Funeral home created and director invited';
+        lead.textContent = 'The funeral home is ready and the director has been emailed their invitation. Their sign-in details are below if they need them read aloud.';
+        note.textContent = invResult.data.email_sent ? 'Invitation email delivered.' : 'The email could not be sent; please share these details with the director directly.';
+        dBlock.style.display = 'block';
+        pendingDirectorInvite = null;
+        return true;
+      } catch (invErr) {
+        console.error('Director invite failed:', invErr);
+        title.textContent = 'Funeral home created';
+        lead.textContent = 'The funeral home is ready, but the director invitation did not go out.';
+        note.textContent = 'The director invitation failed: ' + invErr.message + '. You can retry it below without creating the funeral home again.';
+        retry.style.display = 'block';
+        return false;
+      }
+    }
+    
+    async function retryDirectorInvite() {
+      if (!pendingDirectorInvite) return;
+      const btn = document.getElementById('org-director-retry-btn');
+      btn.disabled = true;
+      btn.textContent = 'Inviting director...';
+      try {
+        await inviteFirstDirector(pendingDirectorInvite);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Retry director invitation';
+      }
+    }
+    window.retryDirectorInvite = retryDirectorInvite;
     
     // Handle create organization form submission
     document.getElementById('create-org-form').addEventListener('submit', async (e) => {
@@ -3979,31 +3875,12 @@
         document.getElementById('created-org-id').textContent = data.id;
 
         // One action: invite the first director for this funeral home
-        const dBlock = document.getElementById('org-director-block');
-        dBlock.style.display = 'none';
         const dName = document.getElementById('org-director-name').value.trim();
         const dEmail = document.getElementById('org-director-email').value.trim();
         const dPhone = document.getElementById('org-director-phone').value.trim();
-        if (dName && dEmail) {
-          createBtn.textContent = 'Inviting director...';
-          try {
-            const { data: { session: s2 } } = await supabaseClient.auth.getSession();
-            const inv = await fetch(`${SUPABASE_URL}/functions/v1/invite-director`, {
-              method: 'POST',
-              headers: { 'Authorization': `Bearer ${s2.access_token}`, 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
-              body: JSON.stringify({ email: dEmail, name: dName, phone: dPhone || undefined, org_id: data.id })
-            });
-            const invResult = await inv.json();
-            if (!inv.ok || !invResult.success) throw new Error(invResult.error || 'Director invitation failed');
-            document.getElementById('org-director-created-email').textContent = invResult.data.email;
-            document.getElementById('org-director-created-password').textContent = invResult.data.temp_password || '';
-            document.getElementById('org-director-note').textContent = invResult.data.email_sent ? 'Invitation email delivered.' : 'Email could not be sent; share these details directly.';
-            dBlock.style.display = 'block';
-          } catch (invErr) {
-            document.getElementById('org-director-note').textContent = 'Funeral home created, but the director invitation failed: ' + invErr.message + '. Use Invite Director.';
-            dBlock.style.display = 'block';
-          }
-        }
+        pendingDirectorInvite = { orgId: data.id, name: dName, email: dEmail, phone: dPhone };
+        createBtn.textContent = 'Inviting director...';
+        await inviteFirstDirector(pendingDirectorInvite);
         successBox.style.display = 'block';
         
         // Auto-scroll to the success box (Organization Details)
@@ -4023,7 +3900,7 @@
       } finally {
         section.classList.remove('loading');
         createBtn.disabled = false;
-        createBtn.textContent = 'Create Funeral Home';
+        createBtn.textContent = 'Create Funeral Home and Invite Director';
       }
     });
     
@@ -4751,6 +4628,21 @@
         
         console.log(`✅ Loaded ${cases?.length || 0} cases`);
         
+        // The reference (case_number) lives on the cases table; the view may not
+        // expose it yet, so fetch it directly and merge when missing.
+        const referenceById = {};
+        if ((cases || []).some(c => !c.case_number)) {
+          try {
+            const { data: refRows } = await supabaseClient
+              .from('cases')
+              .select('id, case_number');
+            (refRows || []).forEach(r => { if (r.case_number) referenceById[r.id] = r.case_number; });
+          } catch (refErr) {
+            console.warn('Reference lookup skipped:', refErr);
+          }
+        }
+        (cases || []).forEach(c => { if (!c.case_number && referenceById[c.id]) c.case_number = referenceById[c.id]; });
+        
         // Get video submissions with QC reviewer info from view (bypasses RLS)
         const { data: submissions, error: submissionsError } = await supabaseClient
           .from('admin_video_submissions_view')
@@ -5037,6 +4929,12 @@
           </div>
           <div class="case-card-org">${esc(orgName)}</div>
           <div class="case-card-meta">
+            ${caseData.case_number ? `
+            <div class="case-card-meta-row">
+              <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></span>
+              <span>Reference ${esc(caseData.case_number)}</span>
+            </div>
+            ` : ''}
             <div class="case-card-meta-row">
               <span class="meta-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
               <span>Family: ${esc(familyName)}</span>
