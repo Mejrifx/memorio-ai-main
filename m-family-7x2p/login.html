@@ -154,6 +154,12 @@
       box-shadow: 0 0 0 3px rgba(67, 100, 129, 0.12);
     }
 
+    .or-row { text-align:center; color:#565a63; font-size:.9rem; margin:18px 0 10px; }
+    .btn-link-signin { width:100%; padding:13px; background:transparent; color:var(--slate); border:1.5px solid var(--slate); border-radius:999px; font-family:inherit; font-weight:600; font-size:1rem; cursor:pointer; min-height:48px; }
+    .btn-link-signin:hover { background: rgba(67,100,129,.07); }
+    .btn-link-signin:disabled { opacity:.6; cursor:default; }
+    .link-status { margin-top:10px; text-align:center; font-size:.92rem; color:#1d6b45; min-height:1.2em; }
+    .link-status.err { color:#a33b2e; }
     .btn-login {
       width: 100%;
       padding: 14px;
@@ -272,6 +278,10 @@
           Sign In
         </button>
       </form>
+
+      <div class="or-row"><span data-i18n="family.orLine">or, no password needed</span></div>
+      <button type="button" class="btn-link-signin" id="magicLinkBtn" data-i18n="family.emailLink">Email me a sign-in link</button>
+      <p class="link-status" id="magicLinkStatus" aria-live="polite"></p>
       
       <p class="help-text">
         <span data-i18n="family.noCredentials">Don't have login credentials?</span><br>
@@ -393,6 +403,20 @@
         if (f) f.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
       });
     })();
+
+    // Passwordless option: Supabase sends a one-time sign-in link; landing back on this page
+    // with the token signs the family in (detectSessionInUrl) and the redirect above takes over.
+    document.getElementById('magicLinkBtn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value.trim();
+      const status = document.getElementById('magicLinkStatus');
+      const btn = document.getElementById('magicLinkBtn');
+      status.className = 'link-status';
+      if (!email) { status.className = 'link-status err'; status.textContent = i18n.t('family.enterEmailFirst') || 'Enter your email above first.'; document.getElementById('email').focus(); return; }
+      btn.disabled = true;
+      const { error } = await supabaseClient.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: window.location.origin + '/family/login' } });
+      if (error) { status.className = 'link-status err'; status.textContent = (i18n.t('family.linkError') || 'We could not send a link to that address.') + ' ' + (error.message || ''); btn.disabled = false; return; }
+      status.textContent = i18n.t('family.linkSent') || 'Check your email. The sign-in link is on its way.';
+    });
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();

@@ -1428,7 +1428,6 @@
       
       <nav class="topbar-nav">
         <button class="topbar-nav-item active" onclick="switchSection('create-case')" data-i18n="director.createCase">Create Case</button>
-        <button class="topbar-nav-item" onclick="switchSection('invite-family')" data-i18n="director.inviteFamily">Re-send Family Invite</button>
         <button class="topbar-nav-item" onclick="switchSection('my-cases')" data-i18n="director.myCases">My Cases</button>
       </nav>
     </div>
@@ -1638,18 +1637,20 @@
               <h2 class="card-title" style="font-size:1.25rem;">Family Contact</h2>
               <p class="card-description">The person who will receive the secure link and share photos and memories. Invited the moment the tribute is opened.</p>
             </div>
+            <div class="form-row-single">
             <div class="form-group">
-              <label for="new-family-name">Family Contact Name</label>
-              <input type="text" id="new-family-name" placeholder="Maria Fermin" autocomplete="off" required>
+              <label for="new-family-name" class="label">Family Contact Name</label>
+              <input class="input" type="text" id="new-family-name" placeholder="Maria Fermin" autocomplete="off" required>
+            </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label for="new-family-email">Family Email</label>
-                <input type="email" id="new-family-email" placeholder="family@example.com" autocomplete="off" required>
+                <label for="new-family-email" class="label">Family Email</label>
+                <input class="input" type="email" id="new-family-email" placeholder="family@example.com" autocomplete="off" required>
               </div>
               <div class="form-group">
-                <label for="new-family-phone">Family Phone <span class="optional">(optional)</span></label>
-                <input type="tel" id="new-family-phone" placeholder="(305) 555-0100" autocomplete="off">
+                <label for="new-family-phone" class="label">Family Phone <span class="optional">(optional)</span></label>
+                <input class="input" type="tel" id="new-family-phone" placeholder="(305) 555-0100" autocomplete="off">
               </div>
             </div>
 </form>

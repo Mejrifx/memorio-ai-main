@@ -1761,3 +1761,6 @@ Object.assign(i18n.translations.es, {
   "director.caseCreatedSuccess": "Tributo abierto",
   "director.caseCreatedDesc": "Su número de referencia está abajo. La invitación a la familia se envió en el mismo paso."
 });
+
+Object.assign(i18n.translations.en, {"family.orLine":"or, no password needed","family.emailLink":"Email me a sign-in link","family.enterEmailFirst":"Enter your email above first.","family.linkError":"We could not send a link to that address.","family.linkSent":"Check your email. The sign-in link is on its way."});
+Object.assign(i18n.translations.es, {"family.orLine":"o, sin contraseña","family.emailLink":"Envíenme un enlace para entrar","family.enterEmailFirst":"Primero escriba su correo arriba.","family.linkError":"No pudimos enviar un enlace a esa dirección.","family.linkSent":"Revise su correo. El enlace para entrar va en camino."});
