@@ -1246,7 +1246,31 @@
          * If not, redirect to family login page
          * If yes, load their assigned case
          */
+        // Preview mode: /family/form?preview=1 shows the form with sample data and no sign-in.
+        // Nothing can be saved (no session means every write is refused by RLS, and the submit
+        // handler blocks first). For demos, screenshots, and checking copy.
+        const PREVIEW_MODE = new URLSearchParams(window.location.search).get('preview') === '1';
+        function enterPreviewMode() {
+            currentUser = { id: 'preview', email: 'preview@memorio.ai' };
+            currentCase = {
+                id: 'preview', deceased_name: 'Manny Fermin', status: 'waiting_on_family',
+                organizations: { name: 'Preview Funeral Home' },
+                metadata: { gender: 'male', date_of_birth: '1966-03-14', date_of_death: '2022-03-17',
+                    city_of_birth: 'Miami', state_of_birth: 'FL', country_of_birth: 'United States',
+                    city_of_death: 'Miami', state_of_death: 'FL', country_of_death: 'United States', service_date: '2022-03-24' }
+            };
+            hideLoginModal();
+            const banner = document.createElement('div');
+            banner.id = 'preview-banner';
+            banner.setAttribute('style', 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#2c4459;color:#f2ede7;font-family:"Public Sans",Arial,sans-serif;font-size:14px;text-align:center;padding:10px 16px;');
+            banner.textContent = 'Preview mode: this is the family intake form with sample details. Nothing you enter here is saved.';
+            document.body.prepend(banner);
+            try { populateDeceasedName(); } catch (e) { console.warn('preview populate skipped', e); }
+            return true;
+        }
+
         async function checkAuthentication() {
+            if (PREVIEW_MODE) return enterPreviewMode();
             try {
                 // Get current session
                 const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
@@ -2747,6 +2771,10 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (PREVIEW_MODE) {
+                    alert('Preview mode: the form is not connected to a real tribute, so nothing was submitted.');
+                    return;
+                }
                 console.log('Form submitted - our handler');
                 
                 // Ensure date fields are combined before submission

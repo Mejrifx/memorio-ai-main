@@ -1739,3 +1739,25 @@ Object.assign(i18n.translations.es, {
   "family.upload.closedByYou": "Fotos completas",
   "family.upload.closedByYouDesc": "Nos indicó que las fotos están completas. Su video tributo está en producción. Aún puede ver todas sus fotos abajo."
 });
+
+// ===== Director portal: one-action tribute + family invite (2026-09-01) =====
+Object.assign(i18n.translations.en, {
+  "director.createCase": "New Tribute",
+  "director.createCaseDesc": "Open a tribute and invite the family in one step. About two minutes.",
+  "director.createCaseBtn": "Open Tribute and Invite Family",
+  "director.inviteFamily": "Re-send Family Invite",
+  "director.inviteFamilyTitle": "Re-send a Family Invite",
+  "director.myCases": "My Tributes",
+  "director.caseCreatedSuccess": "Tribute opened",
+  "director.caseCreatedDesc": "Your reference number is below. The family invitation was sent in the same step."
+});
+Object.assign(i18n.translations.es, {
+  "director.createCase": "Nuevo Tributo",
+  "director.createCaseDesc": "Abra un tributo e invite a la familia en un solo paso. Unos dos minutos.",
+  "director.createCaseBtn": "Abrir Tributo e Invitar a la Familia",
+  "director.inviteFamily": "Reenviar Invitación",
+  "director.inviteFamilyTitle": "Reenviar una Invitación a la Familia",
+  "director.myCases": "Mis Tributos",
+  "director.caseCreatedSuccess": "Tributo abierto",
+  "director.caseCreatedDesc": "Su número de referencia está abajo. La invitación a la familia se envió en el mismo paso."
+});

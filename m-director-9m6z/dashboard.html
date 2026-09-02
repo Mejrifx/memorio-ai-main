@@ -1428,7 +1428,7 @@
       
       <nav class="topbar-nav">
         <button class="topbar-nav-item active" onclick="switchSection('create-case')" data-i18n="director.createCase">Create Case</button>
-        <button class="topbar-nav-item" onclick="switchSection('invite-family')" data-i18n="director.inviteFamily">Invite Family</button>
+        <button class="topbar-nav-item" onclick="switchSection('invite-family')" data-i18n="director.inviteFamily">Re-send Family Invite</button>
         <button class="topbar-nav-item" onclick="switchSection('my-cases')" data-i18n="director.myCases">My Cases</button>
       </nav>
     </div>
@@ -1484,8 +1484,8 @@
     <!-- CREATE CASE SECTION -->
     <div id="create-case-section" class="content-section active">
       <div class="page-header">
-        <h1 class="page-title" data-i18n="director.createCase">Create New Case</h1>
-        <p class="page-description" data-i18n="director.createCaseDesc">Start a new memorial tribute case by providing the loved one's information.</p>
+        <h1 class="page-title" data-i18n="director.createCase">New Tribute</h1>
+        <p class="page-description" data-i18n="director.createCaseDesc">Open a tribute and invite the family in one step. About two minutes.</p>
       </div>
       
       <div class="card">
@@ -1633,12 +1633,31 @@
                 required>
             </div>
           </div>
-        </form>
+        
+            <div class="card-header" style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(67,100,129,.18);">
+              <h2 class="card-title" style="font-size:1.25rem;">Family Contact</h2>
+              <p class="card-description">The person who will receive the secure link and share photos and memories. Invited the moment the tribute is opened.</p>
+            </div>
+            <div class="form-group">
+              <label for="new-family-name">Family Contact Name</label>
+              <input type="text" id="new-family-name" placeholder="Maria Fermin" autocomplete="off" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="new-family-email">Family Email</label>
+                <input type="email" id="new-family-email" placeholder="family@example.com" autocomplete="off" required>
+              </div>
+              <div class="form-group">
+                <label for="new-family-phone">Family Phone <span class="optional">(optional)</span></label>
+                <input type="tel" id="new-family-phone" placeholder="(305) 555-0100" autocomplete="off">
+              </div>
+            </div>
+</form>
       </div>
       
       <div class="card-footer">
         <button type="submit" form="create-case-form" class="btn btn-primary btn-lg" id="create-case-btn" data-i18n="director.createCaseBtn">
-          CREATE CASE
+          Open Tribute and Invite Family
         </button>
       </div>
     </div>
@@ -1653,6 +1672,20 @@
           <div class="credential-value" id="created-case-id"></div>
           <button class="copy-btn" onclick="copyToClipboard('created-case-id')" data-i18n="director.copyBtn">Copy</button>
         </div>
+        <div id="created-family-block" style="display:none;">
+          <p style="margin-top:18px;">The family has been emailed their invitation. If they need it read to them, these are their sign-in details:</p>
+          <div class="credential-box">
+            <div class="credential-label">Family Email</div>
+            <div class="credential-value" id="created-family-email"></div>
+            <button class="copy-btn" onclick="copyToClipboard('created-family-email')">Copy</button>
+          </div>
+          <div class="credential-box">
+            <div class="credential-label">Temporary Password</div>
+            <div class="credential-value" id="created-family-password"></div>
+            <button class="copy-btn" onclick="copyToClipboard('created-family-password')">Copy</button>
+          </div>
+          <p id="created-family-note" style="margin-top:10px;color:#565a63;font-size:.92rem;"></p>
+        </div>
       </div>
       
       <!-- Error Message -->
@@ -1662,7 +1695,7 @@
     <!-- INVITE FAMILY SECTION -->
     <div id="invite-family-section" class="content-section">
       <div class="page-header">
-        <h1 class="page-title" data-i18n="director.inviteFamilyTitle">Invite Family Member</h1>
+        <h1 class="page-title" data-i18n="director.inviteFamilyTitle">Re-send a Family Invite</h1>
         <p class="page-description" data-i18n="director.inviteFamilyDesc">Send a secure invitation to a family member to complete the tribute form for their case.</p>
       </div>
       
@@ -3247,7 +3280,7 @@
       
       if (section) section.classList.add('loading');
       createBtn.disabled = true;
-      createBtn.textContent = 'CREATING CASE...';
+      createBtn.textContent = 'Opening tribute...';
       
       try {
         // Get valid session (will auto-refresh if needed)
@@ -3277,6 +3310,33 @@
         
         console.log('✅ Case created successfully:', result.data.case_id);
         document.getElementById('created-case-id').textContent = result.data.case_id;
+
+        // One action: invite the family for this tribute right away
+        const famBlock = document.getElementById('created-family-block');
+        famBlock.style.display = 'none';
+        const famEmail = document.getElementById('new-family-email').value.trim();
+        const famName = document.getElementById('new-family-name').value.trim();
+        const famPhone = document.getElementById('new-family-phone').value.trim();
+        if (famEmail && famName) {
+          createBtn.textContent = 'Inviting family...';
+          try {
+            const inv = await fetch(`${SUPABASE_URL}/functions/v1/invite-family`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY },
+              body: JSON.stringify({ email: famEmail, name: famName, phone: famPhone || undefined, case_id: result.data.case_id })
+            });
+            const invResult = await inv.json();
+            if (!inv.ok || !invResult.success) throw new Error(invResult.error || 'Family invitation failed');
+            document.getElementById('created-family-email').textContent = invResult.data.email;
+            document.getElementById('created-family-password').textContent = invResult.data.temp_password || '';
+            document.getElementById('created-family-note').textContent = invResult.data.email_sent ? 'Invitation email delivered.' : 'The email could not be sent; please share these details with the family directly.';
+            famBlock.style.display = 'block';
+          } catch (invErr) {
+            console.error('Family invite failed:', invErr);
+            document.getElementById('created-family-note').textContent = 'The tribute was opened but the family invitation failed: ' + invErr.message + '. Use Re-send Family Invite.';
+            famBlock.style.display = 'block';
+          }
+        }
         successBox.style.display = 'block';
         setTimeout(() => successBox.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
         document.getElementById('create-case-form').reset();
@@ -3295,7 +3355,7 @@
       } finally {
         section.classList.remove('loading');
         createBtn.disabled = false;
-        createBtn.textContent = 'CREATE CASE';
+        createBtn.textContent = 'Open Tribute and Invite Family';
       }
     });
     
