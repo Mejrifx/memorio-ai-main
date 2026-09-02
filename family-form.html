@@ -1260,6 +1260,9 @@
                     city_of_death: 'Miami', state_of_death: 'FL', country_of_death: 'United States', service_date: '2022-03-24' }
             };
             hideLoginModal();
+            const formContent = document.querySelector('.form-container, .form-wrapper, .w-form');
+            if (formContent) formContent.classList.add('show');
+            try { initFamilyPortalEnhancements(); } catch (e) { console.warn('preview enhancements skipped', e); }
             const banner = document.createElement('div');
             banner.id = 'preview-banner';
             banner.setAttribute('style', 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#2c4459;color:#f2ede7;font-family:"Public Sans",Arial,sans-serif;font-size:14px;text-align:center;padding:10px 16px;');
